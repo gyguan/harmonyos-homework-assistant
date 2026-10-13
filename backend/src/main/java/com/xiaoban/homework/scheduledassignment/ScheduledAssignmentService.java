@@ -72,7 +72,7 @@ public class ScheduledAssignmentService {
     plan.familyId = familyId;
     plan.studentId = studentId;
     plan.status = "ENABLED";
-    applyPlanInput(plan, input.planType(), input.name(), input.scheduleType(),
+    applyPlanInput(plan, input.planType(), input.subjectCode(), input.name(), input.scheduleType(),
         input.timeOfDay(), input.weekdays(), input.startDate(), input.endDate(), null);
     ensureVoicePlanUnique(plan);
     plan.createdAt = now;
@@ -94,7 +94,7 @@ public class ScheduledAssignmentService {
       throw new ApiExceptions.Conflict("定时计划已在其他设备更新，请刷新后重试");
     }
     students.requireOwnedForUpdate(familyId, plan.studentId);
-    applyPlanInput(plan, input.planType(), input.name(), input.scheduleType(),
+    applyPlanInput(plan, input.planType(), input.subjectCode(), input.name(), input.scheduleType(),
         input.timeOfDay(), input.weekdays(), input.startDate(), input.endDate(), plan.id);
     ensureVoicePlanUnique(plan);
     if ("ENDED".equals(plan.status)) plan.status = "ENABLED";
@@ -230,9 +230,10 @@ public class ScheduledAssignmentService {
   }
 
   private void applyPlanInput(ScheduledAssignmentPlanEntity plan,
-      String planType, String name, String scheduleType, String timeOfDay,
+      String planType, String subjectCode, String name, String scheduleType, String timeOfDay,
       List<String> weekdays, String startDate, String endDate, UUID selfId) {
     plan.planType = planType(planType);
+    plan.subjectCode = subjectCode(subjectCode);
     plan.name = name.trim();
     plan.scheduleType = scheduleType(scheduleType);
     plan.scheduleTime = time(timeOfDay, "创建时间");
@@ -259,8 +260,8 @@ public class ScheduledAssignmentService {
       template.createdAt = now;
     }
     template.assignmentType = assignmentType(input.assignmentType());
-    template.subject = input.subject().trim();
-    template.subjectCode = input.subjectCode().trim().toUpperCase(Locale.ROOT);
+    template.subject = subjectDisplay(plan.subjectCode);
+    template.subjectCode = plan.subjectCode;
     template.title = input.title().trim();
     template.instruction = input.instruction().trim();
     template.expectedMinutes = expectedMinutes(input.expectedMinutes());
@@ -299,7 +300,7 @@ public class ScheduledAssignmentService {
     ScheduledAssignmentDtos.TemplateResponse template = templates.findById(plan.id)
         .map(this::templateResponse).orElse(null);
     return new ScheduledAssignmentDtos.PlanResponse(
-        plan.id.toString(), plan.studentId, plan.planType, plan.name,
+        plan.id.toString(), plan.studentId, plan.planType, plan.subjectCode, plan.name,
         plan.scheduleType, plan.scheduleTime.format(TIME_FORMAT),
         weekdayList(plan.weekdays), plan.startDate.toString(),
         plan.endDate == null ? "" : plan.endDate.toString(),
@@ -348,6 +349,24 @@ public class ScheduledAssignmentService {
       throw new ApiExceptions.BadRequest("不支持的计划类型: " + value);
     }
     return normalized;
+  }
+
+  private String subjectCode(String value) {
+    String normalized = text(value).trim().toUpperCase(Locale.ROOT);
+    if (!"CHINESE".equals(normalized) && !"MATH".equals(normalized) &&
+        !"ENGLISH".equals(normalized) && !"OTHER".equals(normalized)) {
+      throw new ApiExceptions.BadRequest("不支持的科目: " + value);
+    }
+    return normalized;
+  }
+
+  private String subjectDisplay(String value) {
+    return switch (value) {
+      case "CHINESE" -> "语文";
+      case "MATH" -> "数学";
+      case "ENGLISH" -> "英语";
+      default -> "其他";
+    };
   }
 
   private String scheduleType(String value) {

@@ -120,10 +120,17 @@ public class VoiceMaterialAssignmentService {
 
   @Transactional
   public VoiceMaterialDtos.AutoCreateResponse autoCreateNext(UUID familyId, String studentId) {
+    return autoCreateNext(familyId, studentId, "");
+  }
+
+  @Transactional
+  public VoiceMaterialDtos.AutoCreateResponse autoCreateNext(
+      UUID familyId, String studentId, String subjectCode) {
     students.requireOwnedForUpdate(familyId, studentId);
+    String requestedSubjectCode = normalizeAutoSubjectCode(subjectCode);
     LocalDate businessDate = LocalDate.now(BUSINESS_ZONE);
-    log.info("voice_material auto_create_start studentId={} businessDate={}",
-        studentId, businessDate);
+    log.info("voice_material auto_create_start studentId={} subjectCode={} businessDate={}",
+        studentId, requestedSubjectCode, businessDate);
 
     AssignmentDtos.Response current =
         assignments.findFirstVoiceMaterialTaskForDate(familyId, studentId, businessDate);
@@ -148,10 +155,10 @@ public class VoiceMaterialAssignmentService {
           todayRecord.assignmentId, null);
     }
 
-    VoiceMaterialPackageEntity item = chooseAutoFolder(familyId, studentId);
+    VoiceMaterialPackageEntity item = chooseAutoFolder(familyId, studentId, requestedSubjectCode);
     if (item == null) {
-      log.info("voice_material auto_create_exit studentId={} businessDate={} reason=NO_MATERIAL",
-          studentId, businessDate);
+      log.info("voice_material auto_create_exit studentId={} subjectCode={} businessDate={} reason=NO_MATERIAL",
+          studentId, requestedSubjectCode, businessDate);
       return new VoiceMaterialDtos.AutoCreateResponse(
           false, businessDate.toString(), "", "", null);
     }
@@ -186,11 +193,13 @@ public class VoiceMaterialAssignmentService {
         assignment.id(), assignment);
   }
 
-  private VoiceMaterialPackageEntity chooseAutoFolder(UUID familyId, String studentId) {
+  private VoiceMaterialPackageEntity chooseAutoFolder(
+      UUID familyId, String studentId, String subjectCode) {
     List<VoiceMaterialPackageEntity> candidates =
         packages.findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
             familyId, studentId).stream()
             .filter(item -> "READY".equals(item.status) || "CONSUMED".equals(item.status))
+            .filter(item -> subjectCode.isBlank() || subjectCode.equals(item.subjectCode))
             .toList();
     if (candidates.isEmpty()) {
       log.info("voice_material auto_folder_candidates studentId={} candidateCount=0", studentId);
@@ -296,6 +305,16 @@ public class VoiceMaterialAssignmentService {
       packages.save(item);
     }
     return assignment;
+  }
+
+  private String normalizeAutoSubjectCode(String subjectCode) {
+    String value = subjectCode == null ? "" : subjectCode.trim().toUpperCase();
+    if (value.isBlank()) return "";
+    if ("CHINESE".equals(value) || "MATH".equals(value) ||
+        "ENGLISH".equals(value) || "OTHER".equals(value)) {
+      return value;
+    }
+    throw new ApiExceptions.BadRequest("不支持的科目: " + subjectCode);
   }
 
   private String normalizeRequestId(String requestId) {

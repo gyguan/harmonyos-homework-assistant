@@ -22,6 +22,7 @@ public final class ScheduledAssignmentDtos {
 
   public record UpsertRequest(
       @NotBlank String planType,
+      @NotBlank @Size(max = 64) String subjectCode,
       @NotBlank @Size(max = 300) String name,
       @NotBlank String scheduleType,
       @NotBlank String timeOfDay,
@@ -33,6 +34,7 @@ public final class ScheduledAssignmentDtos {
   public record UpdateRequest(
       @NotNull Long version,
       @NotBlank String planType,
+      @NotBlank @Size(max = 64) String subjectCode,
       @NotBlank @Size(max = 300) String name,
       @NotBlank String scheduleType,
       @NotBlank String timeOfDay,
@@ -58,6 +60,7 @@ public final class ScheduledAssignmentDtos {
       String id,
       String studentId,
       String planType,
+      String subjectCode,
       String name,
       String scheduleType,
       String timeOfDay,
