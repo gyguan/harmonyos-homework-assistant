@@ -29,7 +29,7 @@ parent_vm = read("entry/src/main/ets/features/parent/progress/ParentProgressView
 student_vm = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsViewModel.ets")
 filter_factory = read("entry/src/main/ets/domain/service/AssignmentFilterFactory.ets")
 date_range = read("entry/src/main/ets/domain/service/AssignmentDateRange.ets")
-due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
+task_date = read("entry/src/main/ets/domain/service/AssignmentTaskDate.ets")
 parent_home = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
 student_home = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
 selection = read("entry/src/main/ets/common/state/SelectionIds.ets")
@@ -57,9 +57,10 @@ for forbidden in [
 require("ensureRemoteCurrent" in repo and "reloadRemote" in repo and
         "current.backing === AssignmentBacking.LOCAL_SEED" in repo,
         "repository commands must share one explicit backing/hydration path")
-require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 10" in migrator and
+require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 11" in migrator and
         "migrateV7ToV8" in migrator and "legacyBacking" in migrator and
-        "migrateV8ToV9" in migrator and "migrateV9ToV10" in migrator,
+        "migrateV8ToV9" in migrator and "migrateV9ToV10" in migrator and
+        "migrateV10ToV11" in migrator,
         "current snapshot chain must retain the V7 -> V8 identity migration and newer explicit migrations")
 require("backing: source.backing," in store and
         "source.backing === AssignmentBacking.REMOTE ?" not in store,
@@ -72,16 +73,15 @@ require("snapshot.schemaVersion >= 8" in migrator and
 # Date/query construction lives in domain services rather than diverging in ViewModels.
 require("export class AssignmentDateRange" in date_range and "forDay" in date_range,
         "shared assignment date range service is required")
-require("businessDayStart" in due_date and "businessDateParts" in due_date and
-        "businessWeekday" in due_date and "AssignmentDueDate.businessDayStart" in date_range,
-        "all assignment date ranges must share Asia/Shanghai business-day semantics")
-require("text.indexOf('今晚') >= 0 || text.indexOf('晚上') >= 0" not in due_date and
-        "if (text.indexOf('晚上') >= 0) return today;" in due_date,
-        "generic evening text must be resolved only after explicit/relative dates so 明天晚上 does not become today")
-require("AssignmentDueDate.businessDayStart" in store and
-        "AssignmentDueDate.businessDayStart" in student_home and
-        "AssignmentDueDate.businessDayStart" in date_range,
-        "parent summary, Student Home and assignment filters must use the same business-day boundary")
+require("SHANGHAI_OFFSET_HOURS: number = 8" in task_date and
+        "AssignmentTaskDate.fromEpochMs" in date_range and "AssignmentTaskDate.toDayStartEpochMs" in date_range,
+        "all assignment date ranges must share Asia/Shanghai task-date semantics")
+require(task_date.index("text.indexOf('明天')") < task_date.index("text.indexOf('今晚')"),
+        "relative task-date parsing must resolve 明天 before the broader 今晚/today fallback")
+require("AssignmentTaskDate.today()" in store and
+        "AssignmentTaskDate.today()" in student_home and
+        "AssignmentTaskDate.toDayStartEpochMs" in date_range,
+        "parent summary, Student Home and assignment filters must use the same task-date boundary")
 require("todayPendingAssignments(studentId: string = '')" in student_home,
         "Student Home must explicitly scope unfinished work to today's completion date")
 require(not (ROOT / "entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets").exists(),
