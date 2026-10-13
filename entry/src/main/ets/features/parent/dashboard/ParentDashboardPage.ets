@@ -13,7 +13,7 @@ import { ParentDashboardViewModel } from './ParentDashboardViewModel';
 @Component
 export struct ParentDashboardPage {
   @Prop @Watch('onCoverageContextChanged') revision: number = 0;
-  @Prop studentId: string = '';
+  @Prop @Watch('onCoverageContextChanged') studentId: string = '';
   @State private availableWidthVp: number = 390;
   @State private coverageParents: HomeworkCoverageParent[] = [];
   @State private coverageStudentName: string = '';
