@@ -97,11 +97,11 @@ require("private HomeContent()" in home and
         "LayoutPolicy.pagePaddingForWidth(this.availableWidthVp)" in home and
         "private PhoneHome()" not in home and "private PadHome()" not in home,
         "V2 Student Home must use one shared Phone/Pad single-column composition")
-# Student Home is an unfinished-work surface. Direct task actions remain, while subject headers
+# Student Home is today's unfinished-work surface. Direct task actions remain, while subject headers
 # organize the list without introducing an accordion or a second navigation step.
 require("private PendingTasks()" in home and "StudentPendingTaskCard" in home and
-        "pendingAssignments(studentId: string = '')" in view_model and
-        "this.viewModel.pendingAssignments(this.studentId)" in home and
+        "todayPendingAssignments(studentId: string = '')" in view_model and
+        "this.viewModel.todayPendingAssignments(this.studentId)" in home and
         "ForEach(this.subjectGroups" in home and "ForEach(group.items" in home and
         "taskRenderEpoch" in home and "AssignmentAction.START" in home,
         "V2 Student Home must preserve direct actions in subject-grouped unfinished work")
@@ -110,8 +110,10 @@ require("StudentHomeMetricCard" not in home and "StudentSubjectTaskGroupCard" no
         "V2 Student Home must not restore summary-card or subject-accordion friction")
 require("status !== AssignmentStatus.SUBMITTED" in view_model and
         "status !== AssignmentStatus.COMPLETED" in view_model and
-        "dueText" not in view_model and "AssignmentDueDate.businessDayStart" not in view_model,
-        "V2 Student Home must show unfinished work across dates without legacy Today inference")
+        "private static isToday(item: Assignment)" in view_model and
+        "AssignmentDueDate.businessDayStart" in view_model and
+        "dueText" not in view_model,
+        "V2 Student Home must show only today's unfinished work using structured completion date")
 require("StudentHomePage" in shell and "StudentTodayPage" not in shell,
         "AppShell must cut over to V2 Student Home")
 require("HOME = 'HOME'" in shell and "TODAY = 'TODAY'" not in shell,

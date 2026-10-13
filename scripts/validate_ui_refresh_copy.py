@@ -91,7 +91,7 @@ require("@State private pendingTaskItems: Assignment[]" in student_home and
         "this.subjectGroups = [];" in student_home and
         "this.pendingTaskItems = items;" in student_home and
         "this.subjectGroups = this.buildSubjectGroups(items);" in student_home and
-        "this.viewModel.pendingAssignments(this.studentId)" in student_home and
+        "this.viewModel.todayPendingAssignments(this.studentId)" in student_home and
         "ForEach(this.subjectGroups" in student_home and
         "ForEach(group.items" in student_home and
         "taskRenderEpoch" in student_home and
@@ -101,9 +101,9 @@ require("@State private pendingTaskItems: Assignment[]" in student_home and
         "student home must render a reactive student-owned single-column subject snapshot on phone and PAD")
 require("assignments(studentId: string = '')" in home_vm and
         "item.studentId === studentId" in home_vm and
-        "pendingAssignments(studentId: string = '')" in home_vm and
+        "todayPendingAssignments(studentId: string = '')" in home_vm and
         "this.assignments(studentId)" in home_vm,
-        "student home view model must filter unfinished tasks by explicit active student ID")
+        "student home view model must filter today's unfinished tasks by explicit active student ID")
 
 # Family switching must update every student-scoped tab immediately, not only
 # when the role changes or when an unrelated network request completes.
@@ -121,7 +121,7 @@ require("@Prop @Watch('onStudentIdChanged') studentId: string = '';" in student_
         "item.studentId !== this.studentId" in student_home and
         "item.studentId}|\u0024{item.id}" in student_home and
         "actionGeneration !== this.identityGeneration" in student_home,
-        "student home must show identity-scoped pending cards and reject late old-child actions")
+        "student home must show identity-scoped today cards and reject late old-child actions")
 require("@Prop @Watch('onStudentIdChanged') studentId: string = '';" in student_assignments and
         "private onStudentIdChanged(): void" in student_assignments and
         "this.snapshotRevision = -1;" in student_assignments and
