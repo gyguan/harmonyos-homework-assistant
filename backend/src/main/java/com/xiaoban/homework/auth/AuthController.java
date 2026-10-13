@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -21,6 +22,14 @@ public class AuthController {
       @RequestAttribute(AuthInterceptor.ACCOUNT_ID) UUID accountId,
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId) {
     return service.familyAccounts(familyId, accountId);
+  }
+
+  @PutMapping("/family-accounts/me")
+  public FamilyAccountDtos.Item updateMyFamilyAccount(
+      @RequestAttribute(AuthInterceptor.ACCOUNT_ID) UUID accountId,
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @Valid @RequestBody FamilyAccountDtos.UpdateMineRequest request) {
+    return service.updateMyFamilyAccount(familyId, accountId, request);
   }
 
   @PostMapping("/family-accounts")
