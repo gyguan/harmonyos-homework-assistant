@@ -112,7 +112,7 @@ export class HomeworkImportInboxService {
         title: candidate.title,
         instruction: candidate.instruction,
         textbookRef: candidate.textbookRef,
-        dueText: candidate.dueText,
+        taskDate: candidate.taskDate,
         expectedMinutes: candidate.expectedMinutes,
         sourceEvidence: {
           sourceLabel: candidate.sourceEvidence.sourceLabel,
@@ -227,7 +227,7 @@ export class HomeworkImportInboxService {
       title: candidate.title,
       instruction: candidate.instruction,
       textbookRef: candidate.textbookRef,
-      dueText: candidate.dueText,
+      taskDate: candidate.taskDate,
       expectedMinutes: candidate.expectedMinutes,
       sourceEvidence: {
         sourceLabel: candidate.sourceEvidence.sourceLabel,

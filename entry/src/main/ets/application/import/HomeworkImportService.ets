@@ -18,6 +18,7 @@ import { HomeworkAssignmentParser } from '../../domain/port/HomeworkAssignmentPa
 import { HomeworkImportDraftRepository } from '../../domain/port/HomeworkImportDraftRepository';
 import { HomeworkTextExtractor } from '../../domain/port/HomeworkTextExtractor';
 import { HomeworkImportPipeline } from './HomeworkImportPipeline';
+import { AssignmentTaskDate } from '../../domain/service/AssignmentTaskDate';
 
 export class HomeworkImportService {
   static readonly instance: HomeworkImportService = new HomeworkImportService();
@@ -36,7 +37,7 @@ export class HomeworkImportService {
 
   private normalizeCandidateDates(candidates: CandidateAssignment[]): CandidateAssignment[] {
     for (let candidate of candidates) {
-      if (candidate.dueText.trim().length === 0) candidate.dueText = '今天';
+      candidate.taskDate = AssignmentTaskDate.resolve(candidate.taskDate);
     }
     return candidates;
   }
@@ -212,7 +213,7 @@ export class HomeworkImportService {
         title: candidate.title,
         instruction: candidate.instruction,
         textbookRef: candidate.textbookRef,
-        dueText: candidate.dueText,
+        taskDate: candidate.taskDate,
         expectedMinutes: candidate.expectedMinutes,
         sourceEvidence: candidate.sourceEvidence,
         confidence: candidate.confidence,
@@ -238,7 +239,7 @@ export class HomeworkImportService {
       title: title,
       instruction: text,
       textbookRef: '',
-      dueText: '今天',
+      taskDate: AssignmentTaskDate.today(),
       expectedMinutes: 20,
       sourceEvidence: {
         sourceLabel: sourceLabel,

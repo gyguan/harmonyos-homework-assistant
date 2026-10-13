@@ -32,6 +32,30 @@ export class AssignmentTaskDate {
     return AssignmentTaskDate.parse(taskDate) !== null;
   }
 
+  static resolve(value: string, nowEpochMs: number = Date.now()): string {
+    let text = value.trim();
+    if (text.length === 0) return AssignmentTaskDate.today(nowEpochMs);
+    let parsed = AssignmentTaskDate.parse(text);
+    if (parsed !== null) return AssignmentTaskDate.format(parsed.year, parsed.month, parsed.day);
+    let today = AssignmentTaskDate.today(nowEpochMs);
+    if (text.indexOf('后天') >= 0) return AssignmentTaskDate.addDays(today, 2);
+    if (text.indexOf('明天') >= 0 || text.indexOf('明日') >= 0) return AssignmentTaskDate.addDays(today, 1);
+    if (text.indexOf('今天') >= 0 || text.indexOf('今日') >= 0 || text.indexOf('今晚') >= 0) return today;
+
+    let full = text.match(/(\d{4})年(\d{1,2})月(\d{1,2})[日号]?/);
+    if (full !== null && full.length >= 4) {
+      let result = AssignmentTaskDate.format(Number(full[1]), Number(full[2]), Number(full[3]));
+      return AssignmentTaskDate.isValid(result) ? result : today;
+    }
+    let monthDay = text.match(/(\d{1,2})月(\d{1,2})[日号]?/);
+    if (monthDay !== null && monthDay.length >= 3) {
+      let now = AssignmentTaskDate.parse(today)!;
+      let result = AssignmentTaskDate.format(now.year, Number(monthDay[1]), Number(monthDay[2]));
+      return AssignmentTaskDate.isValid(result) ? result : today;
+    }
+    return today;
+  }
+
   static addDays(taskDate: string, days: number): string {
     let parts = AssignmentTaskDate.parse(taskDate);
     if (parts === null) return '';
