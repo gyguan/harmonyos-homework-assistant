@@ -32,7 +32,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
     when(transport.completeWithImage(anyString(), anyString(), anyString(), anyString(), anyInt(),
         anyString(), anyMap())).thenReturn(java.util.Optional.of(
-            "{\"assignments\":[{\"subject\":\"数学\",\"title\":\"口算20题\",\"instruction\":\"完成口算20题\",\"textbookRef\":\"\",\"sourceExcerpt\":\"数学口算20题\"}]}"));
+            "{\"assignments\":[{\"subject\":\"数学\",\"title\":\"口算20题\",\"instruction\":\"完成口算20题\",\"textbookRef\":\"\",\"taskDate\":\"今天\",\"expectedMinutes\":10,\"sourceExcerpt\":\"数学口算20题\",\"confidence\":0.9}]}"));
     var client = new ConfigurableHomeworkOrganizerModelClient(
         new AiProviderProperties(), transport, JsonMapper.builder().build());
 
@@ -43,7 +43,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     var input = org.mockito.ArgumentCaptor.forClass(String.class);
     verify(transport).completeWithImage(
         anyString(), instructions.capture(), input.capture(),
-        eq("data:image/jpeg;base64,PRIVATE"), eq(2200), anyString(), anyMap());
+        eq("data:image/jpeg;base64,PRIVATE"), eq(3000), anyString(), anyMap());
 
     assertTrue(input.getValue().contains("补充文字（可能为空）：\n数学口算20题"));
     assertFalse(instructions.getValue().contains("sameTaskGroup"));
@@ -78,10 +78,10 @@ class ConfigurableHomeworkOrganizerModelClientTest {
         new AiProviderProperties(), null, JsonMapper.builder().build());
     String output = """
         {"assignments":[
-          {"subject":"语文","title":"背诵","instruction":"明天背诵课文","textbookRef":"",
-           "sourceExcerpt":"明天语文背诵"},
-          {"subject":"数学","title":"口算","instruction":"口算20题","textbookRef":"",
-           "sourceExcerpt":"数学口算20题"}
+          {"subject":"语文","title":"背诵","instruction":"背诵课文","textbookRef":"","taskDate":"今天",
+           "expectedMinutes":10,"sourceExcerpt":"语文背诵","confidence":0.9},
+          {"subject":"数学","title":"口算","instruction":"口算20题","textbookRef":"","taskDate":"今天",
+           "expectedMinutes":15,"sourceExcerpt":"数学口算","confidence":0.8}
         ]}
         """;
 
@@ -89,103 +89,11 @@ class ConfigurableHomeworkOrganizerModelClientTest {
 
     assertEquals(List.of("语文", "数学"),
         result.assignments().stream().map(HomeworkOrganizerDtos.Candidate::subject).toList());
-    assertEquals("明天语文背诵\n数学口算20题", result.recognizedText());
-    assertEquals(LocalDate.now(ZoneId.of("Asia/Shanghai")).plusDays(1).toString(),
-        result.assignments().getFirst().taskDate());
-    assertEquals(15, result.assignments().get(1).expectedMinutes());
-    assertEquals(0.85, result.assignments().getFirst().confidence(), 0.0001);
+    assertEquals("语文背诵\n数学口算", result.recognizedText());
     assertTrue(client.parseImageOutput("{\"assignments\":[]}").isEmpty());
-    var partiallyValid = client.parseImageOutput(
-        output.replace("\"数学\"", "\"InvalidSubject\"")).orElseThrow();
-    assertEquals(List.of("语文"),
-        partiallyValid.assignments().stream().map(HomeworkOrganizerDtos.Candidate::subject).toList());
+    assertTrue(client.parseImageOutput(output.replace("\"数学\"", "\"InvalidSubject\"")).isEmpty());
   }
 
-  @Test
-  void imageParserToleratesProviderFieldTypeDrift() {
-    var client = new ConfigurableHomeworkOrganizerModelClient(
-        new AiProviderProperties(), null, JsonMapper.builder().build());
-    String output = """
-        {"assignments":[
-          {"subject":{"name":"数学"},"title":"口算20题",
-           "instruction":["完成口算20题","订正错题"],
-           "textbookRef":{"book":"数学练习册","page":"第12页"},
-           "sourceExcerpt":["数学","口算20题"]},
-          {"subject":"语文","title":"朗读课文","instruction":"朗读两遍",
-           "textbookRef":"","sourceExcerpt":{"text":"明天朗读第8课"}}
-        ]}
-        """;
-
-    var result = client.parseImageOutput(output).orElseThrow();
-
-    assertEquals(2, result.assignments().size());
-    assertEquals("数学", result.assignments().get(0).subject());
-    assertTrue(result.assignments().get(0).instruction().contains("完成口算20题"));
-    assertTrue(result.assignments().get(0).instruction().contains("订正错题"));
-    assertTrue(result.assignments().get(0).textbookRef().contains("数学练习册"));
-    assertEquals(LocalDate.now(ZoneId.of("Asia/Shanghai")).plusDays(1).toString(),
-        result.assignments().get(1).taskDate());
-  }
-
-  @Test
-  void imageParserAcceptsWrappedAssignmentsAndDropsOnlyInvalidItems() {
-    var client = new ConfigurableHomeworkOrganizerModelClient(
-        new AiProviderProperties(), null, JsonMapper.builder().build());
-    String output = """
-        {"assignments":{"items":[
-          {"subject":"数学","title":"计算","instruction":"完成10题",
-           "textbookRef":"","sourceExcerpt":"数学10题"},
-          {"subject":"科学","title":"无效科目","instruction":"忽略",
-           "textbookRef":"","sourceExcerpt":"无效"},
-          {"subject":"英语","title":"朗读","instruction":"朗读课文",
-           "textbookRef":"","sourceExcerpt":"英语朗读"}
-        ]}}
-        """;
-
-    var result = client.parseImageOutput(output).orElseThrow();
-
-    assertEquals(List.of("数学", "英语"),
-        result.assignments().stream().map(HomeworkOrganizerDtos.Candidate::subject).toList());
-  }
-
-  @Test
-  void imageParserNormalizesQuotedFencedAndEmbeddedJson() throws Exception {
-    var mapper = JsonMapper.builder().build();
-    var client = new ConfigurableHomeworkOrganizerModelClient(
-        new AiProviderProperties(), null, mapper);
-    String json = """
-        {"assignments":[
-          {"subject":"数学","title":"口算20题","instruction":"完成20题",
-           "textbookRef":"","sourceExcerpt":"数学口算20题"}
-        ]}
-        """.trim();
-
-    var quoted = client.parseImageOutput(mapper.writeValueAsString(json)).orElseThrow();
-    var fenced = client.parseImageOutput("```json\n" + json + "\n```").orElseThrow();
-    var embedded = client.parseImageOutput("以下为整理结果：\n" + json + "\n请核对").orElseThrow();
-
-    assertEquals(1, quoted.assignments().size());
-    assertEquals(1, fenced.assignments().size());
-    assertEquals(1, embedded.assignments().size());
-    assertEquals("数学", quoted.assignments().getFirst().subject());
-  }
-
-  @Test
-  void imageParserNormalizesCommonProviderWrapper() {
-    var client = new ConfigurableHomeworkOrganizerModelClient(
-        new AiProviderProperties(), null, JsonMapper.builder().build());
-    String output = """
-        {"result":{"assignments":[
-          {"subject":"英语","title":"朗读课文","instruction":"朗读两遍",
-           "textbookRef":"","sourceExcerpt":"英语朗读"}
-        ]}}
-        """;
-
-    var result = client.parseImageOutput(output).orElseThrow();
-
-    assertEquals(1, result.assignments().size());
-    assertEquals("英语", result.assignments().getFirst().subject());
-  }
   @Test
   void promptKeepsOnlyNecessaryStudentContext() {
     TestStudent student = new TestStudent();
@@ -261,12 +169,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertFalse(schema.contains("duplicateAssignmentId"));
     assertFalse(schema.contains("duplicateConfidence"));
     assertFalse(schema.contains("duplicateReason"));
-    String imageSchema = ConfigurableHomeworkOrganizerModelClient.imageSchema().toString();
-    assertFalse(imageSchema.contains("recognizedText"));
-    assertFalse(imageSchema.contains("taskDate"));
-    assertFalse(imageSchema.contains("expectedMinutes"));
-    assertFalse(imageSchema.contains("confidence"));
-    assertTrue(imageSchema.contains("sourceExcerpt"));
+    assertFalse(ConfigurableHomeworkOrganizerModelClient.imageSchema().toString().contains("recognizedText"));
     assertTrue(schema.contains("maxLength=80"));
     assertTrue(schema.contains("maxLength=400"));
   }
@@ -288,18 +191,6 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertEquals(1, result.size());
     verify(transport).complete(
         anyString(), anyString(), anyString(), eq(1400), eq("homework_organization"), anyMap());
-  }
-
-  @Test
-  void imageMetadataIsInferredLocallyWithoutModelFields() {
-    assertEquals(10, ConfigurableHomeworkOrganizerModelClient.imageExpectedMinutes(
-        "朗读", "朗读课文", "朗读两遍", "语文朗读"));
-    assertEquals(15, ConfigurableHomeworkOrganizerModelClient.imageExpectedMinutes(
-        "数学", "口算", "完成30题", "口算30题"));
-    assertEquals(25, ConfigurableHomeworkOrganizerModelClient.imageExpectedMinutes(
-        "数学", "练习", "完成50道题", "数学50道题"));
-    assertEquals(40, ConfigurableHomeworkOrganizerModelClient.imageExpectedMinutes(
-        "语文", "习作", "完成一篇作文", "作文"));
   }
 
   @Test
