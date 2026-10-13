@@ -68,40 +68,10 @@ export struct CandidateDurationControl {
 @Component
 export struct ConfirmationCandidateCard {
   @Prop item: CandidateAssignment;
-  @Prop sameTaskPeerTitles: string = '';
   @Prop selected: boolean = false;
   onSelect: () => void = () => {};
   onMinutesChange: (candidate: CandidateAssignment, minutes: number) => void =
     (_candidate: CandidateAssignment, _minutes: number) => {};
-
-  private duplicateAssignmentId(): string {
-    let value = this.item.duplicateAssignmentId;
-    return value === undefined ? '' : value.trim();
-  }
-
-  private duplicateAssignmentTitle(): string {
-    let value = this.item.duplicateAssignmentTitle;
-    return value === undefined ? '' : value.trim();
-  }
-
-  private duplicateReason(): string {
-    let value = this.item.duplicateReason;
-    return value === undefined ? '' : value.trim();
-  }
-
-  private isLocalFallbackDuplicate(): boolean {
-    return this.duplicateReason().startsWith('【本地兜底】');
-  }
-
-  private duplicateReasonText(): string {
-    let reason = this.duplicateReason();
-    if (!reason.startsWith('【本地兜底】')) return reason;
-    return reason.substring('【本地兜底】'.length).trim();
-  }
-
-  private hasSemanticWarning(): boolean {
-    return this.sameTaskPeerTitles.trim().length > 0 || this.duplicateAssignmentId().length > 0;
-  }
 
   build() {
     Column({ space: 7 }) {
@@ -112,24 +82,7 @@ export struct ConfirmationCandidateCard {
             .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY);
-          if (this.hasSemanticWarning()) {
-            Text('疑似重复')
-              .fontSize(AppTheme.META_SIZE)
-              .lineHeight(AppTheme.META_LINE_HEIGHT)
-              .fontColor(AppTheme.WARNING)
-              .padding({ left: 7, right: 7, top: 3, bottom: 3 })
-              .backgroundColor(AppTheme.WARNING_SOFT)
-              .borderRadius(AppTheme.CHIP_RADIUS);
-            if (this.isLocalFallbackDuplicate()) {
-              Text('本地兜底')
-                .fontSize(AppTheme.META_SIZE)
-                .lineHeight(AppTheme.META_LINE_HEIGHT)
-                .fontColor(AppTheme.WARNING)
-                .padding({ left: 7, right: 7, top: 3, bottom: 3 })
-                .backgroundColor(AppTheme.WARNING_SOFT)
-                .borderRadius(AppTheme.CHIP_RADIUS);
-            }
-          } else if (this.item.confidence < 0.8) {
+          if (this.item.confidence < 0.8) {
             Text('重点确认')
               .fontSize(AppTheme.META_SIZE)
               .lineHeight(AppTheme.META_LINE_HEIGHT)
@@ -156,77 +109,6 @@ export struct ConfirmationCandidateCard {
         .fontColor(AppTheme.TEXT)
         .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
         .textOverflow({ overflow: TextOverflow.Ellipsis });
-
-      if (this.duplicateAssignmentId().length > 0) {
-        Column({ space: 4 }) {
-          Text('疑似与已有任务相同')
-            .width('100%')
-            .fontSize(AppTheme.META_SIZE)
-            .lineHeight(AppTheme.META_LINE_HEIGHT)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.WARNING);
-          if (this.duplicateAssignmentTitle().length > 0) {
-            Text('已有任务 · ' + this.duplicateAssignmentTitle())
-              .width('100%')
-              .fontSize(AppTheme.META_SIZE)
-              .lineHeight(AppTheme.META_LINE_HEIGHT)
-              .fontColor(AppTheme.TEXT)
-              .maxLines(2)
-              .textOverflow({ overflow: TextOverflow.Ellipsis });
-          }
-          if (this.isLocalFallbackDuplicate()) {
-            Text('AI 判重暂不可用，本次由本地规则辅助判断，请重点确认。')
-              .width('100%')
-              .fontSize(AppTheme.CAPTION_SIZE)
-              .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
-              .fontColor(AppTheme.WARNING)
-              .maxLines(2);
-          }
-          if (this.duplicateReasonText().length > 0) {
-            Text(this.duplicateReasonText())
-              .width('100%')
-              .fontSize(AppTheme.CAPTION_SIZE)
-              .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
-              .fontColor(AppTheme.SUBTEXT)
-              .maxLines(2)
-              .textOverflow({ overflow: TextOverflow.Ellipsis });
-          }
-          Text('确认重复可删除当前候选；确认不是同一项可直接保留。')
-            .width('100%')
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
-            .fontColor(AppTheme.TERTIARY_TEXT);
-        }
-        .width('100%')
-        .padding(9)
-        .backgroundColor(AppTheme.WARNING_SOFT)
-        .borderRadius(AppTheme.CONTROL_RADIUS);
-      } else if (this.sameTaskPeerTitles.trim().length > 0) {
-        Column({ space: 4 }) {
-          Text('疑似与本批以下任务属于同一作业')
-            .width('100%')
-            .fontSize(AppTheme.META_SIZE)
-            .lineHeight(AppTheme.META_LINE_HEIGHT)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.WARNING);
-          Text('本批任务 · ' + this.sameTaskPeerTitles.trim())
-            .width('100%')
-            .fontSize(AppTheme.META_SIZE)
-            .lineHeight(AppTheme.META_LINE_HEIGHT)
-            .fontColor(AppTheme.TEXT)
-            .maxLines(3)
-            .textOverflow({ overflow: TextOverflow.Ellipsis });
-          Text('请核对这些任务；若重复可删除其中一项，若确为独立任务可保留。')
-            .width('100%')
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .width('100%')
-        .padding(9)
-        .backgroundColor(AppTheme.WARNING_SOFT)
-        .borderRadius(AppTheme.CONTROL_RADIUS);
-      }
 
       if (this.item.textbookRef.length > 0) {
         Text(this.item.textbookRef)
@@ -346,12 +228,7 @@ export struct ConfirmationCandidateEditor {
         imageRef: this.item.sourceEvidence.imageRef,
         capturedAtEpochMs: this.item.sourceEvidence.capturedAtEpochMs
       },
-      confidence: this.item.confidence,
-      sameTaskGroup: this.item.sameTaskGroup,
-      duplicateAssignmentId: this.item.duplicateAssignmentId,
-      duplicateAssignmentTitle: this.item.duplicateAssignmentTitle,
-      duplicateConfidence: this.item.duplicateConfidence,
-      duplicateReason: this.item.duplicateReason
+      confidence: this.item.confidence
     };
   }
 

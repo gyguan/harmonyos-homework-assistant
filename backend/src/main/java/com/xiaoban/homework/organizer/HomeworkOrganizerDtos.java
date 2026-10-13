@@ -26,15 +26,6 @@ public final class HomeworkOrganizerDtos {
       double duplicateConfidence,
       String duplicateReason) {}
 
-  public record ExistingAssignment(
-      String id,
-      String subject,
-      String title,
-      String instruction,
-      String textbookRef,
-      String taskDate,
-      String sourceExcerpt) {}
-
   public record Response(List<Candidate> assignments, String mode) {}
 
   public record ImageRequest(

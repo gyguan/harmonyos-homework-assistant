@@ -3,7 +3,6 @@ package com.xiaoban.homework.organizer;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.xiaoban.homework.assignment.AssignmentService;
 import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.student.StudentEntity;
 import com.xiaoban.homework.student.StudentRepository;
@@ -38,10 +37,7 @@ class HomeworkImageInputTest {
   void passesSupplementaryTextToImageModel() throws Exception {
     var students = mock(StudentRepository.class);
     var model = mock(HomeworkOrganizerModelClient.class);
-    var assignments = mock(AssignmentService.class);
-    when(assignments.list(any(), anyString(), any(), any(), any(), any(), any()))
-        .thenReturn(List.of());
-    var service = new HomeworkOrganizerService(students, assignments, model);
+    var service = new HomeworkOrganizerService(students, model);
     var family = UUID.randomUUID();
     StudentEntity student = new ConfigurableHomeworkOrganizerModelClientTest.TestStudent();
     student.familyId = family;
@@ -58,14 +54,8 @@ class HomeworkImageInputTest {
     service.organizeImage(family, "student-1",
         new HomeworkOrganizerDtos.ImageRequest(png(), "image/png", "图片", "数学口算20题"));
 
-    var from = org.mockito.ArgumentCaptor.forClass(Long.class);
-    var to = org.mockito.ArgumentCaptor.forClass(Long.class);
-    var order = inOrder(model, assignments);
-    order.verify(model).organizeImage(eq(student), eq("图片"), startsWith("data:image/png;base64,"),
-        eq("数学口算20题"));
-    order.verify(assignments).list(eq(family), eq("student-1"), isNull(), isNull(),
-        from.capture(), to.capture(), contains("NOT_STARTED"));
-    assertTrue(to.getValue() - from.getValue() < 24L * 60L * 60L * 1000L);
+    verify(model, times(1)).organizeImage(
+        eq(student), eq("图片"), startsWith("data:image/png;base64,"), eq("数学口算20题"));
   }
 
   static String png() throws Exception {
@@ -93,10 +83,7 @@ class HomeworkImageInputTest {
   void checksFamilyBeforeAnyModelCallAndKeepsParsedSubjects() throws Exception {
     var students = mock(StudentRepository.class);
     var model = mock(HomeworkOrganizerModelClient.class);
-    var assignments = mock(AssignmentService.class);
-    when(assignments.list(any(), anyString(), any(), any(), any(), any(), any()))
-        .thenReturn(List.of());
-    var service = new HomeworkOrganizerService(students, assignments, model);
+    var service = new HomeworkOrganizerService(students, model);
     var family = UUID.randomUUID();
     StudentEntity student = new ConfigurableHomeworkOrganizerModelClientTest.TestStudent();
     student.familyId = family;
