@@ -52,7 +52,6 @@ import { PracticeHistoryPage } from '../features/student/practice/PracticeHistor
 import { PracticeAttemptPage } from '../features/student/practice/PracticeAttemptPage';
 import { PracticePaperDetailPage } from '../features/student/practice/PracticePaperDetailPage';
 import { PracticeResultPage } from '../features/student/practice/PracticeResultPage';
-import { StudyWorkspaceRoutePage } from '../features/student/study/StudyWorkspaceRoutePage';
 
 export enum AppRole {
   NONE = 'NONE',
@@ -315,10 +314,6 @@ export struct AppShell {
       AppRoute.STUDENT_ASSIGNMENT_DETAIL, new AssignmentRouteParam(assignmentId));
   }
 
-  private openStudy(assignmentId: string): void {
-    this.navPathStack.pushPathByName(AppRoute.STUDENT_STUDY, new AssignmentRouteParam(assignmentId));
-  }
-
   private openPracticeHistory(paperId: string = ''): void {
     this.navPathStack.pushPathByName(
       AppRoute.STUDENT_PRACTICE_HISTORY, new PracticeHistoryRouteParam(paperId));
@@ -429,7 +424,7 @@ export struct AppShell {
         revision: this.storeRevision,
         attentionKind: this.studentAttentionKind,
         onOpenDetail: (assignmentId: string) => this.openAssignmentDetail(assignmentId),
-        onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId),
+        onStoreChanged: () => this.notifyUiChanged(),
         onAttentionFilterCleared: () => this.studentAttentionKind = AssignmentAttentionKind.NONE
       });
     } else if (this.studentRoute === StudentRoute.PRACTICE) {
@@ -447,7 +442,7 @@ export struct AppShell {
         studentId: this.activeStudentId,
         offlineMode: this.demoScenario === DemoScenario.OFFLINE,
         revision: this.storeRevision,
-        onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId),
+        onOpenStudy: (assignmentId: string) => this.openAssignmentDetail(assignmentId),
         onOpenAttention: (kind: AssignmentAttentionKind) => this.openStudentAttention(kind),
         onStoreChanged: () => this.notifyUiChanged()
       });
@@ -462,18 +457,7 @@ export struct AppShell {
           assignmentId: this.routeAssignmentId(param),
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
-          onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
-        });
-      }
-      .hideTitleBar(true)
-      .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.STUDENT_STUDY) {
-      NavDestination() {
-        StudyWorkspaceRoutePage({
-          tutorUnavailable: this.demoScenario === DemoScenario.TUTOR_UNAVAILABLE,
-          assignmentId: this.routeAssignmentId(param),
-          revision: this.storeRevision,
-          onBack: () => this.navPathStack.pop()
+          onStoreChanged: () => this.notifyUiChanged()
         });
       }
       .hideTitleBar(true)

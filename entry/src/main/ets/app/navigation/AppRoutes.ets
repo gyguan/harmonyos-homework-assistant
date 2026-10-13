@@ -1,6 +1,5 @@
 export enum AppRoute {
   STUDENT_ASSIGNMENT_DETAIL = 'student/assignment/detail',
-  STUDENT_STUDY = 'student/study',
   STUDENT_PRACTICE_HISTORY = 'student/practice/history',
   STUDENT_PRACTICE_PAPER = 'student/practice/paper',
   STUDENT_PRACTICE_ATTEMPT = 'student/practice/attempt',

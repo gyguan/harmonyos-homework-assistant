@@ -7,7 +7,7 @@ export struct StudentAssignmentDetailPage {
   @Prop assignmentId: string = '';
   @Prop revision: number = 0;
   onBack: () => void = () => {};
-  onOpenStudy: (assignmentId: string) => void = (_assignmentId: string) => {};
+  onStoreChanged: () => void = () => {};
 
   build() {
     Row() {
@@ -21,7 +21,7 @@ export struct StudentAssignmentDetailPage {
           AssignmentDetailPane({
             assignmentId: this.assignmentId,
             revision: this.revision,
-            onOpenStudy: (assignmentId: string) => this.onOpenStudy(assignmentId)
+            onStoreChanged: () => this.onStoreChanged()
           });
         }
         .width('100%')

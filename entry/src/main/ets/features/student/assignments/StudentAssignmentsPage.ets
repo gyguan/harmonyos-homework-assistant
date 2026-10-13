@@ -39,7 +39,7 @@ export struct StudentAssignmentsPage {
   private querySequence: number = 0;
 
   onOpenDetail: (assignmentId: string) => void = (_assignmentId: string) => {};
-  onOpenStudy: (assignmentId: string) => void = (_assignmentId: string) => {};
+  onStoreChanged: () => void = () => {};
   onAttentionFilterCleared: () => void = () => {};
 
   private readonly viewModel: StudentAssignmentsViewModel =
@@ -575,7 +575,7 @@ export struct StudentAssignmentsPage {
         AssignmentDetailPane({
           assignmentId: this.selectedAssignmentId,
           revision: this.revision,
-          onOpenStudy: (assignmentId: string) => this.onOpenStudy(assignmentId)
+          onStoreChanged: () => this.onStoreChanged()
         });
       }
       .width('100%')
