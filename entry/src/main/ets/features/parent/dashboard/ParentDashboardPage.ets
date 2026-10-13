@@ -6,7 +6,7 @@ import {
   HomeworkCoveragePicker,
   HomeworkCoverageSubject
 } from '../../../components/assignment/HomeworkCoveragePicker';
-import { ParentIdentity } from '../../../domain/model/ParentIdentity';
+import { ParentIdentity, ParentIdentityHelper } from '../../../domain/model/ParentIdentity';
 import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { AssignmentAttentionKind } from '../../../domain/service/AssignmentAttentionPolicy';
 import { ParentDashboardViewModel } from './ParentDashboardViewModel';
@@ -208,11 +208,11 @@ export struct ParentDashboardPage {
     Column() {
       Row({ space: 10 }) {
         Column({ space: 3 }) {
-          Text('今日作业协同')
+          Text(ParentIdentityHelper.label(this.parentIdentity) + ' · 今日作业')
             .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
-          Text('只修改你自己的标记，不会改变其他家长的状态')
+          Text('标记今天已经布置完成的作业')
             .fontSize(AppTheme.CAPTION_SIZE)
             .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
@@ -232,34 +232,6 @@ export struct ParentDashboardPage {
 
       Scroll() {
         Column({ space: 14 }) {
-          if (this.coverageParents.length > 0) {
-            Column({ space: 6 }) {
-              Text('家庭当前状态')
-                .width('100%')
-                .fontSize(AppTheme.LABEL_TITLE_SIZE)
-                .fontWeight(FontWeight.Medium)
-                .fontColor(AppTheme.TEXT);
-              ForEach(this.coverageParents, (parent: HomeworkCoverageParent) => {
-                Row({ space: 8 }) {
-                  Text(parent.displayName + (parent.mine ? '（我）' : ''))
-                    .fontSize(AppTheme.META_SIZE)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor(parent.mine ? AppTheme.PRIMARY : AppTheme.TEXT);
-                  Text(this.parentCoverageText(parent))
-                    .layoutWeight(1)
-                    .fontSize(AppTheme.META_SIZE)
-                    .fontColor(AppTheme.SUBTEXT);
-                }
-                .width('100%');
-              }, (parent: HomeworkCoverageParent) =>
-                `editor|${parent.displayName}|${parent.mine}|${parent.subjects.join(',')}|${parent.updatedAt}`);
-            }
-            .width('100%')
-            .padding(AppTheme.CARD_PADDING_COMPACT)
-            .backgroundColor(AppTheme.CARD_SURFACE)
-            .borderRadius(AppTheme.CONTROL_RADIUS);
-          }
-
           HomeworkCoveragePicker({
             selected: this.coverageDraft,
             disabled: this.coverageBusy,
