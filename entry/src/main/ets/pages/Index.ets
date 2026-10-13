@@ -2,11 +2,13 @@ import { VoiceMaterialAutoCreateService } from '../application/assignment/VoiceM
 import { BackendAuthService } from '../application/remote/BackendAuthService';
 import { BackendSession } from '../application/remote/BackendSession';
 import { FamilyCloudService } from '../application/remote/FamilyCloudService';
+import { ParentAccessRemoteApi } from '../application/remote/ParentAccessRemoteApi';
 import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
 import { ParentAccessDialog } from '../components/family/ParentAccessDialog';
 import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
 import { ParentIdentity } from '../domain/model/ParentIdentity';
 import { FamilyContextRepository } from '../domain/port/FamilyContextRepository';
+import { ParentAccessState } from '../domain/service/ParentAccessState';
 import { AppRole, AppShell } from './AppShell';
 import { PersonEntryPage } from './PersonEntryPage';
 
@@ -52,7 +54,7 @@ struct Index {
   private applyShareImportParentRole(): void {
     if (!this.shareImportForceParent) return;
     this.shareImportForceParent = false;
-    this.requestParentAccess(this.selectedParentIdentity);
+    void this.requestParentAccess(this.selectedParentIdentity);
   }
 
   onBackPress(): boolean {
@@ -63,17 +65,33 @@ struct Index {
   private async restoreCloud(): Promise<void> {
     let valid = await BackendAuthService.instance.validateSession();
     if (!valid) return;
-    if (await FamilyCloudService.instance.syncStudents()) {
+    let studentsSynced = await FamilyCloudService.instance.syncStudents();
+    let parentAccessSynced = await FamilyCloudService.instance.syncParentAccess();
+    if (studentsSynced) {
       this.selectedStudentId = this.familyContext.getActiveStudentId();
       this.cloudRevision++;
       this.studentContextRevision++;
     }
+    if (!parentAccessSynced) {
+      console.warn('Family parent access state synchronization failed');
+    }
   }
 
-  private requestParentAccess(identity: ParentIdentity): void {
+  private async requestParentAccess(identity: ParentIdentity): Promise<void> {
     this.pendingParentIdentity = identity;
-    let configuredCode = this.familyContext.getSettings().parentAccessCode;
-    if (configuredCode.length === 0) {
+
+    if (BackendSession.instance.isConnected()) {
+      let synced = await FamilyCloudService.instance.syncParentAccess();
+      if (!synced) {
+        this.parentAccessCodeInput = '';
+        this.parentAccessMessage = '家长保护状态同步失败，请检查网络后重试';
+        this.parentAccessController.open();
+        return;
+      }
+    }
+
+    let configuredState = this.familyContext.getSettings().parentAccessCode;
+    if (!ParentAccessState.isEnabled(configuredState)) {
       this.enterParent(identity);
       return;
     }
@@ -82,12 +100,33 @@ struct Index {
     this.parentAccessController.open();
   }
 
-  private confirmParentAccess(): void {
-    let configuredCode = this.familyContext.getSettings().parentAccessCode;
-    if (this.parentAccessCodeInput !== configuredCode) {
-      this.parentAccessMessage = '家长码不正确';
+  private async confirmParentAccess(): Promise<void> {
+    let input = this.parentAccessCodeInput.trim();
+    if (!ParentAccessState.isLegacyCode(input)) {
+      this.parentAccessMessage = '请输入 4 位数字家长码';
       return;
     }
+
+    if (BackendSession.instance.isConnected()) {
+      try {
+        let valid = await ParentAccessRemoteApi.instance.verify(input);
+        if (!valid) {
+          this.parentAccessMessage = '家长码不正确';
+          return;
+        }
+      } catch {
+        this.parentAccessMessage = '家长码验证失败，请检查网络后重试';
+        return;
+      }
+    } else {
+      let localValue = this.familyContext.getSettings().parentAccessCode;
+      if (!ParentAccessState.isLegacyCode(localValue) || input !== localValue) {
+        this.parentAccessMessage = localValue === ParentAccessState.CLOUD_ENABLED ?
+          '当前无法连接家庭云端，暂时不能验证家长码' : '家长码不正确';
+        return;
+      }
+    }
+
     this.parentAccessController.close();
     this.parentAccessCodeInput = '';
     this.parentAccessMessage = '';
@@ -125,7 +164,7 @@ struct Index {
       if (this.selectedRole === AppRole.NONE) {
         PersonEntryPage({
           revision: this.cloudRevision,
-          onSelectParent: (identity: ParentIdentity) => this.requestParentAccess(identity),
+          onSelectParent: (identity: ParentIdentity) => { void this.requestParentAccess(identity); },
           onSelectStudent: (studentId: string) => this.enterStudent(studentId)
         });
       } else {
@@ -134,7 +173,7 @@ struct Index {
           parentIdentity: this.selectedParentIdentity,
           studentContextRevision: this.studentContextRevision,
           rootStudentId: this.selectedStudentId,
-          onSwitchParent: (identity: ParentIdentity) => this.requestParentAccess(identity),
+          onSwitchParent: (identity: ParentIdentity) => { void this.requestParentAccess(identity); },
           onSwitchStudent: (studentId: string) => this.enterStudent(studentId),
           onRegisterBackHandler: (handler: () => boolean) => this.shellBackHandler = handler
         });
