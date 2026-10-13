@@ -30,6 +30,18 @@ public class AuthService {
     return new FamilyAccountDtos.Response(List.copyOf(items));
   }
 
+  public FamilyAccountDtos.Item updateMyFamilyAccount(
+      UUID familyId, UUID accountId, FamilyAccountDtos.UpdateMineRequest request) {
+    AccountEntity account = accounts.findById(accountId)
+        .orElseThrow(() -> new ApiExceptions.Unauthorized("登录状态已失效，请重新登录"));
+    if (!familyId.equals(account.familyId)) throw new ApiExceptions.Unauthorized("登录状态无效");
+    account.displayName = request.displayName().trim();
+    account.updatedAt = Instant.now();
+    accounts.save(account);
+    return new FamilyAccountDtos.Item(
+        account.id.toString(), account.loginName, account.displayName, true);
+  }
+
   public FamilyAccountDtos.Item createFamilyAccount(
       UUID familyId, UUID accountId, FamilyAccountDtos.CreateRequest request) {
     AccountEntity current = accounts.findById(accountId)
