@@ -95,6 +95,7 @@ public class DailyHomeworkCoverageService {
     List<String> normalized = normalize(input.subjects());
     coverage.deleteByFamilyIdAndStudentIdAndTaskDateAndAccountId(
         familyId, studentId, taskDate, accountId);
+    coverage.flush();
 
     Instant now = Instant.now();
     List<DailyHomeworkCoverageEntity> created = new ArrayList<>();
