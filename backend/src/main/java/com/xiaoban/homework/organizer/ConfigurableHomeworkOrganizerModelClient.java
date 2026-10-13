@@ -17,6 +17,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
 @Service
@@ -88,7 +89,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   }
 
   Optional<HomeworkOrganizerDtos.ImageResponse> parseImageOutput(String output) {
-    StructuredResult parsed = jsonMapper.readValue(stripCodeFence(output), StructuredResult.class);
+    StructuredResult parsed = readStructured(output);
     if (parsed == null || parsed.assignments() == null || parsed.assignments().size() > 30) return Optional.empty();
     ConversionResult converted = toCandidates(parsed);
     if (converted.candidates().size() != parsed.assignments().size() || converted.candidates().isEmpty()) {
@@ -96,6 +97,37 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     }
     return Optional.of(new HomeworkOrganizerDtos.ImageResponse(
         converted.candidates(), "AI_IMAGE", recognizedText(converted.candidates())));
+  }
+
+  /**
+   * 解析模型输出。模型偶尔会漂移成两种形态，这里都接受：
+   * <ul>
+   *   <li>{@code {"assignments":[...]}} —— 提示词要求的标准形态</li>
+   *   <li>{@code [...]} —— 直接把 assignments 数组当根输出（2026-10-13 线上 503 的真实原因）</li>
+   * </ul>
+   * 另外容忍 JSON 前后的围栏与寒暄文字：只要正文里有 JSON 就取出来解析。
+   */
+  StructuredResult readStructured(String output) {
+    String text = jsonBody(stripCodeFence(output));
+    if (text.startsWith("[")) {
+      List<StructuredCandidate> items =
+          jsonMapper.readValue(text, new TypeReference<List<StructuredCandidate>>() {});
+      return new StructuredResult(items);
+    }
+    return jsonMapper.readValue(text, StructuredResult.class);
+  }
+
+  /** 截取正文里的 JSON 主体：跳过 ```json 围栏和"好的，结果如下"之类的寒暄，截到最后一个括号为止。 */
+  static String jsonBody(String text) {
+    String value = text == null ? "" : text.trim();
+    int objectStart = value.indexOf('{');
+    int arrayStart = value.indexOf('[');
+    int start = objectStart < 0 ? arrayStart
+        : (arrayStart < 0 ? objectStart : Math.min(objectStart, arrayStart));
+    if (start > 0) value = value.substring(start);
+    int end = Math.max(value.lastIndexOf('}'), value.lastIndexOf(']'));
+    if (end >= 0 && end < value.length() - 1) value = value.substring(0, end + 1);
+    return value.trim();
   }
 
   static Map<String, Object> imageSchema() {
@@ -128,7 +160,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         structuredSchema());
     if (outputText.isEmpty()) return Optional.empty();
     try {
-      StructuredResult structured = jsonMapper.readValue(stripCodeFence(outputText.get()), StructuredResult.class);
+      StructuredResult structured = readStructured(outputText.get());
       ConversionResult converted = toCandidates(structured);
       log.info(
           "[AI] organizer parsed model={} assignments={} accepted={} unsupportedSubject={} blankTitle={} unsupportedValues={}",
@@ -163,7 +195,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         + "sourceExcerpt 必须尽量直接摘取对应老师原文，confidence 为 0 到 1。"
         + "title 要简洁，instruction 保留完成任务所需信息。"
         + "明显属于同一任务的重复表述直接合并，不做重复任务对比或额外标记。"
-        + "最终只输出一个 JSON 对象，根字段为 assignments，不要输出 Markdown 或额外解释。";
+        + "最终只输出一个 JSON 对象（以 { 开头、以 } 结尾），根字段为 assignments、其值为数组；"
+        + "不要直接把数组当根输出，不要输出 Markdown 代码围栏或额外解释。";
   }
 
   static String buildInput(StudentEntity student, String sourceLabel, String text) {

@@ -95,6 +95,47 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
+  void imageOutputIsAcceptedWhenGlmDropsTheAssignmentsWrapper() {
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), null, JsonMapper.builder().build());
+    // 2026-10-13 线上 503 的原始输出形态：不发 response_format 时 glm-4.6v-flashx 直接以数组为根，
+    // 且不带 textbookRef，外层还包了代码围栏。解析必须容忍，否则整条截图识别链路挂掉。
+    String arrayRoot = """
+        ```json
+        [
+          {"subject": "语文", "taskDate": "2026-10-13", "sourceExcerpt": "1.语文：抄写第12课生字表两遍",
+           "confidence": 1, "title": "语文作业：抄写生字表", "instruction": "抄写两遍", "expectedMinutes": 15},
+          {"subject": "数学", "taskDate": "2026-10-13", "sourceExcerpt": "2.数学：练习册 P34-P35",
+           "confidence": 1, "title": "数学作业：练习册", "instruction": "完成 P34-P35", "expectedMinutes": 18}
+        ]
+        ```
+        """;
+
+    var result = client.parseImageOutput(arrayRoot).orElseThrow();
+
+    assertEquals(List.of("语文", "数学"),
+        result.assignments().stream().map(HomeworkOrganizerDtos.Candidate::subject).toList());
+    assertEquals("AI_IMAGE", result.mode());
+    // textbookRef 缺失时按约定回退到"待家长确认"
+    assertTrue(result.assignments().stream()
+        .allMatch(item -> "待家长确认".equals(item.textbookRef())));
+  }
+
+  @Test
+  void imageOutputToleratesPreambleAndTrailingChatter() {
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), null, JsonMapper.builder().build());
+
+    var result = client.parseImageOutput("好的，我识别到如下作业：\n"
+        + "[{\"subject\":\"英语\",\"title\":\"跟读\",\"instruction\":\"跟读三遍\",\"taskDate\":\"2026-10-13\","
+        + "\"expectedMinutes\":10,\"sourceExcerpt\":\"英语跟读\",\"confidence\":0.9}]\n"
+        + "如需调整请告诉我。").orElseThrow();
+
+    assertEquals(1, result.assignments().size());
+    assertEquals("英语", result.assignments().get(0).subject());
+  }
+
+  @Test
   void imageAvailabilityFollowsTheConfiguredModelCapabilityNotJustTheApiKey() {
     var properties = new AiProviderProperties();
     properties.setBaseUrl("https://open.bigmodel.cn/api/paas/v4");
