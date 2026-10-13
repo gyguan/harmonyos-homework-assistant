@@ -575,26 +575,31 @@ export struct HomeworkConfirmationPage {
 
       Scroll() {
         Column() {
-          this.CandidateList();
+          Column() {
+            this.CandidateList();
+          }
+          .width('100%')
+          .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
+          .padding({
+            left: AppTheme.PAGE_PADDING,
+            right: AppTheme.PAGE_PADDING,
+            top: 4,
+            bottom: 16
+          });
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
-        .padding({
-          left: AppTheme.PAGE_PADDING,
-          right: AppTheme.PAGE_PADDING,
-          top: 4,
-          bottom: 16
-        });
+        .alignItems(HorizontalAlign.Center);
       }
       .width('100%')
       .layoutWeight(1)
-      .align(Alignment.TopStart)
+      .align(Alignment.Top)
       .scrollBar(BarState.Off);
 
       this.BottomActionBar();
     }
     .width('100%')
     .height('100%')
+    .alignItems(HorizontalAlign.Center)
     .backgroundColor(AppTheme.BACKGROUND)
     .bindSheet($$this.showEditorSheet, this.CandidateEditorSheet(), {
       height: '82%',
