@@ -10,6 +10,7 @@ import { PhotoPreviewDialog } from '../../../components/submission/PhotoPreviewD
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
+import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { ParentReviewViewModel } from './ParentReviewViewModel';
 import { ParentAssignmentEditPanel } from './ParentAssignmentEditPanel';
 
@@ -413,7 +414,7 @@ export struct ParentReviewPane {
                 .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
                 .textOverflow({ overflow: TextOverflow.Ellipsis });
               Row({ space: 8 }) {
-                Text(this.assignment()!.dueText.length > 0 ? this.assignment()!.dueText : '未设置截止时间')
+                Text('任务日期 ' + AssignmentTaskDate.displayText(this.assignment()!.taskDate))
                   .fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
                 Text('·').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
                 Text(this.actualMinutes(this.assignment()!) > 0 ?
