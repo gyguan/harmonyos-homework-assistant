@@ -1,6 +1,10 @@
 import { AssignmentEditChangeDetector, AssignmentEditValues } from '../../../common/state/AssignmentEditChangeDetector';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
+import {
+  PendingAssignmentAttachment,
+  PendingAssignmentAttachmentPicker
+} from '../../../components/assignment/PendingAssignmentAttachmentPicker';
 import { EditSheetHeader } from '../../../components/navigation/EditSheetHeader';
 import { ChoiceSelectionChip } from '../../../components/selection/SelectionControls';
 import { CandidateAssignment, Subject } from '../../../domain/model/HomeworkModels';
@@ -152,17 +156,20 @@ export struct ConfirmationCandidateCard {
 @Component
 export struct ConfirmationCandidateEditor {
   @Prop item: CandidateAssignment;
+  @Prop attachments: PendingAssignmentAttachment[] = [];
   @State private subjectDraft: Subject = Subject.CHINESE;
   @State private titleDraft: string = '';
   @State private instructionDraft: string = '';
   @State private taskDateDraft: string = '';
   @State private expectedMinutesDraft: number = 20;
   @State private textbookRefDraft: string = '';
+  @State private attachmentDraft: PendingAssignmentAttachment[] = [];
   @State private confirmDiscard: boolean = false;
   @State private confirmDelete: boolean = false;
 
   onClose: () => void = () => {};
-  onSave: (candidate: CandidateAssignment) => boolean = (_candidate: CandidateAssignment) => false;
+  onSave: (candidate: CandidateAssignment, attachments: PendingAssignmentAttachment[]) => boolean =
+    (_candidate: CandidateAssignment, _attachments: PendingAssignmentAttachment[]) => false;
   onDelete: (candidateId: string) => void = (_candidateId: string) => {};
 
   aboutToAppear(): void {
@@ -172,6 +179,7 @@ export struct ConfirmationCandidateEditor {
     this.taskDateDraft = this.item.taskDate;
     this.expectedMinutesDraft = this.item.expectedMinutes;
     this.textbookRefDraft = this.item.textbookRef;
+    this.attachmentDraft = this.attachments.slice();
     this.confirmDiscard = false;
     this.confirmDelete = false;
   }
@@ -198,8 +206,20 @@ export struct ConfirmationCandidateEditor {
     };
   }
 
+  private attachmentsChanged(): boolean {
+    if (this.attachments.length !== this.attachmentDraft.length) return true;
+    for (let i = 0; i < this.attachments.length; i++) {
+      let original = this.attachments[i];
+      let draft = this.attachmentDraft[i];
+      if (original.resourceType !== draft.resourceType || original.uri !== draft.uri ||
+        original.displayName !== draft.displayName) return true;
+    }
+    return false;
+  }
+
   private hasChanges(): boolean {
-    return AssignmentEditChangeDetector.hasChanges(this.originalEditValues(), this.currentEditValues());
+    return AssignmentEditChangeDetector.hasChanges(this.originalEditValues(), this.currentEditValues()) ||
+      this.attachmentsChanged();
   }
 
   private markChanged(): void {
@@ -242,7 +262,7 @@ export struct ConfirmationCandidateEditor {
   }
 
   private saveAndClose(): void {
-    if (!this.onSave(this.buildCandidate())) return;
+    if (!this.onSave(this.buildCandidate(), this.attachmentDraft.slice())) return;
     this.onClose();
   }
 
@@ -360,6 +380,15 @@ export struct ConfirmationCandidateEditor {
             },
             onMinutesChange: (minutes: number) => {
               this.expectedMinutesDraft = minutes;
+              this.markChanged();
+            }
+          });
+
+          PendingAssignmentAttachmentPicker({
+            candidateId: this.item.id,
+            attachments: this.attachmentDraft,
+            onChange: (attachments: PendingAssignmentAttachment[]) => {
+              this.attachmentDraft = attachments.slice();
               this.markChanged();
             }
           });
