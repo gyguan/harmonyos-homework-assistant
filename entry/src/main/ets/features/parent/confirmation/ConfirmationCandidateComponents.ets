@@ -68,6 +68,7 @@ export struct CandidateDurationControl {
 @Component
 export struct ConfirmationCandidateCard {
   @Prop item: CandidateAssignment;
+  @Prop sameTaskPeerTitles: string = '';
   @Prop selected: boolean = false;
   onSelect: () => void = () => {};
   onMinutesChange: (candidate: CandidateAssignment, minutes: number) => void =
@@ -104,7 +105,7 @@ export struct ConfirmationCandidateCard {
   }
 
   private hasSemanticWarning(): boolean {
-    return this.sameTaskGroup().length > 0 || this.duplicateAssignmentId().length > 0;
+    return this.sameTaskPeerTitles.trim().length > 0 || this.duplicateAssignmentId().length > 0;
   }
 
   build() {
@@ -205,15 +206,22 @@ export struct ConfirmationCandidateCard {
         .padding(9)
         .backgroundColor(AppTheme.WARNING_SOFT)
         .borderRadius(AppTheme.CONTROL_RADIUS);
-      } else if (this.sameTaskGroup().length > 0) {
-        Column({ space: 3 }) {
-          Text('疑似与本批另一项属于同一作业')
+      } else if (this.sameTaskPeerTitles.trim().length > 0) {
+        Column({ space: 4 }) {
+          Text('疑似与本批以下任务属于同一作业')
             .width('100%')
             .fontSize(AppTheme.META_SIZE)
             .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.WARNING);
-          Text('请核对两项内容；若重复可删除其中一项，若确为两项任务可保留。')
+          Text('本批任务 · ' + this.sameTaskPeerTitles.trim())
+            .width('100%')
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
+            .fontColor(AppTheme.TEXT)
+            .maxLines(3)
+            .textOverflow({ overflow: TextOverflow.Ellipsis });
+          Text('请核对这些任务；若重复可删除其中一项，若确为独立任务可保留。')
             .width('100%')
             .fontSize(AppTheme.CAPTION_SIZE)
             .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
