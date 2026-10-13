@@ -37,6 +37,7 @@ class DailyHomeworkCoverageServiceTest {
   void parentIdentityIsLimitedToDadAndMom() {
     assertEquals("DAD", DailyHomeworkCoverageService.normalizeParentIdentity("dad"));
     assertEquals("MOM", DailyHomeworkCoverageService.normalizeParentIdentity(" MOM "));
+    assertEquals("DAD", DailyHomeworkCoverageService.normalizeParentIdentity(null));
   }
 
   @Test
