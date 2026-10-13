@@ -24,6 +24,8 @@ export class AssignmentAudioPlayerService {
     try {
       if (canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
         if (canIUse('SystemCapability.Multimedia.Media.Core')) {
+          // Runtime SysCap guards above are intentional; API 26 compiler cannot narrow canIUse() for MediaKit.
+          // @SuppressWarnings syscap
           let player = await media.createAVPlayer();
           this.player = player;
           player.on('stateChange', (state: media.AVPlayerState) => {
