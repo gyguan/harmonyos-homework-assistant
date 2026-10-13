@@ -41,19 +41,39 @@ public class HomeworkOrganizerService {
 
   public HomeworkOrganizerDtos.ImageResponse organizeImage(UUID familyId, String studentId,
       HomeworkOrganizerDtos.ImageRequest request) {
+    long totalStarted = System.nanoTime();
     StudentEntity student = students.findById(studentId)
         .orElseThrow(() -> new ApiExceptions.NotFound("孩子不存在"));
     if (!familyId.equals(student.familyId)) throw new ApiExceptions.NotFound("孩子不存在");
+
+    long validateStarted = System.nanoTime();
     String imageDataUrl = HomeworkImageInput.dataUrl(request);
+    long validateMs = elapsedMs(validateStarted);
+
     if (!model.imageAvailable()) throw new ApiExceptions.ServiceUnavailable("AI图片解析暂未配置");
+    long modelStarted = System.nanoTime();
     var result = model.organizeImage(
         student, request.sourceLabel(), imageDataUrl, request.text())
         .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI图片解析失败，请确认模型支持图片"));
+    long modelMs = elapsedMs(modelStarted);
+
     List<HomeworkOrganizerDtos.Candidate> normalized =
         normalizeDefaultTaskDates(result.assignments(), result.recognizedText());
-    log.info("homework_import image_parsed studentId={} assignments={}", studentId, normalized.size());
+    log.info(
+        "[AI-PERF] homework_image studentId={} base64Chars={} imageValidateMs={} modelMs={} totalMs={} assignments={} recognizedChars={}",
+        studentId,
+        request.imageBase64() == null ? 0 : request.imageBase64().length(),
+        validateMs,
+        modelMs,
+        elapsedMs(totalStarted),
+        normalized.size(),
+        result.recognizedText() == null ? 0 : result.recognizedText().length());
     return new HomeworkOrganizerDtos.ImageResponse(
         normalized, result.mode(), result.recognizedText());
+  }
+
+  private static long elapsedMs(long started) {
+    return java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started);
   }
 
   static List<HomeworkOrganizerDtos.Candidate> normalizeDefaultTaskDates(

@@ -53,17 +53,23 @@ export class HomeworkOrganizerRemoteApi {
 
   async organizeImage(input: ExtractedHomeworkText, imageRef: string): Promise<OrganizedHomeworkImage> {
     if (!BackendSession.instance.isConnected()) throw new Error('请先连接后端后再解析作业图片');
+    let totalStarted = Date.now();
+    let encodeStarted = Date.now();
     let encoded = await HomeworkImageEncoder.encode(imageRef);
+    let encodeMs = Date.now() - encodeStarted;
     let payload: ImageOrganizePayload = {
       imageBase64: encoded.imageBase64,
       contentType: encoded.contentType,
       sourceLabel: input.sourceLabel,
       text: input.text
     };
+    let requestStarted = Date.now();
     let response = await BackendHttpClient.instance.requestFor(
       'homework.organize.image',
       `/api/v1/students/${encodeURIComponent(input.studentId)}/homework/organize-image`,
       http.RequestMethod.POST, payload, true, 120000);
+    let requestMs = Date.now() - requestStarted;
+    console.info(`[AI-PERF] homework_image encodeMs=${encodeMs} requestMs=${requestMs} totalMs=${Date.now() - totalStarted} imageBytes=${encoded.encodedBytes}`);
     if (response.statusCode === 401) throw new Error('登录已失效，请重新登录后重试');
     if (response.statusCode < 200 || response.statusCode >= 300) {
       let message = 'AI图片解析失败，请换一张清晰图片后重试';
