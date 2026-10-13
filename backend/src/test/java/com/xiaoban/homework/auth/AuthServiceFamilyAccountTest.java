@@ -67,4 +67,26 @@ class AuthServiceFamilyAccountTest {
     assertTrue(response.accounts().get(1).mine());
     assertEquals("妈妈", response.accounts().get(1).displayName());
   }
+  @Test
+  void updatesOnlyCurrentAccountDisplayName() {
+    var accounts = mock(AccountRepository.class);
+    var encoder = mock(PasswordEncoder.class);
+    var tokens = mock(AuthTokenService.class);
+    var service = new AuthService(accounts, encoder, tokens);
+
+    UUID familyId = UUID.randomUUID();
+    UUID accountId = UUID.randomUUID();
+    AccountEntity account = new AccountEntity(
+        accountId, familyId, "parent", "hash", "家长", Instant.now());
+    when(accounts.findById(accountId)).thenReturn(Optional.of(account));
+
+    var updated = service.updateMyFamilyAccount(
+        familyId, accountId, new FamilyAccountDtos.UpdateMineRequest(" 爸爸 "));
+
+    assertEquals("爸爸", account.displayName);
+    assertEquals("爸爸", updated.displayName());
+    assertTrue(updated.mine());
+    verify(accounts).save(account);
+  }
+
 }
