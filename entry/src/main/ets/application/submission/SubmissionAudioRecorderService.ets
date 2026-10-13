@@ -63,17 +63,18 @@ export class SubmissionAudioRecorderService {
             console.error(`student submission recorder error: ${error.code} ${error.message}`);
             this.stateValue = 'ERROR';
           });
+          // Suppress the Media.Core warning for the whole profile initializer.
+          // Object-literal property members cannot carry the warning directive individually.
+          // @SuppressWarnings syscap
           let profile: media.AVRecorderProfile = {
             audioBitrate: 96000,
             audioChannels: 1,
-            // @SuppressWarnings syscap
             audioCodec: media.CodecMimeType.AUDIO_AAC,
             audioSampleRate: 48000,
-            // @SuppressWarnings syscap
             fileFormat: media.ContainerFormatType.CFT_MPEG_4A
           };
+          // @SuppressWarnings syscap
           let config: media.AVRecorderConfig = {
-            // @SuppressWarnings syscap
             audioSourceType: media.AudioSourceType.AUDIO_SOURCE_TYPE_MIC,
             profile: profile,
             url: 'fd://' + file.fd.toString()
