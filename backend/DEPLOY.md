@@ -342,7 +342,24 @@ AI_IMAGE_ORGANIZER_MODEL=glm-4.6v-flashx
 
 启动日志里 `[AI] config ... imageOrganizerModel=glm-4.6v-flashx` 是唯一可靠判据。
 
-### 9.8 成本
+### 9.8 作业媒体同步（录音/照片 → 任务）的模型配置（2026-10-13）
+
+媒体同步链路新增了 5 个 `AI_*` / `MEDIA_SYNC_*` 键（`application.yml` 的 `app.ai.media-sync-*`），
+**同样必须在 `docker-compose.prod.yml` 里透传**，否则容器内一律取默认值：
+
+| `.env` 键 | 作用 | 留空的后果 |
+|---|---|---|
+| `AI_AUDIO_TRANSCRIPTION_MODEL` | 语音转写模型 | **没有回退目标**，留空即 `AudioTranscriptionClient.available()=false`，整条转写链路静默跳过 |
+| `AI_MEDIA_SYNC_TRANSCRIPTIONS_PATH` | 转写接口路径，默认 `/v1/audio/transcriptions` | 用默认值即可 |
+| `AI_MEDIA_SYNC_IMAGE_MODEL` | 媒体图片理解模型 | 回退到 `AI_IMAGE_ORGANIZER_MODEL` |
+| `AI_MEDIA_SYNC_ALIGNMENT_MODEL` | 任务对齐模型 | 回退到 `AI_ORGANIZER_MODEL` |
+| `AI_MEDIA_SYNC_MAX_AI_IMAGES` | 单次送 AI 的图片数上限（1–30，默认 12） | 用默认值即可 |
+| `MEDIA_SYNC_WORKER_DELAY_MS` | 后台轮询间隔，默认 5000ms | 用默认值即可 |
+
+**排查方法**：`docker exec homework-backend-app-1 env | grep -E 'AI_AUDIO|MEDIA_SYNC'`
+——能打印出键才说明透传成功；键不在容器环境里，改 `.env` 也不会生效。
+
+### 9.9 成本
 
 `glm-4-flash` 单价 0 元，但**免费档有并发与速率限制**（智谱免费模型并发很低），适合家庭单用户场景，**不要用于多用户并发**。
 
