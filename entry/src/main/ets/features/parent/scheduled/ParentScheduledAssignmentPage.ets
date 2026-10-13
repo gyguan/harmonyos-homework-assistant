@@ -90,6 +90,7 @@ export struct ParentScheduledAssignmentPage {
     this.resetEditorState();
     this.editingId = plan.id;
     this.planType = plan.planType;
+    this.subjectCode = plan.subjectCode;
     this.name = plan.name;
     this.scheduleType = plan.scheduleType;
     this.timeOfDay = plan.timeOfDay;
@@ -97,7 +98,6 @@ export struct ParentScheduledAssignmentPage {
     this.startDate = plan.startDate;
     this.endDate = plan.endDate;
     if (plan.template !== null) {
-      this.subjectCode = plan.template.subjectCode;
       this.taskTitle = plan.template.title;
       this.instruction = plan.template.instruction;
       this.expectedMinutesText = String(plan.template.expectedMinutes);
@@ -246,6 +246,7 @@ export struct ParentScheduledAssignmentPage {
 
     return {
       planType: this.planType,
+      subjectCode: this.subjectCode,
       name: planName,
       scheduleType: this.scheduleType,
       timeOfDay: this.timeOfDay.trim(),
@@ -370,8 +371,9 @@ export struct ParentScheduledAssignmentPage {
             .fontColor(AppTheme.TEXT)
             .maxLines(2)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
-          Text(plan.planType === ScheduledAssignmentPlanType.VOICE_MATERIAL_AUTO ?
-            '自动语音作业' : '普通定时作业')
+          Text(this.subjectDisplay(plan.subjectCode) + ' · ' +
+            (plan.planType === ScheduledAssignmentPlanType.VOICE_MATERIAL_AUTO ?
+              '自动语音作业' : '普通定时作业'))
             .fontSize(AppTheme.CAPTION_SIZE)
             .fontColor(AppTheme.SUBTEXT);
         }
@@ -448,23 +450,13 @@ export struct ParentScheduledAssignmentPage {
   }
 
   @Builder
-  private Editor() {
-    Column({ space: 16 }) {
-      Row() {
-        Text(this.editingId.length === 0 ? '新建定时计划' : '编辑定时计划')
-          .fontSize(AppTheme.SECTION_TITLE_SIZE)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.TEXT);
-        Blank();
-        Button('取消', { type: ButtonType.Normal })
-          .height(AppTheme.MIN_TOUCH_TARGET)
-          .fontSize(AppTheme.ACTION_TEXT_SIZE)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .fontColor(AppTheme.TEXT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onClick(() => this.closeEditor());
-      }
-      .width('100%');
+  private TaskInformationSection() {
+    Column({ space: 14 }) {
+      Text('任务信息')
+        .width('100%')
+        .fontSize(AppTheme.SECTION_TITLE_SIZE)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(AppTheme.TEXT);
 
       Text('任务类型')
         .width('100%')
@@ -475,6 +467,146 @@ export struct ParentScheduledAssignmentPage {
         SegmentedSelectionButton({ label: '自动语音作业', selected: this.planType === ScheduledAssignmentPlanType.VOICE_MATERIAL_AUTO, onSelect: () => this.selectOption('PLAN_TYPE', ScheduledAssignmentPlanType.VOICE_MATERIAL_AUTO) });
       }
       .width('100%');
+
+      Text('科目')
+        .width('100%')
+        .fontSize(AppTheme.LABEL_TITLE_SIZE)
+        .fontColor(AppTheme.SUBTEXT);
+      Row({ space: 6 }) {
+        SegmentedSelectionButton({ label: '语文', selected: this.subjectCode === 'CHINESE', onSelect: () => this.selectOption('SUBJECT', 'CHINESE') });
+        SegmentedSelectionButton({ label: '数学', selected: this.subjectCode === 'MATH', onSelect: () => this.selectOption('SUBJECT', 'MATH') });
+        SegmentedSelectionButton({ label: '英语', selected: this.subjectCode === 'ENGLISH', onSelect: () => this.selectOption('SUBJECT', 'ENGLISH') });
+        SegmentedSelectionButton({ label: '其他', selected: this.subjectCode === 'OTHER', onSelect: () => this.selectOption('SUBJECT', 'OTHER') });
+      }
+      .width('100%');
+
+      if (this.planType === ScheduledAssignmentPlanType.MANUAL_ASSIGNMENT) {
+        Row() {
+          Text('任务名称')
+            .fontSize(AppTheme.LABEL_TITLE_SIZE)
+            .fontColor(AppTheme.SUBTEXT);
+          Blank();
+          if (this.taskTitle.length > 0) {
+            Text('清空')
+              .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+              .padding({ left: 12, right: 4 })
+              .fontSize(AppTheme.ACTION_TEXT_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.PRIMARY)
+              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .accessibilityText('清空任务名称')
+              .onClick(() => this.taskTitle = '');
+          }
+        }
+        .width('100%');
+
+        TextInput({ placeholder: '例如：阅读 20 分钟', text: this.taskTitle })
+          .width('100%')
+          .height(AppTheme.INPUT_HEIGHT)
+          .fontSize(AppTheme.FORM_TEXT_SIZE)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onChange((value: string) => this.taskTitle = value);
+
+        Row() {
+          Text('完成要求')
+            .fontSize(AppTheme.LABEL_TITLE_SIZE)
+            .fontColor(AppTheme.SUBTEXT);
+          Blank();
+          if (this.instruction.length > 0) {
+            Text('清空')
+              .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+              .padding({ left: 12, right: 4 })
+              .fontSize(AppTheme.ACTION_TEXT_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.PRIMARY)
+              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .accessibilityText('清空完成要求')
+              .onClick(() => this.instruction = '');
+          }
+        }
+        .width('100%');
+
+        TextArea({ placeholder: '完成要求', text: this.instruction })
+          .width('100%')
+          .height(104)
+          .fontSize(AppTheme.FORM_TEXT_SIZE)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onChange((value: string) => this.instruction = value);
+
+        Column({ space: 5 }) {
+          Text('预计用时')
+            .width('100%')
+            .fontSize(AppTheme.LABEL_TITLE_SIZE)
+            .fontColor(AppTheme.SUBTEXT);
+          TextInput({ placeholder: '分钟，例如 20', text: this.expectedMinutesText })
+            .width('100%')
+            .height(AppTheme.INPUT_HEIGHT)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .backgroundColor(AppTheme.SURFACE_SUBTLE)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onChange((value: string) => this.expectedMinutesText = value);
+        }
+        .width('100%');
+
+        Text('截止规则')
+          .width('100%')
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .fontColor(AppTheme.SUBTEXT);
+        Row({ space: 5 }) {
+          SegmentedSelectionButton({ label: '当天', selected: this.duePolicy === ScheduledAssignmentDuePolicy.SAME_DAY_AT, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.SAME_DAY_AT) });
+          SegmentedSelectionButton({ label: '次日', selected: this.duePolicy === ScheduledAssignmentDuePolicy.NEXT_DAY_AT, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.NEXT_DAY_AT) });
+          SegmentedSelectionButton({ label: '创建后', selected: this.duePolicy === ScheduledAssignmentDuePolicy.AFTER_MINUTES, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.AFTER_MINUTES) });
+          SegmentedSelectionButton({ label: '不设置', selected: this.duePolicy === ScheduledAssignmentDuePolicy.NONE, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.NONE) });
+        }
+        .width('100%');
+
+        if (this.duePolicy === ScheduledAssignmentDuePolicy.SAME_DAY_AT ||
+          this.duePolicy === ScheduledAssignmentDuePolicy.NEXT_DAY_AT) {
+          TextInput({ placeholder: '截止时间 HH:mm', text: this.dueTime })
+            .width('100%')
+            .height(AppTheme.INPUT_HEIGHT)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .backgroundColor(AppTheme.SURFACE_SUBTLE)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onChange((value: string) => this.dueTime = value);
+        } else if (this.duePolicy === ScheduledAssignmentDuePolicy.AFTER_MINUTES) {
+          TextInput({ placeholder: '创建后多少分钟截止', text: this.dueOffsetMinutesText })
+            .width('100%')
+            .height(AppTheme.INPUT_HEIGHT)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .backgroundColor(AppTheme.SURFACE_SUBTLE)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onChange((value: string) => this.dueOffsetMinutesText = value);
+        }
+      } else {
+        Text('到点后只从' + this.subjectDisplay(this.subjectCode) +
+          '语音素材中选择任务；存在未完成语音任务或当天已自动创建时不会重复创建。')
+          .width('100%')
+          .fontSize(AppTheme.BODY_SIZE)
+          .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT)
+          .padding(12)
+          .backgroundColor(AppTheme.PRIMARY_FAINT)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
+      }
+    }
+    .width('100%')
+    .padding(AppTheme.CARD_PADDING_STANDARD)
+    .backgroundColor(AppTheme.CARD_SURFACE)
+    .border({ width: 1, color: AppTheme.BORDER })
+    .borderRadius(AppTheme.CARD_RADIUS_STANDARD);
+  }
+
+  @Builder
+  private PlanInformationSection() {
+    Column({ space: 14 }) {
+      Text('计划信息')
+        .width('100%')
+        .fontSize(AppTheme.SECTION_TITLE_SIZE)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(AppTheme.TEXT);
 
       Row() {
         Text('计划名称')
@@ -495,7 +627,7 @@ export struct ParentScheduledAssignmentPage {
       }
       .width('100%');
 
-      TextInput({ placeholder: '例如：每天阅读 20 分钟', text: this.name })
+      TextInput({ placeholder: '例如：每天 17:00 创建语文作业', text: this.name })
         .width('100%')
         .height(AppTheme.INPUT_HEIGHT)
         .fontSize(AppTheme.FORM_TEXT_SIZE)
@@ -514,6 +646,7 @@ export struct ParentScheduledAssignmentPage {
         SegmentedSelectionButton({ label: '自定义', selected: this.scheduleType === ScheduledAssignmentScheduleType.WEEKLY, onSelect: () => this.selectOption('SCHEDULE', ScheduledAssignmentScheduleType.WEEKLY) });
       }
       .width('100%');
+
       if (this.scheduleType === ScheduledAssignmentScheduleType.WEEKLY) {
         this.WeekdayOptions();
       }
@@ -552,162 +685,85 @@ export struct ParentScheduledAssignmentPage {
       .width('100%');
 
       if (this.scheduleType !== ScheduledAssignmentScheduleType.ONCE) {
-        TextInput({ placeholder: '结束日期（可不填，YYYY-MM-DD）', text: this.endDate })
-          .width('100%')
-          .height(AppTheme.INPUT_HEIGHT)
-          .fontSize(AppTheme.FORM_TEXT_SIZE)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onChange((value: string) => this.endDate = value);
-      }
-
-      if (this.planType === ScheduledAssignmentPlanType.MANUAL_ASSIGNMENT) {
-        Text('作业模板')
-          .width('100%')
-          .fontSize(AppTheme.SECTION_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Row({ space: 6 }) {
-          SegmentedSelectionButton({ label: '语文', selected: this.subjectCode === 'CHINESE', onSelect: () => this.selectOption('SUBJECT', 'CHINESE') });
-          SegmentedSelectionButton({ label: '数学', selected: this.subjectCode === 'MATH', onSelect: () => this.selectOption('SUBJECT', 'MATH') });
-          SegmentedSelectionButton({ label: '英语', selected: this.subjectCode === 'ENGLISH', onSelect: () => this.selectOption('SUBJECT', 'ENGLISH') });
-          SegmentedSelectionButton({ label: '其他', selected: this.subjectCode === 'OTHER', onSelect: () => this.selectOption('SUBJECT', 'OTHER') });
-        }
-        .width('100%');
-
-        Row() {
-          Text('任务名称')
+        Column({ space: 5 }) {
+          Text('结束日期')
+            .width('100%')
             .fontSize(AppTheme.LABEL_TITLE_SIZE)
             .fontColor(AppTheme.SUBTEXT);
-          Blank();
-          if (this.taskTitle.length > 0) {
-            Text('清空')
-              .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-              .padding({ left: 12, right: 4 })
-              .fontSize(AppTheme.ACTION_TEXT_SIZE)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.PRIMARY)
-              .accessibilityRole(AccessibilityRoleType.BUTTON)
-              .accessibilityText('清空任务名称')
-              .onClick(() => this.taskTitle = '');
-          }
-        }
-        .width('100%');
-
-        TextInput({ placeholder: '任务名称', text: this.taskTitle })
-          .width('100%')
-          .height(AppTheme.INPUT_HEIGHT)
-          .fontSize(AppTheme.FORM_TEXT_SIZE)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onChange((value: string) => this.taskTitle = value);
-
-        Row() {
-          Text('完成要求')
-            .fontSize(AppTheme.LABEL_TITLE_SIZE)
-            .fontColor(AppTheme.SUBTEXT);
-          Blank();
-          if (this.instruction.length > 0) {
-            Text('清空')
-              .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-              .padding({ left: 12, right: 4 })
-              .fontSize(AppTheme.ACTION_TEXT_SIZE)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.PRIMARY)
-              .accessibilityRole(AccessibilityRoleType.BUTTON)
-              .accessibilityText('清空完成要求')
-              .onClick(() => this.instruction = '');
-          }
-        }
-        .width('100%');
-
-        TextArea({ placeholder: '完成要求', text: this.instruction })
-          .width('100%')
-          .height(104)
-          .fontSize(AppTheme.FORM_TEXT_SIZE)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onChange((value: string) => this.instruction = value);
-
-        TextInput({ placeholder: '预计用时（分钟）', text: this.expectedMinutesText })
-          .width('100%')
-          .height(AppTheme.INPUT_HEIGHT)
-          .fontSize(AppTheme.FORM_TEXT_SIZE)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onChange((value: string) => this.expectedMinutesText = value);
-
-        Text('截止规则')
-          .width('100%')
-          .fontSize(AppTheme.LABEL_TITLE_SIZE)
-          .fontColor(AppTheme.SUBTEXT);
-        Row({ space: 5 }) {
-          SegmentedSelectionButton({ label: '当天', selected: this.duePolicy === ScheduledAssignmentDuePolicy.SAME_DAY_AT, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.SAME_DAY_AT) });
-          SegmentedSelectionButton({ label: '次日', selected: this.duePolicy === ScheduledAssignmentDuePolicy.NEXT_DAY_AT, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.NEXT_DAY_AT) });
-          SegmentedSelectionButton({ label: '创建后', selected: this.duePolicy === ScheduledAssignmentDuePolicy.AFTER_MINUTES, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.AFTER_MINUTES) });
-          SegmentedSelectionButton({ label: '不设置', selected: this.duePolicy === ScheduledAssignmentDuePolicy.NONE, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.NONE) });
-        }
-        .width('100%');
-
-        if (this.duePolicy === ScheduledAssignmentDuePolicy.SAME_DAY_AT ||
-          this.duePolicy === ScheduledAssignmentDuePolicy.NEXT_DAY_AT) {
-          TextInput({ placeholder: '截止时间 HH:mm', text: this.dueTime })
+          TextInput({ placeholder: '可不填，YYYY-MM-DD', text: this.endDate })
             .width('100%')
             .height(AppTheme.INPUT_HEIGHT)
             .fontSize(AppTheme.FORM_TEXT_SIZE)
             .backgroundColor(AppTheme.SURFACE_SUBTLE)
             .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onChange((value: string) => this.dueTime = value);
-        } else if (this.duePolicy === ScheduledAssignmentDuePolicy.AFTER_MINUTES) {
-          TextInput({ placeholder: '创建后多少分钟截止', text: this.dueOffsetMinutesText })
-            .width('100%')
-            .height(AppTheme.INPUT_HEIGHT)
-            .fontSize(AppTheme.FORM_TEXT_SIZE)
-            .backgroundColor(AppTheme.SURFACE_SUBTLE)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onChange((value: string) => this.dueOffsetMinutesText = value);
+            .onChange((value: string) => this.endDate = value);
         }
-      } else {
-        Text('到点后自动从语音素材库选择任务；存在未完成语音任务或当天已自动创建时不会重复创建。')
-          .width('100%')
-          .fontSize(AppTheme.BODY_SIZE)
-          .lineHeight(AppTheme.BODY_LINE_HEIGHT)
-          .fontColor(AppTheme.SUBTEXT)
-          .padding(12)
-          .backgroundColor(AppTheme.PRIMARY_FAINT)
-          .borderRadius(AppTheme.CONTROL_RADIUS);
-      }
-
-      if (this.editingId.length > 0 && this.recentRuns.length > 0) {
-        Text('最近执行')
-          .width('100%')
-          .fontSize(AppTheme.SECTION_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        ForEach(this.recentRuns, (run: ScheduledAssignmentRun) => {
-          Row({ space: 8 }) {
-            Text(this.formatEpoch(run.scheduledFireAtEpochMs))
-              .fontSize(AppTheme.META_SIZE)
-              .fontColor(AppTheme.TEXT);
-            Text(run.status === 'SUCCESS' ? '成功' : run.status === 'SKIPPED' ? '跳过' : '失败')
-              .fontSize(AppTheme.CAPTION_SIZE)
-              .fontColor(run.status === 'SUCCESS' ? AppTheme.SUCCESS :
-                run.status === 'FAILED' ? AppTheme.DANGER : AppTheme.SUBTEXT);
-            Blank();
-            if (run.skipReason.length > 0) {
-              Text(run.skipReason)
-                .fontSize(AppTheme.CAPTION_SIZE)
-                .fontColor(AppTheme.SUBTEXT);
-            }
-          }
-          .width('100%');
-        }, (run: ScheduledAssignmentRun) => run.id);
+        .width('100%');
       }
     }
     .width('100%')
     .padding(AppTheme.CARD_PADDING_STANDARD)
     .backgroundColor(AppTheme.CARD_SURFACE)
+    .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.CARD_RADIUS_STANDARD);
+  }
+
+  @Builder
+  private Editor() {
+    Column({ space: 12 }) {
+      Row() {
+        Text(this.editingId.length === 0 ? '新建定时计划' : '编辑定时计划')
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.TEXT);
+        Blank();
+        Button('取消', { type: ButtonType.Normal })
+          .height(AppTheme.MIN_TOUCH_TARGET)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .fontColor(AppTheme.TEXT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onClick(() => this.closeEditor());
+      }
+      .width('100%');
+
+      this.TaskInformationSection();
+      this.PlanInformationSection();
+
+      if (this.editingId.length > 0 && this.recentRuns.length > 0) {
+        Column({ space: 10 }) {
+          Text('最近执行')
+            .width('100%')
+            .fontSize(AppTheme.SECTION_TITLE_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          ForEach(this.recentRuns, (run: ScheduledAssignmentRun) => {
+            Row({ space: 8 }) {
+              Text(this.formatEpoch(run.scheduledFireAtEpochMs))
+                .fontSize(AppTheme.META_SIZE)
+                .fontColor(AppTheme.TEXT);
+              Text(run.status === 'SUCCESS' ? '成功' : run.status === 'SKIPPED' ? '跳过' : '失败')
+                .fontSize(AppTheme.CAPTION_SIZE)
+                .fontColor(run.status === 'SUCCESS' ? AppTheme.SUCCESS :
+                  run.status === 'FAILED' ? AppTheme.DANGER : AppTheme.SUBTEXT);
+              Blank();
+              if (run.skipReason.length > 0) {
+                Text(run.skipReason)
+                  .fontSize(AppTheme.CAPTION_SIZE)
+                  .fontColor(AppTheme.SUBTEXT);
+              }
+            }
+            .width('100%');
+          }, (run: ScheduledAssignmentRun) => run.id);
+        }
+        .width('100%')
+        .padding(AppTheme.CARD_PADDING_STANDARD)
+        .backgroundColor(AppTheme.CARD_SURFACE)
+        .border({ width: 1, color: AppTheme.BORDER })
+        .borderRadius(AppTheme.CARD_RADIUS_STANDARD);
+      }
+    }
+    .width('100%');
   }
 
   @Builder
