@@ -490,7 +490,9 @@ def main() -> None:
     translation_catalog = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationCatalog.ets")
     require("static validationItems(questionIds:string[]):ToeicQuestionTranslation[]" in translation_catalog and
             "let resolved=ToeicQuestionTranslationCatalog.find(questionId);" in translation_catalog and
-            "if (resolved!==null) result.push(resolved);" in translation_catalog,
+            "if (resolved!==null) {" in translation_catalog and
+            "result.push(resolved);" in translation_catalog and
+            "known.set(questionId,true);" in translation_catalog,
             "current versioned question translations must participate in runtime validation")
     for active_translation_id in [
         "R-FP1-DX-P5-05","R-FP5-VERB-0206","R-FP5-SPRINT-1517",
@@ -509,8 +511,39 @@ def main() -> None:
 
     ui = read("entry/src/main/ets/toeic/ui/ToeicHomePage.ets")
     require("校验详情：" in ui and
-            "this.viewModel.contentErrors().slice(0,5)" in ui,
-            "TOEIC fail-closed UI must surface concrete runtime validation errors")
+            "this.contentValidationErrors.slice(0,5)" in ui and
+            "this.contentValidationErrors=this.viewModel.contentErrors();" in ui and
+            "if (!this.contentValidationReady)" in ui and
+            "return this.contentValidationReady && this.contentValidationErrors.length===0;" in ui,
+            "TOEIC fail-closed UI must show cached validation errors and block training until validated")
+    # Cached, immutable release catalogs must not be rebuilt for every
+    # non-mock day, and hot tab navigation must reuse completed validation.
+    preset = read("entry/src/main/ets/toeic/content/PresetToeicContent.ets")
+    view_model = read("entry/src/main/ets/toeic/ui/ToeicCoachViewModel.ets")
+    progress_store = read("entry/src/main/ets/toeic/data/ToeicProgressStore.ets")
+    require(all(token in preset for token in [
+        "private static cachedQuestions:", "private static cachedReadingGroups:",
+        "private static cachedPublishedQuestions:", "private static cachedLiveQuestions:",
+        "private static cachedStudyDays:", "private static cachedVocabulary:",
+        "private static cachedSentenceDrills:", "cachedLiveQuestionIndex.get(id)"
+    ]), "TOEIC bundled catalogs must remain cached and indexed for navigation")
+    require("private static cachedItems:" in translation_catalog and
+            "private static cachedById:" in translation_catalog and
+            "ToeicQuestionTranslationCatalog.baseById().get(questionId)" in translation_catalog,
+            "TOEIC historical translations must be cached and indexed")
+    require("this.viewModel.cachedErrors()" in ui and
+            "this.contentValidationReady=true;" in ui and
+            "this.contentValidationTimer=setTimeout" in ui and
+            "},16);" in ui and
+            "content.validate costMs=" in ui,
+            "TOEIC home must reuse completed validation and measure cold validation cost")
+    require("private static syncInFlight:" in view_model and
+            "lastSuccessfulSyncAtMs" in view_model and
+            "return localChanged;" in view_model and
+            "if (!changed) return;" in ui and
+            "local.streak===incoming.streak" in progress_store and
+            "if (changed) await this.save();" in progress_store,
+            "TOEIC cloud recall sync must avoid redundant requests, writes and renders")
     require("标记重点" not in ui and
             "取消重点" not in ui and
             "toggleVocabularyImportant" not in ui and

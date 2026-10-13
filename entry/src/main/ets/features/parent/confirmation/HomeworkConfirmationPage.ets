@@ -1,18 +1,23 @@
 import { SelectionIds } from '../../../common/state/SelectionIds';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { RemoteAssignmentResourceApi } from '../../../application/remote/RemoteAssignmentResourceApi';
+import { HomeworkCoverageRemoteApi } from '../../../application/remote/HomeworkCoverageRemoteApi';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
+import { PendingAssignmentAttachment } from '../../../components/assignment/PendingAssignmentAttachmentPicker';
 import {
-  PendingAssignmentAttachment,
-  PendingAssignmentAttachmentPicker
-} from '../../../components/assignment/PendingAssignmentAttachmentPicker';
-import { CandidateAssignment } from '../../../domain/model/HomeworkModels';
+  HomeworkCoveragePicker,
+  HomeworkCoverageSubject
+} from '../../../components/assignment/HomeworkCoveragePicker';
+import { CandidateAssignment, Subject } from '../../../domain/model/HomeworkModels';
+import { ParentIdentity } from '../../../domain/model/ParentIdentity';
+import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { HomeworkConfirmationViewModel } from './HomeworkConfirmationViewModel';
 import { ConfirmationCandidateCard, ConfirmationCandidateEditor } from './ConfirmationCandidateComponents';
 
 @Component
 export struct HomeworkConfirmationPage {
   @Prop revision: number = 0;
+  @Prop parentIdentity: ParentIdentity = ParentIdentity.DAD;
   @State private localRevision: number = 0;
   @State private editingCandidateId: string = '';
   @State private manualCandidateDraft: CandidateAssignment | null = null;
@@ -25,12 +30,20 @@ export struct HomeworkConfirmationPage {
   @State private selectedCandidateIds: string[] = [];
   @State private batchDeleteConfirm: boolean = false;
   @State private pendingAttachments: PendingAssignmentAttachment[] = [];
+  @State private coverageSubjects: string[] = [];
   onBack: () => void = () => {};
   onPublished: () => void = () => {};
   onStoreChanged: () => void = () => {};
 
   private readonly viewModel: HomeworkConfirmationViewModel = new HomeworkConfirmationViewModel();
   private readonly resourceApi: RemoteAssignmentResourceApi = RemoteAssignmentResourceApi.instance;
+  private readonly coverageApi: HomeworkCoverageRemoteApi = HomeworkCoverageRemoteApi.instance;
+
+  aboutToAppear(): void {
+    this.coverageSubjects = this.suggestCoverageSubjects();
+    void this.mergeExistingCoverage();
+  }
+
 
   private touchRevision(): number { return this.revision + this.localRevision; }
 
@@ -38,6 +51,47 @@ export struct HomeworkConfirmationPage {
     let currentRevision = this.touchRevision();
     if (currentRevision < 0) return [];
     return this.viewModel.candidates();
+  }
+
+  private suggestCoverageSubjects(): string[] {
+    let today = AssignmentTaskDate.today();
+    let suggested: string[] = [];
+    for (let item of this.viewModel.candidates()) {
+      if (item.taskDate !== today) continue;
+      let subject = '';
+      if (item.subject === Subject.CHINESE) subject = HomeworkCoverageSubject.CHINESE;
+      else if (item.subject === Subject.MATH) subject = HomeworkCoverageSubject.MATH;
+      else if (item.subject === Subject.ENGLISH) subject = HomeworkCoverageSubject.ENGLISH;
+      if (subject.length > 0 && !HomeworkCoverageSubject.contains(suggested, subject)) {
+        suggested.push(subject);
+      }
+    }
+    return HomeworkCoverageSubject.order(suggested);
+  }
+
+  private async mergeExistingCoverage(): Promise<void> {
+    let items = this.viewModel.candidates();
+    if (items.length === 0) return;
+    try {
+      let response = await this.coverageApi.get(
+        items[0].studentId, AssignmentTaskDate.today(), this.parentIdentity);
+      let mine: string[] = [];
+      for (let parent of response.parents) {
+        if (parent.mine) {
+          mine = parent.subjects.slice();
+          break;
+        }
+      }
+      if (HomeworkCoverageSubject.contains(mine, HomeworkCoverageSubject.ALL)) {
+        this.coverageSubjects = [HomeworkCoverageSubject.ALL];
+        return;
+      }
+      let merged = this.coverageSubjects.slice();
+      for (let subject of mine) {
+        if (!HomeworkCoverageSubject.contains(merged, subject)) merged.push(subject);
+      }
+      this.coverageSubjects = HomeworkCoverageSubject.order(merged);
+    } catch {}
   }
 
   private editingCandidate(): CandidateAssignment | null {
@@ -49,7 +103,7 @@ export struct HomeworkConfirmationPage {
   }
 
   private candidateRenderKey(item: CandidateAssignment): string {
-    return `${item.id}|${item.subject}|${item.title}|${item.instruction}|${item.dueText}|${item.textbookRef}|${item.expectedMinutes}`;
+    return `${item.id}|${item.subject}|${item.title}|${item.instruction}|${item.taskDate}|${item.textbookRef}|${item.expectedMinutes}`;
   }
 
   private openEditor(candidateId: string): void {
@@ -79,6 +133,17 @@ export struct HomeworkConfirmationPage {
     return true;
   }
 
+  private saveCandidateWithAttachments(
+    candidate: CandidateAssignment, attachments: PendingAssignmentAttachment[]): boolean {
+    let saved = this.manualCandidateDraft !== null && this.manualCandidateDraft.id === candidate.id ?
+      this.viewModel.addCandidate(candidate) : this.viewModel.updateCandidate(candidate);
+    if (!saved) return false;
+    this.updateCandidateAttachments(candidate.id, attachments);
+    this.localRevision++;
+    this.onStoreChanged();
+    return true;
+  }
+
   private setExpectedMinutes(item: CandidateAssignment, minutes: number): void {
     if (this.bulkMode) return;
     this.saveCandidate({
@@ -88,7 +153,7 @@ export struct HomeworkConfirmationPage {
       title: item.title,
       instruction: item.instruction,
       textbookRef: item.textbookRef,
-      dueText: item.dueText,
+      taskDate: item.taskDate,
       expectedMinutes: minutes,
       sourceEvidence: {
         sourceLabel: item.sourceEvidence.sourceLabel,
@@ -213,11 +278,24 @@ export struct HomeworkConfirmationPage {
 
   private async publish(): Promise<void> {
     if (this.publishing || this.candidates().length === 0 || this.bulkMode) return;
+    let publishCandidates = this.candidates();
+    let coverageStudentId = publishCandidates[0].studentId;
+    let coverageDate = AssignmentTaskDate.today();
+    let coverageSubjects = this.coverageSubjects.slice();
     this.publishing = true;
     this.publishMessage = '';
     this.publishError = false;
     try {
       let result = await this.viewModel.publish();
+      let coverageSyncFailed = false;
+      if (coverageSubjects.length > 0) {
+        try {
+          await this.coverageApi.updateMine(
+            coverageStudentId, coverageDate, this.parentIdentity, coverageSubjects);
+        } catch {
+          coverageSyncFailed = true;
+        }
+      }
       let attachmentCount = 0;
       let uploadFailures = 0;
       for (let assignment of result.assignments) {
@@ -235,9 +313,17 @@ export struct HomeworkConfirmationPage {
       this.pendingAttachments = [];
       this.localRevision++;
       this.onStoreChanged();
-      if (uploadFailures > 0) {
+      if (uploadFailures > 0 || coverageSyncFailed) {
         this.publishError = true;
-        this.publishMessage = `作业已发布，${attachmentCount} 个附件上传成功，${uploadFailures} 个失败；可在作业编辑中继续补充。`;
+        if (uploadFailures > 0 && coverageSyncFailed) {
+          this.publishMessage =
+            `作业已发布；${attachmentCount} 个附件上传成功，${uploadFailures} 个失败，今日协同状态同步失败。`;
+        } else if (uploadFailures > 0) {
+          this.publishMessage =
+            `作业已发布，${attachmentCount} 个附件上传成功，${uploadFailures} 个失败；可在作业编辑中继续补充。`;
+        } else {
+          this.publishMessage = '作业已发布，但今日协同状态同步失败；可返回首页重新标记。';
+        }
       } else {
         this.publishMessage = attachmentCount > 0 ?
           `已发布 ${result.publishedCount} 项作业，并上传 ${attachmentCount} 个附件` :
@@ -259,8 +345,10 @@ export struct HomeworkConfirmationPage {
     if (this.editingCandidate() !== null) {
       ConfirmationCandidateEditor({
         item: this.editingCandidate()!,
+        attachments: this.attachmentsFor(this.editingCandidate()!.id),
         onClose: () => this.closeEditor(),
-        onSave: (candidate: CandidateAssignment) => this.saveCandidate(candidate),
+        onSave: (candidate: CandidateAssignment, attachments: PendingAssignmentAttachment[]) =>
+          this.saveCandidateWithAttachments(candidate, attachments),
         onDelete: (candidateId: string) => this.removeCandidate(candidateId)
       });
     }
@@ -369,15 +457,6 @@ export struct HomeworkConfirmationPage {
             .width('100%')
             .alignItems(VerticalAlign.Center);
 
-            if (!this.bulkMode) {
-              PendingAssignmentAttachmentPicker({
-                candidateId: item.id,
-                attachments: this.attachmentsFor(item.id),
-                disabled: this.publishing,
-                onChange: (attachments: PendingAssignmentAttachment[]) =>
-                  this.updateCandidateAttachments(item.id, attachments)
-              });
-            }
           }
           .width('100%');
         }, (item: CandidateAssignment) => this.candidateRenderKey(item));
@@ -401,6 +480,16 @@ export struct HomeworkConfirmationPage {
   private BottomActionBar() {
     Column() {
       Column({ space: 8 }) {
+        if (!this.bulkMode) {
+          HomeworkCoveragePicker({
+            selected: this.coverageSubjects,
+            disabled: this.publishing,
+            title: '同步给其他家长',
+            description: '可选：标记你今天已经负责布置完成的作业，其他家长进入首页即可看到',
+            onChange: (subjects: string[]) => this.coverageSubjects = subjects.slice()
+          });
+        }
+
         this.PublishFeedback();
 
         if (this.bulkMode) {
@@ -486,26 +575,31 @@ export struct HomeworkConfirmationPage {
 
       Scroll() {
         Column() {
-          this.CandidateList();
+          Column() {
+            this.CandidateList();
+          }
+          .width('100%')
+          .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
+          .padding({
+            left: AppTheme.PAGE_PADDING,
+            right: AppTheme.PAGE_PADDING,
+            top: 4,
+            bottom: 16
+          });
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
-        .padding({
-          left: AppTheme.PAGE_PADDING,
-          right: AppTheme.PAGE_PADDING,
-          top: 4,
-          bottom: 16
-        });
+        .alignItems(HorizontalAlign.Center);
       }
       .width('100%')
       .layoutWeight(1)
-      .align(Alignment.TopStart)
+      .align(Alignment.Top)
       .scrollBar(BarState.Off);
 
       this.BottomActionBar();
     }
     .width('100%')
     .height('100%')
+    .alignItems(HorizontalAlign.Center)
     .backgroundColor(AppTheme.BACKGROUND)
     .bindSheet($$this.showEditorSheet, this.CandidateEditorSheet(), {
       height: '82%',

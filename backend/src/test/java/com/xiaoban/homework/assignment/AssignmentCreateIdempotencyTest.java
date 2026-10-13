@@ -11,6 +11,7 @@ import com.xiaoban.homework.storage.FileTransactionCoordinator;
 import com.xiaoban.homework.student.StudentService;
 import com.xiaoban.homework.submission.SubmissionPhotoRepository;
 import com.xiaoban.homework.submission.SubmissionRepository;
+import com.xiaoban.homework.submission.SubmissionResourceRepository;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -35,6 +36,7 @@ class AssignmentCreateIdempotencyTest {
         students,
         mock(SubmissionRepository.class),
         mock(SubmissionPhotoRepository.class),
+        mock(SubmissionResourceRepository.class),
         mock(AssignmentResourceRepository.class),
         mock(FileTransactionCoordinator.class));
 
@@ -55,12 +57,10 @@ class AssignmentCreateIdempotencyTest {
         title,
         "完成10道口算",
         "",
-        "今天",
+        "2026-10-13",
         "SCHOOL",
         "MATH",
         "NORMAL",
-        null,
-        "Asia/Shanghai",
         "NOT_STARTED",
         "测试",
         "老师原文",

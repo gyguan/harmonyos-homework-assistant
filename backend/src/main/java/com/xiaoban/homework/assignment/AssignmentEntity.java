@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity(name = "assignment")
@@ -18,9 +19,7 @@ public class AssignmentEntity {
   public String title;
   public String instruction;
   public String textbookRef;
-  public Instant dueAt;
-  public String dueTimezone;
-  public String dueText;
+  public LocalDate taskDate;
   public String status;
   public String sourceLabel;
   public String sourceExcerpt;

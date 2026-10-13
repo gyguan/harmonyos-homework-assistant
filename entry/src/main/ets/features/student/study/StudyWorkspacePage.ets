@@ -1,48 +1,41 @@
-import { TutorChatMessage, TutorConversation, TutorRemoteApi } from '../../../application/remote/TutorRemoteApi';
+import { AssignmentAudioPlayerService } from '../../../application/assignment/AssignmentAudioPlayerService';
 import { HomeworkSubmissionService } from '../../../application/submission/HomeworkSubmissionService';
-import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
-import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
+import { SubmissionAudioRecorderService } from '../../../application/submission/SubmissionAudioRecorderService';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
 import { AssignmentAttachmentViewer } from '../../../components/assignment/AssignmentAttachmentViewer';
 import { VoiceAssignmentPane } from '../../../components/assignment/VoiceAssignmentPane';
-import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
-import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { PhotoPreviewDialog } from '../../../components/submission/PhotoPreviewDialog';
 import { SubmissionResumeConfirmDialog } from '../../../components/submission/SubmissionResumeConfirmDialog';
-import { TutorQuestionCapturePanel } from '../../../components/tutor/TutorQuestionCapturePanel';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
 import { Assignment, AssignmentContentType, AssignmentStatus, Submission } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
+import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { StudyWorkspaceViewModel } from './StudyWorkspaceViewModel';
 
 @Component
 export struct StudyWorkspacePage {
-  @Prop tutorUnavailable: boolean = false;
   @Prop assignmentId: string = 'a-math-001';
   @Prop revision: number = 0;
   @State private actionRevision: number = 0;
   @State private actionRunning: boolean = false;
   @State private actionMessage: string = '';
-  @State private tutorPanelOpen: boolean = false;
-  @State private availableWidthVp: number = 390;
   @State private submissionPhotoUris: string[] = [];
   @State private selectingPhotos: boolean = false;
   @State private capturingPhoto: boolean = false;
   @State private submittingPhotos: boolean = false;
   @State private submissionMessage: string = '';
+  @State private submissionAudioUri: string = '';
+  @State private submissionAudioDurationMs: number = 0;
+  @State private submissionAudioState: string = 'IDLE';
+  @State private submissionRecordingElapsedMs: number = 0;
+  @State private submittingAudio: boolean = false;
+  @State private submissionAudioPrepared: boolean = false;
+  @State private submissionAudioPlaying: boolean = false;
+  @State private submissionAudioCurrentMs: number = 0;
   @State private previewUri: string = '';
   @State private resumePhotoCount: number = 0;
-  @State private tutorDraft: string = '';
-  @State private tutorMessages: TutorChatMessage[] = [];
-  @State private tutorNotice: string = '';
-  @State private tutorAvailable: boolean = false;
-  @State private tutorHasMore: boolean = false;
-  @State private tutorNextBeforeEpochMs: number = 0;
-  @State private tutorLoading: boolean = false;
-  @State private tutorLoadingOlder: boolean = false;
-  @State private tutorSending: boolean = false;
   @State private voiceFullscreenOpen: boolean = false;
   @State private voiceImageUris: string[] = [];
   @State private voiceImageIndex: number = 0;
@@ -51,7 +44,6 @@ export struct StudyWorkspacePage {
   @State private voiceDurationMs: number = 0;
   @State private voicePlaybackEnabled: boolean = false;
   @State private voicePrepared: boolean = false;
-  onBack: () => void = () => {};
   onStoreChanged: () => void = () => {};
 
   private previewController: CustomDialogController = new CustomDialogController({
@@ -73,12 +65,31 @@ export struct StudyWorkspacePage {
 
   private readonly viewModel: StudyWorkspaceViewModel =
     new StudyWorkspaceViewModel(DefaultAssignmentRepository.instance);
+  private readonly submissionAudioPlayer: AssignmentAudioPlayerService =
+    new AssignmentAudioPlayerService();
+  private submissionRecordingTimer: number = -1;
   private pauseEmbeddedMedia: () => void = () => {};
   private voiceToggleAudio: () => void = () => {};
   private voiceSeek: (value: number) => void = (_value: number) => {};
   private voicePreviousImage: () => void = () => {};
   private voiceNextImage: () => void = () => {};
   private voiceSelectImage: (index: number) => void = (_index: number) => {};
+
+  aboutToDisappear(): void {
+    this.stopSubmissionRecordingTimer();
+    void SubmissionAudioRecorderService.instance.release();
+    void this.submissionAudioPlayer.release();
+  }
+
+  private isVoiceSubmission(): boolean {
+    let item = this.assignment();
+    return item !== null && item.contentType === AssignmentContentType.AUDIO_IMAGE;
+  }
+
+  private submissionBusy(): boolean {
+    return this.selectingPhotos || this.capturingPhoto || this.submittingPhotos ||
+      this.submittingAudio || this.submissionAudioState === 'RECORDING';
+  }
 
   private applyVoiceMediaState(
     imageUris: string[],
@@ -109,14 +120,6 @@ export struct StudyWorkspacePage {
     return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   }
 
-  private canUseTutorSplit(): boolean {
-    return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.studyTutorRequirement());
-  }
-
-  private showTutorAsStandalone(): boolean {
-    return !this.canUseTutorSplit() && this.tutorPanelOpen;
-  }
-
   private assignment(): Assignment | null {
     let currentRevision = this.revision + this.actionRevision;
     if (currentRevision < 0) return null;
@@ -129,62 +132,6 @@ export struct StudyWorkspacePage {
     return HomeworkSubmissionService.instance.listCached(this.assignmentId);
   }
 
-  private async loadTutor(): Promise<void> {
-    if (this.tutorUnavailable || this.assignmentId.length === 0 || this.tutorLoading) return;
-    this.tutorLoading = true;
-    let conversation = await TutorRemoteApi.instance.load(this.assignmentId);
-    this.applyTutor(conversation);
-    this.tutorLoading = false;
-  }
-
-  private applyTutor(conversation: TutorConversation): void {
-    this.tutorMessages = conversation.messages.slice();
-    this.tutorAvailable = conversation.available;
-    this.tutorNotice = conversation.notice;
-    this.tutorHasMore = conversation.hasMore;
-    this.tutorNextBeforeEpochMs = conversation.nextBeforeEpochMs;
-  }
-
-  private async loadOlderTutor(): Promise<void> {
-    if (!this.tutorHasMore || this.tutorNextBeforeEpochMs <= 0 || this.tutorLoadingOlder) return;
-    this.tutorLoadingOlder = true;
-    let older = await TutorRemoteApi.instance.load(this.assignmentId, this.tutorNextBeforeEpochMs);
-    let merged: TutorChatMessage[] = [];
-    let seen: Set<string> = new Set<string>();
-    for (let item of older.messages) {
-      if (seen.has(item.id)) continue;
-      seen.add(item.id);
-      merged.push(item);
-    }
-    for (let item of this.tutorMessages) {
-      if (seen.has(item.id)) continue;
-      seen.add(item.id);
-      merged.push(item);
-    }
-    this.tutorMessages = merged;
-    this.tutorHasMore = older.hasMore;
-    this.tutorNextBeforeEpochMs = older.nextBeforeEpochMs;
-    if (older.notice.length > 0) this.tutorNotice = older.notice;
-    this.tutorLoadingOlder = false;
-  }
-
-  private async askTutor(): Promise<void> {
-    let text = this.tutorDraft.trim();
-    if (text.length === 0 || this.tutorSending) return;
-    this.tutorSending = true;
-    this.tutorNotice = '小伴正在想怎么提示你…';
-    let conversation = await TutorRemoteApi.instance.ask(this.assignmentId, text);
-    this.applyTutor(conversation);
-    if (conversation.available) this.tutorDraft = '';
-    this.tutorSending = false;
-  }
-
-  private fillTutorPrompt(prompt: string): void {
-    this.tutorDraft = prompt;
-    this.tutorNotice = '';
-  }
-
-
   private primaryActionLabel(): string {
     if (this.actionRunning) return '处理中…';
     let assignment = this.assignment();
@@ -196,6 +143,12 @@ export struct StudyWorkspacePage {
       case AssignmentStatus.PAUSED: return '继续作业';
       case AssignmentStatus.IN_PROGRESS: return '我做完了，准备提交';
       case AssignmentStatus.READY_TO_SUBMIT:
+        if (this.isVoiceSubmission()) {
+          if (this.submittingAudio) return '正在提交录音…';
+          if (this.submissionAudioState === 'RECORDING') return '请先完成录音';
+          if (this.submissionAudioState === 'PAUSED') return '请先完成录音';
+          return this.submissionAudioUri.length === 0 ? '请先录制作业' : '提交我的录音';
+        }
         if (this.selectingPhotos) return '正在打开图库…';
         if (this.capturingPhoto) return '正在打开相机…';
         if (this.submittingPhotos) return '正在检查并提交…';
@@ -208,9 +161,13 @@ export struct StudyWorkspacePage {
 
   private primaryActionEnabled(): boolean {
     let assignment = this.assignment();
-    if (assignment === null || this.actionRunning || this.selectingPhotos ||
-      this.capturingPhoto || this.submittingPhotos) return false;
-    if (assignment.status === AssignmentStatus.READY_TO_SUBMIT && this.submissionPhotoUris.length === 0) return false;
+    if (assignment === null || this.actionRunning || this.submissionBusy()) return false;
+    if (assignment.status === AssignmentStatus.READY_TO_SUBMIT) {
+      if (this.isVoiceSubmission()) {
+        return this.submissionAudioUri.length > 0 && this.submissionAudioState === 'RECORDED';
+      }
+      return this.submissionPhotoUris.length > 0;
+    }
     return assignment.status !== AssignmentStatus.SUBMITTED && assignment.status !== AssignmentStatus.COMPLETED;
   }
 
@@ -224,8 +181,13 @@ export struct StudyWorkspacePage {
       this.pauseEmbeddedMedia();
       await this.executeAction(AssignmentAction.READY_TO_SUBMIT);
     } else if (assignment.status === AssignmentStatus.READY_TO_SUBMIT) {
-      if (this.submissionPhotoUris.length === 0) return;
-      await this.submitSelectedPhotos(assignment.id);
+      if (this.isVoiceSubmission()) {
+        if (this.submissionAudioUri.length === 0 || this.submissionAudioState !== 'RECORDED') return;
+        await this.submitRecordedAudio(assignment.id);
+      } else {
+        if (this.submissionPhotoUris.length === 0) return;
+        await this.submitSelectedPhotos(assignment.id);
+      }
     }
   }
 
@@ -256,20 +218,180 @@ export struct StudyWorkspacePage {
   private async resumeFromSubmission(): Promise<void> {
     let assignment = this.assignment();
     if (assignment === null || assignment.status !== AssignmentStatus.READY_TO_SUBMIT ||
-      this.actionRunning || this.submittingPhotos) return;
+      this.actionRunning || this.submissionBusy()) return;
     let resumed = await this.executeAction(AssignmentAction.START);
     if (!resumed) return;
-    this.submissionPhotoUris = [];
+    if (!this.isVoiceSubmission()) this.submissionPhotoUris = [];
     this.submissionMessage = '';
   }
 
   private requestResumeFromSubmission(): void {
-    if (this.submissionPhotoUris.length === 0) {
+    if (this.isVoiceSubmission() || this.submissionPhotoUris.length === 0) {
       void this.resumeFromSubmission();
       return;
     }
     this.resumePhotoCount = this.submissionPhotoUris.length;
     this.resumeConfirmController.open();
+  }
+
+  private formatSubmissionTime(ms: number): string {
+    let totalSeconds = Math.max(0, Math.floor(ms / 1000));
+    let minutes = Math.floor(totalSeconds / 60);
+    let seconds = totalSeconds % 60;
+    return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  }
+
+  private startSubmissionRecordingTimer(): void {
+    this.stopSubmissionRecordingTimer();
+    this.submissionRecordingTimer = setInterval(() => {
+      this.submissionRecordingElapsedMs = SubmissionAudioRecorderService.instance.elapsedMs();
+    }, 250);
+  }
+
+  private stopSubmissionRecordingTimer(): void {
+    if (this.submissionRecordingTimer >= 0) {
+      clearInterval(this.submissionRecordingTimer);
+      this.submissionRecordingTimer = -1;
+    }
+  }
+
+  private async startSubmissionRecording(): Promise<void> {
+    if (!this.isVoiceSubmission() || this.submittingAudio ||
+      this.submissionAudioState === 'RECORDING' || this.submissionAudioState === 'PAUSED') return;
+    this.pauseEmbeddedMedia();
+    await this.submissionAudioPlayer.release();
+    this.submissionAudioPrepared = false;
+    this.submissionAudioPlaying = false;
+    this.submissionAudioCurrentMs = 0;
+    this.submissionMessage = '';
+    try {
+      await SubmissionAudioRecorderService.instance.start(this.assignmentId);
+      this.submissionAudioUri = '';
+      this.submissionAudioDurationMs = 0;
+      this.submissionRecordingElapsedMs = 0;
+      this.submissionAudioState = 'RECORDING';
+      this.startSubmissionRecordingTimer();
+    } catch (error) {
+      this.submissionAudioState = 'IDLE';
+      this.submissionMessage = error instanceof Error ? error.message : '无法开始录音';
+    }
+  }
+
+  private async pauseSubmissionRecording(): Promise<void> {
+    if (this.submissionAudioState !== 'RECORDING') return;
+    try {
+      await SubmissionAudioRecorderService.instance.pause();
+      this.submissionRecordingElapsedMs = SubmissionAudioRecorderService.instance.elapsedMs();
+      this.submissionAudioState = 'PAUSED';
+      this.stopSubmissionRecordingTimer();
+    } catch {
+      this.submissionMessage = '暂停录音失败，请重试';
+    }
+  }
+
+  private async resumeSubmissionRecording(): Promise<void> {
+    if (this.submissionAudioState !== 'PAUSED') return;
+    try {
+      await SubmissionAudioRecorderService.instance.resume();
+      this.submissionAudioState = 'RECORDING';
+      this.startSubmissionRecordingTimer();
+    } catch {
+      this.submissionMessage = '继续录音失败，请重试';
+    }
+  }
+
+  private async finishSubmissionRecording(): Promise<void> {
+    if (this.submissionAudioState !== 'RECORDING' && this.submissionAudioState !== 'PAUSED') return;
+    try {
+      let recording = await SubmissionAudioRecorderService.instance.stop();
+      this.stopSubmissionRecordingTimer();
+      this.submissionAudioUri = recording.uri;
+      this.submissionAudioDurationMs = recording.durationMs;
+      this.submissionRecordingElapsedMs = recording.durationMs;
+      this.submissionAudioState = 'RECORDED';
+      let preflight = await HomeworkSubmissionService.instance.preflightAudio(
+        this.submissionAudioUri, this.submissionAudioDurationMs);
+      this.submissionMessage = preflight.passed ? '录音完成，可以试听后提交' : preflight.message;
+    } catch {
+      this.stopSubmissionRecordingTimer();
+      this.submissionAudioState = 'IDLE';
+      this.submissionMessage = '录音保存失败，请重新录制';
+    }
+  }
+
+  private async resetSubmissionRecording(): Promise<void> {
+    this.stopSubmissionRecordingTimer();
+    await SubmissionAudioRecorderService.instance.release();
+    await this.submissionAudioPlayer.release();
+    this.submissionAudioUri = '';
+    this.submissionAudioDurationMs = 0;
+    this.submissionRecordingElapsedMs = 0;
+    this.submissionAudioState = 'IDLE';
+    this.submissionAudioPrepared = false;
+    this.submissionAudioPlaying = false;
+    this.submissionAudioCurrentMs = 0;
+    this.submissionMessage = '';
+  }
+
+  private async toggleSubmissionAudioPreview(): Promise<void> {
+    if (this.submissionAudioUri.length === 0 || this.submissionAudioState !== 'RECORDED') return;
+    if (this.submissionAudioPlaying) {
+      await this.submissionAudioPlayer.pause();
+      return;
+    }
+    if (this.submissionAudioPrepared) {
+      await this.submissionAudioPlayer.play();
+      return;
+    }
+    this.submissionMessage = '正在准备试听…';
+    await this.submissionAudioPlayer.prepare(this.submissionAudioUri, {
+      onPrepared: (durationMs: number) => {
+        this.submissionAudioPrepared = true;
+        if (durationMs > 0) this.submissionAudioDurationMs = durationMs;
+        this.submissionMessage = '';
+        void this.submissionAudioPlayer.play();
+      },
+      onState: (state) => {
+        this.submissionAudioPlaying = state === 'playing';
+        if (state === 'completed') this.submissionAudioCurrentMs = 0;
+      },
+      onTime: (timeMs: number) => this.submissionAudioCurrentMs = timeMs,
+      onError: (_message: string) => {
+        this.submissionAudioPlaying = false;
+        this.submissionMessage = '录音试听暂不可用';
+      }
+    });
+  }
+
+  private async submitRecordedAudio(assignmentId: string): Promise<void> {
+    if (this.submittingAudio || this.submissionAudioUri.length === 0) return;
+    this.submittingAudio = true;
+    this.submissionMessage = '正在检查并提交录音…';
+    try {
+      let preflight = await HomeworkSubmissionService.instance.preflightAudio(
+        this.submissionAudioUri, this.submissionAudioDurationMs);
+      if (!preflight.passed) {
+        this.submissionMessage = preflight.message;
+        return;
+      }
+      await this.submissionAudioPlayer.release();
+      let submitted = await HomeworkSubmissionService.instance.submitAudio(
+        assignmentId, this.submissionAudioUri, this.submissionAudioDurationMs);
+      if (!submitted) {
+        this.submissionMessage = '提交失败，请确认作业状态后重试';
+        return;
+      }
+      this.submissionAudioState = 'IDLE';
+      this.submissionAudioPrepared = false;
+      this.submissionAudioPlaying = false;
+      this.submissionMessage = '';
+      this.actionRevision++;
+      this.onStoreChanged();
+    } catch {
+      this.submissionMessage = '录音提交失败，请检查网络后重试';
+    } finally {
+      this.submittingAudio = false;
+    }
   }
 
   private appendSubmissionPhotos(uris: string[]): void {
@@ -384,57 +506,170 @@ export struct StudyWorkspacePage {
   }
 
   @Builder
-  private SubmissionPane() {
-    if (this.assignment() !== null && this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) {
-      Column({ space: 10 }) {
-        Text('提交作业照片')
+  private VoiceSubmissionPane() {
+    Column({ space: 12 }) {
+      Text('录制我的作业')
+        .width('100%')
+        .fontSize(AppTheme.CARD_TITLE_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
+
+      if (this.submissionAudioState === 'IDLE') {
+        Button('🎙 开始录音', { type: ButtonType.Normal })
           .width('100%')
-          .fontSize(AppTheme.CARD_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        if (this.submissionPhotoUris.length > 0) {
-          this.PhotoStrip(this.submissionPhotoUris, true);
-        }
-        Row({ space: 10 }) {
-          Button(this.selectingPhotos ? '正在打开图库…' : '从图库选择', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
-              this.submissionPhotoUris.length < 6)
-            .backgroundColor(AppTheme.PRIMARY_SOFT)
-            .fontColor(AppTheme.PRIMARY)
-            .onClick(() => { void this.selectSubmissionPhotos(); });
-          Button(this.capturingPhoto ? '正在打开相机…' : '拍照', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
-              this.submissionPhotoUris.length < 6)
-            .backgroundColor(AppTheme.PRIMARY_SOFT)
-            .fontColor(AppTheme.PRIMARY)
-            .onClick(() => { void this.captureSubmissionPhoto(); });
-        }
-        .width('100%');
-        Text(this.submissionPhotoUris.length === 0 ?
-          '可从图库选择或直接拍照，最多 6 张。' :
-          '请确认照片清晰、完整，页数和顺序无误。')
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(!this.submittingAudio)
+          .backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .onClick(() => { void this.startSubmissionRecording(); });
+        Text('完成朗读或口语练习后，在这里录下你的作业。')
           .width('100%')
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
-        if (this.submissionMessage.length > 0) {
-          Text(this.submissionMessage)
-            .width('100%')
-            .fontSize(AppTheme.ACTION_TEXT_SIZE)
-            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
-            .fontColor(AppTheme.PRIMARY);
+      } else if (this.submissionAudioState === 'RECORDING' || this.submissionAudioState === 'PAUSED') {
+        Column({ space: 8 }) {
+          Text(this.submissionAudioState === 'RECORDING' ? '● 正在录音' : '录音已暂停')
+            .fontSize(AppTheme.BODY_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.submissionAudioState === 'RECORDING' ? AppTheme.DANGER : AppTheme.WARNING);
+          Text(this.formatSubmissionTime(this.submissionRecordingElapsedMs))
+            .fontSize(30)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.TEXT);
         }
+        .width('100%')
+        .alignItems(HorizontalAlign.Center)
+        .padding({ top: 8, bottom: 8 });
+
+        Row({ space: 10 }) {
+          Button(this.submissionAudioState === 'RECORDING' ? '暂停' : '继续录音', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .fontColor(AppTheme.PRIMARY)
+            .onClick(() => {
+              if (this.submissionAudioState === 'RECORDING') void this.pauseSubmissionRecording();
+              else void this.resumeSubmissionRecording();
+            });
+          Button('完成录音', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.PRIMARY)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .onClick(() => { void this.finishSubmissionRecording(); });
+        }
+        .width('100%');
+      } else {
+        Row({ space: 12 }) {
+          Button(this.submissionAudioPlaying ? 'Ⅱ' : '▶', { type: ButtonType.Circle })
+            .width(48)
+            .height(48)
+            .backgroundColor(AppTheme.PRIMARY)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .accessibilityText(this.submissionAudioPlaying ? '暂停试听' : '播放录音')
+            .onClick(() => { void this.toggleSubmissionAudioPreview(); });
+          Column({ space: 3 }) {
+            Text('我的录音')
+              .fontSize(AppTheme.BODY_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+            Text(`${this.formatSubmissionTime(this.submissionAudioCurrentMs)} / ${this.formatSubmissionTime(this.submissionAudioDurationMs)}`)
+              .fontSize(AppTheme.META_SIZE)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Start);
+          Text('重新录音')
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 8, right: 8 })
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY)
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .onClick(() => { void this.resetSubmissionRecording(); });
+        }
+        .width('100%')
+        .padding(10)
+        .backgroundColor(AppTheme.SURFACE)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
       }
-      .width('100%')
-      .padding(14)
-      .backgroundColor(AppTheme.PRIMARY_FAINT)
-      .borderRadius(AppTheme.CONTROL_RADIUS);
+
+      if (this.submissionMessage.length > 0) {
+        Text(this.submissionMessage)
+          .width('100%')
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
+          .fontColor(AppTheme.PRIMARY);
+      }
+    }
+    .width('100%')
+    .padding(14)
+    .backgroundColor(AppTheme.PRIMARY_FAINT)
+    .borderRadius(AppTheme.CONTROL_RADIUS);
+  }
+
+  @Builder
+  private PhotoSubmissionPane() {
+    Column({ space: 10 }) {
+      Text('提交作业照片')
+        .width('100%')
+        .fontSize(AppTheme.CARD_TITLE_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
+      if (this.submissionPhotoUris.length > 0) {
+        this.PhotoStrip(this.submissionPhotoUris, true);
+      }
+      Row({ space: 10 }) {
+        Button(this.selectingPhotos ? '正在打开图库…' : '从图库选择', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(!this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
+            this.submissionPhotoUris.length < 6)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .fontColor(AppTheme.PRIMARY)
+          .onClick(() => { void this.selectSubmissionPhotos(); });
+        Button(this.capturingPhoto ? '正在打开相机…' : '拍照', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(!this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
+            this.submissionPhotoUris.length < 6)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .fontColor(AppTheme.PRIMARY)
+          .onClick(() => { void this.captureSubmissionPhoto(); });
+      }
+      .width('100%');
+      Text(this.submissionPhotoUris.length === 0 ?
+        '可从图库选择或直接拍照，最多 6 张。' :
+        '请确认照片清晰、完整，页数和顺序无误。')
+        .width('100%')
+        .fontSize(AppTheme.META_SIZE)
+        .lineHeight(AppTheme.META_LINE_HEIGHT)
+        .fontColor(AppTheme.SUBTEXT);
+      if (this.submissionMessage.length > 0) {
+        Text(this.submissionMessage)
+          .width('100%')
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
+          .fontColor(AppTheme.PRIMARY);
+      }
+    }
+    .width('100%')
+    .padding(14)
+    .backgroundColor(AppTheme.PRIMARY_FAINT)
+    .borderRadius(AppTheme.CONTROL_RADIUS);
+  }
+
+  @Builder
+  private SubmissionPane() {
+    if (this.assignment() !== null && this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT &&
+      !this.isVoiceSubmission()) {
+      this.PhotoSubmissionPane();
     }
 
     if (this.submissions().length > 0) {
@@ -459,45 +694,62 @@ export struct StudyWorkspacePage {
   @Builder
   private ResourcePane() {
     if (this.assignment() !== null && this.assignment()!.contentType !== AssignmentContentType.AUDIO_IMAGE &&
-      (this.assignment()!.textbookRef.length > 0 || this.assignment()!.resourceLabels.length > 0)) {
-      Column({ space: 0 }) {
-        if (this.assignment()!.textbookRef.length > 0) {
-          Row() {
-            Column({ space: 3 }) {
-              Text('教材 / 页码').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
-              Text(this.assignment()!.textbookRef)
-                .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            }
-            .layoutWeight(1)
-            .alignItems(HorizontalAlign.Start);
-          }
-          .width('100%')
-          .padding({ top: 12, bottom: 12 });
+      this.assignment()!.resourceLabels.length > 0) {
+      Row() {
+        Column({ space: 3 }) {
+          Text('老师附件')
+            .fontSize(AppTheme.LABEL_TITLE_SIZE)
+            .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
+            .fontColor(AppTheme.TERTIARY_TEXT);
+          Text(`${this.assignment()!.resourceLabels.length} 项资料`)
+            .fontSize(AppTheme.BODY_SIZE)
+            .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
         }
-
-        if (this.assignment()!.textbookRef.length > 0 && this.assignment()!.resourceLabels.length > 0) {
-          Divider().color(AppTheme.DIVIDER);
-        }
-
-        if (this.assignment()!.resourceLabels.length > 0) {
-          Row() {
-            Column({ space: 3 }) {
-              Text('老师附件').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
-              Text(`${this.assignment()!.resourceLabels.length} 项资料`)
-                .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            }
-            .layoutWeight(1)
-            .alignItems(HorizontalAlign.Start);
-          }
-          .width('100%')
-          .padding({ top: 12, bottom: 12 });
-        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
       }
       .width('100%')
-      .padding({ left: 14, right: 14 })
+      .padding({ left: 14, right: 14, top: 12, bottom: 12 })
       .backgroundColor(AppTheme.SURFACE_SUBTLE)
       .borderRadius(AppTheme.CONTROL_RADIUS);
     }
+  }
+
+  @Builder
+  private VoiceAssignmentContent(playbackEnabled: boolean, imageOnlyMode: boolean) {
+    VoiceAssignmentPane({
+      assignmentId: this.assignmentId,
+      playbackEnabled: playbackEnabled,
+      imageOnlyMode: imageOnlyMode,
+      onPauseReady: (pause: () => void) => this.pauseEmbeddedMedia = pause,
+      onFullscreenRequest: () => this.voiceFullscreenOpen = true,
+      onFullscreenDismissed: () => this.voiceFullscreenOpen = false,
+      onMediaStateChanged: (
+        imageUris: string[],
+        imageIndex: number,
+        playing: boolean,
+        currentTimeMs: number,
+        durationMs: number,
+        currentPlaybackEnabled: boolean,
+        prepared: boolean
+      ) => this.applyVoiceMediaState(
+        imageUris, imageIndex, playing, currentTimeMs, durationMs, currentPlaybackEnabled, prepared),
+      onFullscreenControlsReady: (
+        toggleAudio: () => void,
+        seek: (value: number) => void,
+        previousImage: () => void,
+        nextImage: () => void,
+        selectImage: (index: number) => void
+      ) => {
+        this.voiceToggleAudio = toggleAudio;
+        this.voiceSeek = seek;
+        this.voicePreviousImage = previousImage;
+        this.voiceNextImage = nextImage;
+        this.voiceSelectImage = selectImage;
+      }
+    });
   }
 
   @Builder
@@ -528,7 +780,7 @@ export struct StudyWorkspacePage {
                 .fontSize(AppTheme.CAPTION_SIZE)
                 .fontColor(AppTheme.SUBTEXT);
               Blank();
-              Text(`截至 ${this.assignment()!.dueText}`).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+              Text(`任务日期 ${AssignmentTaskDate.displayText(this.assignment()!.taskDate)}`).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
             }
             .width('100%');
           }
@@ -554,9 +806,11 @@ export struct StudyWorkspacePage {
                 .fontSize(24)
                 .fontColor([AppTheme.SUCCESS]);
               Text(this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT ?
-                '最后一步：添加清晰、完整的作业照片。' :
+                (this.isVoiceSubmission() ? '看着图片完成朗读，录音时可以左右切换图片。' :
+                  '最后一步：添加清晰、完整的作业照片。') :
                 (this.assignment()!.status === AssignmentStatus.SUBMITTED ?
-                  '照片已提交，等待家长确认。' : '这项作业已经完成。'))
+                  (this.isVoiceSubmission() ? '录音已提交，等待家长确认。' :
+                    '照片已提交，等待家长确认。') : '这项作业已经完成。'))
                 .layoutWeight(1)
                 .fontSize(AppTheme.READING_BODY_SIZE)
                 .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
@@ -567,7 +821,13 @@ export struct StudyWorkspacePage {
             .backgroundColor(AppTheme.SUCCESS_SOFT)
             .borderRadius(AppTheme.CONTROL_RADIUS);
 
-            this.SubmissionPane();
+            if (this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT &&
+              this.isVoiceSubmission()) {
+              this.VoiceAssignmentContent(false, true);
+              this.VoiceSubmissionPane();
+            } else {
+              this.SubmissionPane();
+            }
           } else {
             if (this.assignment()!.reviewNote.length > 0) {
               Column({ space: 5 }) {
@@ -599,39 +859,14 @@ export struct StudyWorkspacePage {
             }
 
             if (this.assignment()!.contentType === AssignmentContentType.AUDIO_IMAGE) {
-              VoiceAssignmentPane({
-                assignmentId: this.assignment()!.id,
-                playbackEnabled: this.assignment()!.status === AssignmentStatus.IN_PROGRESS,
-                onPauseReady: (pause: () => void) => this.pauseEmbeddedMedia = pause,
-                onFullscreenRequest: () => this.voiceFullscreenOpen = true,
-                onFullscreenDismissed: () => this.voiceFullscreenOpen = false,
-                onMediaStateChanged: (
-                  imageUris: string[],
-                  imageIndex: number,
-                  playing: boolean,
-                  currentTimeMs: number,
-                  durationMs: number,
-                  playbackEnabled: boolean,
-                  prepared: boolean
-                ) => this.applyVoiceMediaState(
-                  imageUris, imageIndex, playing, currentTimeMs, durationMs, playbackEnabled, prepared),
-                onFullscreenControlsReady: (
-                  toggleAudio: () => void,
-                  seek: (value: number) => void,
-                  previousImage: () => void,
-                  nextImage: () => void,
-                  selectImage: (index: number) => void
-                ) => {
-                  this.voiceToggleAudio = toggleAudio;
-                  this.voiceSeek = seek;
-                  this.voicePreviousImage = previousImage;
-                  this.voiceNextImage = nextImage;
-                  this.voiceSelectImage = selectImage;
-                }
-              });
+              this.VoiceAssignmentContent(
+                this.assignment()!.status === AssignmentStatus.IN_PROGRESS, false);
             }
 
-            AssignmentCountdownCard({ assignment: this.assignment()! });
+            if (this.assignment()!.status === AssignmentStatus.IN_PROGRESS ||
+              this.assignment()!.status === AssignmentStatus.PAUSED) {
+              AssignmentCountdownCard({ assignment: this.assignment()! });
+            }
             this.ResourcePane();
           }
 
@@ -670,28 +905,14 @@ export struct StudyWorkspacePage {
   }
 
   @Builder
-  private WorkspaceActionBar(showTutorEntry: boolean) {
+  private WorkspaceActionBar() {
     if (this.assignment() !== null &&
       this.assignment()!.status !== AssignmentStatus.SUBMITTED &&
       this.assignment()!.status !== AssignmentStatus.COMPLETED) {
       Row({ space: 10 }) {
-        if (showTutorEntry && this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
-          Button('问小伴', { type: ButtonType.Normal })
-            .width(88)
-            .height(AppTheme.BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .backgroundColor(AppTheme.PRIMARY_SOFT)
-            .fontColor(AppTheme.PRIMARY)
-            .fontSize(AppTheme.ACTION_TEXT_SIZE)
-            .onClick(() => {
-              this.tutorPanelOpen = true;
-              void this.loadTutor();
-            });
-        }
-
         if (this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
           Button('暂停一下', { type: ButtonType.Normal })
-            .width(showTutorEntry ? 88 : 112)
+            .width(112)
             .height(AppTheme.BUTTON_HEIGHT)
             .borderRadius(AppTheme.CONTROL_RADIUS)
             .enabled(!this.actionRunning)
@@ -707,7 +928,7 @@ export struct StudyWorkspacePage {
             .width(112)
             .height(AppTheme.BUTTON_HEIGHT)
             .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.actionRunning && !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos)
+            .enabled(!this.actionRunning && !this.submissionBusy())
             .backgroundColor(AppTheme.PRIMARY_SOFT)
             .fontColor(AppTheme.PRIMARY)
             .fontSize(AppTheme.ACTION_TEXT_SIZE)
@@ -722,252 +943,13 @@ export struct StudyWorkspacePage {
           .enabled(this.primaryActionEnabled())
           .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED)
           .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .fontSize(14)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
           .fontWeight(FontWeight.Medium)
           .onClick(() => { void this.runPrimaryAction(); });
       }
       .width('100%')
       .padding({ top: 2, bottom: 4 });
     }
-  }
-
-  @Builder
-  private TutorSuggestion(label: string, prompt: string) {
-    Button(label, { type: ButtonType.Normal })
-      .layoutWeight(1)
-      .height(36)
-      .borderRadius(AppTheme.CONTROL_RADIUS)
-      .backgroundColor(AppTheme.SURFACE)
-      .fontColor(AppTheme.PRIMARY)
-      .fontSize(AppTheme.ACTION_TEXT_SIZE)
-      .border({ width: 1, color: AppTheme.BORDER })
-      .onClick(() => this.fillTutorPrompt(prompt));
-  }
-
-  @Builder
-  private TutorPane() {
-    Column({ space: 0 }) {
-      Row({ space: 10 }) {
-        CenteredTextBadge({
-          badgeText: '伴',
-          badgeWidth: 40,
-          badgeHeight: 40,
-          badgeFontSize: 15,
-          badgeRadius: 20,
-          badgeBold: true,
-          badgeForeground: AppTheme.PRIMARY,
-          badgeBackground: AppTheme.PRIMARY_SOFT
-        });
-
-        Column({ space: 2 }) {
-          Text('小伴学习助手')
-            .fontSize(AppTheme.CARD_TITLE_SIZE)
-            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-
-        if (this.tutorLoading) {
-          Text('同步中')
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        if (this.canUseTutorSplit() && this.tutorPanelOpen) {
-          Text('收起')
-            .fontSize(AppTheme.ACTION_TEXT_SIZE)
-            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
-            .fontColor(AppTheme.PRIMARY)
-            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-            .padding({ left: 10, right: 2 })
-            .accessibilityRole(AccessibilityRoleType.BUTTON)
-            .accessibilityText('收起小伴学习助手')
-            .onClick(() => this.tutorPanelOpen = false);
-        }
-      }
-      .width('100%')
-      .padding({ bottom: 12 });
-
-      Divider().color(AppTheme.DIVIDER);
-
-      if (this.tutorUnavailable) {
-        Column({ space: 8 }) {
-          Text('小伴暂时休息一下')
-            .fontSize(AppTheme.CARD_TITLE_SIZE)
-            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-          Text('AI 辅导暂时不可用，但作业查看、计时和提交都不受影响。')
-            .fontSize(AppTheme.META_SIZE)
-            .lineHeight(AppTheme.META_LINE_HEIGHT)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .width('100%')
-        .padding({ top: 24, bottom: 24, left: 14, right: 14 })
-        .backgroundColor(AppTheme.WARNING_SOFT)
-        .borderRadius(AppTheme.CONTROL_RADIUS);
-      } else {
-        Scroll() {
-          Column({ space: 12 }) {
-            if (this.tutorHasMore) {
-              Text(this.tutorLoadingOlder ? '正在加载更早记录…' : '查看更早的对话')
-                .width('100%')
-                .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                .fontSize(AppTheme.ACTION_TEXT_SIZE)
-                .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
-                .fontColor(AppTheme.PRIMARY)
-                .textAlign(TextAlign.Center)
-                .accessibilityRole(AccessibilityRoleType.BUTTON)
-                .accessibilityText('加载更早的小伴对话')
-                .onClick(() => { void this.loadOlderTutor(); });
-            }
-
-            if (this.tutorMessages.length === 0 && !this.tutorLoading) {
-              Column({ space: 12 }) {
-                CenteredTextBadge({
-                  badgeText: '伴',
-                  badgeWidth: 48,
-                  badgeHeight: 48,
-                  badgeFontSize: 17,
-                  badgeRadius: 24,
-                  badgeBold: true,
-                  badgeForeground: AppTheme.PRIMARY,
-                  badgeBackground: AppTheme.PRIMARY_SOFT
-                });
-                Text('有哪里卡住了？')
-                  .fontSize(AppTheme.SECTION_TITLE_SIZE)
-                  .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(AppTheme.TEXT);
-                Row({ space: 8 }) {
-                  this.TutorSuggestion('怎么开始？', '这题我不知道怎么开始，请先给我一个提示。');
-                  this.TutorSuggestion('检查思路', '我已经有一个思路了，请帮我检查哪里需要调整。');
-                  this.TutorSuggestion('提示下一步', '我做到一半卡住了，请只提示我下一步怎么想。');
-                }
-                .width('100%');
-              }
-              .width('100%')
-              .padding({ top: 28, bottom: 24, left: 8, right: 8 })
-              .alignItems(HorizontalAlign.Center);
-            }
-
-            ForEach(this.tutorMessages, (message: TutorChatMessage) => {
-              if (message.role === 'USER') {
-                Row({ space: 8 }) {
-                  Blank();
-                  Text(message.content)
-                    .constraintSize({ maxWidth: '82%' })
-                    .padding({ left: 12, right: 12, top: 10, bottom: 10 })
-                    .fontSize(AppTheme.BODY_SIZE)
-                    .lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                    .fontColor(AppTheme.TEXT_ON_PRIMARY)
-                    .backgroundColor(AppTheme.PRIMARY)
-                    .borderRadius(14);
-                }
-                .width('100%')
-                .alignItems(VerticalAlign.Bottom);
-              } else {
-                Row({ space: 8 }) {
-                  CenteredTextBadge({
-                    badgeText: '伴',
-                    badgeWidth: 28,
-                    badgeHeight: 28,
-                    badgeFontSize: 11,
-                    badgeRadius: 14,
-                    badgeBold: true,
-                    badgeForeground: AppTheme.PRIMARY,
-                    badgeBackground: AppTheme.PRIMARY_SOFT
-                  });
-                  Text(message.content)
-                    .constraintSize({ maxWidth: '82%' })
-                    .padding({ left: 12, right: 12, top: 10, bottom: 10 })
-                    .fontSize(AppTheme.BODY_SIZE)
-                    .lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                    .fontColor(AppTheme.TEXT)
-                    .backgroundColor(AppTheme.SURFACE_SUBTLE)
-                    .borderRadius(14);
-                  Blank();
-                }
-                .width('100%')
-                .alignItems(VerticalAlign.Top);
-              }
-            }, (message: TutorChatMessage) => message.id);
-          }
-          .width('100%')
-          .padding({ top: 14, bottom: 14 });
-        }
-        .width('100%')
-        .layoutWeight(1)
-        .scrollBar(BarState.Off);
-
-        if (this.tutorNotice.length > 0) {
-          Text(this.tutorNotice)
-            .width('100%')
-            .padding({ top: 6, bottom: 6 })
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
-            .fontColor(this.tutorAvailable ? AppTheme.SUBTEXT : AppTheme.WARNING);
-        }
-
-        Column({ space: 8 }) {
-          Row() {
-            Text('你的问题')
-              .fontSize(AppTheme.LABEL_TITLE_SIZE)
-              .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.TEXT);
-          }
-          .width('100%');
-
-          TextArea({ placeholder: '说说你卡在哪一步…', text: this.tutorDraft })
-            .width('100%')
-            .height(82)
-            .fontSize(AppTheme.FORM_TEXT_SIZE)
-            .lineHeight(AppTheme.FORM_TEXT_LINE_HEIGHT)
-            .backgroundColor(AppTheme.SURFACE)
-            .border({ width: 1, color: AppTheme.BORDER })
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onChange((value: string) => this.tutorDraft = value);
-
-          Row({ space: 10 }) {
-            TutorQuestionCapturePanel({
-              studentId: this.viewModel.studentId(),
-              onRecognized: (text: string) => {
-                this.tutorDraft = `题目识别结果：\n${text}\n\n我卡住的地方：`;
-                this.tutorNotice = '识别文字已填入，请确认或补充后再发送';
-              }
-            })
-            .layoutWeight(1);
-
-            Button(this.tutorSending ? '发送中…' : '发送', { type: ButtonType.Normal })
-              .width(88)
-              .height(38)
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .enabled(!this.tutorSending && this.tutorDraft.trim().length > 0)
-              .backgroundColor(!this.tutorSending && this.tutorDraft.trim().length > 0 ?
-                AppTheme.PRIMARY : AppTheme.DISABLED)
-              .fontColor(AppTheme.TEXT_ON_PRIMARY)
-              .fontSize(13)
-              .fontWeight(FontWeight.Medium)
-              .onClick(() => { void this.askTutor(); });
-          }
-          .width('100%')
-          .alignItems(VerticalAlign.Center);
-        }
-        .width('100%')
-        .padding(10)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .border({ width: 1, color: AppTheme.BORDER })
-        .borderRadius(AppTheme.CARD_RADIUS);
-      }
-    }
-    .width('100%')
-    .height('100%')
-    .padding(AppTheme.CARD_PADDING)
-    .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(AppTheme.CARD_RADIUS);
   }
 
   @Builder
@@ -1153,145 +1135,27 @@ export struct StudyWorkspacePage {
   }
 
   @Builder
-  private PageHeader() {
-    DeepPageHeader({
-      title: this.showTutorAsStandalone() ? '问小伴' : '学习空间',
-      subtitle: this.assignment() === null ? '' : this.assignment()!.subject,
-      trailingText: this.showTutorAsStandalone() || this.assignment() === null ? '' : this.assignment()!.dueText,
-      backAccessibilityText: this.showTutorAsStandalone() ? '返回学习任务' : '返回上一页',
-      onBack: () => {
-        if (this.showTutorAsStandalone()) this.tutorPanelOpen = false;
-        else this.onBack();
-      }
-    });
-  }
-
-  @Builder
-  private SingleColumnWorkspace() {
-    if (this.tutorPanelOpen) {
+  private UnifiedWorkspace() {
+    Column({ space: 10 }) {
       Column() {
-        this.TutorPane();
+        this.StudyContent(false);
       }
       .width('100%')
       .layoutWeight(1)
       .justifyContent(FlexAlign.Start)
       .alignItems(HorizontalAlign.Start);
-    } else {
-      Column({ space: 10 }) {
-        Column() {
-          this.StudyContent(false);
-        }
-        .width('100%')
-        .layoutWeight(1)
-        .justifyContent(FlexAlign.Start)
-        .alignItems(HorizontalAlign.Start);
 
-        this.WorkspaceActionBar(true);
-      }
-      .width('100%')
-      .layoutWeight(1)
-      .justifyContent(FlexAlign.Start)
-      .alignItems(HorizontalAlign.Start);
-    }
-  }
-
-  @Builder
-  private SplitWorkspace() {
-    Row({ space: AppTheme.SPLIT_PANE_GAP }) {
-      Column({ space: 10 }) {
-        Column() {
-          this.StudyContent(false);
-        }
-        .width('100%')
-        .layoutWeight(1)
-        .justifyContent(FlexAlign.Start)
-        .alignItems(HorizontalAlign.Start);
-
-        this.WorkspaceActionBar(false);
-      }
-      .layoutWeight(1)
-      .height('100%')
-      .constraintSize({ minWidth: AppTheme.STUDY_PRIMARY_MIN_WIDTH })
-      .alignItems(HorizontalAlign.Start);
-
-      Column() {
-        this.TutorPane();
-      }
-      .width(AppTheme.STUDY_TUTOR_MIN_WIDTH)
-      .height('100%')
-      .alignItems(HorizontalAlign.Start);
-    }
-    .width('100%')
-    .layoutWeight(1)
-    .alignItems(VerticalAlign.Top);
-  }
-
-  @Builder
-  private PhoneWorkspacePage() {
-    Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
-      this.PageHeader();
-      this.SingleColumnWorkspace();
+      this.WorkspaceActionBar();
     }
     .width('100%')
     .height('100%')
-    .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
     .justifyContent(FlexAlign.Start)
-    .alignItems(HorizontalAlign.Start)
-    .padding({
-      left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
-      right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
-      top: AppTheme.DEEP_PAGE_TOP_PADDING,
-      bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING
-    });
-  }
-
-  @Builder
-  private PadWorkspacePage() {
-    Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
-      this.PageHeader();
-      if (this.tutorPanelOpen) this.SplitWorkspace();
-      else {
-        Row() {
-          Column() {
-            this.SingleColumnWorkspace();
-          }
-          .width('100%')
-          .height('100%')
-          .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH });
-        }
-        .width('100%')
-        .layoutWeight(1)
-        .justifyContent(FlexAlign.Center)
-        .alignItems(VerticalAlign.Top);
-      }
-    }
-    .width('100%')
-    .height('100%')
-    .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
-    .justifyContent(FlexAlign.Start)
-    .alignItems(HorizontalAlign.Start)
-    .padding({
-      left: AppTheme.PAGE_PADDING_EXPANDED,
-      right: AppTheme.PAGE_PADDING_EXPANDED,
-      top: AppTheme.DEEP_PAGE_TOP_PADDING,
-      bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING
-    });
+    .alignItems(HorizontalAlign.Start);
   }
 
   build() {
     Stack({ alignContent: Alignment.TopStart }) {
-      Row() {
-        if (this.canUseTutorSplit()) {
-          this.PadWorkspacePage();
-        } else {
-          this.PhoneWorkspacePage();
-        }
-      }
-      .width('100%')
-      .height('100%')
-      .justifyContent(FlexAlign.Center)
-      .alignItems(VerticalAlign.Top)
-      .backgroundColor(AppTheme.BACKGROUND);
+      this.UnifiedWorkspace();
 
       if (this.voiceFullscreenOpen && this.voiceImageUris.length > 0) {
         this.VoiceFullscreenOverlay();
@@ -1299,9 +1163,6 @@ export struct StudyWorkspacePage {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(AppTheme.BACKGROUND)
-    .onAreaChange((_oldValue, newValue) => {
-      this.availableWidthVp = ResponsiveContext.areaLengthToVp(newValue.width, this.availableWidthVp);
-    });
+    .backgroundColor(AppTheme.BACKGROUND);
   }
 }

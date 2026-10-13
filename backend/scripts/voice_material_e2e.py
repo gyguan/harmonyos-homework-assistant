@@ -50,7 +50,7 @@ def create_batch(base_url: str, token: str, student_id: str) -> str:
 def register_package(base_url: str, token: str, batch_id: str, name: str, subject: str) -> dict:
     return expect(http(base_url, "POST", f"/api/v1/voice-material-batches/{batch_id}/packages",
         token=token, payload={"directoryName": name, "subjectCode": subject, "title": "",
-                             "expectedMinutes": 15, "dueAtEpochMs": 0, "assignmentType": "EXTRA"}),
+                             "expectedMinutes": 15, "assignmentType": "EXTRA"}),
         (200,), f"register package {name}").json()
 
 def upload(base_url: str, token: str, package_id: str, resource_type: str,
@@ -76,6 +76,7 @@ def main() -> int:
     try:
         token = expect(http(base_url, "POST", "/api/v1/auth/login",
             payload={"loginName": "parent", "password": "parent123"}), (200,), "voice login").json()["token"]
+        task_date = datetime.now(ZoneInfo("Asia/Shanghai")).date().isoformat()
         run_id = f"{int(time.time())}-{uuid.uuid4().hex[:8]}"
         student_id = f"voice-material-{run_id}"
         create_student(base_url, token, student_id)
@@ -84,8 +85,8 @@ def main() -> int:
         legacy_id = f"legacy-voice-{run_id}"
         metadata = {"id": legacy_id, "assignmentType": "EXTRA", "subject": "语文",
             "subjectCode": "CHINESE", "contentType": "NORMAL", "title": "旧版手工语音兼容验证",
-            "instruction": "兼容验证", "textbookRef": "", "dueText": "", "dueAtEpochMs": 0,
-            "dueTimezone": "Asia/Shanghai", "status": "NOT_STARTED", "sourceLabel": "legacy",
+            "instruction": "兼容验证", "textbookRef": "", "taskDate": task_date,
+            "status": "NOT_STARTED", "sourceLabel": "legacy",
             "sourceExcerpt": "", "expectedMinutes": 10, "startedAtEpochMs": 0,
             "finishedAtEpochMs": 0, "elapsedSeconds": 0, "reviewNote": ""}
         body, ctype = multipart_voice_assignment(metadata, "legacy.mp3", "legacy.png")
@@ -166,8 +167,8 @@ def main() -> int:
 
         # Manual creation is independent from automatic creation: parents may create multiple
         # active voice tasks even while an automatically created task already exists.
-        create_payload = {"studentId": student_id, "expectedMinutes": 15, "dueAtEpochMs": 0,
-                          "dueText": "", "title": "数学 · 手工语音作业", "requestId": f"manual-second-{run_id}"}
+        create_payload = {"studentId": student_id, "expectedMinutes": 15, "taskDate": task_date,
+                          "title": "数学 · 手工语音作业", "requestId": f"manual-second-{run_id}"}
         manual_second = expect(http(base_url, "POST",
             f"/api/v1/voice-material-packages/{second['id']}/create-assignment",
             token=token, payload=create_payload), (200,), "manual create while auto task active").json()
@@ -227,8 +228,8 @@ def main() -> int:
 
         # Manual creation remains unrestricted by the daily automatic-create limit.
         request_id = f"reuse-{run_id}"
-        reuse_payload = {"studentId": student_id, "expectedMinutes": 18, "dueAtEpochMs": 0,
-                         "dueText": "", "title": "语文 · 重复使用验证", "requestId": request_id}
+        reuse_payload = {"studentId": student_id, "expectedMinutes": 18, "taskDate": task_date,
+                         "title": "语文 · 重复使用验证", "requestId": request_id}
         reused = expect(http(base_url, "POST",
             f"/api/v1/voice-material-packages/{first['id']}/create-assignment",
             token=token, payload=reuse_payload), (200,), "reuse same folder manually").json()
@@ -236,8 +237,8 @@ def main() -> int:
         reused_assignment = reused["assignmentId"]
 
         parallel_request_id = f"reuse-parallel-{run_id}"
-        parallel_payload = {"studentId": student_id, "expectedMinutes": 12, "dueAtEpochMs": 0,
-                            "dueText": "", "title": "语文 · 并行手工语音作业",
+        parallel_payload = {"studentId": student_id, "expectedMinutes": 12, "taskDate": task_date,
+                            "title": "语文 · 并行手工语音作业",
                             "requestId": parallel_request_id}
         parallel = expect(http(base_url, "POST",
             f"/api/v1/voice-material-packages/{first['id']}/create-assignment",
@@ -253,8 +254,8 @@ def main() -> int:
             token=token, payload=reuse_payload), (200,), "manual create idempotent retry").json()
         require(retry.get("created") is False and retry.get("assignmentId") == reused_assignment,
                 "same requestId must resolve to original Assignment")
-        conflict_payload = {"studentId": student_id, "expectedMinutes": 18, "dueAtEpochMs": 0,
-                            "dueText": "", "title": "冲突幂等键", "requestId": request_id}
+        conflict_payload = {"studentId": student_id, "expectedMinutes": 18, "taskDate": task_date,
+                            "title": "冲突幂等键", "requestId": request_id}
         expect(http(base_url, "POST",
             f"/api/v1/voice-material-packages/{second['id']}/create-assignment",
             token=token, payload=conflict_payload), (409,), "reject requestId reuse across folders")

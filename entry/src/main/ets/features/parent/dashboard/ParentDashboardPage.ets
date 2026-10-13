@@ -1,18 +1,109 @@
+import { HomeworkCoverageParent, HomeworkCoverageRemoteApi } from '../../../application/remote/HomeworkCoverageRemoteApi';
+import { BackendSession } from '../../../application/remote/BackendSession';
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import {
+  HomeworkCoveragePicker,
+  HomeworkCoverageSubject
+} from '../../../components/assignment/HomeworkCoveragePicker';
+import { ParentIdentity, ParentIdentityHelper } from '../../../domain/model/ParentIdentity';
+import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { AssignmentAttentionKind } from '../../../domain/service/AssignmentAttentionPolicy';
 import { ParentDashboardViewModel } from './ParentDashboardViewModel';
 
 @Component
 export struct ParentDashboardPage {
-  @Prop revision: number = 0;
+  @Prop @Watch('onCoverageContextChanged') revision: number = 0;
+  @Prop @Watch('onCoverageContextChanged') studentId: string = '';
+  @Prop @Watch('onCoverageContextChanged') parentIdentity: ParentIdentity = ParentIdentity.DAD;
   @State private availableWidthVp: number = 390;
+  @State private coverageParents: HomeworkCoverageParent[] = [];
+  @State private coverageStudentName: string = '';
+  @State private coverageBusy: boolean = false;
+  @State private coverageMessage: string = '';
+  @State private showCoverageEditor: boolean = false;
+  @State private coverageDraft: string[] = [];
   private readonly viewModel: ParentDashboardViewModel = new ParentDashboardViewModel();
+  private readonly coverageApi: HomeworkCoverageRemoteApi = HomeworkCoverageRemoteApi.instance;
   onOpenAssignment: () => void = () => {};
   onOpenVoice: () => void = () => {};
   onOpenScheduled: () => void = () => {};
   onOpenPracticeGeneration: () => void = () => {};
   onOpenAttention: (kind: AssignmentAttentionKind) => void = (_kind: AssignmentAttentionKind) => {};
+
+  aboutToAppear(): void {
+    void this.refreshCoverage();
+  }
+
+  private onCoverageContextChanged(): void {
+    void this.refreshCoverage();
+  }
+
+  private async refreshCoverage(): Promise<void> {
+    if (this.studentId.length === 0 || !BackendSession.instance.isConnected()) {
+      this.coverageParents = [];
+      this.coverageStudentName = '';
+      this.coverageMessage = '';
+      return;
+    }
+    this.coverageBusy = true;
+    try {
+      let response = await this.coverageApi.get(
+        this.studentId, AssignmentTaskDate.today(), this.parentIdentity);
+      if (response.studentId !== this.studentId) return;
+      this.coverageParents = response.parents.slice();
+      this.coverageStudentName = response.studentName;
+      this.coverageMessage = '';
+    } catch {
+      this.coverageMessage = '今日作业协同状态暂时无法加载';
+    } finally {
+      this.coverageBusy = false;
+    }
+  }
+
+  private mineSubjects(): string[] {
+    for (let parent of this.coverageParents) if (parent.mine) return parent.subjects.slice();
+    return [];
+  }
+
+  private openCoverageEditor(): void {
+    if (!BackendSession.instance.isConnected() || this.studentId.length === 0) return;
+    this.coverageDraft = this.mineSubjects();
+    this.coverageMessage = '';
+    this.showCoverageEditor = true;
+  }
+
+  private async saveCoverage(): Promise<void> {
+    if (this.coverageBusy) return;
+    this.coverageBusy = true;
+    this.coverageMessage = '';
+    try {
+      let response = await this.coverageApi.updateMine(
+        this.studentId, AssignmentTaskDate.today(), this.parentIdentity, this.coverageDraft);
+      this.coverageParents = response.parents.slice();
+      this.coverageStudentName = response.studentName;
+      this.showCoverageEditor = false;
+    } catch {
+      this.coverageMessage = '保存失败，请检查家庭云端连接后重试';
+    } finally {
+      this.coverageBusy = false;
+    }
+  }
+
+  private parentCoverageText(parent: HomeworkCoverageParent): string {
+    if (HomeworkCoverageSubject.contains(parent.subjects, HomeworkCoverageSubject.ALL)) {
+      return '已确认今天全部作业已布置';
+    }
+    let labels = HomeworkCoverageSubject.labels(parent.subjects);
+    return labels.length > 0 ? `已布置：${labels}` : '暂未标记';
+  }
+
+  private coverageComplete(): boolean {
+    for (let parent of this.coverageParents) {
+      if (HomeworkCoverageSubject.contains(parent.subjects, HomeworkCoverageSubject.ALL)) return true;
+    }
+    return false;
+  }
 
   private canUseWideComposition(): boolean {
     return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.parentHomeRequirement());
@@ -22,6 +113,159 @@ export struct ParentDashboardPage {
     let currentRevision = this.revision;
     if (currentRevision < 0) return '';
     return this.viewModel.attentionText();
+  }
+
+  @Builder
+  private HomeworkCoverageCard() {
+    if (BackendSession.instance.isConnected()) {
+      Column({ space: 9 }) {
+        Row({ space: 8 }) {
+          Text(this.coverageComplete() ? '✓' : '协')
+            .width(30)
+            .height(30)
+            .fontSize(16)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.coverageComplete() ? AppTheme.SUCCESS : AppTheme.PRIMARY)
+            .textAlign(TextAlign.Center)
+            .backgroundColor(this.coverageComplete() ? AppTheme.SUCCESS_SOFT : AppTheme.PRIMARY_SOFT)
+            .borderRadius(10);
+          Column({ space: 2 }) {
+            Text(this.coverageComplete() ? '今日作业已安排完成' : '今日作业协同')
+              .width('100%')
+              .fontSize(AppTheme.CARD_TITLE_SIZE)
+              .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+            Text((this.coverageStudentName.length > 0 ? this.coverageStudentName : '当前孩子') +
+              ' · ' + AssignmentTaskDate.displayText(AssignmentTaskDate.today()))
+              .width('100%')
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Start);
+          Text('修改')
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY);
+        }
+        .width('100%');
+
+        if (this.coverageParents.length === 0) {
+          Text(this.coverageBusy ? '正在同步家庭成员的布置状态…' : '还没有家长标记今天已布置的作业')
+            .width('100%')
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
+            .fontColor(AppTheme.SUBTEXT);
+        } else {
+          Column({ space: 6 }) {
+            ForEach(this.coverageParents, (parent: HomeworkCoverageParent) => {
+              Row({ space: 8 }) {
+                Text(parent.displayName + (parent.mine ? '（我）' : ''))
+                  .fontSize(AppTheme.META_SIZE)
+                  .lineHeight(AppTheme.META_LINE_HEIGHT)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(parent.mine ? AppTheme.PRIMARY : AppTheme.TEXT);
+                Text(this.parentCoverageText(parent))
+                  .layoutWeight(1)
+                  .fontSize(AppTheme.META_SIZE)
+                  .lineHeight(AppTheme.META_LINE_HEIGHT)
+                  .fontColor(this.parentCoverageText(parent).indexOf('全部') >= 0 ?
+                    AppTheme.SUCCESS : AppTheme.SUBTEXT)
+                  .maxLines(2);
+              }
+              .width('100%');
+            }, (parent: HomeworkCoverageParent) =>
+              `${parent.displayName}|${parent.mine}|${parent.subjects.join(',')}|${parent.updatedAt}`);
+          }
+          .width('100%');
+        }
+
+        if (this.coverageMessage.length > 0) {
+          Text(this.coverageMessage)
+            .width('100%')
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontColor(AppTheme.WARNING);
+        }
+      }
+      .width('100%')
+      .padding(AppTheme.PARENT_HOME_ACTION_CARD_PADDING)
+      .backgroundColor(this.coverageComplete() ? AppTheme.SUCCESS_SOFT : AppTheme.CARD_SURFACE)
+      .border({ width: 1, color: this.coverageComplete() ? AppTheme.SUCCESS : AppTheme.BORDER })
+      .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
+      .accessibilityGroup(true)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText('今日作业协同，点击查看或修改我的布置状态')
+      .onClick(() => this.openCoverageEditor());
+    }
+  }
+
+  @Builder
+  private HomeworkCoverageEditor() {
+    Column() {
+      Row({ space: 10 }) {
+        Column({ space: 3 }) {
+          Text(ParentIdentityHelper.label(this.parentIdentity) + ' · 今日作业')
+            .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.TEXT);
+          Text('标记今天已经布置完成的作业')
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+        Text('关闭')
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .onClick(() => this.showCoverageEditor = false);
+      }
+      .width('100%')
+      .padding({ left: 16, right: 16, top: 16, bottom: 12 });
+
+      Divider().color(AppTheme.DIVIDER);
+
+      Scroll() {
+        Column({ space: 14 }) {
+          HomeworkCoveragePicker({
+            selected: this.coverageDraft,
+            disabled: this.coverageBusy,
+            title: '我今天已经布置',
+            description: '“全部”表示你确认当前孩子今天需要布置的作业已经全部处理完成',
+            onChange: (subjects: string[]) => this.coverageDraft = subjects.slice()
+          });
+
+          if (this.coverageMessage.length > 0) {
+            Text(this.coverageMessage)
+              .width('100%')
+              .fontSize(AppTheme.META_SIZE)
+              .fontColor(AppTheme.DANGER);
+          }
+        }
+        .width('100%')
+        .padding({ left: 16, right: 16, top: 14, bottom: 16 });
+      }
+      .width('100%')
+      .layoutWeight(1);
+
+      Button(this.coverageBusy ? '正在保存…' : '保存我的状态', { type: ButtonType.Normal })
+        .width('100%')
+        .height(AppTheme.BUTTON_HEIGHT)
+        .margin({ left: 16, right: 16, bottom: 18 })
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .enabled(!this.coverageBusy)
+        .backgroundColor(AppTheme.PRIMARY)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .onClick(() => { void this.saveCoverage(); });
+    }
+    .width('100%')
+    .height('100%')
+    .backgroundColor(AppTheme.SURFACE);
   }
 
   @Builder
@@ -277,6 +521,7 @@ export struct ParentDashboardPage {
     Scroll() {
       Column() {
         Column({ space: 10 }) {
+          this.HomeworkCoverageCard();
           this.AttentionBanner();
           this.CreateAssignmentAction();
           this.CreateVoiceAction();
@@ -304,44 +549,49 @@ export struct ParentDashboardPage {
   @Builder
   private WideHome() {
     Scroll() {
-      Column({ space: 18 }) {
-        this.AttentionBanner();
-        Row({ space: AppTheme.SPLIT_PANE_GAP }) {
-          Column() {
-            this.CreateAssignmentAction();
-          }
-          .layoutWeight(1);
+      Column() {
+        Column({ space: 18 }) {
+          this.HomeworkCoverageCard();
+          this.AttentionBanner();
+          Row({ space: AppTheme.SPLIT_PANE_GAP }) {
+            Column() {
+              this.CreateAssignmentAction();
+            }
+            .layoutWeight(1);
 
-          Column() {
-            this.CreateVoiceAction();
+            Column() {
+              this.CreateVoiceAction();
+            }
+            .layoutWeight(1);
           }
-          .layoutWeight(1);
+          .width('100%')
+          .alignItems(VerticalAlign.Top);
+
+          Row({ space: AppTheme.SPLIT_PANE_GAP }) {
+            Column() {
+              this.ScheduledAssignmentAction();
+            }
+            .layoutWeight(1);
+
+            Column() {
+              this.AiPracticeAction();
+            }
+            .layoutWeight(1);
+          }
+          .width('100%')
+          .alignItems(VerticalAlign.Top);
         }
         .width('100%')
-        .alignItems(VerticalAlign.Top);
-
-        Row({ space: AppTheme.SPLIT_PANE_GAP }) {
-          Column() {
-            this.ScheduledAssignmentAction();
-          }
-          .layoutWeight(1);
-
-          Column() {
-            this.AiPracticeAction();
-          }
-          .layoutWeight(1);
-        }
-        .width('100%')
-        .alignItems(VerticalAlign.Top);
+        .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
+        .padding({
+          left: AppTheme.PAGE_PADDING_WIDE,
+          right: AppTheme.PAGE_PADDING_WIDE,
+          top: 24,
+          bottom: 24
+        });
       }
       .width('100%')
-      .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
-      .padding({
-        left: AppTheme.PAGE_PADDING_WIDE,
-        right: AppTheme.PAGE_PADDING_WIDE,
-        top: 24,
-        bottom: 24
-      });
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%')
     .height('100%')
@@ -360,6 +610,11 @@ export struct ParentDashboardPage {
     .backgroundColor(AppTheme.BACKGROUND)
     .onAreaChange((_oldValue, newValue) => {
       this.availableWidthVp = LayoutPolicy.areaLengthToVp(newValue.width, this.availableWidthVp);
+    })
+    .bindSheet($$this.showCoverageEditor, this.HomeworkCoverageEditor(), {
+      height: '72%',
+      showClose: false,
+      preferType: SheetType.BOTTOM
     });
   }
 }

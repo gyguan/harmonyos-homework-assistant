@@ -73,9 +73,10 @@ require("MODEL_CONTEXT_MESSAGES = 20" in tutor_service and
 require("findBySessionIdOrderByCreatedAtDesc" in tutor_repository and
         "findBySessionIdAndCreatedAtBeforeOrderByCreatedAtDesc" in tutor_repository,
         "Tutor repository must query bounded recent/older pages")
-require("nextBeforeEpochMs" in tutor_remote and "loadOlderTutor" in study and
-        "加载更早记录" in study,
-        "HarmonyOS Tutor UI must consume paged history on demand")
+require("nextBeforeEpochMs" in tutor_remote,
+        "Tutor client must retain bounded paged-history support for any future Tutor surface")
+require("TutorRemoteApi" not in study and "loadOlderTutor" not in study,
+        "focused assignment workspace must not load Tutor history after Tutor UI removal")
 
 if errors:
     print("API_EFFICIENCY_P1_GATE_FAIL")

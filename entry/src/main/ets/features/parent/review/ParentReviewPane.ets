@@ -1,13 +1,16 @@
+import { RemoteSubmissionResource } from '../../../application/remote/RemoteSubmissionApi';
 import {
   ParentSubmissionEvidence,
   ParentSubmissionEvidenceService
 } from '../../../application/submission/ParentSubmissionEvidenceService';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { CloudSubmissionPhotoStrip } from '../../../components/submission/CloudSubmissionPhotoStrip';
+import { SubmissionAudioEvidencePlayer } from '../../../components/submission/SubmissionAudioEvidencePlayer';
 import { PhotoPreviewDialog } from '../../../components/submission/PhotoPreviewDialog';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
+import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { ParentReviewViewModel } from './ParentReviewViewModel';
 import { ParentAssignmentEditPanel } from './ParentAssignmentEditPanel';
 
@@ -81,6 +84,25 @@ export struct ParentReviewPane {
         this.localRevision++;
       }
     }
+  }
+
+  private remotePhotoResources(): RemoteSubmissionResource[] {
+    let evidence = this.evidence();
+    if (evidence === null) return [];
+    let result: RemoteSubmissionResource[] = [];
+    for (let resource of evidence.remoteResources) {
+      if (resource.resourceType === 'IMAGE') result.push(resource);
+    }
+    return result;
+  }
+
+  private remoteAudioResource(): RemoteSubmissionResource | null {
+    let evidence = this.evidence();
+    if (evidence === null) return null;
+    for (let resource of evidence.remoteResources) {
+      if (resource.resourceType === 'AUDIO') return resource;
+    }
+    return null;
   }
 
   private openPreview(uri: string): void {
@@ -298,14 +320,24 @@ export struct ParentReviewPane {
       .width('100%');
 
       if (this.evidence() === null) {
-        Text('暂未找到提交照片').width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
+        Text('暂未找到提交内容').width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
           .padding({ top: 12, bottom: 12 });
-      } else if (this.evidence()!.remotePhotos.length > 0) {
-        CloudSubmissionPhotoStrip({ photos: this.evidence()!.remotePhotos });
+      } else if (this.remoteAudioResource() !== null) {
+        SubmissionAudioEvidencePlayer({
+          resource: this.remoteAudioResource(),
+          fallbackDurationMs: this.remoteAudioResource()!.durationMs
+        });
+      } else if (this.evidence()!.localAudioUri.length > 0) {
+        SubmissionAudioEvidencePlayer({
+          localUri: this.evidence()!.localAudioUri,
+          fallbackDurationMs: this.evidence()!.localAudioDurationMs
+        });
+      } else if (this.remotePhotoResources().length > 0) {
+        CloudSubmissionPhotoStrip({ photos: this.remotePhotoResources() });
       } else if (this.evidence()!.localPhotoUris.length > 0) {
         this.LocalPhotos(this.evidence()!.localPhotoUris);
       } else {
-        Text('本次提交没有可展示的照片').width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+        Text('本次提交没有可展示的内容').width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
     }
     .width('100%')
@@ -382,7 +414,7 @@ export struct ParentReviewPane {
                 .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
                 .textOverflow({ overflow: TextOverflow.Ellipsis });
               Row({ space: 8 }) {
-                Text(this.assignment()!.dueText.length > 0 ? this.assignment()!.dueText : '未设置截止时间')
+                Text('任务日期 ' + AssignmentTaskDate.displayText(this.assignment()!.taskDate))
                   .fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
                 Text('·').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
                 Text(this.actualMinutes(this.assignment()!) > 0 ?

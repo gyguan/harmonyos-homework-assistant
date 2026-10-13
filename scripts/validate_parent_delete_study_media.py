@@ -77,7 +77,7 @@ require("@Prop selectionMode: boolean = false;" in list_item and
         "if (this.selectionMode)" in list_item and
         ".width(38)" in list_item,
         "delete selector must replace the existing 38vp subject badge inside the card instead of adding external width")
-require("this.assignment.subject} · ${this.deadlineText()} · ${this.timingText()}" in list_item and
+require("this.assignment.subject} · ${this.taskDateText()} · ${this.timingText()}" in list_item and
         ".maxLines(1)" in list_item and
         ".textOverflow({ overflow: TextOverflow.Ellipsis })" in list_item,
         "task-card secondary information must stay on one bounded line without overlap or horizontal overflow")
@@ -101,7 +101,9 @@ require("确认并发布" in confirmation and "ConfirmationCandidateCard" in con
         "final confirmation page must retain review/edit/publish behavior")
 
 # Voice/image assignment workspace must support touch paging inline and fullscreen.
-require("Swiper()" in voice and ".onChange((index: number) => { void this.showImage(index); })" in voice,
+require("Swiper()" in voice and (
+        ".onChange((index: number) => { void this.showImage(index); })" in voice or
+        ".onChange((index: number) => this.selectImage(index))" in voice),
         "inline assignment images must support swipe paging")
 require("Swiper()" in study and "this.voiceSelectImage(index)" in study,
         "fullscreen assignment images must support swipe paging")

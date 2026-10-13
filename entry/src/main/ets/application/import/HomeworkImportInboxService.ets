@@ -112,7 +112,7 @@ export class HomeworkImportInboxService {
         title: candidate.title,
         instruction: candidate.instruction,
         textbookRef: candidate.textbookRef,
-        dueText: candidate.dueText,
+        taskDate: candidate.taskDate,
         expectedMinutes: candidate.expectedMinutes,
         sourceEvidence: {
           sourceLabel: candidate.sourceEvidence.sourceLabel,
@@ -124,7 +124,12 @@ export class HomeworkImportInboxService {
           imageRef: candidate.sourceEvidence.imageRef,
           capturedAtEpochMs: candidate.sourceEvidence.capturedAtEpochMs
         },
-        confidence: candidate.confidence
+        confidence: candidate.confidence,
+        sameTaskGroup: candidate.sameTaskGroup,
+        duplicateAssignmentId: candidate.duplicateAssignmentId,
+        duplicateAssignmentTitle: candidate.duplicateAssignmentTitle,
+        duplicateConfidence: candidate.duplicateConfidence,
+        duplicateReason: candidate.duplicateReason
       });
     }
 
@@ -222,7 +227,7 @@ export class HomeworkImportInboxService {
       title: candidate.title,
       instruction: candidate.instruction,
       textbookRef: candidate.textbookRef,
-      dueText: candidate.dueText,
+      taskDate: candidate.taskDate,
       expectedMinutes: candidate.expectedMinutes,
       sourceEvidence: {
         sourceLabel: candidate.sourceEvidence.sourceLabel,
@@ -234,7 +239,12 @@ export class HomeworkImportInboxService {
         imageRef: message.sourceEvidence.imageRef,
         capturedAtEpochMs: message.sourceEvidence.capturedAtEpochMs
       },
-      confidence: candidate.confidence
+      confidence: candidate.confidence,
+      sameTaskGroup: candidate.sameTaskGroup,
+      duplicateAssignmentId: candidate.duplicateAssignmentId,
+      duplicateAssignmentTitle: candidate.duplicateAssignmentTitle,
+      duplicateConfidence: candidate.duplicateConfidence,
+      duplicateReason: candidate.duplicateReason
     };
   }
 

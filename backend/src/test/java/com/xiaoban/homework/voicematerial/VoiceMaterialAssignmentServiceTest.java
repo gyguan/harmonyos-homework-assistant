@@ -18,6 +18,7 @@ import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.student.StudentService;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -127,6 +128,43 @@ class VoiceMaterialAssignmentServiceTest {
   }
 
   @Test
+  void automaticCreationCanFilterMaterialByRequestedSubject() {
+    UUID familyId = UUID.randomUUID();
+    UUID chineseId = UUID.randomUUID();
+    UUID mathId = UUID.randomUUID();
+    VoiceMaterialPackageEntity chinese = packageEntity(familyId, chineseId, "001-语文", "READY");
+    VoiceMaterialPackageEntity math = packageEntity(familyId, mathId, "002-数学", "READY");
+    math.subjectCode = "MATH";
+    math.title = "口算练习";
+    AssignmentDtos.Response created = response("a-voice-math", "数学 · 语音作业");
+
+    when(autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(Optional.empty());
+    when(assignments.findFirstVoiceMaterialTaskForDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(null);
+    when(packages.findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
+        familyId, "student-1")).thenReturn(List.of(chinese, math));
+    when(links.findByFamilyIdAndStudentIdOrderByCreatedAtDesc(
+        familyId, "student-1")).thenReturn(List.of());
+    when(packages.lockOwned(familyId, mathId)).thenReturn(Optional.of(math));
+    when(assignments.nextVoiceMaterialTaskTitle(
+        any(UUID.class), anyString(), org.mockito.ArgumentMatchers.eq("MATH"),
+        any(LocalDate.class), anyString())).thenReturn("数学 · 语音作业");
+    when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
+        .thenReturn(created);
+    when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
+        familyId, mathId)).thenReturn(List.of());
+
+    VoiceMaterialDtos.AutoCreateResponse result =
+        service().autoCreateNext(familyId, "student-1", "MATH");
+
+    assertTrue(result.created());
+    assertEquals(mathId.toString(), result.packageId());
+    verify(packages).lockOwned(familyId, mathId);
+    verify(packages, never()).lockOwned(familyId, chineseId);
+  }
+
+  @Test
   void manualCreationCanReusePreviouslyUsedReadyFolder() {
     UUID familyId = UUID.randomUUID();
     UUID packageId = UUID.randomUUID();
@@ -143,7 +181,7 @@ class VoiceMaterialAssignmentServiceTest {
     VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
         familyId, packageId,
         new VoiceMaterialDtos.CreateAssignmentRequest(
-            "student-1", "CHINESE", 18, 0L, "", "语文 · 第二次语音作业", "", "req-2"));
+            "student-1", "CHINESE", 18, "2026-09-28", "语文 · 第二次语音作业", "", "req-2"));
 
     assertTrue(result.created());
     assertEquals(created.id(), result.assignmentId());
@@ -176,7 +214,7 @@ class VoiceMaterialAssignmentServiceTest {
     VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
         familyId, packageId,
         new VoiceMaterialDtos.CreateAssignmentRequest(
-            "student-1", "MATH", 15, 0L, "", "数学 · 手工语音作业", "", "req-parallel"));
+            "student-1", "MATH", 15, "2026-09-28", "数学 · 手工语音作业", "", "req-parallel"));
 
     assertTrue(result.created());
     assertEquals(created.id(), result.assignmentId());
@@ -201,7 +239,7 @@ class VoiceMaterialAssignmentServiceTest {
     VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
         familyId, packageId,
         new VoiceMaterialDtos.CreateAssignmentRequest(
-            "student-1", null, 15, 0L, "", "", "", "req-1"));
+            "student-1", null, 15, "2026-09-28", "", "", "req-1"));
 
     assertFalse(result.created());
     assertEquals(existing.id(), result.assignmentId());
@@ -209,8 +247,42 @@ class VoiceMaterialAssignmentServiceTest {
     verify(assignments, never()).create(any(), anyString(), any());
   }
 
+
   @Test
-  void manualCreationUsesTitleDueDateAndExpectedMinutes() {
+  void manualCreationDefaultsMissingTaskDateToBusinessToday() {
+    UUID familyId = UUID.randomUUID();
+    UUID packageId = UUID.randomUUID();
+    VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "001-课文朗读", "READY");
+    when(packages.findOwnedStudentId(familyId, packageId)).thenReturn(Optional.of("student-1"));
+    when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
+    when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
+        familyId, packageId)).thenReturn(List.of());
+    when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
+        .thenAnswer(invocation -> {
+          AssignmentDtos.Create input = invocation.getArgument(2);
+          return new AssignmentDtos.Response(
+              input.id(), "student-1", input.assignmentType(), input.subjectCode(),
+              input.contentType(), input.subject(), input.title(), input.instruction(),
+              input.textbookRef(), input.taskDate(), input.status(), input.sourceLabel(),
+              input.sourceExcerpt(), input.expectedMinutes(), 0L, 0L, 0L, "", 0L);
+        });
+
+    LocalDate expectedToday = LocalDate.now(ZoneId.of("Asia/Shanghai"));
+    VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
+        familyId,
+        packageId,
+        new VoiceMaterialDtos.CreateAssignmentRequest(
+            "student-1", "CHINESE", 20, null, "当天语音作业", "完成当天语音任务", "req-default-date"));
+
+    ArgumentCaptor<AssignmentDtos.Create> input =
+        ArgumentCaptor.forClass(AssignmentDtos.Create.class);
+    verify(assignments).create(any(UUID.class), org.mockito.ArgumentMatchers.eq("student-1"), input.capture());
+    assertEquals(expectedToday.toString(), input.getValue().taskDate());
+    assertTrue(result.created());
+  }
+
+  @Test
+  void manualCreationUsesTitleTaskDateAndExpectedMinutes() {
     UUID familyId = UUID.randomUUID();
     UUID packageId = UUID.randomUUID();
     VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "001-课文朗读", "READY");
@@ -222,17 +294,17 @@ class VoiceMaterialAssignmentServiceTest {
     when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
         .thenReturn(authoritative);
 
-    long dueAt = Instant.parse("2026-09-25T15:59:59Z").toEpochMilli();
+    String taskDate = "2026-09-25";
     VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
         familyId, packageId,
         new VoiceMaterialDtos.CreateAssignmentRequest(
-            "student-1", "ENGLISH", 30, dueAt, "自定义", "自定义语音作业", "先听两遍并跟读。", "req-custom"));
+            "student-1", "ENGLISH", 30, taskDate, "自定义语音作业", "先听两遍并跟读。", "req-custom"));
 
     ArgumentCaptor<AssignmentDtos.Create> input =
         ArgumentCaptor.forClass(AssignmentDtos.Create.class);
     verify(assignments).create(any(UUID.class), org.mockito.ArgumentMatchers.eq("student-1"), input.capture());
     assertEquals(30, input.getValue().expectedMinutes());
-    assertEquals(dueAt, input.getValue().dueAtEpochMs());
+    assertEquals(taskDate, input.getValue().taskDate());
     assertEquals("ENGLISH", input.getValue().subjectCode());
     assertEquals("英语", input.getValue().subject());
     assertEquals("自定义语音作业", input.getValue().title());
@@ -249,7 +321,7 @@ class VoiceMaterialAssignmentServiceTest {
     Executable action = () -> service().createManually(
         familyId, packageId,
         new VoiceMaterialDtos.CreateAssignmentRequest(
-            "student-2", null, 15, 0L, "", "", "", "req-cross"));
+            "student-2", null, 15, "2026-09-28", "", "", "req-cross"));
 
     org.junit.jupiter.api.Assertions.assertThrows(ApiExceptions.BadRequest.class, action);
     verify(packages, never()).lockOwned(any(), any());
@@ -267,7 +339,6 @@ class VoiceMaterialAssignmentServiceTest {
     item.assignmentType = "EXTRA";
     item.expectedMinutes = 15;
     item.status = status;
-    item.dueAt = null;
     item.createdAt = Instant.now();
     return item;
   }
@@ -286,7 +357,7 @@ class VoiceMaterialAssignmentServiceTest {
     return new AssignmentDtos.Response(
         id, "student-1", "EXTRA", "CHINESE",
         "AUDIO_IMAGE", "语文", title, "请听语音并结合图片完成任务。",
-        "", 0L, "Asia/Shanghai", "", "NOT_STARTED",
+        "", "2026-09-28", "NOT_STARTED",
         "语音素材库", "001-课文朗读", 15,
         0L, 0L, 0L, "", 0L);
   }

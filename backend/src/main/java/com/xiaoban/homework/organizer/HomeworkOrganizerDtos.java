@@ -16,10 +16,15 @@ public final class HomeworkOrganizerDtos {
       String title,
       String instruction,
       String textbookRef,
-      String dueText,
+      String taskDate,
       int expectedMinutes,
       String sourceExcerpt,
-      double confidence) {}
+      double confidence,
+      String sameTaskGroup,
+      String duplicateAssignmentId,
+      String duplicateAssignmentTitle,
+      double duplicateConfidence,
+      String duplicateReason) {}
 
   public record Response(List<Candidate> assignments, String mode) {}
 

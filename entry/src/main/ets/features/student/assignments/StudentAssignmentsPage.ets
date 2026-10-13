@@ -13,6 +13,7 @@ import { StudentAssignmentsViewModel } from './StudentAssignmentsViewModel';
 
 @Component
 export struct StudentAssignmentsPage {
+  @Prop @Watch('onStudentIdChanged') studentId: string = '';
   @Prop @Watch('onRevisionChanged') revision: number = 0;
   @Prop @Watch('onAttentionKindChanged') attentionKind: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
   @State private availableWidthVp: number = 390;
@@ -35,9 +36,10 @@ export struct StudentAssignmentsPage {
   @State private visibleTotal: number = 0;
   @State private totalCount: number = 0;
   @State private snapshotRevision: number = -1;
+  private querySequence: number = 0;
 
   onOpenDetail: (assignmentId: string) => void = (_assignmentId: string) => {};
-  onOpenStudy: (assignmentId: string) => void = (_assignmentId: string) => {};
+  onStoreChanged: () => void = () => {};
   onAttentionFilterCleared: () => void = () => {};
 
   private readonly viewModel: StudentAssignmentsViewModel =
@@ -63,6 +65,20 @@ export struct StudentAssignmentsPage {
   }
 
   private onRevisionChanged(): void {
+    this.querySequence++;
+    this.querying = false;
+    this.rebuildView();
+  }
+
+  private onStudentIdChanged(): void {
+    this.querySequence++;
+    this.querying = false;
+    this.selectedAssignmentId = '';
+    this.snapshotRevision = -1;
+    this.needHandlingAssignments = [];
+    this.notStartedAssignments = [];
+    this.submittedAssignments = [];
+    this.completedAssignments = [];
     this.rebuildView();
   }
 
@@ -220,7 +236,7 @@ export struct StudentAssignmentsPage {
   }
 
   private assignmentRenderKey(item: Assignment): string {
-    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+    return `${item.studentId}|${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.taskDate}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
   }
 
   private syncSelectedAssignment(items: Assignment[]): void {
@@ -251,6 +267,8 @@ export struct StudentAssignmentsPage {
     if (this.querying) return;
     this.clearAttentionPreset();
     this.querying = true;
+    let queryStudentId = this.studentId;
+    let querySequence = ++this.querySequence;
     this.draftAllDates = allDates;
     this.draftSelectedDayEpochMs = selectedDayEpochMs;
     this.draftSubjectCode = subjectCode;
@@ -262,9 +280,11 @@ export struct StudentAssignmentsPage {
       let items = allDates ?
         await this.viewModel.query(AssignmentTypeFilter.ALL, subjectCode, AssignmentDateFilter.ALL) :
         await this.viewModel.queryOnDay(subjectCode, selectedDayEpochMs);
-      this.applyItems(this.filterByAttention(items));
+      if (querySequence === this.querySequence && queryStudentId === this.studentId) {
+        this.applyItems(this.filterByAttention(items));
+      }
     } finally {
-      this.querying = false;
+      if (querySequence === this.querySequence) this.querying = false;
     }
   }
 
@@ -555,7 +575,7 @@ export struct StudentAssignmentsPage {
         AssignmentDetailPane({
           assignmentId: this.selectedAssignmentId,
           revision: this.revision,
-          onOpenStudy: (assignmentId: string) => this.onOpenStudy(assignmentId)
+          onStoreChanged: () => this.onStoreChanged()
         });
       }
       .width('100%')

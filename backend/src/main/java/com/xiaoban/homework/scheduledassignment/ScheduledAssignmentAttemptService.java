@@ -7,7 +7,6 @@ import com.xiaoban.homework.voicematerial.VoiceMaterialAssignmentService;
 import com.xiaoban.homework.voicematerial.VoiceMaterialDtos;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -169,16 +168,7 @@ public class ScheduledAssignmentAttemptService {
 
     ScheduledAssignmentTemplateEntity template = templates.findById(plan.id)
         .orElseThrow(() -> new ApiExceptions.BadRequest("普通定时作业缺少任务模板"));
-    Instant dueAt = dueAt(plan, template, executionAt);
-    if ("SAME_DAY_AT".equals(template.duePolicy) &&
-        dueAt != null && !dueAt.isAfter(executionAt)) {
-      log.info("scheduled_assignment manual_skip planId={} studentId={} fireAt={} reason=MISSED_DUE_WINDOW dueAt={} executionAt={}",
-          plan.id, plan.studentId, fireAt, dueAt, executionAt);
-      finishSkipped(run, "MISSED_DUE_WINDOW", executionAt);
-      advance(plan, fireAt, executionAt);
-      return;
-    }
-
+    LocalDate taskDate = fireAt.atZone(ScheduledAssignmentSchedule.zone(plan.timezone)).toLocalDate();
     String assignmentId = "a-scheduled-" + plan.id + "-" + fireAt.toEpochMilli();
     AssignmentDtos.Create create = new AssignmentDtos.Create(
         assignmentId,
@@ -186,12 +176,10 @@ public class ScheduledAssignmentAttemptService {
         instanceTitle(plan, template, fireAt),
         template.instruction,
         "",
-        dueText(template),
+        taskDate.toString(),
         template.assignmentType,
         template.subjectCode,
         "NORMAL",
-        dueAt == null ? null : dueAt.toEpochMilli(),
-        plan.timezone,
         "NOT_STARTED",
         "定时作业",
         plan.name,
@@ -201,8 +189,8 @@ public class ScheduledAssignmentAttemptService {
         0L,
         "");
 
-    log.info("scheduled_assignment manual_create_start planId={} studentId={} fireAt={} assignmentId={} subjectCode={} dueAt={}",
-        plan.id, plan.studentId, fireAt, assignmentId, template.subjectCode, dueAt);
+    log.info("scheduled_assignment manual_create_start planId={} studentId={} fireAt={} assignmentId={} subjectCode={} taskDate={}",
+        plan.id, plan.studentId, fireAt, assignmentId, template.subjectCode, taskDate);
     AssignmentDtos.Response assignment =
         assignments.create(plan.familyId, plan.studentId, create);
     run.status = "SUCCESS";
@@ -227,10 +215,10 @@ public class ScheduledAssignmentAttemptService {
       return emptyVoiceResponse();
     }
 
-    log.info("scheduled_assignment voice_auto_create_start planId={} studentId={} triggerSource={} fireAt={}",
-        plan.id, plan.studentId, triggerSource, fireAt);
+    log.info("scheduled_assignment voice_auto_create_start planId={} studentId={} subjectCode={} triggerSource={} fireAt={}",
+        plan.id, plan.studentId, plan.subjectCode, triggerSource, fireAt);
     VoiceMaterialDtos.AutoCreateResponse result =
-        voiceAssignments.autoCreateNext(plan.familyId, plan.studentId);
+        voiceAssignments.autoCreateNext(plan.familyId, plan.studentId, plan.subjectCode);
     if (result.created()) {
       run.status = "SUCCESS";
       run.assignmentId = blankToNull(result.assignmentId());
@@ -294,8 +282,7 @@ public class ScheduledAssignmentAttemptService {
     if ("SUCCESS".equals(run.status)) return true;
     if ("FAILED".equals(run.status) && run.retryCount >= MAX_RETRIES) return true;
     if (!"SKIPPED".equals(run.status)) return false;
-    return "ALREADY_CREATED_TODAY".equals(run.skipReason) ||
-        "MISSED_DUE_WINDOW".equals(run.skipReason);
+    return "ALREADY_CREATED_TODAY".equals(run.skipReason);
   }
 
   private void finishSkipped(
@@ -319,33 +306,11 @@ public class ScheduledAssignmentAttemptService {
         plan.id, plan.studentId, plan.planType, fireAt, next, plan.status);
   }
 
-  private Instant dueAt(ScheduledAssignmentPlanEntity plan,
-      ScheduledAssignmentTemplateEntity template, Instant executionAt) {
-    ZoneId zone = ScheduledAssignmentSchedule.zone(plan.timezone);
-    LocalDate date = executionAt.atZone(zone).toLocalDate();
-    return switch (template.duePolicy) {
-      case "SAME_DAY_AT" -> date.atTime(template.dueTime).atZone(zone).toInstant();
-      case "NEXT_DAY_AT" -> date.plusDays(1).atTime(template.dueTime).atZone(zone).toInstant();
-      case "AFTER_MINUTES" -> executionAt.plusSeconds((long) template.dueOffsetMinutes * 60L);
-      case "NONE" -> null;
-      default -> throw new ApiExceptions.BadRequest("不支持的截止规则: " + template.duePolicy);
-    };
-  }
-
   private String instanceTitle(ScheduledAssignmentPlanEntity plan,
       ScheduledAssignmentTemplateEntity template, Instant fireAt) {
     String fireDate = fireAt.atZone(ScheduledAssignmentSchedule.zone(plan.timezone))
         .toLocalDate().format(INSTANCE_DATE_FORMAT);
     return template.title + " · " + fireDate;
-  }
-
-  private String dueText(ScheduledAssignmentTemplateEntity template) {
-    return switch (template.duePolicy) {
-      case "SAME_DAY_AT" -> "今天 " + template.dueTime.format(TIME_FORMAT);
-      case "NEXT_DAY_AT" -> "明天 " + template.dueTime.format(TIME_FORMAT);
-      case "AFTER_MINUTES" -> "创建后 " + template.dueOffsetMinutes + " 分钟";
-      default -> "未定";
-    };
   }
 
   private String voiceSkipReason(VoiceMaterialDtos.AutoCreateResponse result) {

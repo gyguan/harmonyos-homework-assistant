@@ -18,7 +18,6 @@ import {
   Subject
 } from '../../domain/model/HomeworkModels';
 import { HomeworkImportDraftRepository } from '../../domain/port/HomeworkImportDraftRepository';
-import { AssignmentDueDate } from '../../domain/service/AssignmentDueDate';
 
 export interface HomeworkBatchPublishResult {
   publishedCount: number;
@@ -47,7 +46,12 @@ export class HomeworkBatchPublishService {
       let candidateBatchId = this.sourceBatchId(candidate);
       if (candidateBatchId !== batchId) throw new Error('待发布作业不属于同一导入批次');
       let assignment = this.toAssignment(candidate);
-      entries.push({ candidateId: candidate.id, assignment: assignment });
+      entries.push({
+        candidateId: candidate.id,
+        assignment: assignment,
+        sourceLabel: candidate.sourceEvidence.sourceLabel,
+        sourceExcerpt: this.sourceEvidenceText(candidate)
+      });
       localByCandidateId.set(candidate.id, assignment);
     }
 
@@ -81,6 +85,12 @@ export class HomeworkBatchPublishService {
     return { publishedCount: mapped.length, assignments: mapped.slice() };
   }
 
+  private sourceEvidenceText(candidate: CandidateAssignment): string {
+    let rawText = candidate.sourceEvidence.rawText;
+    if (rawText !== undefined && rawText.trim().length > 0) return rawText.trim();
+    return candidate.sourceEvidence.excerpt.trim();
+  }
+
   private sourceBatchId(candidate: CandidateAssignment): string {
     let batchId = candidate.sourceEvidence.batchId;
     if (batchId === undefined) return '';
@@ -100,9 +110,7 @@ export class HomeworkBatchPublishService {
       title: candidate.title,
       instruction: candidate.instruction,
       textbookRef: candidate.textbookRef,
-      dueAtEpochMs: this.resolveCandidateDueAt(candidate),
-      dueTimezone: 'Asia/Shanghai',
-      dueText: candidate.dueText,
+      taskDate: candidate.taskDate,
       status: AssignmentStatus.NOT_STARTED,
       expectedMinutes: candidate.expectedMinutes > 0 ? candidate.expectedMinutes : 20,
       startedAtEpochMs: 0,
@@ -114,21 +122,6 @@ export class HomeworkBatchPublishService {
       lastSyncedAtEpochMs: 0,
       resourceLabels: []
     };
-  }
-
-  private resolveCandidateDueAt(candidate: CandidateAssignment): number {
-    let dueAt = AssignmentDueDate.resolveDueAtEpochMs(candidate.dueText, this.candidateAnchor(candidate.id));
-    return dueAt > 0 ? dueAt : 0;
-  }
-
-  private candidateAnchor(candidateId: string): number {
-    let parts = candidateId.split('-');
-    for (let part of parts) {
-      if (part.length !== 13) continue;
-      let value = Number(part);
-      if (Number.isFinite(value) && value > 0) return value;
-    }
-    return Date.now();
   }
 
   private assignmentType(subject: Subject): AssignmentType {

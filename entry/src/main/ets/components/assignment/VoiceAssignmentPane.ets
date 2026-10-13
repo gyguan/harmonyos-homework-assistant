@@ -1,4 +1,9 @@
 import { AppTheme } from '../../common/theme/AppTheme';
+import {
+  AssignmentMediaSyncApi,
+  AssignmentMediaSyncItem,
+  AssignmentMediaSyncStatus
+} from '../../application/assignment/AssignmentMediaSyncApi';
 import { RemoteAssignmentResourceApi } from '../../application/remote/RemoteAssignmentResourceApi';
 import {
   AssignmentResource,
@@ -15,6 +20,7 @@ const IMAGE_PREFETCH_CONCURRENCY: number = 2;
 export struct VoiceAssignmentPane {
   @Prop assignmentId: string = '';
   @Prop playbackEnabled: boolean = false;
+  @Prop imageOnlyMode: boolean = false;
   @State private loading: boolean = true;
   @State private message: string = '';
   @State private imageUris: string[] = [];
@@ -28,6 +34,9 @@ export struct VoiceAssignmentPane {
   @State private playing: boolean = false;
   @State private currentTimeMs: number = 0;
   @State private durationMs: number = 0;
+  @State private syncStatus: AssignmentMediaSyncStatus = AssignmentMediaSyncStatus.UNAVAILABLE;
+  @State private syncEnabled: boolean = false;
+  @State private syncMessage: string = '';
 
   onPauseReady: (pause: () => void) => void = (_pause: () => void) => {};
   onFullscreenRequest: () => void = () => {};
@@ -57,13 +66,17 @@ export struct VoiceAssignmentPane {
   private audioResource: AssignmentResource | null = null;
   private imageRequestVersion: number = 0;
   private lifecycleVersion: number = 0;
+  private syncItems: AssignmentMediaSyncItem[] = [];
+  private syncTimelineDurationMs: number = 0;
+  private syncPreferenceInitialized: boolean = false;
+  private manualSyncResumeAtMs: number = 0;
 
   aboutToAppear(): void {
     this.lifecycleVersion++;
     this.onPauseReady(() => { void this.pauseAudio(); });
     this.onFullscreenControlsReady(
       () => { void this.toggleAudio(); },
-      (value: number) => this.player.seek(value),
+      (value: number) => this.seekAudio(value),
       () => this.previousImage(),
       () => this.nextImage(),
       (index: number) => this.selectImage(index)
@@ -103,6 +116,13 @@ export struct VoiceAssignmentPane {
     this.playing = false;
     this.currentTimeMs = 0;
     this.durationMs = 0;
+    this.syncStatus = AssignmentMediaSyncStatus.UNAVAILABLE;
+    this.syncEnabled = false;
+    this.syncMessage = '';
+    this.syncItems = [];
+    this.syncTimelineDurationMs = 0;
+    this.syncPreferenceInitialized = false;
+    this.manualSyncResumeAtMs = 0;
     this.imageResources = [];
     this.imageUris = [];
     this.imageIndex = 0;
@@ -124,6 +144,9 @@ export struct VoiceAssignmentPane {
         this.compareImageResources(left, right));
       this.imageResources = images;
       this.audioResource = audio;
+      if (!this.imageOnlyMode) {
+        void this.loadMediaSync(lifecycleVersion);
+      }
 
       let slots: string[] = [];
       for (let i = 0; i < images.length; i++) slots.push('');
@@ -139,7 +162,9 @@ export struct VoiceAssignmentPane {
       this.imageIndex = 0;
       this.notifyMediaState();
       this.loading = false;
-      void this.loadAudio(audio);
+      if (!this.imageOnlyMode) {
+        void this.loadAudio(audio);
+      }
       this.startImagePrefetch(1, lifecycleVersion);
     } catch {
       this.message = '作业资料加载失败，请检查网络后重试';
@@ -172,6 +197,7 @@ export struct VoiceAssignmentPane {
         this.prepared = true;
         this.durationMs = durationMs;
         this.currentTimeMs = 0;
+        this.syncImageForTime(0, true);
         this.notifyMediaState();
       },
       onState: (state) => {
@@ -181,6 +207,7 @@ export struct VoiceAssignmentPane {
       },
       onTime: (timeMs: number) => {
         this.currentTimeMs = timeMs;
+        this.syncImageForTime(timeMs, false);
         this.notifyMediaState();
       },
       onError: (message: string) => {
@@ -193,6 +220,39 @@ export struct VoiceAssignmentPane {
       }
     };
     await this.player.prepare(this.audioUri, callbacks);
+  }
+
+  private async loadMediaSync(lifecycleVersion: number): Promise<void> {
+    let sync = await AssignmentMediaSyncApi.instance.get(this.assignmentId);
+    if (lifecycleVersion !== this.lifecycleVersion) return;
+
+    this.syncStatus = sync.status;
+    this.syncItems = sync.items;
+    this.syncTimelineDurationMs = sync.durationMs;
+    if (sync.available && sync.items.length > 0) {
+      if (!this.syncPreferenceInitialized) {
+        this.syncEnabled = true;
+        this.syncPreferenceInitialized = true;
+      }
+      this.syncMessage = '';
+      this.syncImageForTime(this.currentTimeMs, true);
+      return;
+    }
+
+    this.syncEnabled = false;
+    if (sync.status === AssignmentMediaSyncStatus.PENDING ||
+      sync.status === AssignmentMediaSyncStatus.RUNNING) {
+      this.syncMessage = '图文同步正在准备，可先正常播放语音';
+      setTimeout(() => {
+        if (lifecycleVersion === this.lifecycleVersion) {
+          void this.loadMediaSync(lifecycleVersion);
+        }
+      }, 3000);
+    } else if (sync.status === AssignmentMediaSyncStatus.FAILED) {
+      this.syncMessage = '暂未生成图文同步，可手动查看图片';
+    } else {
+      this.syncMessage = '图文同步暂不可用，可手动查看图片';
+    }
   }
 
   private retryAudio(): void {
@@ -272,8 +332,14 @@ export struct VoiceAssignmentPane {
     let cursor = index;
     while (cursor < this.imageResources.length) {
       if (lifecycleVersion !== this.lifecycleVersion) return;
-      await RemoteAssignmentResourceApi.instance.preload(this.imageResources[cursor]);
+      let uri = await RemoteAssignmentResourceApi.instance.preload(this.imageResources[cursor]);
       if (lifecycleVersion !== this.lifecycleVersion) return;
+      if (uri.length > 0 && cursor < this.imageUris.length && this.imageUris[cursor].length === 0) {
+        let next = this.imageUris.slice();
+        next[cursor] = uri;
+        this.imageUris = next;
+        this.notifyMediaState();
+      }
       cursor += stride;
     }
   }
@@ -317,18 +383,77 @@ export struct VoiceAssignmentPane {
   private previousImage(): void {
     if (this.imageResources.length <= 1) return;
     let index = this.imageIndex <= 0 ? this.imageResources.length - 1 : this.imageIndex - 1;
+    this.suspendAutoSync();
     void this.showImage(index);
   }
 
   private nextImage(): void {
     if (this.imageResources.length <= 1) return;
     let index = this.imageIndex >= this.imageResources.length - 1 ? 0 : this.imageIndex + 1;
+    this.suspendAutoSync();
     void this.showImage(index);
   }
 
   private selectImage(index: number): void {
-    if (index < 0 || index >= this.imageResources.length) return;
+    if (index < 0 || index >= this.imageResources.length || index === this.imageIndex) return;
+    this.suspendAutoSync();
     void this.showImage(index);
+  }
+
+  private suspendAutoSync(): void {
+    if (!this.syncEnabled) return;
+    this.manualSyncResumeAtMs = Date.now() + 5000;
+  }
+
+  private setSyncEnabled(enabled: boolean): void {
+    this.syncEnabled = enabled && this.syncStatus === AssignmentMediaSyncStatus.READY &&
+      this.syncItems.length > 0;
+    if (this.syncEnabled) {
+      this.manualSyncResumeAtMs = 0;
+      this.syncImageForTime(this.currentTimeMs, true);
+    }
+  }
+
+  private seekAudio(value: number): void {
+    this.currentTimeMs = value;
+    this.manualSyncResumeAtMs = 0;
+    this.syncImageForTime(value, true);
+    this.player.seek(value);
+  }
+
+  private syncImageForTime(timeMs: number, force: boolean): void {
+    if (!this.syncEnabled || this.syncItems.length === 0) return;
+    if (!force && Date.now() < this.manualSyncResumeAtMs) return;
+
+    let timelineIndex = 0;
+    if (this.syncTimelineDurationMs > 0) {
+      let lookupMs = this.durationMs > 0 ?
+        Math.floor(Math.max(0, timeMs) * this.syncTimelineDurationMs / this.durationMs) :
+        Math.max(0, timeMs);
+      for (let i = 0; i < this.syncItems.length; i++) {
+        let item = this.syncItems[i];
+        if (lookupMs < item.startMs) break;
+        timelineIndex = i;
+        if (item.endMs > item.startMs && lookupMs < item.endMs) break;
+      }
+    } else if (this.durationMs > 0) {
+      let ratio = Math.max(0, Math.min(1, timeMs / this.durationMs));
+      timelineIndex = Math.min(
+        this.syncItems.length - 1,
+        Math.floor(ratio * this.syncItems.length));
+    }
+
+    let resourceId = this.syncItems[timelineIndex].imageResourceId;
+    let targetIndex = -1;
+    for (let i = 0; i < this.imageResources.length; i++) {
+      if (this.imageResources[i].id === resourceId) {
+        targetIndex = i;
+        break;
+      }
+    }
+    if (targetIndex >= 0 && targetIndex !== this.imageIndex) {
+      void this.showImage(targetIndex);
+    }
   }
 
   private openFullscreen(): void {
@@ -373,7 +498,7 @@ export struct VoiceAssignmentPane {
         .index(this.imageIndex)
         .indicator(false)
         .loop(true)
-        .onChange((index: number) => { void this.showImage(index); })
+        .onChange((index: number) => this.selectImage(index))
         .borderRadius(AppTheme.CONTROL_RADIUS);
 
         Row({ space: 6 }) {
@@ -482,6 +607,42 @@ export struct VoiceAssignmentPane {
   }
 
   @Builder
+  private MediaSyncControls() {
+    if (this.syncStatus === AssignmentMediaSyncStatus.READY && this.syncItems.length > 0) {
+      Row({ space: 10 }) {
+        Column({ space: 2 }) {
+          Text('图文同步')
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text(this.syncEnabled ? '语音播放时自动切换图片' : '已关闭，可手动查看图片')
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+        Toggle({ type: ToggleType.Switch, isOn: this.syncEnabled })
+          .onChange((isOn: boolean) => this.setSyncEnabled(isOn));
+      }
+      .width('100%')
+      .padding({ left: 10, right: 10, top: 8, bottom: 8 })
+      .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+      .borderRadius(AppTheme.CONTROL_RADIUS);
+    } else if (this.syncMessage.length > 0) {
+      Text(this.syncMessage)
+        .width('100%')
+        .padding({ left: 10, right: 10, top: 8, bottom: 8 })
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+        .fontColor(AppTheme.SUBTEXT)
+        .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
+    }
+  }
+
+  @Builder
   private AudioControls() {
     Column({ space: 5 }) {
       if (this.audioLoading) {
@@ -533,7 +694,7 @@ export struct VoiceAssignmentPane {
               .onChange((value: number, mode: SliderChangeMode) => {
                 this.currentTimeMs = value;
                 if (mode === SliderChangeMode.End || mode === SliderChangeMode.Click) {
-                  this.player.seek(value);
+                  this.seekAudio(value);
                 }
               });
 
@@ -591,7 +752,16 @@ export struct VoiceAssignmentPane {
       } else if (this.imageUris.length > 0 && this.imageUris[this.imageIndex].length > 0) {
         Column({ space: 10 }) {
           this.ImageViewer();
-          this.AudioControls();
+          if (this.imageOnlyMode) {
+            Text('录音时可以左右滑动或点击缩略图切换图片')
+              .width('100%')
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+              .fontColor(AppTheme.SUBTEXT);
+          } else {
+            this.MediaSyncControls();
+            this.AudioControls();
+          }
         }
         .width('100%')
         .padding(10)

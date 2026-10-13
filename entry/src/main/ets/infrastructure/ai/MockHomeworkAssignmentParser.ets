@@ -14,7 +14,7 @@ export class MockHomeworkAssignmentParser implements HomeworkAssignmentParser {
         title: candidate.title,
         instruction: candidate.instruction,
         textbookRef: candidate.textbookRef,
-        dueText: candidate.dueText,
+        taskDate: candidate.taskDate,
         expectedMinutes: candidate.expectedMinutes,
         sourceEvidence: {
           sourceLabel: input.sourceLabel,

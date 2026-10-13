@@ -20,6 +20,7 @@ def require(condition: bool, message: str) -> None:
 
 
 parser = read("entry/src/main/ets/infrastructure/ai/LocalHomeworkAssignmentParser.ets")
+task_date = read("entry/src/main/ets/domain/service/AssignmentTaskDate.ets")
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 confirmation_components = read(
     "entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
@@ -34,15 +35,18 @@ for word in ["背诵", "听读", "口算", "订正", "默写", "预习", "复习
     require(word in parser, f"parser missing common homework action: {word}")
 for word in ["带书", "缴费", "穿校服", "家长会"]:
     require(word in parser, f"parser missing notice filter keyword: {word}")
-for due in ["周五", "星期五", "月\\d{1,2}"]:
-    require(due in parser, f"parser missing due-date support marker: {due}")
+require("AssignmentTaskDate.resolve" in parser,
+        "parser must delegate task-date normalization to the shared AssignmentTaskDate service")
+for marker in ["resolveWeekday", "下周|下星期|本周|本星期|这周|这星期|周|星期",
+               "(\\d{1,2})月(\\d{1,2})"]:
+    require(marker in task_date, f"task-date parser missing support marker: {marker}")
 
 require("updateCandidate(candidate" in store, "HomeworkStore must support full candidate updates")
 require("addCandidate(candidate" in store, "HomeworkStore must support manually adding a candidate")
 
 for capability in ["saveCandidate", "addCandidate", "ConfirmationCandidateEditor", "CandidateEditorSheet"]:
     require(capability in confirmation, f"confirmation page missing capability: {capability}")
-for capability in ["subjectDraft", "titleDraft", "dueTextDraft", "textbookRefDraft",
+for capability in ["subjectDraft", "titleDraft", "taskDateDraft", "textbookRefDraft",
                    "buildCandidate", "saveAndClose", "confirmDiscard"]:
     require(capability in confirmation_components,
             f"confirmation editor missing staged-edit capability: {capability}")

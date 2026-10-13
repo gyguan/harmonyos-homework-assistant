@@ -62,7 +62,6 @@ require(".height(AppTheme.DEEP_PAGE_HEADER_HEIGHT)" not in header and
 
 for path, text in [
     ("StudentAssignmentDetailPage.ets", detail),
-    ("StudyWorkspacePage.ets", study),
     ("HomeworkImportRoutePage.ets", parent_import_route),
     ("PracticeAttemptPage.ets", practice_attempt),
 ]:
@@ -74,20 +73,20 @@ for path, text in [
 
 require("backAccessibilityText: '返回家长首页'" in parent_import_route and "embeddedInDeepPage: true" in parent_import_route,
         "parent import deep page must expose shared back chrome without duplicating the import page heading")
-require("private WorkspaceHeader()" not in study,
-        "StudyWorkspace must not reintroduce its legacy private WorkspaceHeader")
-require("top: 0" in study,
-        "StudyWorkspace content should not add a second top padding below shared chrome")
+require("private WorkspaceHeader()" not in study and "DeepPageHeader" not in study,
+        "embedded workspace must not own a second deep-page header")
+require("private UnifiedWorkspace()" in study and "this.StudyContent(false);" in study,
+        "StudyWorkspace must act as embedded content inside Assignment Detail")
 
 study_content = ""
-if "private StudyContent" in study and "private TutorPane" in study:
-    study_content = study.split("private StudyContent", 1)[1].split("private TutorPane", 1)[0]
+if "private StudyContent" in study and "private WorkspaceActionBar" in study:
+    study_content = study.split("private StudyContent", 1)[1].split("private WorkspaceActionBar", 1)[0]
 require(".align(Alignment.TopStart)" in study_content,
-        "StudyWorkspace page-level Scroll must be explicitly top anchored")
+        "embedded workspace Scroll must be explicitly top anchored")
 require(".scrollBar(BarState.Off)" in study_content,
-        "StudyWorkspace page-level Scroll must keep scrolling but hide the system scrollbar")
+        "embedded workspace must keep scrolling but hide the system scrollbar")
 require(".justifyContent(FlexAlign.Start)" in study_content and ".alignItems(HorizontalAlign.Start)" in study_content,
-        "StudyWorkspace content column must be explicitly anchored to the top/start")
+        "embedded workspace content must be explicitly anchored to the top/start")
 
 require("docs/product/v2-deep-page-chrome-standard.md" in agents and "DeepPageHeader" in agents,
         "Agent guide must require the shared deep-page chrome standard for future V2 refactors")

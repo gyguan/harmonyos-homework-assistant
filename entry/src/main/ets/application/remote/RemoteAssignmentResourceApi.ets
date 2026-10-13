@@ -38,12 +38,10 @@ interface VoiceAssignmentMetadata {
   title: string;
   instruction: string;
   textbookRef: string;
-  dueText: string;
+  taskDate: string;
   assignmentType: string;
   subjectCode: string;
   contentType: string;
-  dueAtEpochMs: number;
-  dueTimezone: string;
   status: string;
   sourceLabel: string;
   sourceExcerpt: string;
@@ -201,8 +199,8 @@ export class RemoteAssignmentResourceApi {
     this.cache.delete(resourceId);
   }
 
-  async preload(resource: AssignmentResource): Promise<void> {
-    await this.download(resource);
+  async preload(resource: AssignmentResource): Promise<string> {
+    return await this.download(resource);
   }
 
   async download(resource: AssignmentResource): Promise<string> {
@@ -288,12 +286,10 @@ export class RemoteAssignmentResourceApi {
       title: assignment.title,
       instruction: assignment.instruction,
       textbookRef: assignment.textbookRef,
-      dueText: assignment.dueText,
+      taskDate: assignment.taskDate,
       assignmentType: assignment.assignmentType,
       subjectCode: assignment.subjectCode,
       contentType: AssignmentContentType.AUDIO_IMAGE,
-      dueAtEpochMs: assignment.dueAtEpochMs,
-      dueTimezone: assignment.dueTimezone,
       status: assignment.status,
       sourceLabel: '',
       sourceExcerpt: '',

@@ -81,9 +81,9 @@ require(len(auto_block) == 2 and
         "assignments.findFirstVoiceMaterialTaskForDate(familyId, studentId, businessDate)" in auto_block[1],
         "automatic creation must only stop for an effective voice task due on the current business day")
 require("findFirstVoiceMaterialTaskForDate" in delete_service and
-        "DueAtGreaterThanEqualAndDueAtLessThan" in read(
+        "StatusNotAndTaskDateOrderByUpdatedAtDesc" in read(
             "backend/src/main/java/com/xiaoban/homework/assignment/AssignmentRepository.java"),
-        "current-day active voice task lookup must be bounded by structured dueAt")
+        "current-day active voice task lookup must be bounded by structured taskDate")
 if len(auto_block) == 2:
     auto_body = auto_block[1].split("private VoiceMaterialPackageEntity chooseAutoFolder", 1)[0]
     require("todayRecord" in auto_body and
@@ -156,7 +156,7 @@ require("Select([" in voice_page and "subjectFromIndex" in voice_page and
 require("titleCustomized" not in voice_page and "instructionCustomized" not in voice_page and
         "TextInput({ placeholder: '选择素材后自动生成" not in voice_page,
         "generated voice task name/instruction must not require manual editing")
-require("Text('任务设置')" in voice_page and "Text('截止时间')" in voice_page and
+require("Text('任务设置')" in voice_page and "Text('任务日期')" in voice_page and
         "Text('预计完成时长')" in voice_page,
         "voice assignment task metadata must use compact user-facing labels")
 require("private MaterialSection()" in voice_page and

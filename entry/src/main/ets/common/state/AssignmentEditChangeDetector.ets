@@ -4,7 +4,7 @@ export interface AssignmentEditValues {
   subject: Subject;
   title: string;
   instruction: string;
-  dueText: string;
+  taskDate: string;
   expectedMinutes: number;
   textbookRef: string;
 }
@@ -14,7 +14,7 @@ export class AssignmentEditChangeDetector {
     return original.subject !== current.subject ||
       original.title !== current.title ||
       original.instruction !== current.instruction ||
-      original.dueText !== current.dueText ||
+      original.taskDate !== current.taskDate ||
       original.expectedMinutes !== current.expectedMinutes ||
       original.textbookRef !== current.textbookRef;
   }

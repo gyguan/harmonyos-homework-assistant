@@ -16,7 +16,6 @@ def require(condition: bool, message: str) -> None:
     if not condition:
         errors.append(message)
 
-route = read("entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 pane = read("entry/src/main/ets/components/assignment/VoiceAssignmentPane.ets")
 parent = read("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
@@ -24,8 +23,6 @@ media_picker = read("entry/src/main/ets/application/assignment/VoiceAssignmentMe
 remote_resource = read("entry/src/main/ets/application/remote/RemoteAssignmentResourceApi.ets")
 backend_resource = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentResourceService.java")
 
-require("assignment.contentType !== AssignmentContentType.AUDIO_IMAGE" in route,
-        "voice assignments must hide the duplicated extracurricular context banner")
 require("contentType !== AssignmentContentType.AUDIO_IMAGE" in study,
         "voice assignments must hide the duplicated generic ResourcePane")
 require(study.count("contentType !== AssignmentContentType.AUDIO_IMAGE") >= 3,
@@ -36,7 +33,9 @@ require(".height(286)" in pane,
         "voice media pane must give the main image more visual space")
 require("ForEach(this.imageUris" in pane and "this.selectImage(index)" in pane,
         "voice media pane must provide direct thumbnail image switching")
-require("Swiper()" in pane and ".onChange((index: number) => { void this.showImage(index); })" in pane,
+require("Swiper()" in pane and (
+        ".onChange((index: number) => { void this.showImage(index); })" in pane or
+        ".onChange((index: number) => this.selectImage(index))" in pane),
         "voice media pane must support direct touch swipe paging")
 image_viewer = pane.split("@Builder\n  private ImageViewer()", 1)[1].split(
     "@Builder\n  private AudioControls()", 1)[0]
@@ -63,11 +62,13 @@ require("loadImage(index: number)" in pane and
         "IMAGE_PREFETCH_CONCURRENCY: number = 2" in pane and
         "startImagePrefetch(1, lifecycleVersion)" in pane and
         "prefetchImageWorker" in pane and
-        "RemoteAssignmentResourceApi.instance.preload" in pane,
-        "student voice images must cache all remaining images in the background with bounded concurrency")
-require("async preload(resource: AssignmentResource): Promise<void>" in remote_resource and
-        "await this.download(resource)" in remote_resource,
-        "resource API must expose cache-only preloading without binding every image to UI state")
+        "let uri = await RemoteAssignmentResourceApi.instance.preload" in pane and
+        "next[cursor] = uri" in pane and
+        "this.imageUris = next" in pane,
+        "student voice images must preload all remaining images with bounded concurrency and bind local URIs before user navigation")
+require("async preload(resource: AssignmentResource): Promise<string>" in remote_resource and
+        "return await this.download(resource)" in remote_resource,
+        "resource API preload must return the cached local URI so the viewer can render prefetched images immediately")
 require("pendingDownloads" in remote_resource,
         "resource downloads must deduplicate concurrent prefetch and foreground requests")
 show_image = pane.split("private async showImage(index: number)", 1)[1].split(

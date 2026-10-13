@@ -27,6 +27,8 @@ draft_repo = read("entry/src/main/ets/data/repository/DefaultHomeworkImportDraft
 draft_local = read("entry/src/main/ets/data/local/HomeworkImportLocalDataSource.ets")
 parser = read("entry/src/main/ets/infrastructure/ai/LocalHomeworkAssignmentParser.ets")
 publisher = read("entry/src/main/ets/application/import/HomeworkBatchPublishService.ets")
+inbox_service = read("entry/src/main/ets/application/import/HomeworkImportInboxService.ets")
+confirmation_candidate = read("entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
 
 # One parent-facing assignment input: pasted teacher copy, direct parent instructions and
 # screenshot OCR all converge before organization.
@@ -102,6 +104,23 @@ require("this.assignmentType(candidate.subject)" in publisher and
         "return AssignmentType.EXTRA" in publisher and
         "return AssignmentType.SCHOOL" in publisher,
         "unified create flow must preserve school versus extracurricular AssignmentType")
+
+require("private sourceEvidenceText(candidate: CandidateAssignment): string" in publisher and
+        "candidate.sourceEvidence.rawText" in publisher and
+        "sourceExcerpt: this.sourceEvidenceText(candidate)" in publisher,
+        "published AI homework must preserve deterministic raw source text for duplicate review")
+
+for field in ["sameTaskGroup", "duplicateAssignmentId", "duplicateAssignmentTitle",
+              "duplicateConfidence", "duplicateReason"]:
+    require(f"{field}: candidate.{field}" in service,
+            f"subject override must preserve AI duplicate metadata: {field}")
+    require(inbox_service.count(f"{field}: candidate.{field}") >= 2,
+            f"import inbox enrichment and normalization must preserve AI duplicate metadata: {field}")
+
+require("【本地兜底】" in confirmation_candidate and
+        "本地兜底" in confirmation_candidate and
+        "AI 判重暂不可用，本次由本地规则辅助判断，请重点确认。" in confirmation_candidate,
+        "confirmation must clearly identify local duplicate-review fallback to parents")
 
 require("getRawImport" in draft_port and "getCandidates" in draft_port and
         "replaceRawImport" in draft_port and "replaceCandidates" in draft_port,

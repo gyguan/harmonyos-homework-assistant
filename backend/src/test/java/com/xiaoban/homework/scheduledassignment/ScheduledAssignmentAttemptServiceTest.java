@@ -57,7 +57,7 @@ class ScheduledAssignmentAttemptServiceTest {
 
     when(plans.lockById(planId)).thenReturn(Optional.of(plan));
     when(runs.findByPlanIdAndScheduledFireAt(planId, fireAt)).thenReturn(Optional.of(run));
-    when(voiceAssignments.autoCreateNext(familyId, "student-1")).thenReturn(created);
+    when(voiceAssignments.autoCreateNext(familyId, "student-1", "CHINESE")).thenReturn(created);
 
     VoiceMaterialDtos.AutoCreateResponse result =
         service().executeStudentEntry(familyId, "student-1", planId, fireAt, executionAt);
@@ -65,36 +65,7 @@ class ScheduledAssignmentAttemptServiceTest {
     assertTrue(result.created());
     assertEquals("SUCCESS", run.status);
     assertEquals("a-voice-1", run.assignmentId);
-    verify(voiceAssignments).autoCreateNext(familyId, "student-1");
-  }
-
-  @Test
-  void missedSameDayDueWindowSkipsInsteadOfCreatingExpiredAssignment() {
-    UUID familyId = UUID.randomUUID();
-    UUID planId = UUID.randomUUID();
-    Instant fireAt = Instant.parse("2026-09-28T09:00:00Z");
-    Instant executionAt = Instant.parse("2026-09-28T14:00:00Z");
-
-    ScheduledAssignmentPlanEntity plan = manualPlan(familyId, planId, fireAt);
-    ScheduledAssignmentTemplateEntity template = template(planId);
-    template.duePolicy = "SAME_DAY_AT";
-    template.dueTime = LocalTime.of(21, 0);
-
-    when(plans.lockById(planId)).thenReturn(Optional.of(plan));
-    when(runs.findByPlanIdAndScheduledFireAt(planId, fireAt)).thenReturn(Optional.empty());
-    when(runs.saveAndFlush(any(ScheduledAssignmentRunEntity.class)))
-        .thenAnswer(invocation -> invocation.getArgument(0));
-    when(templates.findById(planId)).thenReturn(Optional.of(template));
-
-    service().executeScheduler(planId, fireAt, executionAt);
-
-    verify(assignments, never()).create(any(UUID.class), any(String.class), any(AssignmentDtos.Create.class));
-    ArgumentCaptor<ScheduledAssignmentRunEntity> run =
-        ArgumentCaptor.forClass(ScheduledAssignmentRunEntity.class);
-    verify(runs).save(run.capture());
-    assertEquals("SKIPPED", run.getValue().status);
-    assertEquals("MISSED_DUE_WINDOW", run.getValue().skipReason);
-    assertEquals("ENDED", plan.status);
+    verify(voiceAssignments).autoCreateNext(familyId, "student-1", "CHINESE");
   }
 
   @Test
@@ -107,8 +78,6 @@ class ScheduledAssignmentAttemptServiceTest {
     ScheduledAssignmentPlanEntity plan = manualPlan(familyId, planId, fireAt);
     plan.scheduleType = "DAILY";
     ScheduledAssignmentTemplateEntity template = template(planId);
-    template.duePolicy = "AFTER_MINUTES";
-    template.dueOffsetMinutes = 60;
 
     when(plans.lockById(planId)).thenReturn(Optional.of(plan));
     when(runs.findByPlanIdAndScheduledFireAt(planId, fireAt)).thenReturn(Optional.empty());
@@ -121,8 +90,7 @@ class ScheduledAssignmentAttemptServiceTest {
           return new AssignmentDtos.Response(
               create.id(), "student-1", create.assignmentType(), create.subjectCode(),
               create.contentType(), create.subject(), create.title(), create.instruction(),
-              create.textbookRef(), create.dueAtEpochMs() == null ? 0L : create.dueAtEpochMs(),
-              create.dueTimezone(), create.dueText(), create.status(), create.sourceLabel(),
+              create.textbookRef(), create.taskDate(), create.status(), create.sourceLabel(),
               create.sourceExcerpt(), create.expectedMinutes(), 0L, 0L, 0L, "", 0L);
         });
 
@@ -135,6 +103,7 @@ class ScheduledAssignmentAttemptServiceTest {
         org.mockito.ArgumentMatchers.eq("student-1"),
         create.capture());
     assertEquals("阅读 20 分钟 · 09-30", create.getValue().title());
+    assertEquals("2026-09-30", create.getValue().taskDate());
     assertEquals("阅读 20 分钟", template.title);
   }
 
@@ -171,6 +140,7 @@ class ScheduledAssignmentAttemptServiceTest {
     plan.familyId = familyId;
     plan.studentId = "student-1";
     plan.planType = "VOICE_MATERIAL_AUTO";
+    plan.subjectCode = "CHINESE";
     plan.name = "每日语音作业";
     plan.scheduleType = "DAILY";
     plan.scheduleTime = LocalTime.of(6, 30);
@@ -190,6 +160,7 @@ class ScheduledAssignmentAttemptServiceTest {
     plan.familyId = familyId;
     plan.studentId = "student-1";
     plan.planType = "MANUAL_ASSIGNMENT";
+    plan.subjectCode = "CHINESE";
     plan.name = "每天阅读";
     plan.scheduleType = "ONCE";
     plan.scheduleTime = LocalTime.of(17, 0);

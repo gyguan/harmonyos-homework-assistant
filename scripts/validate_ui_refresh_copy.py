@@ -25,7 +25,6 @@ student_home = read("entry/src/main/ets/features/student/home/StudentHomePage.et
 parent_import = read("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
 parent_confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 voice_create = read("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
-study_route = read("entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets")
 deadline = read("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
 review = read("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
 person_entry = read("entry/src/main/ets/pages/PersonEntryPage.ets")
@@ -70,6 +69,76 @@ require("TodayScopeNote" not in student_home,
         "student home must not reference the removed TodayScopeNote builder")
 require("this.assignmentRenderKey(item)" in student_home,
         "student home task rows must use content-aware assignment keys")
+# Regression for an actual user-visible stale "Today tasks" list after A -> B.
+# Reading an observable revision while doing a repository lookup inside ArkUI
+# Builder is insufficient; a student-scoped @State snapshot must be reassigned.
+home_vm = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
+index_page = read("entry/src/main/ets/pages/Index.ets")
+app_shell = read("entry/src/main/ets/pages/AppShell.ets")
+require("@State private selectedStudentId: string" in index_page and
+        "this.selectedStudentId = studentId;" in index_page and
+        "rootStudentId: this.selectedStudentId" in index_page and
+        "@Prop @Watch('onRootStudentIdChanged') rootStudentId: string" in app_shell and
+        "private onRootStudentIdChanged(): void" in app_shell,
+        "root must publish observable selected student ID, not only a role/revision")
+require("@State private pendingTaskItems: Assignment[]" in student_home and
+        "@State private subjectGroups: StudentHomeSubjectGroup[]" in student_home and
+        "@Prop @Watch('onRevisionChanged') revision" in student_home and
+        "private onRevisionChanged(): void" in student_home and
+        "private onStudentIdChanged(): void" in student_home and
+        "this.pendingTaskItems = [];" in student_home and
+        "this.subjectGroups = [];" in student_home and
+        "this.pendingTaskItems = items;" in student_home and
+        "this.subjectGroups = this.buildSubjectGroups(items);" in student_home and
+        "this.viewModel.todayPendingAssignments(this.studentId)" in student_home and
+        "ForEach(this.subjectGroups" in student_home and
+        "ForEach(group.items" in student_home and
+        "taskRenderEpoch" in student_home and
+        "private HomeContent()" in student_home and
+        "private PadHome()" not in student_home and
+        "this.assignments()" not in student_home,
+        "student home must render a reactive student-owned single-column subject snapshot on phone and PAD")
+require("assignments(studentId: string = '')" in home_vm and
+        "item.studentId === studentId" in home_vm and
+        "todayPendingAssignments(studentId: string = '')" in home_vm and
+        "this.assignments(studentId)" in home_vm,
+        "student home view model must filter today's unfinished tasks by explicit active student ID")
+
+# Family switching must update every student-scoped tab immediately, not only
+# when the role changes or when an unrelated network request completes.
+app_shell = read("entry/src/main/ets/pages/AppShell.ets")
+index_page = read("entry/src/main/ets/pages/Index.ets")
+require("studentContextRevision: this.studentContextRevision" in index_page and
+        "private onStudentContextChanged(): void" in app_shell and
+        "this.invalidateStudentScopedPages();" in app_shell and
+        "this.practiceRevision++;" in app_shell and
+        "this.importRevision++;" in app_shell and
+        "this.storeRevision++;" in app_shell,
+        "same-role child switching must refresh assignments, practice and import tabs")
+require("@Prop @Watch('onStudentIdChanged') studentId: string = '';" in student_home and
+        "private onStudentIdChanged(): void" in student_home and
+        "item.studentId !== this.studentId" in student_home and
+        "item.studentId}|\u0024{item.id}" in student_home and
+        "actionGeneration !== this.identityGeneration" in student_home,
+        "student home must show identity-scoped today cards and reject late old-child actions")
+require("@Prop @Watch('onStudentIdChanged') studentId: string = '';" in student_assignments and
+        "private onStudentIdChanged(): void" in student_assignments and
+        "this.snapshotRevision = -1;" in student_assignments and
+        "queryStudentId === this.studentId" in student_assignments and
+        "querySequence === this.querySequence" in student_assignments and
+        "item.studentId}|\u0024{item.id}" in student_assignments,
+        "student assignments must clear stale tabs, master selection and old-child queries")
+require("@Prop @Watch('onStudentIdChanged') studentId: string = '';" in parent_progress and
+        "private onStudentIdChanged(): void" in parent_progress and
+        "queryStudentId === this.studentId" in parent_progress and
+        "this.selectedDeleteIds = [];" in parent_progress,
+        "parent progress must isolate in-flight queries and selection across children")
+require("@Prop @Watch('onRevisionChanged') revision: number = 0" in practice_home and
+        "private onRevisionChanged(): void" in practice_home and
+        "sequence !== this.loadSequence" in practice_home and
+        "@Prop @Watch('onRevisionChanged') revision: number = 0" in practice_history and
+        "sequence !== this.loadSequence" in practice_history,
+        "practice home and history must reload and reject stale results after identity revision")
 
 require("CandidatePane" not in parent_import and "继续确认" not in parent_import and
         "this.onOpenConfirmation()" in parent_import,
@@ -78,7 +147,6 @@ require("CandidatePane" not in parent_import and "继续确认" not in parent_im
 for source, token, message in [
     (parent_confirmation, "发布采用整批原子提交", "publish page must not expose atomic-submit implementation details"),
     (voice_create, "学生端会按图片文件名排序", "voice create page must not expose student-side sorting implementation"),
-    (study_route, "不建立第二套任务流程", "study page must not expose architecture implementation copy"),
     (student_assignments, "共用 Assignment", "student assignment UI must not expose domain-model terminology"),
     (deadline, "日期和时间均使用北京时间", "deadline picker should not show redundant timezone implementation copy"),
     (student_home, "首页只显示今天要做的任务", "student home should not carry persistent navigation guidance"),

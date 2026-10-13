@@ -4,11 +4,13 @@ from __future__ import annotations
 import sys
 import time
 import uuid
+from datetime import datetime, timedelta, timezone
 
 from e2e_smoke import DEFAULT_BASE_URL, SmokeFailure, expect, http, multipart_png, require
 
 
 def create_assignment(base_url: str, token: str, student_id: str, assignment_id: str, status: str) -> dict:
+    task_date = datetime.now(timezone(timedelta(hours=8))).date().isoformat()
     created = expect(
         http(
             base_url,
@@ -23,9 +25,7 @@ def create_assignment(base_url: str, token: str, student_id: str, assignment_id:
                 "title": f"验收作业 {assignment_id[-4:]}",
                 "instruction": "完成后提交，供家长验收",
                 "textbookRef": "P1",
-                "dueText": "今天",
-                "dueAtEpochMs": int(time.time() * 1000) + 3600000,
-                "dueTimezone": "Asia/Shanghai",
+                "taskDate": task_date,
                 "status": "NOT_STARTED",
                 "sourceLabel": "parent review e2e",
                 "sourceExcerpt": "",
@@ -134,9 +134,7 @@ def main() -> int:
                     "title": "家长已调整任务标题",
                     "instruction": "完成第 1-3 题，注意验算",
                     "textbookRef": "P18",
-                    "dueText": "明天 20:30",
-                    "dueAtEpochMs": int(time.time() * 1000) + 86400000,
-                    "dueTimezone": "Asia/Shanghai",
+                    "taskDate": (datetime.now(timezone(timedelta(hours=8))).date() + timedelta(days=1)).isoformat(),
                     "expectedMinutes": 35,
                 },
             ),
@@ -146,6 +144,9 @@ def main() -> int:
         require(edited.get("title") == "家长已调整任务标题", "parent edit did not persist title")
         require(edited.get("instruction") == "完成第 1-3 题，注意验算", "parent edit did not persist instruction")
         require(edited.get("textbookRef") == "P18", "parent edit did not persist textbook ref")
+        require(edited.get("taskDate") ==
+                (datetime.now(timezone(timedelta(hours=8))).date() + timedelta(days=1)).isoformat(),
+                "parent edit did not persist task date")
         require(int(edited.get("expectedMinutes", 0)) == 35, "parent edit did not persist expected minutes")
         require(edited.get("status") == "NOT_STARTED", "parent edit must not alter assignment status")
         require(int(edited.get("version", -1)) > int(invalid_source["version"]),

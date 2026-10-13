@@ -46,8 +46,13 @@ for table in ["submission", "submission_photo"]:
     require(f"create table {table}" in v2.lower(), f"missing submission table: {table}")
 require("e.version != input.version()" in assignment_service and "ApiExceptions.Conflict" in assignment_service,
         "assignment updates must reject stale remote versions")
-require("files.size() > 6" in submission_service and "FileStorage" in submission_service,
+require(("files.size() > 6" in submission_service or "safePhotos.size() > 6" in submission_service) and
+        "FileStorage" in submission_service and "mediaPolicy.validateImage" in submission_service,
         "submission service must keep 1-6 photos behind FileStorage")
+require('"AUDIO_IMAGE".equals(assignment.contentType)' in submission_service and
+        "mediaPolicy.validateAudio(audio)" in submission_service and
+        "MIN_AUDIO_DURATION_MS" in submission_service and "MAX_AUDIO_DURATION_MS" in submission_service,
+        "voice assignments must require validated student audio while preserving the photo path")
 require('"ohos.permission.INTERNET"' in module, "HarmonyOS module must declare INTERNET permission")
 require("replaceAssignmentsForActiveStudent" in store,
         "HomeworkStore must expose a child-scoped remote snapshot replacement method")
@@ -73,8 +78,12 @@ require("request.uploadFile" not in remote_submission and "@kit.BasicServicesKit
 require("http.RequestMethod.POST" in remote_submission and "multipart/form-data; boundary=" in remote_submission and
         "extraData: payload.body" in remote_submission and "buildMultipartPayload" in remote_submission,
         "remote photo submission must use NetworkKit HTTP multipart with an ArrayBuffer body")
-require("name=\"photos\"" in remote_submission and "sourceUris.length > 6" in remote_submission,
+require(("name=\"photos\"" in remote_submission or "fieldName: 'photos'" in remote_submission) and
+        "sourceUris.length > 6" in remote_submission and "uploadPhotos" in remote_submission,
         "multipart upload must preserve the backend photos field and 1-6 photo contract")
+require("fieldName: 'audio'" in remote_submission and "uploadAudio" in remote_submission and
+        "audioDurationMs" in remote_submission,
+        "remote submission must support one recorded audio resource for voice assignments")
 require("await client.request" in http_client and "catch {" in http_client and
         "后端请求失败，请检查网络或后端地址" in http_client,
         "BackendHttpClient must explicitly guard request exceptions with a stable error")

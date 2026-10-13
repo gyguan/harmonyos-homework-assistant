@@ -3,6 +3,7 @@ package com.xiaoban.homework.assignment;
 import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.media.MediaAssetEntity;
 import com.xiaoban.homework.media.MediaAssetService;
+import com.xiaoban.homework.mediasync.AssignmentResourcesReadyEvent;
 import com.xiaoban.homework.storage.FileStorage;
 import com.xiaoban.homework.storage.FileTransactionCoordinator;
 import java.nio.file.Path;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.Locale;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,17 +25,20 @@ public class AssignmentResourceService {
   private final FileTransactionCoordinator fileTransactions;
   private final MediaAssetService mediaAssets;
   private final VoiceMediaPolicy mediaPolicy;
+  private final ApplicationEventPublisher events;
 
   public AssignmentResourceService(AssignmentService assignments,
       AssignmentResourceRepository resources, FileStorage storage,
       FileTransactionCoordinator fileTransactions,
-      MediaAssetService mediaAssets, VoiceMediaPolicy mediaPolicy) {
+      MediaAssetService mediaAssets, VoiceMediaPolicy mediaPolicy,
+      ApplicationEventPublisher events) {
     this.assignments = assignments;
     this.resources = resources;
     this.storage = storage;
     this.fileTransactions = fileTransactions;
     this.mediaAssets = mediaAssets;
     this.mediaPolicy = mediaPolicy;
+    this.events = events;
   }
 
   @Transactional
@@ -44,8 +49,8 @@ public class AssignmentResourceService {
 
     AssignmentDtos.Create voiceInput = new AssignmentDtos.Create(
         input.id(), input.subject(), input.title(), input.instruction(), input.textbookRef(),
-        input.dueText(), input.assignmentType(), input.subjectCode(), "AUDIO_IMAGE",
-        input.dueAtEpochMs(), input.dueTimezone(), input.status(), input.sourceLabel(),
+        input.taskDate(), input.assignmentType(), input.subjectCode(), "AUDIO_IMAGE",
+        input.status(), input.sourceLabel(),
         input.sourceExcerpt(), input.expectedMinutes(), input.startedAtEpochMs(),
         input.finishedAtEpochMs(), input.elapsedSeconds(), input.reviewNote());
 
@@ -55,6 +60,7 @@ public class AssignmentResourceService {
       List<AssignmentResourceEntity> existing =
           resources.findByFamilyIdAndAssignmentIdOrderBySortOrderAscCreatedAtAsc(familyId, assignment.id());
       if (!existing.isEmpty()) {
+        publishResourcesReady(familyId, assignment.id());
         return new AssignmentResourceDtos.VoiceCreateResponse(
             assignment, existing.stream().map(AssignmentResourceDtos.Response::from).toList());
       }
@@ -66,6 +72,7 @@ public class AssignmentResourceService {
       }
       resources.saveAll(created);
       resources.flush();
+      publishResourcesReady(familyId, assignment.id());
       return new AssignmentResourceDtos.VoiceCreateResponse(
           assignment, created.stream().map(AssignmentResourceDtos.Response::from).toList());
     } catch (RuntimeException error) {
@@ -149,6 +156,7 @@ public class AssignmentResourceService {
     List<AssignmentResourceEntity> existing =
         resources.findByFamilyIdAndAssignmentIdOrderBySortOrderAscCreatedAtAsc(familyId, assignmentId);
     if (!existing.isEmpty()) {
+      publishResourcesReady(familyId, assignmentId);
       return existing.stream().map(AssignmentResourceDtos.Response::from).toList();
     }
 
@@ -174,7 +182,12 @@ public class AssignmentResourceService {
     }
     resources.saveAll(created);
     resources.flush();
+    publishResourcesReady(familyId, assignmentId);
     return created.stream().map(AssignmentResourceDtos.Response::from).toList();
+  }
+
+  private void publishResourcesReady(UUID familyId, String assignmentId) {
+    events.publishEvent(new AssignmentResourcesReadyEvent(familyId, assignmentId));
   }
 
   @Transactional(readOnly = true)

@@ -6,7 +6,7 @@ import {
 } from '../../../domain/model/HomeworkModels';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
 import { AssignmentRepository } from '../../../domain/port/AssignmentRepository';
-import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
+import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { AssignmentAttentionKind, AssignmentAttentionPolicy, AssignmentAttentionResult } from '../../../domain/service/AssignmentAttentionPolicy';
 
 export class StudentHomeViewModel {
@@ -24,8 +24,14 @@ export class StudentHomeViewModel {
     return this.repository.getCachedSummary();
   }
 
-  assignments(): Assignment[] {
-    return this.repository.listCached();
+  assignments(studentId: string = ''): Assignment[] {
+    let source = this.repository.listCached();
+    if (studentId.length === 0) return source;
+    let owned: Assignment[] = [];
+    for (let item of source) {
+      if (item.studentId === studentId) owned.push(item);
+    }
+    return owned;
   }
 
   assignment(assignmentId: string): Assignment | null {
@@ -36,8 +42,8 @@ export class StudentHomeViewModel {
     return this.repository.performAction(assignmentId, action);
   }
 
-  attention(): AssignmentAttentionResult {
-    return AssignmentAttentionPolicy.studentResult(this.assignments());
+  attention(studentId: string = ''): AssignmentAttentionResult {
+    return AssignmentAttentionPolicy.studentResult(this.assignments(studentId));
   }
 
   attentionText(): string {
@@ -48,20 +54,14 @@ export class StudentHomeViewModel {
     return this.attention().kind;
   }
 
-  todayActionableAssignments(): Assignment[] {
+  todayPendingAssignments(studentId: string = ''): Assignment[] {
     let result: Assignment[] = [];
-    for (let item of this.assignments()) {
+    for (let item of this.assignments(studentId)) {
       if (!StudentHomeViewModel.isToday(item)) continue;
-      if (!StudentHomeViewModel.isActionable(item.status)) continue;
+      if (!StudentHomeViewModel.isUnfinished(item.status)) continue;
       StudentHomeViewModel.insertByPriority(result, item);
     }
     return result;
-  }
-
-  dateLabel(): string {
-    let now = AssignmentDueDate.businessDateParts(Date.now());
-    let weekday: string[] = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-    return `今天 · ${now.month}月${now.day}日 ${weekday[AssignmentDueDate.businessWeekday(Date.now())]}`;
   }
 
   async refresh(): Promise<boolean> {
@@ -69,13 +69,11 @@ export class StudentHomeViewModel {
   }
 
   private static isToday(item: Assignment): boolean {
-    if (item.dueAtEpochMs <= 0) return false;
-    return AssignmentDueDate.businessDayStart(item.dueAtEpochMs) ===
-      AssignmentDueDate.businessDayStart(Date.now());
+    return item.taskDate === AssignmentTaskDate.today();
   }
 
-  private static isActionable(status: AssignmentStatus): boolean {
-    return StudentHomeViewModel.priority(status) < 100;
+  private static isUnfinished(status: AssignmentStatus): boolean {
+    return status !== AssignmentStatus.SUBMITTED && status !== AssignmentStatus.COMPLETED;
   }
 
   private static priority(status: AssignmentStatus): number {
@@ -102,7 +100,7 @@ export class StudentHomeViewModel {
     let candidatePriority = StudentHomeViewModel.priority(candidate.status);
     let currentPriority = StudentHomeViewModel.priority(current.status);
     if (candidatePriority !== currentPriority) return candidatePriority < currentPriority;
-    if (candidate.dueAtEpochMs !== current.dueAtEpochMs) return candidate.dueAtEpochMs < current.dueAtEpochMs;
+
     return candidate.id < current.id;
   }
 }

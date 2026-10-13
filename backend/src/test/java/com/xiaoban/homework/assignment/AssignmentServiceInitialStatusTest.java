@@ -9,6 +9,7 @@ import com.xiaoban.homework.storage.FileTransactionCoordinator;
 import com.xiaoban.homework.student.StudentService;
 import com.xiaoban.homework.submission.SubmissionPhotoRepository;
 import com.xiaoban.homework.submission.SubmissionRepository;
+import com.xiaoban.homework.submission.SubmissionResourceRepository;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ class AssignmentServiceInitialStatusTest {
         students,
         mock(SubmissionRepository.class),
         mock(SubmissionPhotoRepository.class),
+        mock(SubmissionResourceRepository.class),
         mock(AssignmentResourceRepository.class),
         mock(FileTransactionCoordinator.class));
 
@@ -34,12 +36,10 @@ class AssignmentServiceInitialStatusTest {
         "非法状态测试",
         "完成练习",
         "",
-        "今天",
+        "2026-10-13",
         "SCHOOL",
         "MATH",
         "NORMAL",
-        null,
-        "Asia/Shanghai",
         "COMPLETED",
         "测试",
         "",

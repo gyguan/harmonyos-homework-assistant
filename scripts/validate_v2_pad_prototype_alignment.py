@@ -48,23 +48,22 @@ for token in [
 ]:
     require(token in policy, f"LayoutPolicy missing Pad prototype capability: {token}")
 
-# Home: wide composition must be materially different from Phone single column. The current
-# Student Home uses a first-task focus pane plus the remaining priority-ordered tasks.
+# Home: Phone and Pad intentionally share one readable single-column task stream.
+# Pad-specific density comes from shared width/padding tokens, not a forced two-pane split.
 for token in [
     "@State private availableWidthVp",
-    "LayoutPolicy.homeFocusSummaryRequirement()",
-    "private PhoneHome()",
-    "private PadHome()",
-    "AppTheme.HOME_PRIMARY_MIN_WIDTH",
-    "AppTheme.HOME_SECONDARY_MIN_WIDTH",
-    "this.TodayTasks();",
-    "StudentTodayTaskCard",
-    "this.TaskList(this.remainingAssignments());",
-    "先做这项",
-    "接下来",
+    "private HomeContent()",
+    "AppTheme.CONTENT_STANDARD_MAX_WIDTH",
+    "LayoutPolicy.pagePaddingForWidth(this.availableWidthVp)",
+    "private PendingTasks()",
+    "private SubjectTaskSection(group: StudentHomeSubjectGroup)",
+    "StudentPendingTaskCard",
     ".onAreaChange",
 ]:
-    require(token in home, f"Student Home missing Pad prototype behavior: {token}")
+    require(token in home, f"Student Home missing shared Phone/Pad single-column behavior: {token}")
+for removed in ["private PhoneHome()", "private PadHome()", "先做这项", "接下来",
+                "AppTheme.HOME_PRIMARY_MIN_WIDTH", "AppTheme.HOME_SECONDARY_MIN_WIDTH"]:
+    require(removed not in home, f"Student Home must not keep obsolete Pad split behavior: {removed}")
 require("WindowSizeClass." not in home and "@Prop sizeClass" not in home and "this.sizeClass" not in home,
         "Student Home must use container capability, not size-class branching")
 
@@ -76,7 +75,7 @@ for token in [
     "AssignmentDetailPane",
     "selected: this.isSelected(item.id)",
     "showChevron: !this.canUseMasterDetail()",
-    "onOpenStudy: (assignmentId: string)",
+    "onStoreChanged: () => void",
     ".onAreaChange",
 ]:
     require(token in assignments, f"Assignment master-detail missing behavior: {token}")
@@ -84,31 +83,24 @@ require("selectedAssignmentId" not in shell,
         "Pad assignment selection must stay inside Assignment Feature, not AppShell")
 require("AssignmentDetailPane" in detail_page and "DeepPageHeader" in detail_page,
         "Phone detail page must reuse AssignmentDetailPane under standard deep-page chrome")
-require("DefaultAssignmentRepository.instance" in detail_pane,
-        "AssignmentDetailPane must use the same Assignment repository/cache as Phone detail")
-require("onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)" in shell,
-        "AppShell must wire the embedded Pad detail primary action to the existing Study destination")
+require("StudyWorkspacePage" in detail_pane and "onStoreChanged: () => void" in detail_pane,
+        "AssignmentDetailPane must embed the unified workspace and publish repository changes")
+require("openStudy(" not in shell and "STUDENT_STUDY" not in shell and
+        "StudyWorkspaceRoutePage" not in shell,
+        "AppShell must not route from Assignment Detail to a second Study page")
 
-# Study: Phone stays single-column; Pad opens Study + Tutor only after the student asks for help.
+# Unified workspace stays inside the Phone detail page or Pad master-detail pane.
 for token in [
-    "@State private availableWidthVp",
-    "LayoutPolicy.studyTutorRequirement()",
-    "private SingleColumnWorkspace()",
-    "private SplitWorkspace()",
-    "private PhoneWorkspacePage()",
-    "private PadWorkspacePage()",
+    "private UnifiedWorkspace()",
     "this.StudyContent(false);",
-    "this.TutorPane();",
-    "if (this.tutorPanelOpen) this.SplitWorkspace();",
-    "AppTheme.STUDY_PRIMARY_MIN_WIDTH",
-    "AppTheme.STUDY_TUTOR_MIN_WIDTH",
-    ".onAreaChange",
+    "this.WorkspaceActionBar();",
+    "AssignmentCountdownCard",
+    "Button('暂停一下'",
 ]:
-    require(token in study, f"Study/Tutor Pad composition missing behavior: {token}")
-require("WindowSizeClass." not in study and "@Prop sizeClass" not in study and "this.sizeClass" not in study,
-        "Study Workspace must not regress to size-class/device branching")
-require("Button('问小伴'" in study,
-        "Phone Study flow must retain the standalone Tutor entry")
+    require(token in study, f"unified assignment workspace missing behavior: {token}")
+require("Button('问小伴'" not in study and "TutorPane" not in study and
+        "教材 / 页码" not in study,
+        "unified assignment workspace must remove Tutor and textbook/page UI")
 
 require("Pad 不是放大的 Phone" in prototype,
         "V2 UI prototype must retain the Pad-not-enlarged-Phone principle")

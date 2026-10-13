@@ -4,6 +4,7 @@ from __future__ import annotations
 import sys
 import time
 import uuid
+from datetime import datetime, timedelta, timezone
 
 from e2e_smoke import DEFAULT_BASE_URL, SmokeFailure, expect, http, require
 
@@ -20,6 +21,7 @@ def create_student(base_url: str, token: str, student_id: str, name: str) -> Non
 
 
 def assignment(candidate_id: str, title: str) -> dict:
+    task_date = (datetime.now(timezone(timedelta(hours=8))).date() + timedelta(days=1)).isoformat()
     return {
         "candidateId": candidate_id,
         "assignment": {
@@ -30,9 +32,7 @@ def assignment(candidate_id: str, title: str) -> dict:
             "title": title,
             "instruction": title,
             "textbookRef": "P10",
-            "dueText": "明天",
-            "dueAtEpochMs": 0,
-            "dueTimezone": "Asia/Shanghai",
+            "taskDate": task_date,
             "status": "NOT_STARTED",
             "sourceLabel": "batch e2e",
             "sourceExcerpt": title,

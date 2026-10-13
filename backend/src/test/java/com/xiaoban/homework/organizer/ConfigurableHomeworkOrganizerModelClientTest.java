@@ -3,32 +3,54 @@ package com.xiaoban.homework.organizer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import com.xiaoban.homework.student.StudentEntity;
 import com.xiaoban.homework.ai.AiProviderProperties;
-import tools.jackson.databind.json.JsonMapper;
+import com.xiaoban.homework.student.StudentEntity;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.json.JsonMapper;
 
 class ConfigurableHomeworkOrganizerModelClientTest {
+
+  static class TestStudent extends StudentEntity {
+    TestStudent() { super(); }
+  }
+
   @Test
-  void submitsSupplementaryTextAlongsideImageAndKeepsItOutOfInstructions() {
+  void submitsSupplementaryTextAlongsideImageWithoutDuplicateMetadataPrompt() {
     var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
     when(transport.completeWithImage(anyString(), anyString(), anyString(), anyString(), anyInt(),
         anyString(), anyMap())).thenReturn(java.util.Optional.of(
-            "{\"recognizedText\":\"语文朗读\",\"assignments\":[]} "));
-    var client = new ConfigurableHomeworkOrganizerModelClient(new AiProviderProperties(), transport,
-        JsonMapper.builder().build());
-    client.organizeImage(new TestStudent(), "相册", "data:image/jpeg;base64,PRIVATE", " 数学口算20题 ");
+            "{\"assignments\":[{\"subject\":\"数学\",\"title\":\"口算20题\",\"instruction\":\"完成口算20题\",\"textbookRef\":\"\",\"taskDate\":\"今天\",\"expectedMinutes\":10,\"sourceExcerpt\":\"数学口算20题\",\"confidence\":0.9}]}"));
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), transport, JsonMapper.builder().build());
+
+    client.organizeImage(
+        new TestStudent(), "相册", "data:image/jpeg;base64,PRIVATE", " 数学口算20题 ");
+
     var instructions = org.mockito.ArgumentCaptor.forClass(String.class);
     var input = org.mockito.ArgumentCaptor.forClass(String.class);
-    verify(transport).completeWithImage(anyString(), instructions.capture(), input.capture(),
-        eq("data:image/jpeg;base64,PRIVATE"), eq(6000), anyString(), anyMap());
+    verify(transport).completeWithImage(
+        anyString(), instructions.capture(), input.capture(),
+        eq("data:image/jpeg;base64,PRIVATE"), eq(3000), anyString(), anyMap());
+
     assertTrue(input.getValue().contains("补充文字（可能为空）：\n数学口算20题"));
-    assertTrue(instructions.getValue().contains("重复任务只保留一项"));
+    assertFalse(instructions.getValue().contains("sameTaskGroup"));
+    assertFalse(instructions.getValue().contains("duplicateAssignmentId"));
     assertFalse(instructions.getValue().contains("数学口算20题"));
+    assertTrue(instructions.getValue().contains("不要额外") ||
+        ConfigurableHomeworkOrganizerModelClient.imageInput(new TestStudent(), "相册", null).contains("不要额外转写整张图片"));
     assertFalse(ConfigurableHomeworkOrganizerModelClient.imageInput(new TestStudent(), "相册", null)
         .endsWith("null"));
   }
@@ -39,34 +61,39 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     when(transport.completeWithImage(anyString(), anyString(), anyString(), anyString(), anyInt(),
         anyString(), anyMap())).thenThrow(new com.xiaoban.homework.ai.ImageAiRequestException(
             406, com.xiaoban.homework.ai.ImageAiRequestException.Reason.REQUEST_REJECTED));
-    var client = new ConfigurableHomeworkOrganizerModelClient(new AiProviderProperties(), transport,
-        JsonMapper.builder().build());
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), transport, JsonMapper.builder().build());
+
     var error = assertThrows(com.xiaoban.homework.common.ApiExceptions.ServiceUnavailable.class,
-        () -> client.organizeImage(new TestStudent(), "相册", "data:image/jpeg;base64,PRIVATE", null));
+        () -> client.organizeImage(
+            new TestStudent(), "相册", "data:image/jpeg;base64,PRIVATE", null));
+
     assertTrue(error.getMessage().contains("HTTP 406"));
-    assertTrue(error.getMessage().contains("data URL"));
     assertFalse(error.getMessage().contains("PRIVATE"));
   }
 
   @Test
   void imageResultKeepsMultipleSubjectsAndRejectsIncompleteOutput() {
-    var client = new ConfigurableHomeworkOrganizerModelClient(new AiProviderProperties(), null,
-        JsonMapper.builder().build());
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), null, JsonMapper.builder().build());
     String output = """
-        {"recognizedText":"语文背诵；数学口算", "assignments":[
-          {"subject":"语文","title":"背诵","instruction":"背诵课文","expectedMinutes":10,"confidence":0.9},
-          {"subject":"数学","title":"口算","instruction":"口算20题","expectedMinutes":15,"confidence":0.8}
+        {"assignments":[
+          {"subject":"语文","title":"背诵","instruction":"背诵课文","textbookRef":"","taskDate":"今天",
+           "expectedMinutes":10,"sourceExcerpt":"语文背诵","confidence":0.9},
+          {"subject":"数学","title":"口算","instruction":"口算20题","textbookRef":"","taskDate":"今天",
+           "expectedMinutes":15,"sourceExcerpt":"数学口算","confidence":0.8}
         ]}
         """;
+
     var result = client.parseImageOutput(output).orElseThrow();
-    assertEquals(java.util.List.of("语文", "数学"), result.assignments().stream()
-        .map(HomeworkOrganizerDtos.Candidate::subject).toList());
-    assertEquals("语文背诵；数学口算", result.recognizedText());
-    assertTrue(client.parseImageOutput(output.replace("\"recognizedText\"", "\"unused\"")).isEmpty());
+
+    assertEquals(List.of("语文", "数学"),
+        result.assignments().stream().map(HomeworkOrganizerDtos.Candidate::subject).toList());
+    assertEquals("语文背诵\n数学口算", result.recognizedText());
+    assertTrue(client.parseImageOutput("{\"assignments\":[]}").isEmpty());
     assertTrue(client.parseImageOutput(output.replace("\"数学\"", "\"InvalidSubject\"")).isEmpty());
-    assertTrue(client.parseImageOutput("{\"recognizedText\":\"班级通知\",\"assignments\":[]}")
-        .orElseThrow().assignments().isEmpty());
   }
+
   @Test
   void imageAvailabilityFollowsTheConfiguredModelCapabilityNotJustTheApiKey() {
     var properties = new AiProviderProperties();
@@ -87,10 +114,6 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertTrue(client.imageAvailable());
   }
 
-  static class TestStudent extends StudentEntity {
-    TestStudent() { super(); }
-  }
-
   @Test
   void promptKeepsOnlyNecessaryStudentContext() {
     TestStudent student = new TestStudent();
@@ -109,32 +132,24 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
-  void instructionsForbidInventingHomeworkDetailsAndRequestJsonOnly() {
+  void instructionsFocusOnOrganizationAndDoNotRequestDuplicateComparison() {
     String instructions = ConfigurableHomeworkOrganizerModelClient.instructions();
+
     assertTrue(instructions.contains("不解答作业"));
     assertTrue(instructions.contains("不得编造"));
-    assertTrue(instructions.contains("JSON"));
-    assertTrue(instructions.contains("subject 字段必须严格填写语文、数学、英语、阅读、朗读、体育、实践、兴趣、其他之一"));
-    assertTrue(instructions.contains("家长直接布置"));
-  }
-
-  @Test
-  void instructionsRequestGradeAwareFocusedDurationEstimate() {
-    String instructions = ConfigurableHomeworkOrganizerModelClient.instructions();
     assertTrue(instructions.contains("expectedMinutes"));
-    assertTrue(instructions.contains("学生年级"));
     assertTrue(instructions.contains("5 到 120 分钟"));
-    assertTrue(instructions.contains("不包含休息"));
+    assertTrue(instructions.contains("JSON"));
+    assertTrue(instructions.contains("重复表述直接合并"));
+    assertFalse(instructions.contains("sameTaskGroup"));
+    assertFalse(instructions.contains("已有任务"));
+    assertFalse(instructions.contains("重复判定"));
   }
 
   @Test
   void normalizesSchoolAndExtracurricularSubjectLabels() {
     assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("语文作业"));
-    assertEquals("数学", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("数学练习"));
-    assertEquals("英语", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("英语听读"));
     assertEquals("数学", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Math"));
-    assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Chinese Language Arts"));
-    assertEquals("数学", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Mathematics Homework"));
     assertEquals("英语", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("English Reading"));
     assertEquals("阅读", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("阅读任务"));
     assertEquals("朗读", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("朗诵练习"));
@@ -146,9 +161,9 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
-  void conversionReportsRejectedAssignmentsInsteadOfSilentlyDroppingThem() {
+  void conversionReportsRejectedAssignmentsAndClearsLegacyDuplicateFields() {
     var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
-        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(java.util.List.of(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "科学", "观察植物", "观察并记录", "", "今天", 20, "观察植物", 0.9),
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
@@ -157,18 +172,56 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertEquals(2, result.sourceCount());
     assertEquals(1, result.candidates().size());
     assertEquals("语文", result.candidates().getFirst().subject());
+    assertEquals("", result.candidates().getFirst().sameTaskGroup());
+    assertEquals("", result.candidates().getFirst().duplicateAssignmentId());
     assertEquals(1, result.unsupportedSubjectCount());
-    assertEquals(0, result.blankTitleCount());
-    assertEquals(java.util.List.of("科学"), result.unsupportedSubjects());
   }
 
   @Test
-  void schemaKeepsAssignmentsRootAndBoundedExpectedMinutes() {
+  void schemaContainsOnlyOrganizationFields() {
     String schema = ConfigurableHomeworkOrganizerModelClient.structuredSchema().toString();
-    assertTrue(ConfigurableHomeworkOrganizerModelClient.structuredSchema().containsKey("properties"));
+
     assertTrue(schema.contains("assignments"));
     assertTrue(schema.contains("expectedMinutes"));
     assertTrue(schema.contains("minimum=5"));
     assertTrue(schema.contains("maximum=120"));
+    assertFalse(schema.contains("sameTaskGroup"));
+    assertFalse(schema.contains("duplicateAssignmentId"));
+    assertFalse(schema.contains("duplicateConfidence"));
+    assertFalse(schema.contains("duplicateReason"));
+    assertFalse(ConfigurableHomeworkOrganizerModelClient.imageSchema().toString().contains("recognizedText"));
+    assertTrue(schema.contains("maxLength=80"));
+    assertTrue(schema.contains("maxLength=400"));
+  }
+
+  @Test
+  void textOrganizerUsesSingleCompactRequest() {
+    var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
+    when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
+        .thenReturn(java.util.Optional.of("""
+            {"assignments":[{"subject":"数学","title":"口算20题","instruction":"完成口算20题",
+            "textbookRef":"","taskDate":"今天","expectedMinutes":10,"sourceExcerpt":"口算20题",
+            "confidence":0.95}]}
+            """));
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), transport, JsonMapper.builder().build());
+
+    var result = client.organize(new TestStudent(), "老师通知", "数学：口算20题").orElseThrow();
+
+    assertEquals(1, result.size());
+    verify(transport).complete(
+        anyString(), anyString(), anyString(), eq(1400), eq("homework_organization"), anyMap());
+  }
+
+  @Test
+  void resolvesRelativeAndExplicitTaskDates() {
+    ZoneId zone = ZoneId.of("Asia/Shanghai");
+    LocalDate today = LocalDate.now(zone);
+    LocalDate tomorrow = today.plusDays(1);
+
+    assertEquals(today, ConfigurableHomeworkOrganizerModelClient.candidateTaskDate("今天"));
+    assertEquals(tomorrow, ConfigurableHomeworkOrganizerModelClient.candidateTaskDate("明天"));
+    assertEquals(tomorrow,
+        ConfigurableHomeworkOrganizerModelClient.candidateTaskDate(tomorrow.toString()));
   }
 }

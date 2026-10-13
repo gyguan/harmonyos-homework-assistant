@@ -30,17 +30,11 @@ draft_local = read("entry/src/main/ets/data/local/HomeworkImportLocalDataSource.
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 confirmation_components = read("entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
 assignment_edit_form = read("entry/src/main/ets/components/assignment/AssignmentEditForm.ets")
-deadline_picker = read("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
+task_date_picker = read("entry/src/main/ets/components/assignment/TaskDatePickerField.ets")
 mock_parser = read("entry/src/main/ets/infrastructure/ai/MockHomeworkAssignmentParser.ets")
-due_date_service = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
+task_date_service = read("entry/src/main/ets/domain/service/AssignmentTaskDate.ets")
 e2e = read("backend/scripts/batch_publish_e2e.py")
 workflow = read(".github/workflows/static-gate.yml")
-shanghai_resolver = ""
-if "private static resolveShanghaiDate" in due_date_service and "private static resolveTimeMinutes" in due_date_service:
-    start = due_date_service.index("private static resolveShanghaiDate")
-    end = due_date_service.index("private static resolveTimeMinutes", start)
-    shanghai_resolver = due_date_service[start:end]
-
 require("BatchPublishRequest" in dtos and "BatchPublishResponse" in dtos and "boolean atomic" in dtos,
         "batch publish DTO must make atomic semantics explicit")
 require('@PostMapping("/students/{studentId}/assignments/batch")' in controller and
@@ -82,31 +76,18 @@ require("HomeworkStore" not in draft_repo and "HomeworkImportLocalDataSource" in
 require("HomeworkStore.instance.replaceCandidates(candidates)" in draft_local,
         "legacy import local adapter must preserve Candidate persistence")
 
-# Delivery P0: Candidate relative/free-text due dates are normalized exactly once at the
-# Candidate -> Assignment publication boundary. Downstream Home/filter/calendar continue to
-# consume structured dueAtEpochMs instead of re-parsing dueText.
-require("AssignmentDueDate" in client_service and "AssignmentDueDate.resolveDueAtEpochMs" in client_service,
-        "batch publish must materialize the full due timestamp at the Candidate -> Assignment boundary")
-require("AssignmentDueDate.resolveDayStart" not in client_service,
-        "batch publish must not use the day-grouping helper as the authoritative deadline timestamp")
-require("DEFAULT_DUE_HOUR: number = 23" in due_date_service and
-        "DEFAULT_DUE_MINUTE: number = 59" in due_date_service,
-        "date-only homework deadlines must use the explicit 23:59 end-of-day policy")
-require("SHANGHAI_OFFSET_HOURS: number = 8" in due_date_service and "Date.UTC" in due_date_service,
-        "deadline materialization must be anchored to Asia/Shanghai rather than the device timezone")
-require("resolveTimeMinutes" in due_date_service and "[:：]" in due_date_service and "点半" in due_date_service,
-        "deadline resolver must preserve explicit clock times from teacher text")
-require("normalizeChineseHour(text, Number(colon[2]))" in due_date_service,
-        "colon-form times such as 晚上8:30 must honor Chinese day-period hints")
-require("let chineseFull = text.match" in shanghai_resolver and "text.indexOf('今晚')" in shanghai_resolver and
-        shanghai_resolver.index("let chineseFull = text.match") < shanghai_resolver.index("text.indexOf('今晚')"),
-        "explicit calendar dates must take precedence over relative/evening hints")
-require("dueAtEpochMs: this.resolveCandidateDueAt(candidate)" in client_service,
-        "published Assignments must materialize structured dueAtEpochMs")
-require("dueAtEpochMs: 0" not in client_service,
-        "batch publish must not discard Candidate due dates by hard-coding dueAtEpochMs=0")
-require("candidateAnchor(candidate.id)" in client_service,
-        "relative due dates must be anchored to Candidate/import creation time when available")
+# Delivery P0: Candidate task dates are normalized before publication. The publication
+# boundary must preserve the absolute YYYY-MM-DD value without inventing a time-of-day.
+require("taskDate: candidate.taskDate" in client_service,
+        "batch publish must preserve the Candidate absolute taskDate at the publication boundary")
+require("dueAtEpochMs" not in client_service and "dueTimezone" not in client_service and
+        "dueText" not in client_service,
+        "batch publish must not reintroduce legacy deadline fields")
+require("SHANGHAI_OFFSET_HOURS: number = 8" in task_date_service and
+        "static resolve(value: string" in task_date_service,
+        "task-date normalization must remain centralized and Asia/Shanghai based")
+require("AssignmentTaskDate.resolve" not in client_service,
+        "batch publication must not re-parse relative dates after Candidate confirmation")
 
 # Delivery P0: editing the title must preserve the independently editable teacher instruction.
 require("title: this.titleDraft" in confirmation_components and
@@ -115,16 +96,16 @@ require("title: this.titleDraft" in confirmation_components and
 require("instruction: this.titleDraft" not in confirmation_components,
         "confirmation title edit must never overwrite teacher instruction")
 
-# Parent-edited deadlines must use the same native picker as manually created extracurricular tasks.
+# Parent-edited task dates must use the same native picker as manually created assignments.
 require("AssignmentEditForm" in confirmation_components and
-        "DeadlinePickerField" in assignment_edit_form and
-        "onChange: (value: string) => this.onDueTextChange(value)" in assignment_edit_form,
-        "confirmation deadline edit must reuse the shared assignment form and date/time picker")
-require("TextInput({ text: this.item.dueText })" not in confirmation_components and
-        "TextInput({ text: this.dueText })" not in assignment_edit_form,
-        "confirmation deadline must not regress to free-text date/time input")
-require("DatePicker({" in deadline_picker and "TimePicker({" in deadline_picker,
-        "shared confirmation deadline picker must expose native date and time controls")
+        "TaskDatePickerField" in assignment_edit_form and
+        "onChange: (value: string) => this.onTaskDateChange(value)" in assignment_edit_form,
+        "confirmation task-date edit must reuse the shared assignment form and native date picker")
+require("TextInput({ text: this.item.taskDate })" not in confirmation_components and
+        "TextInput({ text: this.taskDate })" not in assignment_edit_form,
+        "confirmation task date must not regress to free-text input")
+require("DatePicker({" in task_date_picker and "TimePicker({" not in task_date_picker,
+        "shared confirmation task-date picker must expose a date control without time-of-day semantics")
 
 # Real ArkTS compilation catches interface completeness that Python string gates previously missed.
 require("expectedMinutes: candidate.expectedMinutes" in mock_parser,

@@ -6,6 +6,11 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 RESOURCE_API = ROOT / "entry/src/main/ets/application/remote/RemoteAssignmentResourceApi.ets"
 AUDIO = ROOT / "entry/src/main/ets/application/assignment/AssignmentAudioPlayerService.ets"
+SUBMISSION_AUDIO_RECORDER = ROOT / "entry/src/main/ets/application/submission/SubmissionAudioRecorderService.ets"
+MODULE_CONFIG = ROOT / "entry/src/main/module.json5"
+HOMEWORK_IMPORT_INBOX_STORE = ROOT / "entry/src/main/ets/data/local/HomeworkImportInboxStore.ets"
+PARENT_REVIEW_PANE = ROOT / "entry/src/main/ets/features/parent/review/ParentReviewPane.ets"
+STUDENT_HOME_PAGE = ROOT / "entry/src/main/ets/features/student/home/StudentHomePage.ets"
 HOMEWORK_IMAGE_ENCODER = ROOT / "entry/src/main/ets/infrastructure/ai/HomeworkImageEncoder.ets"
 SYSCAP_CONFIG = ROOT / "entry/src/main/syscap.json"
 PARENT_PRACTICE_GENERATION = ROOT / "entry/src/main/ets/features/parent/practice/ParentPracticeGenerationPage.ets"
@@ -22,6 +27,7 @@ HVIGOR_CONFIG = ROOT / "hvigor/hvigor-config.json5"
 VERIFY_HARMONY = ROOT / "scripts/verify_harmony_client.ps1"
 ETS_ROOT = ROOT / "entry/src/main/ets"
 TOEIC_WEEK_THREE = ROOT / "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets"
+TOEIC_VALIDATOR = ROOT / "entry/src/main/ets/toeic/content/ToeicContentValidator.ets"
 QUALIFIED_MODEL_SYMBOLS = [
     "AssignmentStatus",
     "AssignmentType",
@@ -64,6 +70,11 @@ def validate_qualified_model_imports() -> None:
 def main() -> int:
     resource_api = RESOURCE_API.read_text(encoding="utf-8")
     audio = AUDIO.read_text(encoding="utf-8")
+    submission_audio_recorder = SUBMISSION_AUDIO_RECORDER.read_text(encoding="utf-8")
+    module_config = MODULE_CONFIG.read_text(encoding="utf-8")
+    homework_import_inbox_store = HOMEWORK_IMPORT_INBOX_STORE.read_text(encoding="utf-8")
+    parent_review_pane = PARENT_REVIEW_PANE.read_text(encoding="utf-8")
+    student_home_page = STUDENT_HOME_PAGE.read_text(encoding="utf-8")
     image_encoder = HOMEWORK_IMAGE_ENCODER.read_text(encoding="utf-8")
     syscap = json.loads(SYSCAP_CONFIG.read_text(encoding="utf-8"))
     parent_practice_generation = PARENT_PRACTICE_GENERATION.read_text(encoding="utf-8")
@@ -172,8 +183,8 @@ def main() -> int:
     avplayer_syscap = "SystemCapability.Multimedia.Media.AVPlayer"
     require(audio.count(f"if (canIUse('{avplayer_syscap}'))") >= 2,
             "AVPlayer create/seek paths must be directly guarded by AVPlayer canIUse")
-    require(f"if (canIUse('{media_core_syscap}'))" in audio,
-            "SeekMode access must be directly guarded by Media.Core canIUse")
+    require("media.SeekMode." not in audio,
+            "optional Media.Core SeekMode must not leak into the AVPlayer seek path")
     require("当前设备不支持语音播放" in audio,
             "audio capability fallback must provide a user-facing error")
     require("let player = await media.createAVPlayer();" in audio,
@@ -182,10 +193,39 @@ def main() -> int:
             "AVPlayer must not restore the runtime-regressing dynamic MediaKit import")
     require("let descriptor: media.AVFileDescriptor = { fd: source.fd, offset: 0, length: -1 };" in audio,
             "AVPlayer must keep the known-good local file descriptor shape")
-    require("player.seek(target, media.SeekMode.SEEK_PREV_SYNC);" in audio,
-            "AVPlayer seek must keep the known-good synchronized seek mode")
+    require("player.seek(target, media.SeekMode." not in audio,
+            "AVPlayer seek must not require optional Media.Core SeekMode")
     require("player.seek(target);" in audio,
             "AVPlayer seek must have a capability-safe fallback when SeekMode is unavailable")
+
+    require("if (canIUse('SystemCapability.Multimedia.Media.Core'))" in audio,
+            "AVPlayer creation must directly guard optional Media.Core before using MediaKit")
+    require("if (canIUse('SystemCapability.Multimedia.Media.AVRecorder'))" in submission_audio_recorder and
+            "if (canIUse('SystemCapability.Multimedia.Media.Core'))" in submission_audio_recorder,
+            "submission recorder must directly guard AVRecorder and optional Media.Core capabilities")
+    require("openOutputFile(" in submission_audio_recorder and
+            "outputUriFromPath(" in submission_audio_recorder,
+            "submission recorder must wrap throwing file open and file-uri operations")
+    for operation in ["await recorder.pause();", "await recorder.resume();", "await recorder.stop();"]:
+        require(operation in submission_audio_recorder,
+                f"submission recorder missing operation: {operation}")
+    require("student submission recorder pause failed" in submission_audio_recorder and
+            "student submission recorder resume failed" in submission_audio_recorder and
+            "student submission recorder stop failed" in submission_audio_recorder,
+            "submission recorder pause/resume/stop calls must have explicit exception handling")
+    require("ohos.permission.MICROPHONE" in module_config and
+            "requestPermissionsFromUser" in submission_audio_recorder and
+            "ohos.permission.MICROPHONE" in submission_audio_recorder,
+            "submission recording must declare and request MICROPHONE permission")
+    for stale_source, stale_name in [
+        (homework_import_inbox_store, "HomeworkImportInboxStore"),
+        (resource_api, "RemoteAssignmentResourceApi"),
+        (parent_review_pane, "ParentReviewPane"),
+        (student_home_page, "StudentHomePage"),
+    ]:
+        for stale_field in ["dueText", "dueAtEpochMs", "dueTimezone"]:
+            require(stale_field not in stale_source,
+                    f"{stale_name} must not restore removed Assignment field {stale_field}")
 
     require("encoded = await packer.packToData(pixelMap, packing);" in image_encoder and
             "try {" in image_encoder and
@@ -200,8 +240,12 @@ def main() -> int:
     for required_syscap in [avplayer_syscap, media_core_syscap]:
         require(required_syscap in development_syscaps,
                 f"syscap.json development.addedSysCaps missing {required_syscap}")
-        require(required_syscap not in production_syscaps,
-                f"Media SysCap must stay optional at runtime, not production-required: {required_syscap}")
+    require(avplayer_syscap in production_syscaps,
+            "AVPlayer must remain a required production capability for voice/video playback")
+    require("SystemCapability.Multimedia.Media.AVRecorder" in production_syscaps,
+            "AVRecorder must remain a required production capability for submission recording")
+    require(media_core_syscap not in production_syscaps,
+            "Media.Core must remain optional in production")
     require("default" in syscap.get("devices", {}).get("general", []) and
             "tablet" in syscap.get("devices", {}).get("general", []),
             "syscap.json must keep phone/default and tablet development device coverage")
@@ -255,6 +299,10 @@ def main() -> int:
         require(not (ROOT / retired_capture_path).exists(),
                 f"retired screen-capture source must stay removed: {retired_capture_path}")
 
+    validator = TOEIC_VALIDATOR.read_text(encoding="utf-8")
+    require("if (translation===undefined) translation=null;" not in validator and
+            "if (translation===undefined) {" in validator,
+            "TOEIC translation lookup must narrow undefined without assigning null")
     week_three = TOEIC_WEEK_THREE.read_text(encoding="utf-8")
     require(re.search(r"\[[^\]\n]*\bnull\b[^\]\n]*\]", week_three) is None,
             "week-three TOEIC options must not contain null placeholders")

@@ -28,7 +28,8 @@ class AssignmentResourceServiceTest {
         mock(FileStorage.class),
         mock(FileTransactionCoordinator.class),
         mock(MediaAssetService.class),
-        new VoiceMediaPolicy());
+        new VoiceMediaPolicy(),
+        mock(org.springframework.context.ApplicationEventPublisher.class));
   }
 
   @Test
@@ -47,7 +48,8 @@ class AssignmentResourceServiceTest {
     MediaAssetService media = mock(MediaAssetService.class);
     AssignmentResourceService service = new AssignmentResourceService(
         assignments, resources, mock(FileStorage.class),
-        mock(FileTransactionCoordinator.class), media, new VoiceMediaPolicy());
+        mock(FileTransactionCoordinator.class), media, new VoiceMediaPolicy(),
+        mock(org.springframework.context.ApplicationEventPublisher.class));
     when(resources.findByFamilyIdAndAssignmentIdOrderBySortOrderAscCreatedAtAsc(
         eq(familyId), eq("assignment-1"))).thenReturn(List.of());
     MediaAssetEntity asset = new MediaAssetEntity() {};

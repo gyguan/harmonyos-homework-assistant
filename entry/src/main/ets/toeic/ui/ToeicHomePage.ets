@@ -34,6 +34,10 @@ export struct ToeicHomePage {
   @State private answerCorrect:boolean=false;
   @State private questionStartedAtMs:number=0;
   @State private refreshRevision:number=0;
+  @State private contentValidationReady:boolean=false;
+  @State private contentValidationErrors:string[]=[];
+  private contentValidationTimer:number=-1;
+  private homeEnterAtMs:number=0;
   @State private pronunciationMessage:string='';
   @State private selectedStudyDay:number=0;
   @State private selectedDayTitle:string='';
@@ -138,17 +142,58 @@ export struct ToeicHomePage {
   private currentOptionOrder:number[]=[0,1,2,3];
 
   aboutToAppear():void {
+    this.homeEnterAtMs=Date.now();
+    let cached=this.viewModel.cachedErrors();
+    if (cached===null) {
+      this.contentValidationReady=false;
+      this.scheduleContentValidation();
+    } else {
+      // Cached validation is authoritative for the bundled release. Do not
+      // hide the home content or footer for an artificial 100ms on re-entry.
+      this.contentValidationErrors=cached;
+      this.contentValidationReady=true;
+    }
+    let progressStartedAtMs=Date.now();
     this.loadProgressSnapshot();
+    console.info('[TOEIC-PERF] progress.snapshot costMs='+String(Date.now()-progressStartedAtMs));
     if (this.selectedStudyDay<=0) this.selectedStudyDay=this.progressCurrentDay;
+    let dayStartedAtMs=Date.now();
     this.loadStudyDay(this.selectedStudyDay);
+    console.info('[TOEIC-PERF] studyDay.load costMs='+String(Date.now()-dayStartedAtMs));
     this.refreshRevision++;
     void this.syncVocabularyCloud();
     if (this.isMockSession() && this.mode===ToeicPageMode.TRAINING) this.startMockClock();
+    if (cached!==null) {
+      console.info('[TOEIC-PERF] home.ready cached=true costMs='+String(Date.now()-this.homeEnterAtMs));
+    }
+  }
+
+  private scheduleContentValidation():void {
+    if (this.contentValidationTimer>=0) clearTimeout(this.contentValidationTimer);
+    // Keep expensive full-catalog validation out of ArkUI build evaluation.
+    // The HOME action is disabled until validation completes (fail closed).
+    this.contentValidationTimer=setTimeout(()=>{
+      this.contentValidationTimer=-1;
+      let validationStartedAtMs=Date.now();
+      try {
+        this.contentValidationErrors=this.viewModel.contentErrors();
+      } catch {
+        // Never enable training if bundled content could not be validated.
+        this.contentValidationErrors=['训练内容初始化失败，请重新进入后重试'];
+      }
+      this.contentValidationReady=true;
+      console.info('[TOEIC-PERF] content.validate costMs='+String(Date.now()-validationStartedAtMs)+
+        ' errors='+String(this.contentValidationErrors.length));
+      console.info('[TOEIC-PERF] home.ready cached=false costMs='+String(Date.now()-this.homeEnterAtMs));
+    },16);
   }
 
   private async syncVocabularyCloud():Promise<void> {
-    let synced=await this.viewModel.syncVocabularyRecalls();
-    if (!synced) return;
+    let startedAtMs=Date.now();
+    let changed=await this.viewModel.syncVocabularyRecalls();
+    console.info('[TOEIC-PERF] vocabulary.sync costMs='+String(Date.now()-startedAtMs)+
+      ' localChanged='+String(changed));
+    if (!changed) return;
     this.loadProgressSnapshot();
     this.refreshVocabularyItems();
     this.loadStudyDay(this.selectedStudyDay);
@@ -156,6 +201,10 @@ export struct ToeicHomePage {
   }
 
   aboutToDisappear():void {
+    if (this.contentValidationTimer>=0) {
+      clearTimeout(this.contentValidationTimer);
+      this.contentValidationTimer=-1;
+    }
     this.stopMockClock();
     if (!this.finishingSession && this.questions.length>0 &&
       (this.mode===ToeicPageMode.TRAINING || this.mode===ToeicPageMode.DIAGNOSTIC)) {
@@ -1166,7 +1215,7 @@ export struct ToeicHomePage {
 
   // Fixed chrome is a sibling of Scroll; only the central content pane scrolls.
   private hasFixedFooter():boolean {
-    if (this.mode===ToeicPageMode.HOME) return this.viewModel.contentErrors().length===0;
+    if (this.mode===ToeicPageMode.HOME) return this.contentValidationReady && this.contentValidationErrors.length===0;
     if (this.mode===ToeicPageMode.VOCABULARY) return this.selectedDayVocabularyCount>0 && !this.selectedVocabDone;
     if (this.mode===ToeicPageMode.SENTENCE) return this.selectedDaySentenceCount>0 && !this.selectedSentenceDone;
     return this.mode===ToeicPageMode.VOCABULARY_RESULT ||
@@ -1311,14 +1360,17 @@ export struct ToeicHomePage {
     Scroll() {
       Column() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
-        if (this.viewModel.contentErrors().length>0) {
+        if (!this.contentValidationReady) {
+          Text('正在检查训练内容…')
+            .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+        } else if (this.contentValidationErrors.length>0) {
           Column({space:6}) {
             Text('内容校验未通过，正式训练内容已暂停。')
               .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.DANGER)
               .fontWeight(FontWeight.Medium);
             Text('校验详情：')
               .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-            ForEach(this.viewModel.contentErrors().slice(0,5),(error:string)=>{
+            ForEach(this.contentValidationErrors.slice(0,5),(error:string)=>{
               Text('• '+error)
                 .width('100%').fontSize(AppTheme.META_SIZE)
                 .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.DANGER);

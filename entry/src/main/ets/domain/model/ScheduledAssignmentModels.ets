@@ -16,29 +16,18 @@ export enum ScheduledAssignmentStatus {
   ENDED = 'ENDED'
 }
 
-export enum ScheduledAssignmentDuePolicy {
-  SAME_DAY_AT = 'SAME_DAY_AT',
-  NEXT_DAY_AT = 'NEXT_DAY_AT',
-  AFTER_MINUTES = 'AFTER_MINUTES',
-  NONE = 'NONE'
-}
-
 export interface ScheduledAssignmentTemplate {
   assignmentType: string;
-  subject: string;
-  subjectCode: string;
   title: string;
   instruction: string;
   expectedMinutes: number;
-  duePolicy: string;
-  dueTime: string;
-  dueOffsetMinutes: number;
 }
 
 export interface ScheduledAssignmentPlan {
   id: string;
   studentId: string;
   planType: string;
+  subjectCode: string;
   name: string;
   scheduleType: string;
   timeOfDay: string;
@@ -67,6 +56,7 @@ export interface ScheduledAssignmentRun {
 
 export interface ScheduledAssignmentPlanDraft {
   planType: string;
+  subjectCode: string;
   name: string;
   scheduleType: string;
   timeOfDay: string;

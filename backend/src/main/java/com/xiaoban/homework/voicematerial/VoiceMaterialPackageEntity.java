@@ -17,7 +17,6 @@ public class VoiceMaterialPackageEntity {
   public String subjectCode;
   public String title;
   public int expectedMinutes;
-  public Instant dueAt;
   public String assignmentType;
   public String status;
   public String packageFingerprint;

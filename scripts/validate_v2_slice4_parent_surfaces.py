@@ -43,7 +43,7 @@ routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 batch_publish = read("entry/src/main/ets/application/import/HomeworkBatchPublishService.ets")
 homework_store = read("entry/src/main/ets/data/HomeworkStore.ets")
-due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
+task_date = read("entry/src/main/ets/domain/service/AssignmentTaskDate.ets")
 issue_spec = read("docs/product/ui-page-spec-v2.md")
 
 for token in [
@@ -151,9 +151,9 @@ require("AssignmentEditForm" in review_editor and "保存修改" in review_edito
         "Parent assignment editor must reuse the shared assignment form and explain status isolation")
 require("AssignmentEditForm" in confirmation_editor,
         "confirmation editing must reuse the same shared assignment form as published assignment editing")
-require("DeadlinePickerField" in shared_editor and "预计用时（分钟）" in shared_editor and
-        "教材 / 页码" not in shared_editor and "作业标题" in shared_editor,
-        "shared assignment editor must own title/deadline/duration and hide textbook/page editing")
+require("TaskDatePickerField" in shared_editor and "预计用时（分钟）" in shared_editor and
+        "教材 / 页码" not in shared_editor and "作业标题" in shared_editor and "任务日期" in shared_editor,
+        "shared assignment editor must own title/task-date/duration and hide textbook/page editing")
 require("bindSheet($$this.showEditSheet" in review_pane and "AssignmentEditorSheet" in review_pane,
         "published assignment editing must open in a bottom sheet rather than inline")
 require("AssignmentStatus.SUBMITTED" in review_pane and "AssignmentStatus.COMPLETED" in review_pane and
@@ -191,21 +191,20 @@ today_summary = homework_store.split("getTodaySummary(): TodaySummary", 1)
 require(len(today_summary) == 2, "HomeworkStore must expose TodaySummary")
 if len(today_summary) == 2:
     today_block = today_summary[1].split("getDashboardSummary()", 1)[0]
-    require("AssignmentDueDate.businessDayStart(Date.now())" in today_block and
-            "AssignmentDueDate.dayStart(assignment)" in today_block,
-            "HomeworkStore TodaySummary must use the shared Asia/Shanghai business-day semantics")
-    require("due.getFullYear() === now.getFullYear()" not in today_block and
-            "new Date(assignment.dueAtEpochMs)" not in today_block,
+    require("AssignmentTaskDate.today()" in today_block and
+            "assignment.taskDate !== today" in today_block,
+            "HomeworkStore TodaySummary must use the shared Asia/Shanghai task-date semantics")
+    require("new Date(assignment.taskDate)" not in today_block,
             "HomeworkStore TodaySummary must not fall back to the device-local calendar date")
 require("@State private scopedAssignments: Assignment[] = []" in progress and
         "this.viewModel.assignmentsOnDay(" in progress and
         "AssignmentDateFilter.ALL" in progress and
         "this.applyItems(this.scopedAssignments)" in progress,
         "Parent Progress list must follow the active date/subject scope without a parallel metric filter")
-require("SHANGHAI_OFFSET_HOURS: number = 8" in due_date,
-        "assignment business-day semantics must remain anchored to Asia/Shanghai")
-require("candidateAnchor(candidate.id)" in batch_publish,
-        "relative teacher deadlines must remain anchored to the Candidate/import creation time")
+require("SHANGHAI_OFFSET_HOURS: number = 8" in task_date,
+        "assignment task-date semantics must remain anchored to Asia/Shanghai")
+require("taskDate: candidate.taskDate" in batch_publish,
+        "published assignments must preserve the absolute task date resolved during import")
 require("private finishParentImportPublished(): void" in app_shell and
         "this.navPathStack.clear();" in app_shell.split("private finishParentImportPublished(): void", 1)[1].split("private openParentVoiceCreate", 1)[0] and
         "this.notifyUiChanged();" in app_shell.split("private finishParentImportPublished(): void", 1)[1].split("private openParentVoiceCreate", 1)[0],

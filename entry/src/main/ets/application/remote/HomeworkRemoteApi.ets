@@ -7,14 +7,14 @@ import { BackendHttpClient } from './BackendHttpClient';
 import { RemoteAssignment } from './RemoteModels';
 
 interface CreateAssignmentBody {
-  id: string; subject: string; title: string; instruction: string; textbookRef: string; dueText: string;
-  assignmentType: string; subjectCode: string; contentType: string; dueAtEpochMs: number; dueTimezone: string;
+  id: string; subject: string; title: string; instruction: string; textbookRef: string; taskDate: string;
+  assignmentType: string; subjectCode: string; contentType: string;
   status: string; sourceLabel: string; sourceExcerpt: string; expectedMinutes: number;
   startedAtEpochMs: number; finishedAtEpochMs: number; elapsedSeconds: number; reviewNote: string;
 }
 interface UpdateAssignmentBody {
-  version: number; subject: string; title: string; instruction: string; textbookRef: string; dueText: string;
-  assignmentType: string; subjectCode: string; contentType: string; dueAtEpochMs: number; dueTimezone: string;
+  version: number; subject: string; title: string; instruction: string; textbookRef: string; taskDate: string;
+  assignmentType: string; subjectCode: string; contentType: string;
   status: string; sourceLabel: string; sourceExcerpt: string; expectedMinutes: number;
   startedAtEpochMs: number; finishedAtEpochMs: number; elapsedSeconds: number; reviewNote: string;
 }
@@ -23,9 +23,7 @@ interface AssignmentDetailsUpdateBody {
   title: string;
   instruction: string;
   textbookRef: string;
-  dueText: string;
-  dueAtEpochMs: number;
-  dueTimezone: string;
+  taskDate: string;
   expectedMinutes: number;
 }
 interface AssignmentActionBody {
@@ -75,6 +73,8 @@ export interface RemoteBatchSyncResponse {
 export interface BatchPublishEntry {
   candidateId: string;
   assignment: Assignment;
+  sourceLabel: string;
+  sourceExcerpt: string;
 }
 
 export interface RemoteBatchPublishResult {
@@ -106,7 +106,6 @@ export class HomeworkRemoteApi {
     }
     if (filter.fromEpochMs > 0) params.push(`from=${filter.fromEpochMs}`);
     if (filter.toEpochMs > 0) params.push(`to=${filter.toEpochMs}`);
-    if (filter.undatedOnly) params.push('undated=true');
     if (filter.statuses.length === 1) params.push(`status=${encodeURIComponent(filter.statuses[0])}`);
 
     return this.listPaged(studentId, params, 'assignment.query');
@@ -143,7 +142,8 @@ export class HomeworkRemoteApi {
   async batchPublish(studentId: string, entries: BatchPublishEntry[]): Promise<RemoteBatchPublishResponse> {
     let items: BatchPublishItemBody[] = [];
     for (let entry of entries) {
-      items.push({ candidateId: entry.candidateId, assignment: this.createBody(entry.assignment) });
+      items.push({ candidateId: entry.candidateId,
+        assignment: this.createBody(entry.assignment, entry.sourceLabel, entry.sourceExcerpt) });
     }
     let body: BatchPublishBody = { items: items };
     let response = await BackendHttpClient.instance.requestFor(
@@ -186,9 +186,7 @@ export class HomeworkRemoteApi {
       title: assignment.title,
       instruction: assignment.instruction,
       textbookRef: assignment.textbookRef,
-      dueText: assignment.dueText,
-      dueAtEpochMs: assignment.dueAtEpochMs,
-      dueTimezone: assignment.dueTimezone,
+      taskDate: assignment.taskDate,
       expectedMinutes: assignment.expectedMinutes
     };
     let response = await BackendHttpClient.instance.requestFor(
@@ -258,26 +256,27 @@ export class HomeworkRemoteApi {
   private updateBody(assignment: Assignment, version: number): UpdateAssignmentBody {
     return {
       version: version, subject: assignment.subject, title: assignment.title, instruction: assignment.instruction,
-      textbookRef: assignment.textbookRef, dueText: assignment.dueText,
+      textbookRef: assignment.textbookRef, taskDate: assignment.taskDate,
       assignmentType: assignment.assignmentType, subjectCode: assignment.subjectCode,
       contentType: assignment.contentType === AssignmentContentType.AUDIO_IMAGE ?
         AssignmentContentType.AUDIO_IMAGE : AssignmentContentType.NORMAL,
-      dueAtEpochMs: assignment.dueAtEpochMs, dueTimezone: assignment.dueTimezone,
       status: assignment.status, sourceLabel: '', sourceExcerpt: '', expectedMinutes: assignment.expectedMinutes,
       startedAtEpochMs: assignment.startedAtEpochMs, finishedAtEpochMs: assignment.finishedAtEpochMs,
       elapsedSeconds: assignment.elapsedSeconds, reviewNote: assignment.reviewNote
     };
   }
 
-  private createBody(assignment: Assignment): CreateAssignmentBody {
+  private createBody(assignment: Assignment, sourceLabel: string = '',
+    sourceExcerpt: string = ''): CreateAssignmentBody {
     return { id: assignment.id, subject: assignment.subject, title: assignment.title, instruction: assignment.instruction,
-      textbookRef: assignment.textbookRef, dueText: assignment.dueText,
+      textbookRef: assignment.textbookRef, taskDate: assignment.taskDate,
       assignmentType: assignment.assignmentType, subjectCode: assignment.subjectCode,
       contentType: assignment.contentType === AssignmentContentType.AUDIO_IMAGE ?
         AssignmentContentType.AUDIO_IMAGE : AssignmentContentType.NORMAL,
-      dueAtEpochMs: assignment.dueAtEpochMs, dueTimezone: assignment.dueTimezone,
-      status: assignment.status, sourceLabel: assignment.candidateId.length > 0 ? '家长确认发布' : '',
-      sourceExcerpt: '', expectedMinutes: assignment.expectedMinutes,
+      status: assignment.status,
+      sourceLabel: sourceLabel.length > 0 ? sourceLabel :
+        (assignment.candidateId.length > 0 ? '家长确认发布' : ''),
+      sourceExcerpt: sourceExcerpt, expectedMinutes: assignment.expectedMinutes,
       startedAtEpochMs: assignment.startedAtEpochMs, finishedAtEpochMs: assignment.finishedAtEpochMs,
       elapsedSeconds: assignment.elapsedSeconds, reviewNote: assignment.reviewNote };
   }

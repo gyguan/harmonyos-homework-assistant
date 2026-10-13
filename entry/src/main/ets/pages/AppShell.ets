@@ -22,6 +22,7 @@ import { PageStateView } from '../components/state/PageStateView';
 import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
 import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../domain/model/HomeworkModels';
+import { ParentIdentity, ParentIdentityHelper } from '../domain/model/ParentIdentity';
 import { AssignmentAttentionKind } from '../domain/service/AssignmentAttentionPolicy';
 import {
   PracticeDifficulty,
@@ -52,7 +53,6 @@ import { PracticeHistoryPage } from '../features/student/practice/PracticeHistor
 import { PracticeAttemptPage } from '../features/student/practice/PracticeAttemptPage';
 import { PracticePaperDetailPage } from '../features/student/practice/PracticePaperDetailPage';
 import { PracticeResultPage } from '../features/student/practice/PracticeResultPage';
-import { StudyWorkspaceRoutePage } from '../features/student/study/StudyWorkspaceRoutePage';
 
 export enum AppRole {
   NONE = 'NONE',
@@ -77,6 +77,9 @@ enum ParentRoute {
 @Component
 export struct AppShell {
   @Prop @Watch('onRoleChanged') role: AppRole = AppRole.STUDENT;
+  @Prop @Watch('onParentIdentityChanged') parentIdentity: ParentIdentity = ParentIdentity.DAD;
+  @Prop @Watch('onStudentContextChanged') studentContextRevision: number = 0;
+  @Prop @Watch('onRootStudentIdChanged') rootStudentId: string = '';
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private widthVp: number = 390;
   @State private heightVp: number = 844;
@@ -91,8 +94,9 @@ export struct AppShell {
   @State private activeStudentId: string = '';
   @State private familyStudents: StudentProfile[] = [];
   @State private identityParentActive: boolean = false;
+  @State private identityParentIdentity: ParentIdentity = ParentIdentity.DAD;
   @StorageLink('shareImportToken') private shareImportToken: string = '';
-  onSwitchParent: () => void = () => {};
+  onSwitchParent: (identity: ParentIdentity) => void = (_identity: ParentIdentity) => {};
   onSwitchStudent: (studentId: string) => void = (_studentId: string) => {};
   onRegisterBackHandler: (handler: () => boolean) => void = (_handler: () => boolean) => {};
 
@@ -103,7 +107,8 @@ export struct AppShell {
       students: $familyStudents,
       activeStudentId: $activeStudentId,
       parentActive: $identityParentActive,
-      onSelectParent: () => this.switchToParent(),
+      parentIdentity: $identityParentIdentity,
+      onSelectParent: (identity: ParentIdentity) => this.switchToParent(identity),
       onSelectStudent: (studentId: string) => this.switchToStudent(studentId)
     }),
     autoCancel: true,
@@ -116,7 +121,8 @@ export struct AppShell {
       students: $familyStudents,
       activeStudentId: $activeStudentId,
       parentActive: $identityParentActive,
-      onSelectParent: () => this.switchToParent(),
+      parentIdentity: $identityParentIdentity,
+      onSelectParent: (identity: ParentIdentity) => this.switchToParent(identity),
       onSelectStudent: (studentId: string) => this.switchToStudent(studentId)
     }),
     autoCancel: true,
@@ -234,21 +240,57 @@ export struct AppShell {
   private onRoleChanged(): void {
     this.resetPersonaNavigation();
     this.identityParentActive = this.role === AppRole.PARENT;
+    this.identityParentIdentity = this.parentIdentity;
     this.syncFamilyContext();
+    this.invalidateStudentScopedPages();
+  }
+
+  private onParentIdentityChanged(): void {
+    this.identityParentIdentity = this.parentIdentity;
+    if (this.role !== AppRole.PARENT) return;
+    this.resetPersonaNavigation();
+    this.storeRevision++;
+  }
+
+  private invalidateStudentScopedPages(): void {
     this.storeRevision++;
     this.practiceRevision++;
     this.importRevision++;
   }
 
+  private onRootStudentIdChanged(): void {
+    // Observe the selected student ID itself, not only a revision counter.
+    // This also covers ArkUI reusing an existing STUDENT page tree.
+    if (this.role === AppRole.STUDENT && this.rootStudentId.length > 0 &&
+      this.activeStudentId !== this.rootStudentId) {
+      this.onStudentContextChanged();
+    }
+  }
+
+  private onStudentContextChanged(): void {
+    // The role stays STUDENT when changing from one child to another, so
+    // onRoleChanged cannot invalidate these cached page trees.
+    let previousStudentId = this.activeStudentId;
+    this.syncFamilyContext();
+    if (previousStudentId !== this.activeStudentId) {
+      this.resetPersonaNavigation();
+    }
+    this.invalidateStudentScopedPages();
+    // Repository refresh reads the selected identity at request start; stale
+    // completions never publish an earlier student's snapshot as the active one.
+    if (previousStudentId !== this.activeStudentId) void this.refreshActiveStudent();
+  }
+
   private openIdentitySwitcher(): void {
     this.identityParentActive = this.role === AppRole.PARENT;
+    this.identityParentIdentity = this.parentIdentity;
     if (this.sizeClass === WindowSizeClass.EXPANDED) this.wideIdentitySwitcherController.open();
     else this.phoneIdentitySwitcherController.open();
   }
 
-  private switchToParent(): void {
-    if (this.role === AppRole.PARENT) return;
-    this.onSwitchParent();
+  private switchToParent(identity: ParentIdentity): void {
+    if (this.role === AppRole.PARENT && this.parentIdentity === identity) return;
+    this.onSwitchParent(identity);
   }
 
   private switchToStudent(studentId: string): void {
@@ -272,9 +314,7 @@ export struct AppShell {
     // the previous child, return to Parent Home, update visible identity immediately, then refresh.
     this.resetPersonaNavigation();
     this.syncFamilyContext();
-    this.storeRevision++;
-    this.practiceRevision++;
-    this.importRevision++;
+    this.invalidateStudentScopedPages();
     void this.refreshActiveStudent();
   }
 
@@ -286,10 +326,6 @@ export struct AppShell {
   private openAssignmentDetail(assignmentId: string): void {
     this.navPathStack.pushPathByName(
       AppRoute.STUDENT_ASSIGNMENT_DETAIL, new AssignmentRouteParam(assignmentId));
-  }
-
-  private openStudy(assignmentId: string): void {
-    this.navPathStack.pushPathByName(AppRoute.STUDENT_STUDY, new AssignmentRouteParam(assignmentId));
   }
 
   private openPracticeHistory(paperId: string = ''): void {
@@ -398,10 +434,11 @@ export struct AppShell {
   private StudentContent() {
     if (this.studentRoute === StudentRoute.ASSIGNMENTS) {
       StudentAssignmentsPage({
+        studentId: this.activeStudentId,
         revision: this.storeRevision,
         attentionKind: this.studentAttentionKind,
         onOpenDetail: (assignmentId: string) => this.openAssignmentDetail(assignmentId),
-        onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId),
+        onStoreChanged: () => this.notifyUiChanged(),
         onAttentionFilterCleared: () => this.studentAttentionKind = AssignmentAttentionKind.NONE
       });
     } else if (this.studentRoute === StudentRoute.PRACTICE) {
@@ -416,9 +453,10 @@ export struct AppShell {
       });
     } else {
       StudentHomePage({
+        studentId: this.activeStudentId,
         offlineMode: this.demoScenario === DemoScenario.OFFLINE,
         revision: this.storeRevision,
-        onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId),
+        onOpenStudy: (assignmentId: string) => this.openAssignmentDetail(assignmentId),
         onOpenAttention: (kind: AssignmentAttentionKind) => this.openStudentAttention(kind),
         onStoreChanged: () => this.notifyUiChanged()
       });
@@ -433,18 +471,7 @@ export struct AppShell {
           assignmentId: this.routeAssignmentId(param),
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
-          onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
-        });
-      }
-      .hideTitleBar(true)
-      .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.STUDENT_STUDY) {
-      NavDestination() {
-        StudyWorkspaceRoutePage({
-          tutorUnavailable: this.demoScenario === DemoScenario.TUTOR_UNAVAILABLE,
-          assignmentId: this.routeAssignmentId(param),
-          revision: this.storeRevision,
-          onBack: () => this.navPathStack.pop()
+          onStoreChanged: () => this.notifyUiChanged()
         });
       }
       .hideTitleBar(true)
@@ -555,6 +582,7 @@ export struct AppShell {
       NavDestination() {
         HomeworkConfirmationPage({
           revision: this.storeRevision,
+          parentIdentity: this.parentIdentity,
           onBack: () => this.navPathStack.pop(),
           onPublished: () => this.finishParentImportPublished(),
           onStoreChanged: () => this.notifyUiChanged()
@@ -623,6 +651,7 @@ export struct AppShell {
   private ParentContent() {
     if (this.parentRoute === ParentRoute.PROGRESS) {
       ParentProgressPage({
+        studentId: this.activeStudentId,
         revision: this.storeRevision,
         attentionKind: this.parentAttentionKind,
         onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId),
@@ -637,6 +666,8 @@ export struct AppShell {
     } else {
       ParentDashboardPage({
         revision: this.storeRevision,
+        studentId: this.activeStudentId,
+        parentIdentity: this.parentIdentity,
         onOpenAssignment: () => ParentImportNavigator.openImport(this.navPathStack),
         onOpenVoice: () => this.openParentVoiceCreate(),
         onOpenScheduled: () => this.openParentScheduledAssignments(),
@@ -758,7 +789,7 @@ export struct AppShell {
 
       Column({ space: 3 }) {
         CenteredTextBadge({
-          badgeText: this.role === AppRole.PARENT ? '家' :
+          badgeText: this.role === AppRole.PARENT ? ParentIdentityHelper.badge(this.parentIdentity) :
             (this.currentStudent().name.length > 0 ? this.currentStudent().name.substring(0, 1) : '伴'),
           badgeWidth: 34,
           badgeHeight: 34,
@@ -768,7 +799,7 @@ export struct AppShell {
           badgeForeground: AppTheme.PRIMARY,
           badgeBackground: AppTheme.PRIMARY_SOFT
         });
-        Text(this.role === AppRole.PARENT ? '家长' : this.currentStudent().name)
+        Text(this.role === AppRole.PARENT ? ParentIdentityHelper.label(this.parentIdentity) : this.currentStudent().name)
           .width(68)
           .fontSize(AppTheme.CAPTION_SIZE)
           .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
@@ -791,7 +822,8 @@ export struct AppShell {
       .accessibilityGroup(true)
       .accessibilityRole(AccessibilityRoleType.BUTTON)
       .accessibilityText(this.role === AppRole.PARENT ?
-        '当前身份家长，点击切换身份' : '当前身份 ' + this.currentStudent().name + '，点击切换身份')
+        '当前身份' + ParentIdentityHelper.label(this.parentIdentity) + '，点击切换身份' :
+        '当前身份 ' + this.currentStudent().name + '，点击切换身份')
       .onClick(() => this.openIdentitySwitcher());
 
       if (this.role === AppRole.PARENT && this.familyStudents.length > 1) {
@@ -832,6 +864,8 @@ export struct AppShell {
       if (!this.hideIdentityBarForToeic()) {
         IdentityContextBar({
           isParent: this.role === AppRole.PARENT,
+          parentName: ParentIdentityHelper.label(this.parentIdentity),
+          parentBadge: ParentIdentityHelper.badge(this.parentIdentity),
           studentName: this.currentStudent().name,
           studentGrade: this.currentStudent().grade,
           studentClassName: this.currentStudent().className,

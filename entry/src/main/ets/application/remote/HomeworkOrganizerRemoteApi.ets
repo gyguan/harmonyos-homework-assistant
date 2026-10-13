@@ -4,6 +4,7 @@ import { ExtractedHomeworkText } from '../../domain/model/ImportModels';
 import { BackendHttpClient } from './BackendHttpClient';
 import { BackendSession } from './BackendSession';
 import { HomeworkImageEncoder } from '../../infrastructure/ai/HomeworkImageEncoder';
+import { AssignmentTaskDate } from '../../domain/service/AssignmentTaskDate';
 
 interface OrganizePayload {
   text: string;
@@ -15,7 +16,7 @@ interface RemoteCandidate {
   title: string;
   instruction: string;
   textbookRef: string;
-  dueText: string;
+  taskDate: string;
   expectedMinutes: number;
   sourceExcerpt: string;
   confidence: number;
@@ -51,21 +52,27 @@ export class HomeworkOrganizerRemoteApi {
   private constructor() {}
 
   async organizeImage(input: ExtractedHomeworkText, imageRef: string): Promise<OrganizedHomeworkImage> {
-    if (!BackendSession.instance.isConnected()) throw new Error('请先连接后端，或点击识别图片文字');
+    if (!BackendSession.instance.isConnected()) throw new Error('请先连接后端后再解析作业图片');
+    let totalStarted = Date.now();
+    let encodeStarted = Date.now();
     let encoded = await HomeworkImageEncoder.encode(imageRef);
+    let encodeMs = Date.now() - encodeStarted;
     let payload: ImageOrganizePayload = {
       imageBase64: encoded.imageBase64,
       contentType: encoded.contentType,
       sourceLabel: input.sourceLabel,
       text: input.text
     };
+    let requestStarted = Date.now();
     let response = await BackendHttpClient.instance.requestFor(
       'homework.organize.image',
       `/api/v1/students/${encodeURIComponent(input.studentId)}/homework/organize-image`,
       http.RequestMethod.POST, payload, true, 120000);
+    let requestMs = Date.now() - requestStarted;
+    console.info(`[AI-PERF] homework_image encodeMs=${encodeMs} requestMs=${requestMs} totalMs=${Date.now() - totalStarted} imageBytes=${encoded.encodedBytes}`);
     if (response.statusCode === 401) throw new Error('登录已失效，请重新登录后重试');
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      let message = 'AI图片解析失败，可点击识别图片文字后重试';
+      let message = 'AI图片解析失败，请换一张清晰图片后重试';
       try {
         let error = JSON.parse(response.body) as OrganizerErrorResponse;
         if (typeof error.message === 'string' && error.message.length > 0) message = error.message;
@@ -77,11 +84,11 @@ export class HomeworkOrganizerRemoteApi {
     let parsed = JSON.parse(response.body) as ImageOrganizeResponse;
     if (parsed.mode !== 'AI_IMAGE' || typeof parsed.recognizedText !== 'string' ||
       parsed.recognizedText.trim().length === 0 || !Array.isArray(parsed.assignments)) {
-      throw new Error('AI图片解析结果不完整，可点击识别图片文字后重试');
+      throw new Error('AI图片解析结果不完整，请换一张清晰图片后重试');
     }
-    let candidates = this.toCandidates(input, parsed.assignments);
+    let candidates = this.toCandidates(input, parsed.assignments, parsed.recognizedText.trim());
     if (candidates.length !== parsed.assignments.length) {
-      throw new Error('AI返回的作业科目或标题无效，请重试或点击识别图片文字');
+      throw new Error('AI返回的作业科目或标题无效，请重试');
     }
     return { candidates: candidates, recognizedText: parsed.recognizedText.trim() };
   }
@@ -111,7 +118,8 @@ export class HomeworkOrganizerRemoteApi {
     }
   }
 
-  private toCandidates(input: ExtractedHomeworkText, assignments: RemoteCandidate[]): CandidateAssignment[] {
+  private toCandidates(input: ExtractedHomeworkText, assignments: RemoteCandidate[],
+    rawTextOverride?: string): CandidateAssignment[] {
     let result: CandidateAssignment[] = [];
     for (let i = 0; i < assignments.length; i++) {
       let remote = assignments[i];
@@ -129,11 +137,12 @@ export class HomeworkOrganizerRemoteApi {
         title: remote.title.trim(),
         instruction: this.value(remote.instruction, remote.title),
         textbookRef: this.value(remote.textbookRef, '待家长确认'),
-        dueText: this.value(remote.dueText, '今天'),
+        taskDate: AssignmentTaskDate.resolve(this.value(remote.taskDate, AssignmentTaskDate.today())),
         expectedMinutes: this.expectedMinutes(remote.expectedMinutes),
         sourceEvidence: {
           sourceLabel: input.sourceLabel,
-          excerpt: this.value(remote.sourceExcerpt, remote.title)
+          excerpt: this.value(remote.sourceExcerpt, remote.title),
+          rawText: rawTextOverride === undefined ? input.text : rawTextOverride
         },
         confidence: confidence
       });

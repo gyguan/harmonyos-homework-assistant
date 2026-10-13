@@ -11,7 +11,6 @@ export enum AssignmentDateFilter {
   TODAY = 'TODAY',
   TOMORROW = 'TOMORROW',
   THIS_WEEK = 'THIS_WEEK',
-  UNDATED = 'UNDATED',
   CUSTOM = 'CUSTOM'
 }
 
@@ -21,7 +20,6 @@ export interface AssignmentFilter {
   dateFilter: AssignmentDateFilter;
   fromEpochMs: number;
   toEpochMs: number;
-  undatedOnly: boolean;
   statuses: AssignmentStatus[];
 }
 
@@ -33,7 +31,6 @@ export class AssignmentFilters {
       dateFilter: AssignmentDateFilter.ALL,
       fromEpochMs: 0,
       toEpochMs: 0,
-      undatedOnly: false,
       statuses: []
     };
   }

@@ -36,6 +36,7 @@ def main() -> int:
             "/api/v1/students/" + student_id + "/scheduled-assignment-plans",
             token=token, payload={
                 "planType": "MANUAL_ASSIGNMENT",
+                "subjectCode": "CHINESE",
                 "name": "E2E 定时阅读",
                 "scheduleType": "ONCE",
                 "timeOfDay": target.strftime("%H:%M"),
@@ -44,18 +45,14 @@ def main() -> int:
                 "endDate": "",
                 "template": {
                     "assignmentType": "EXTRA",
-                    "subject": "语文",
-                    "subjectCode": "CHINESE",
                     "title": "E2E 定时阅读任务",
                     "instruction": "阅读后复述主要内容",
                     "expectedMinutes": 20,
-                    "duePolicy": "AFTER_MINUTES",
-                    "dueTime": "",
-                    "dueOffsetMinutes": 60,
                 },
             }), (200,), "create scheduled plan").json()
 
         require(plan.get("status") == "ENABLED", "new scheduled plan must be enabled")
+        require(plan.get("subjectCode") == "CHINESE", "scheduled plan must persist subject")
         require(plan.get("nextFireAtEpochMs", 0) > 0, "new scheduled plan missing next fire time")
 
         expected_title = "E2E 定时阅读任务 · " + target.strftime("%m-%d")
@@ -77,10 +74,11 @@ def main() -> int:
         require(created["id"].startswith("a-scheduled-"), "scheduled assignment id is not deterministic")
         require(created.get("status") == "NOT_STARTED", "scheduled assignment must start NOT_STARTED")
         require(created.get("assignmentType") == "EXTRA", "scheduled assignment must reuse Assignment EXTRA")
+        require(created.get("subjectCode") == "CHINESE", "scheduled assignment must keep plan subject")
         require(created.get("title") == expected_title,
                 "scheduled assignment title must include scheduled fire date")
-        require(created.get("dueAtEpochMs", 0) > plan["nextFireAtEpochMs"],
-                "AFTER_MINUTES due time must be after scheduled fire time")
+        require(created.get("taskDate") == target.strftime("%Y-%m-%d"),
+                "scheduled assignment taskDate must equal the scheduled fire date")
 
         plans = expect(http(base_url, "GET",
             "/api/v1/scheduled-assignment-plans?studentId=" + student_id,

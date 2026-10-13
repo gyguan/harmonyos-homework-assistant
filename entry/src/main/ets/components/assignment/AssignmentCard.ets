@@ -1,6 +1,7 @@
 import { AppTheme } from '../../common/theme/AppTheme';
 import { Assignment, AssignmentStatus } from '../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../domain/service/AssignmentStateMachine';
+import { AssignmentTaskDate } from '../../domain/service/AssignmentTaskDate';
 
 @Component
 export struct AssignmentCard {
@@ -101,7 +102,7 @@ export struct AssignmentCard {
       }
 
       Row() {
-        Text(`截至 ${this.assignment.dueText}`)
+        Text(`任务日期 ${AssignmentTaskDate.displayText(this.assignment.taskDate)}`)
           .fontSize(AppTheme.CAPTION_SIZE)
           .fontColor(AppTheme.TERTIARY_TEXT);
         Blank();

@@ -11,6 +11,7 @@ def require(condition: bool, message: str) -> None:
         raise SystemExit("FAIL: " + message)
 
 migration = text("backend/src/main/resources/db/migration/V19__scheduled_assignments.sql")
+subject_migration = text("backend/src/main/resources/db/migration/V27__scheduled_assignment_subject.sql")
 service = text("backend/src/main/java/com/xiaoban/homework/scheduledassignment/ScheduledAssignmentService.java")
 attempt = text("backend/src/main/java/com/xiaoban/homework/scheduledassignment/ScheduledAssignmentAttemptService.java")
 scheduler = text("backend/src/main/java/com/xiaoban/homework/scheduledassignment/ScheduledAssignmentScheduler.java")
@@ -28,14 +29,18 @@ for table in ("scheduled_assignment_plan", "scheduled_assignment_template", "sch
 
 require("unique (plan_id, scheduled_fire_at)" in migration,
         "scheduled run must be unique by plan and fire time")
+require("add column subject_code" in subject_migration and
+        "scheduled_assignment_template" in subject_migration and
+        "alter column subject_code set not null" in subject_migration,
+        "scheduled plan subject migration must backfill manual templates and enforce a plan-level subject")
 require('"a-scheduled-" + plan.id + "-" + fireAt.toEpochMilli()' in attempt,
         "manual scheduled Assignment id must be deterministic")
 require("instanceTitle(plan, template, fireAt)" in attempt and
         'DateTimeFormatter.ofPattern("MM-dd")' in attempt and
         'template.title + " · " + fireDate' in attempt,
         "scheduled Assignment instance title must include the scheduled fire date")
-require("voiceAssignments.autoCreateNext" in attempt,
-        "voice schedule must reuse VoiceMaterialAssignmentService.autoCreateNext")
+require("voiceAssignments.autoCreateNext(plan.familyId, plan.studentId, plan.subjectCode)" in attempt,
+        "voice schedule must pass the selected subject to VoiceMaterialAssignmentService")
 require("autoCreateOnStudentEntry" in service,
         "student-entry server gate missing")
 require("@Scheduled(fixedDelay = 30000)" in scheduler,
@@ -44,10 +49,11 @@ require("Propagation.REQUIRES_NEW" in attempt and
         attempt.count("Propagation.REQUIRES_NEW") >= 3,
         "scheduled execution and failure recording must use isolated transactions")
 require("ScheduledAssignmentSchedule.nextFire(plan, executionAt)" in attempt and
-        "dueAt(plan, template, executionAt)" in attempt,
-        "scheduled recovery must use one execution clock and fast-forward missed recurrences")
-require("MISSED_DUE_WINDOW" in attempt,
-        "same-day missed deadline must skip instead of creating an expired assignment")
+        "LocalDate taskDate = fireAt.atZone(ScheduledAssignmentSchedule.zone(plan.timezone)).toLocalDate();" in attempt and
+        "taskDate.toString()" in attempt,
+        "scheduled recovery must use one execution clock and generated assignments must use the scheduled fire date")
+require("MISSED_DUE_WINDOW" not in attempt and "duePolicy" not in attempt,
+        "scheduled assignments must not reintroduce deadline-window semantics")
 require("ScheduledAssignmentSchedule.fireAt(plan, businessDate)" in service,
         "student entry must evaluate today's fire time even when nextFireAt already advanced")
 require("students.requireOwned(familyId, studentId)" in service and
@@ -62,6 +68,15 @@ require("/scheduled-assignment-plans" in controller,
         "scheduled assignment API missing")
 
 require("DeepPageHeader" in page, "scheduled page must use shared deep-page chrome")
+require("private TaskInformationSection()" in page and "Text('任务信息')" in page and
+        "private PlanInformationSection()" in page and "Text('计划信息')" in page,
+        "scheduled editor must group fields into task information and plan information")
+require("Text('科目')" in page and
+        "subjectCode: this.subjectCode" in page and
+        "this.subjectCode = plan.subjectCode" in page,
+        "scheduled editor must expose and persist an explicit subject")
+require("只从' + this.subjectDisplay(this.subjectCode)" in page,
+        "voice scheduled plan must explain subject-scoped material selection")
 require("resetEditorState()" in page and
         "private resetEditorState()" in page and
         "private async openEdit" in page,

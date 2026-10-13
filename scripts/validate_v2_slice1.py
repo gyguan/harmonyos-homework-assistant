@@ -20,6 +20,7 @@ def require(condition: bool, message: str) -> None:
 
 
 migration = read("backend/src/main/resources/db/migration/V7__assignment_v2_core.sql")
+task_date_migration = read("backend/src/main/resources/db/migration/V28__assignment_task_date.sql")
 entity = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentEntity.java")
 dtos = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentDtos.java")
 controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
@@ -45,35 +46,46 @@ require("else 'OTHER'" in migration, "V7 must map unknown historical subjects to
 require("due_text" not in migration.lower(),
         "V7 must not infer structured due_at from historical dueText")
 
-for field in ["assignmentType", "subjectCode", "dueAt", "dueTimezone"]:
-    require(field in entity, f"backend entity missing V2 field: {field}")
-for field in ["assignmentType", "subjectCode", "dueAtEpochMs", "dueTimezone"]:
-    require(field in dtos, f"backend DTO missing V2 field: {field}")
-    require(field in models, f"client Assignment missing V2 field: {field}")
+require("task_date date" in task_date_migration and
+        "alter table assignment alter column task_date set not null" in task_date_migration,
+        "V28 must establish required structured task_date")
+for field in ["assignmentType", "subjectCode", "taskDate"]:
+    require(field in entity, f"backend entity missing current Assignment field: {field}")
+    require(field in dtos, f"backend DTO missing current Assignment field: {field}")
+    require(field in models, f"client Assignment missing current Assignment field: {field}")
+for legacy in ["dueAt", "dueTimezone", "dueText"]:
+    require(legacy not in entity, f"backend entity must not retain legacy deadline field: {legacy}")
+require("dueAtEpochMs" not in dtos and "dueTimezone" not in dtos and "dueText" not in dtos,
+        "backend DTO must expose taskDate instead of legacy deadline fields")
+require("dueAtEpochMs" not in models and "dueTimezone" not in models and "dueText" not in models,
+        "client Assignment must expose taskDate instead of legacy deadline fields")
 require("assignments/summary" in controller and "TodaySummary" in dtos and "todaySummary" in service,
         "backend must expose the Student Home summary query")
-require("undated" in dtos and "assignment.dueAt == null" in service,
-        "historical undated tasks must stay explicit instead of receiving guessed dates")
+require("assignment.taskDate.equals(date)" in service and "undated" not in dtos,
+        "today summary must use required taskDate without an undated bucket")
 
-require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 10" in migrator and
+require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 11" in migrator and
         "migrateV5ToV6" in migrator and
         "migrateV7ToV8" in migrator and
         "migrateV8ToV9" in migrator and
-        "migrateV9ToV10" in migrator,
-        "Assignment V2 client fields must retain V5 -> V6 while later schemas advance through V10")
-require("assignmentType: AssignmentType.SCHOOL" in migrator and "dueAtEpochMs: 0" in migrator,
-        "V5 -> V6 must use deterministic historical defaults without guessing due time")
+        "migrateV9ToV10" in migrator and
+        "migrateV10ToV11" in migrator,
+        "Assignment client fields must retain explicit migrations through V11")
+require("assignmentType: AssignmentType.SCHOOL" in migrator and
+        "taskDate: AssignmentTaskDate.today()" in migrator,
+        "legacy snapshot migration must deterministically populate required taskDate")
 
 require("Subject," in store and "private subjectCode(subject: Subject)" in store,
         "HomeworkStore V2 subject mapper must import Subject explicitly for ArkTS compilation")
 # Parent Progress no longer owns assignment editing in Slice 4. Preserve the original Slice 1
 # invariant at the durable API boundary instead of requiring old page-local edit state.
 for field in ["assignmentType: assignment.assignmentType", "subjectCode: assignment.subjectCode",
-              "dueAtEpochMs: assignment.dueAtEpochMs", "dueTimezone: assignment.dueTimezone"]:
+              "taskDate: assignment.taskDate"]:
     require(field in remote_api,
-            f"Assignment remote update/create must preserve V2 field: {field}")
-require("dueAtEpochMs: number" in remote_api and "dueTimezone: string" in remote_api,
-        "remote Assignment request DTOs must keep structured due fields")
+            f"Assignment remote update/create must preserve current field: {field}")
+require("taskDate: string" in remote_api and
+        "dueAtEpochMs" not in remote_api and "dueTimezone" not in remote_api and "dueText" not in remote_api,
+        "remote Assignment request DTOs must keep taskDate and reject legacy deadline fields")
 
 require("interface AssignmentRepository" in repository_port,
         "V2 Student Home must depend on an AssignmentRepository port")
@@ -93,18 +105,27 @@ require("HomeworkStore.instance" not in view_model and "HomeworkStore.instance" 
         "V2 ViewModel/Page must not directly access HomeworkStore")
 require("WindowSizeClass." not in home and "@Prop sizeClass" not in home and "this.sizeClass" not in home,
         "V2 Student Home must use LayoutPolicy/container capability instead of size-class business branching")
-require("private PhoneHome()" in home and "private PadHome()" in home and
-        "LayoutPolicy.homeFocusSummaryRequirement()" in home,
-        "V2 Student Home must keep the Phone single-column fallback and the approved Pad focus/summary composition")
-# Student Home is a strict Today surface with direct task actions. Summary cards and the
-# subject accordion were removed because they delayed the grade-two student's primary action.
-require("private TodayTasks()" in home and "StudentTodayTaskCard" in home and
-        "todayActionableAssignments()" in view_model and "AssignmentAction.START" in home,
-        "V2 Student Home must preserve the simplified Today task hierarchy and command path")
-require("StudentHomeMetricCard" not in home and "StudentSubjectTaskGroupCard" not in home,
+require("private HomeContent()" in home and
+        "LayoutPolicy.pagePaddingForWidth(this.availableWidthVp)" in home and
+        "private PhoneHome()" not in home and "private PadHome()" not in home,
+        "V2 Student Home must use one shared Phone/Pad single-column composition")
+# Student Home is today's unfinished-work surface. Direct task actions remain, while subject headers
+# organize the list without introducing an accordion or a second navigation step.
+require("private PendingTasks()" in home and "StudentPendingTaskCard" in home and
+        "todayPendingAssignments(studentId: string = '')" in view_model and
+        "this.viewModel.todayPendingAssignments(this.studentId)" in home and
+        "ForEach(this.subjectGroups" in home and "ForEach(group.items" in home and
+        "taskRenderEpoch" in home and "AssignmentAction.START" in home,
+        "V2 Student Home must preserve direct actions in subject-grouped unfinished work")
+require("StudentHomeMetricCard" not in home and "StudentSubjectTaskGroupCard" not in home and
+        "expandedSubjectKey" not in home,
         "V2 Student Home must not restore summary-card or subject-accordion friction")
-require("dueAtEpochMs <= 0" in view_model and "dueText" not in view_model,
-        "V2 Student Home must use structured dueAt for Today and leave undated work to Assignments")
+require("status !== AssignmentStatus.SUBMITTED" in view_model and
+        "status !== AssignmentStatus.COMPLETED" in view_model and
+        "private static isToday(item: Assignment)" in view_model and
+        "item.taskDate === AssignmentTaskDate.today()" in view_model and
+        "dueText" not in view_model and "dueAtEpochMs" not in view_model,
+        "V2 Student Home must show only today's unfinished work using structured taskDate")
 require("StudentHomePage" in shell and "StudentTodayPage" not in shell,
         "AppShell must cut over to V2 Student Home")
 require("HOME = 'HOME'" in shell and "TODAY = 'TODAY'" not in shell,

@@ -110,25 +110,23 @@ if settings_path.exists():
 
 study_route_path = ROOT / "entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets"
 if study_route_path.exists():
-    study_route = study_route_path.read_text(encoding="utf-8")
-    if "AssignmentType.EXTRA" not in study_route or "课外任务" not in study_route:
-        fail("study workspace must surface EXTRA assignment context")
-    if "StudyWorkspacePage" not in study_route or "StudyWorkspaceViewModel" not in study_route:
-        fail("EXTRA context must reuse the standard study workspace and repository-backed execution chain")
-    if "AssignmentAction.START" in study_route or "activateAssignment" in study_route:
-        fail("study route must not auto-start any assignment before the student presses the action button")
+    fail("separate StudyWorkspaceRoutePage must be deleted after Assignment Detail and Study merge")
 
 student_home_path = ROOT / "entry/src/main/ets/features/student/home/StudentHomePage.ets"
 if student_home_path.exists():
     student_home = student_home_path.read_text(encoding="utf-8")
-    if "canUsePadComposition()" not in student_home or "LayoutPolicy.homeFocusSummaryRequirement()" not in student_home:
-        fail("Student Home wide composition must remain capability-based")
-    if "AppTheme.HOME_SECONDARY_MIN_WIDTH" not in student_home or "AppTheme.HOME_PRIMARY_MIN_WIDTH" not in student_home:
-        fail("Pad Student Home must preserve distinct summary and primary task widths")
-    if "this.TodayTasks();" not in student_home or "StudentTodayTaskCard" not in student_home:
-        fail("Student Home must preserve the simplified Today task-list composition")
-    if "this.TaskList(this.remainingAssignments());" not in student_home or "先做这项" not in student_home:
-        fail("Pad Student Home must preserve focus + remaining-task composition")
+    if "private HomeContent()" not in student_home or "LayoutPolicy.pagePaddingForWidth(this.availableWidthVp)" not in student_home:
+        fail("Student Home must use one capability-aware readable single-column composition")
+    if "AppTheme.CONTENT_STANDARD_MAX_WIDTH" not in student_home:
+        fail("Student Home must preserve the shared readable content width")
+    if "private PendingTasks()" not in student_home or "StudentPendingTaskCard" not in student_home:
+        fail("Student Home must preserve the simplified unfinished task-list composition")
+    if "private SubjectTaskSection(group: StudentHomeSubjectGroup)" not in student_home or "ForEach(this.subjectGroups" not in student_home:
+        fail("Student Home must group unfinished tasks by subject")
+    for removed in ["private PadHome()", "private PhoneHome()", "先做这项", "接下来",
+                    "HOME_SECONDARY_MIN_WIDTH", "HOME_PRIMARY_MIN_WIDTH"]:
+        if removed in student_home:
+            fail(f"Student Home must not retain obsolete Pad split behavior: {removed}")
 
 repository_root = ROOT / "entry/src/main/ets/data/repository"
 if repository_root.exists():

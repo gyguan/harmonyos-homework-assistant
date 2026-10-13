@@ -322,7 +322,7 @@ if assignment_list_item:
             "if (this.selectionMode)" in assignment_list_item,
             "AssignmentListItem must support an in-card selection control without expanding row width")
     require("TextOverflow.Ellipsis" in assignment_list_item and
-            "this.assignment.subject} · ${this.deadlineText()} · ${this.timingText()}" in assignment_list_item,
+            "this.assignment.subject} · ${this.taskDateText()} · ${this.timingText()}" in assignment_list_item,
             "AssignmentListItem compact metadata must truncate instead of overlapping neighboring content")
     require("Row({ space: 8 })" in assignment_list_item and
             ".lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)" in assignment_list_item and
@@ -537,8 +537,9 @@ for card_title_name, card_title_source in [
 ]:
     require("AppTheme.CARD_TITLE_SIZE" in card_title_source,
             f"{card_title_name} visible list/card titles must use the shared card-title size")
-require("this.emphasized ? AppTheme.SECTION_TITLE_SIZE : AppTheme.CARD_TITLE_SIZE" in student_home,
-        "Student home task cards must express emphasis through shared title tokens")
+require("fontSize(AppTheme.CARD_TITLE_SIZE)" in student_home and
+        "fontSize(AppTheme.SECTION_TITLE_SIZE)" in student_home,
+        "Student home task cards and subject headers must use shared title tokens")
 require("fontSize(AppTheme.PAGE_TITLE_SIZE)" in parent_review_pane,
         "Parent review business object title must use the shared page-title size")
 require("AppTheme.PAGE_NAV_TITLE_SIZE" in voice_material and
@@ -591,18 +592,18 @@ require("Text('作业进度')" not in parent_progress and
         "Text(this.bulkMode ? '取消' : '删除')" in parent_progress,
         "Parent Progress must avoid duplicate root title and keep delete/cancel action explicit")
 
-deadline_picker = read_optional("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
-require("DatePicker({" in deadline_picker and "TimePicker({" in deadline_picker,
-        "shared deadline input must use native ArkUI date and time pickers")
-require("AssignmentDueDate.resolveDueAtEpochMs" in deadline_picker,
-        "shared deadline picker must understand existing AI/free-text due values before editing")
+task_date_picker = read_optional("entry/src/main/ets/components/assignment/TaskDatePickerField.ets")
+require("DatePicker({" in task_date_picker and "TimePicker({" not in task_date_picker,
+        "shared task-date input must use the native ArkUI date picker without time-of-day semantics")
+require("AssignmentTaskDate" in task_date_picker,
+        "shared task-date picker must use the canonical AssignmentTaskDate service")
 
 extra_assignment = read_optional("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
 category_option = between(extra_assignment, "private CategoryOption(", "private CategorySection()")
 require("backgroundColor(this.category === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)" in category_option,
         "Extra assignment category selection must have an active surface")
-require("DeadlinePickerField" in extra_assignment and "placeholder: 'YYYY-MM-DD'" not in extra_assignment,
-        "Extra assignment deadline must use the shared native picker instead of a manual date field")
+require("TaskDatePickerField" in extra_assignment and "placeholder: 'YYYY-MM-DD'" not in extra_assignment,
+        "Extra assignment task date must use the shared native picker instead of a manual date field")
 
 confirmation = read_optional("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 confirmation_components = read_optional(
@@ -615,9 +616,9 @@ require("private SubjectChip(" not in confirmation and "private TimeChip(" not i
 require("ConfirmationCandidateCard" in confirmation and "ConfirmationCandidateEditor" in confirmation,
         "Confirmation page must render reactive Candidate child components")
 require("AssignmentEditForm" in confirmation_components and
-        "DeadlinePickerField" in assignment_edit_form and
-        "TextInput({ text: this.item.dueText })" not in confirmation_components,
-        "Confirmation deadline edit must reuse the shared assignment form and native deadline picker")
+        "TaskDatePickerField" in assignment_edit_form and
+        "TextInput({ text: this.item.taskDate })" not in confirmation_components,
+        "Confirmation task-date edit must reuse the shared assignment form and native task-date picker")
 require("this.showEditorSheet && this.editingCandidateId === item.id" in confirmation,
         "Confirmation selected Candidate must reflect both the active editor id and bottom-sheet visibility")
 require(".bindSheet($$this.showEditorSheet" in confirmation and

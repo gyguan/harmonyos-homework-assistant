@@ -43,7 +43,8 @@ export enum Subject {
 }
 
 export enum SubmissionType {
-  IMAGE = 'IMAGE'
+  IMAGE = 'IMAGE',
+  AUDIO = 'AUDIO'
 }
 
 export enum HomeworkImportSourceKind {
@@ -112,10 +113,15 @@ export interface CandidateAssignment {
   title: string;
   instruction: string;
   textbookRef: string;
-  dueText: string;
+  taskDate: string;
   expectedMinutes: number;
   sourceEvidence: SourceEvidence;
   confidence: number;
+  sameTaskGroup?: string;
+  duplicateAssignmentId?: string;
+  duplicateAssignmentTitle?: string;
+  duplicateConfidence?: number;
+  duplicateReason?: string;
 }
 
 export interface Assignment {
@@ -130,10 +136,7 @@ export interface Assignment {
   title: string;
   instruction: string;
   textbookRef: string;
-  dueAtEpochMs: number;
-  dueTimezone: string;
-  dueText: string;
-  dueDateKey?: string;
+  taskDate: string;
   status: AssignmentStatus;
   expectedMinutes: number;
   startedAtEpochMs: number;
@@ -151,6 +154,8 @@ export interface Submission {
   assignmentId: string;
   type: SubmissionType;
   photoUris: string[];
+  audioUri?: string;
+  durationMs?: number;
   fileLabel: string;
   submittedAtText: string;
 }
@@ -174,7 +179,6 @@ export interface TodaySummary {
   completed: number;
   total: number;
   attention: number;
-  undated: number;
   nextAssignmentId: string;
 }
 

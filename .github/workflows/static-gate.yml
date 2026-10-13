@@ -194,7 +194,7 @@ jobs:
       - name: Validate V2 Phone/Pad baseline
         run: python scripts/validate_v2_phone_pad_baseline.py
 
-      - name: Validate student home Today task list
+      - name: Validate student home today subject groups
         run: python scripts/validate_student_home_today_subjects.py
 
       - name: Validate issue 291 student UI simplification
@@ -330,6 +330,9 @@ jobs:
 
       - name: Validate cloud submission photos
         run: python scripts/validate_cloud_submission_photos.py
+
+      - name: Validate student voice submission
+        run: python scripts/validate_student_voice_submission.py
 
       - name: Validate persisted assignment sync metadata
         run: python scripts/validate_assignment_sync_metadata.py

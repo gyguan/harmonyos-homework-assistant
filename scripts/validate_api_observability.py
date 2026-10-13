@@ -66,11 +66,12 @@ for scene in ["family.students.list", "family.student.save", "family.student.del
     require(scene in students, f"family API scene missing: {scene}")
 for scene in ["auth.login", "auth.session", "auth.logout"]:
     require(scene in auth, f"auth API scene missing: {scene}")
-for scene in ["parent.review.evidence", "submission.upload", "submission.photo.download"]:
+for scene in ["parent.review.evidence", "submission.upload", "submission.resource.download"]:
     require(scene in submission, f"submission API scene missing: {scene}")
-require("traceHeaders(path, http.RequestMethod.POST, 'submission.upload')" in submission and
-        "traceHeaders(path, http.RequestMethod.GET, 'submission.photo.download')" in submission,
-        "direct multipart/photo HTTP calls must participate in correlation tracing")
+compact_submission = " ".join(submission.split())
+require("traceHeaders( path, http.RequestMethod.POST, 'submission.upload')" in compact_submission and
+        "traceHeaders( path, http.RequestMethod.GET, 'submission.resource.download')" in compact_submission,
+        "direct multipart/resource HTTP calls must participate in correlation tracing")
 
 require("X-Client-Request-Key" in e2e and "X-Request-Id" in e2e and
         "API_OBSERVABILITY_E2E_PASS" in e2e,

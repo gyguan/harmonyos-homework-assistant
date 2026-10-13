@@ -1,6 +1,10 @@
 import { AssignmentEditChangeDetector, AssignmentEditValues } from '../../../common/state/AssignmentEditChangeDetector';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
+import {
+  PendingAssignmentAttachment,
+  PendingAssignmentAttachmentPicker
+} from '../../../components/assignment/PendingAssignmentAttachmentPicker';
 import { EditSheetHeader } from '../../../components/navigation/EditSheetHeader';
 import { ChoiceSelectionChip } from '../../../components/selection/SelectionControls';
 import { CandidateAssignment, Subject } from '../../../domain/model/HomeworkModels';
@@ -93,7 +97,7 @@ export struct ConfirmationCandidateCard {
           }
         }
         Blank();
-        Text(this.item.dueText)
+        Text(this.item.taskDate)
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT)
@@ -152,26 +156,30 @@ export struct ConfirmationCandidateCard {
 @Component
 export struct ConfirmationCandidateEditor {
   @Prop item: CandidateAssignment;
+  @Prop attachments: PendingAssignmentAttachment[] = [];
   @State private subjectDraft: Subject = Subject.CHINESE;
   @State private titleDraft: string = '';
   @State private instructionDraft: string = '';
-  @State private dueTextDraft: string = '';
+  @State private taskDateDraft: string = '';
   @State private expectedMinutesDraft: number = 20;
   @State private textbookRefDraft: string = '';
+  @State private attachmentDraft: PendingAssignmentAttachment[] = [];
   @State private confirmDiscard: boolean = false;
   @State private confirmDelete: boolean = false;
 
   onClose: () => void = () => {};
-  onSave: (candidate: CandidateAssignment) => boolean = (_candidate: CandidateAssignment) => false;
+  onSave: (candidate: CandidateAssignment, attachments: PendingAssignmentAttachment[]) => boolean =
+    (_candidate: CandidateAssignment, _attachments: PendingAssignmentAttachment[]) => false;
   onDelete: (candidateId: string) => void = (_candidateId: string) => {};
 
   aboutToAppear(): void {
     this.subjectDraft = this.item.subject;
     this.titleDraft = this.item.title;
     this.instructionDraft = this.item.instruction;
-    this.dueTextDraft = this.item.dueText;
+    this.taskDateDraft = this.item.taskDate;
     this.expectedMinutesDraft = this.item.expectedMinutes;
     this.textbookRefDraft = this.item.textbookRef;
+    this.attachmentDraft = this.attachments.slice();
     this.confirmDiscard = false;
     this.confirmDelete = false;
   }
@@ -181,7 +189,7 @@ export struct ConfirmationCandidateEditor {
       subject: this.item.subject,
       title: this.item.title,
       instruction: this.item.instruction,
-      dueText: this.item.dueText,
+      taskDate: this.item.taskDate,
       expectedMinutes: this.item.expectedMinutes,
       textbookRef: this.item.textbookRef
     };
@@ -192,14 +200,26 @@ export struct ConfirmationCandidateEditor {
       subject: this.subjectDraft,
       title: this.titleDraft,
       instruction: this.instructionDraft,
-      dueText: this.dueTextDraft,
+      taskDate: this.taskDateDraft,
       expectedMinutes: this.expectedMinutesDraft,
       textbookRef: this.textbookRefDraft
     };
   }
 
+  private attachmentsChanged(): boolean {
+    if (this.attachments.length !== this.attachmentDraft.length) return true;
+    for (let i = 0; i < this.attachments.length; i++) {
+      let original = this.attachments[i];
+      let draft = this.attachmentDraft[i];
+      if (original.resourceType !== draft.resourceType || original.uri !== draft.uri ||
+        original.displayName !== draft.displayName) return true;
+    }
+    return false;
+  }
+
   private hasChanges(): boolean {
-    return AssignmentEditChangeDetector.hasChanges(this.originalEditValues(), this.currentEditValues());
+    return AssignmentEditChangeDetector.hasChanges(this.originalEditValues(), this.currentEditValues()) ||
+      this.attachmentsChanged();
   }
 
   private markChanged(): void {
@@ -215,7 +235,7 @@ export struct ConfirmationCandidateEditor {
       title: this.titleDraft,
       instruction: this.instructionDraft,
       textbookRef: this.textbookRefDraft,
-      dueText: this.dueTextDraft,
+      taskDate: this.taskDateDraft,
       expectedMinutes: this.expectedMinutesDraft,
       sourceEvidence: {
         sourceLabel: this.item.sourceEvidence.sourceLabel,
@@ -242,7 +262,7 @@ export struct ConfirmationCandidateEditor {
   }
 
   private saveAndClose(): void {
-    if (!this.onSave(this.buildCandidate())) return;
+    if (!this.onSave(this.buildCandidate(), this.attachmentDraft.slice())) return;
     this.onClose();
   }
 
@@ -340,7 +360,7 @@ export struct ConfirmationCandidateEditor {
             subjectEditable: true,
             title: this.titleDraft,
             instruction: this.instructionDraft,
-            dueText: this.dueTextDraft,
+            taskDate: this.taskDateDraft,
             expectedMinutes: this.expectedMinutesDraft,
             onSubjectChange: (subject: Subject) => {
               this.subjectDraft = subject;
@@ -354,12 +374,21 @@ export struct ConfirmationCandidateEditor {
               this.instructionDraft = value;
               this.markChanged();
             },
-            onDueTextChange: (value: string) => {
-              this.dueTextDraft = value;
+            onTaskDateChange: (value: string) => {
+              this.taskDateDraft = value;
               this.markChanged();
             },
             onMinutesChange: (minutes: number) => {
               this.expectedMinutesDraft = minutes;
+              this.markChanged();
+            }
+          });
+
+          PendingAssignmentAttachmentPicker({
+            candidateId: this.item.id,
+            attachments: this.attachmentDraft,
+            onChange: (attachments: PendingAssignmentAttachment[]) => {
+              this.attachmentDraft = attachments.slice();
               this.markChanged();
             }
           });

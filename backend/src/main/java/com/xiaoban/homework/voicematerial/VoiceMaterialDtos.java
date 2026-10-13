@@ -35,12 +35,11 @@ public final class VoiceMaterialDtos {
       @NotBlank @Size(max = 64) String subjectCode,
       @Size(max = 300) String title,
       @Min(1) @Max(240) Integer expectedMinutes,
-      Long dueAtEpochMs,
       @Size(max = 32) String assignmentType) {}
 
   public record PackageResponse(String id, String batchId, String studentId,
       String directoryName, String subjectCode, String title, int expectedMinutes,
-      long dueAtEpochMs, String assignmentType, String status, String errorMessage,
+      String assignmentType, String status, String errorMessage,
       String consumedAssignmentId, boolean hasCreatedBefore, boolean hasActiveAssignment,
       long consumedAtEpochMs, List<FileResponse> files) {}
 
@@ -101,8 +100,7 @@ public final class VoiceMaterialDtos {
       @NotBlank @Size(max = 80) String studentId,
       @Size(max = 64) String subjectCode,
       @Min(1) @Max(240) Integer expectedMinutes,
-      Long dueAtEpochMs,
-      @Size(max = 32) String dueText,
+      @Size(max = 10) String taskDate,
       @Size(max = 300) String title,
       @Size(max = 1000) String instruction,
       @Size(max = 120) String requestId) {}

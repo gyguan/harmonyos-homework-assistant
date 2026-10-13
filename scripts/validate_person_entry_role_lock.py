@@ -33,12 +33,35 @@ require("this.familyContext.setActiveStudent(studentId)" in index,
         "student identity selection must bind active student through FamilyContextRepository")
 require("AppShell({" in index and "role: this.selectedRole" in index,
         "AppShell role must remain a root-owned read-only prop")
-require("onSwitchParent: () => this.requestParentAccess()" in index and
+require("onSwitchParent: (identity: ParentIdentity) => { void this.requestParentAccess(identity); }" in index and
         "onSwitchStudent: (studentId: string) => this.enterStudent(studentId)" in index,
-        "AppShell identity changes must delegate role ownership back to Index")
+        "AppShell identity changes must delegate parent/student ownership back to Index")
 require("HomeworkSyncService" not in index and
         "DefaultAssignmentRepository.instance.requestSync()" in index,
         "root identity switch must keep repository background sync")
+
+# A student-to-student switch does not change AppRole.STUDENT; the root must
+# propagate a separate identity epoch and the shell must invalidate cached pages.
+require("@State private studentContextRevision: number = 0;" in index and
+        "this.studentContextRevision++;" in index and
+        "studentContextRevision: this.studentContextRevision" in index,
+        "student-to-student switch must emit an independently observed identity revision")
+require("@Prop @Watch('onStudentContextChanged') studentContextRevision: number = 0;" in app_shell and
+        "private onStudentContextChanged(): void" in app_shell and
+        "this.invalidateStudentScopedPages();" in app_shell and
+        "this.resetPersonaNavigation();" in app_shell.split("private onStudentContextChanged(): void {", 1)[1].split(
+            "private openIdentitySwitcher()", 1)[0],
+        "shell must reset old child navigation and invalidate assignment/practice/import pages")
+require("studentId: this.activeStudentId" in app_shell and
+        "this.syncFamilyContext();" in app_shell and
+        "void this.refreshActiveStudent();" in app_shell,
+        "child context must propagate to pages before asynchronous repository refresh")
+require("finally {" in index.split("private async prepareStudentAssignments(studentId: string): Promise<void> {", 1)[1].split(
+            "  build()", 1)[0] and
+        "DefaultAssignmentRepository.instance.requestSync();" in index.split(
+            "private async prepareStudentAssignments(studentId: string): Promise<void> {", 1)[1].split(
+            "  build()", 1)[0],
+        "failed auto-creation must not suppress task synchronization")
 
 require("HomeworkStore" not in entry_page and "FamilyContextRepository" in entry_page and
         "this.familyContext.getStudents()" in entry_page,
@@ -47,15 +70,16 @@ require("家长" in entry_page and "孩子" in entry_page and "谁在使用" in 
         "initial entry page must still expose parent and child choices")
 require("onSelectStudent(student.id)" in entry_page,
         "initial student selection must preserve the selected child id")
-require("onSelectParent: () => this.requestParentAccess()" in index and
-        "private requestParentAccess(): void" in index and
-        "private confirmParentAccess(): void" in index,
-        "all parent role entry must use the root-owned parent access gate")
-require("@CustomDialog" in parent_access and "请输入设备家长码" in parent_access,
-        "parent access must use an explicit local verification dialog")
-require("updateParentAccessCode" in settings and "设备家长码" in settings and
-        "家长码只保存在当前设备" in settings,
-        "parent settings must allow enabling, changing and disabling the device access code")
+require("onSelectParent: (identity: ParentIdentity) => { void this.requestParentAccess(identity); }" in index and
+        "private async requestParentAccess(identity: ParentIdentity): Promise<void>" in index and
+        "private async confirmParentAccess(): Promise<void>" in index and
+        "private enterParent(identity: ParentIdentity): void" in index,
+        "dad/mom parent entry must use the root-owned cloud parent access gate")
+require("@CustomDialog" in parent_access and "请输入家庭家长码" in parent_access,
+        "parent access must use an explicit family verification dialog")
+require("ParentAccessRemoteApi" in settings and "家庭家长码" in settings and
+        "加密保存到家庭云端" in settings,
+        "parent settings must manage the family cloud parent access code")
 
 require("@Prop @Watch('onRoleChanged') role: AppRole" in app_shell and
         "@State private role" not in app_shell and
@@ -64,21 +88,21 @@ require("@Prop @Watch('onRoleChanged') role: AppRole" in app_shell and
 require("IdentitySwitcherDialog" in app_shell and "@CustomDialog" in identity_switcher,
         "AppShell must expose a reusable in-app identity switcher")
 require("private openIdentitySwitcher()" in app_shell and
-        "private switchToParent()" in app_shell and
+        "private switchToParent(identity: ParentIdentity)" in app_shell and
         "private switchToStudent(studentId: string)" in app_shell,
-        "AppShell must provide explicit identity switch actions")
+        "AppShell must provide explicit dad/mom/student identity switch actions")
 require("private resetPersonaNavigation()" in app_shell and
         "this.navPathStack.clear()" in app_shell and
         "this.studentRoute = StudentRoute.HOME" in app_shell and
         "this.parentRoute = ParentRoute.DASHBOARD" in app_shell,
         "identity changes must clear role-specific navigation state")
-switch_parent = app_shell.split("private switchToParent(): void {", 1)[1].split(
+switch_parent = app_shell.split("private switchToParent(identity: ParentIdentity): void {", 1)[1].split(
     "private switchToStudent(studentId: string): void {", 1)[0]
-require("this.resetPersonaNavigation()" not in switch_parent and
-        "this.onSwitchParent();" in switch_parent and
+require("this.onSwitchParent(identity);" in switch_parent and
         "this.resetPersonaNavigation();" in app_shell.split("private onRoleChanged(): void {", 1)[1].split(
-            "private openIdentitySwitcher()", 1)[0],
-        "parent navigation must reset only after parent access succeeds and role actually changes")
+            "private invalidateStudentScopedPages()", 1)[0] and
+        "private onParentIdentityChanged(): void" in app_shell,
+        "parent navigation must reset only after parent access succeeds or dad/mom identity actually changes")
 switch_student = app_shell.split("private switchToStudent(studentId: string): void {", 1)[1].split(
     "private openStudentSwitcher()", 1)[0]
 require("this.familyContext.setActiveStudent(studentId)" not in switch_student and
@@ -104,15 +128,18 @@ require("private openStudentSwitcher()" in app_shell and
         "parent child-context switching must remain independently available")
 require("if (this.role !== AppRole.PARENT" in app_shell,
         "parent child-context switching must remain parent-only")
-require("选择家长或学生" in identity_switcher and
+require("选择爸爸、妈妈或学生" in identity_switcher and
+        "ParentIdentity.DAD" in identity_switcher and
+        "ParentIdentity.MOM" in identity_switcher and
         "onSelectParent" in identity_switcher and
         "onSelectStudent" in identity_switcher,
-        "identity dialog must combine role and person selection in one surface")
-require("CenteredTextBadge" in identity_switcher and "badgeText: '家'" in identity_switcher,
+        "identity dialog must combine dad, mom and student selection in one surface")
+require("CenteredTextBadge" in identity_switcher and "ParentIdentityHelper.badge(identity)" in identity_switcher,
         "identity dialog must reuse shared centered identity badges")
 require("@Link parentActive: boolean" in identity_switcher and
+        "@Link parentIdentity: ParentIdentity" in identity_switcher and
         identity_switcher.count("!this.parentActive && this.activeStudentId === student.id") >= 4,
-        "student current-state marker must be guarded by non-parent identity")
+        "identity switcher must bind dad/mom and student current-state reactively")
 
 if errors:
     print("PERSON_ENTRY_ROLE_LOCK_GATE_FAIL")

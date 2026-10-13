@@ -13,6 +13,7 @@ import { ParentProgressViewModel } from './ParentProgressViewModel';
 
 @Component
 export struct ParentProgressPage {
+  @Prop @Watch('onStudentIdChanged') studentId: string = '';
   @Prop @Watch('onRevisionChanged') revision: number = 0;
   @Prop @Watch('onAttentionKindChanged') attentionKind: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
   @State private refreshRevision: number = 0;
@@ -34,6 +35,7 @@ export struct ParentProgressPage {
   @State private deleteMessage: string = '';
   @State private showDeleteSheet: boolean = false;
   @State private activeAttentionKind: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
+  private querySequence: number = 0;
 
   onOpenReview: (assignmentId: string) => void = (_assignmentId: string) => {};
   onStoreChanged: () => void = () => {};
@@ -62,6 +64,20 @@ export struct ParentProgressPage {
   }
 
   private onRevisionChanged(): void {
+    this.querySequence++;
+    this.querying = false;
+    this.rebuildView();
+  }
+
+  private onStudentIdChanged(): void {
+    this.querySequence++;
+    this.querying = false;
+    this.selectedAssignmentId = '';
+    this.selectedDeleteIds = [];
+    this.bulkMode = false;
+    this.deleteMessage = '';
+    this.scopedAssignments = [];
+    this.visibleAssignments = [];
     this.rebuildView();
   }
 
@@ -120,7 +136,7 @@ export struct ParentProgressPage {
   }
 
   private assignmentRenderKey(item: Assignment): string {
-    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.taskDate}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
   }
 
   private canDelete(item: Assignment): boolean {
@@ -292,15 +308,19 @@ export struct ParentProgressPage {
   private async queryCurrent(): Promise<void> {
     if (this.querying) return;
     this.querying = true;
+    let queryStudentId = this.studentId;
+    let querySequence = ++this.querySequence;
     try {
       let scoped = this.allDates ?
         await this.viewModel.query(
           AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL) :
         await this.viewModel.queryOnDay(
           this.subjectCode, this.selectedDayEpochMs);
-      this.applyScopedItems(this.filterByAttention(scoped));
+      if (querySequence === this.querySequence && queryStudentId === this.studentId) {
+        this.applyScopedItems(this.filterByAttention(scoped));
+      }
     } finally {
-      this.querying = false;
+      if (querySequence === this.querySequence) this.querying = false;
     }
   }
 

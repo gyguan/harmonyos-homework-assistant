@@ -1,6 +1,7 @@
 import { ExtractedHomeworkText } from '../../domain/model/ImportModels';
 import { CandidateAssignment, Subject } from '../../domain/model/HomeworkModels';
 import { HomeworkAssignmentParser } from '../../domain/port/HomeworkAssignmentParser';
+import { AssignmentTaskDate } from '../../domain/service/AssignmentTaskDate';
 
 export class LocalHomeworkAssignmentParser implements HomeworkAssignmentParser {
   async parse(input: ExtractedHomeworkText): Promise<CandidateAssignment[]> {
@@ -49,7 +50,7 @@ export class LocalHomeworkAssignmentParser implements HomeworkAssignmentParser {
       title: body,
       instruction: body,
       textbookRef: this.textbookRef(subject, body),
-      dueText: this.dueText(body),
+      taskDate: this.taskDate(body),
       expectedMinutes: 20,
       sourceEvidence: {
         sourceLabel: input.sourceLabel,
@@ -274,26 +275,8 @@ export class LocalHomeworkAssignmentParser implements HomeworkAssignmentParser {
     return true;
   }
 
-  private dueText(body: string): string {
-    if (body.indexOf('明天') >= 0 || body.indexOf('明日') >= 0) {
-      return '明天';
-    }
-    if (body.indexOf('今晚') >= 0 || body.indexOf('晚上') >= 0) {
-      return '今晚';
-    }
-
-    let weekdays: string[] = ['周一', '周二', '周三', '周四', '周五', '周六', '周日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
-    for (let weekday of weekdays) {
-      if (body.indexOf(weekday) >= 0) {
-        return weekday;
-      }
-    }
-
-    let dateMatch = body.match(/\d{1,2}月\d{1,2}[日号]/);
-    if (dateMatch !== null && dateMatch.length > 0) {
-      return dateMatch[0];
-    }
-    return '今天';
+  private taskDate(body: string): string {
+    return AssignmentTaskDate.resolve(body);
   }
 
   private textbookRef(subject: Subject, body: string): string {
@@ -336,7 +319,7 @@ export class LocalHomeworkAssignmentParser implements HomeworkAssignmentParser {
     if (this.learningLocation(body).length > 0) {
       score += 0.06;
     }
-    if (this.dueText(body) !== '今天') {
+    if (this.taskDate(body) !== AssignmentTaskDate.today()) {
       score += 0.03;
     }
     return Math.min(score, 0.98);

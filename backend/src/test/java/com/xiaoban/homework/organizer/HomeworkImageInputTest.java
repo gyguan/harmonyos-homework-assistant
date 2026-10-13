@@ -43,10 +43,19 @@ class HomeworkImageInputTest {
     student.familyId = family;
     when(students.findById("student-1")).thenReturn(Optional.of(student));
     when(model.imageAvailable()).thenReturn(true);
-    when(model.organizeImage(eq(student), eq("图片"), startsWith("data:image/png;base64,"), eq("数学口算20题")))
-        .thenReturn(Optional.of(new HomeworkOrganizerDtos.ImageResponse(List.of(), "AI_IMAGE", "图片文字")));
-    service.organizeImage(family, "student-1", new HomeworkOrganizerDtos.ImageRequest(png(), "image/png", "图片", "数学口算20题"));
-    verify(model).organizeImage(eq(student), eq("图片"), startsWith("data:image/png;base64,"), eq("数学口算20题"));
+    var todayCandidate = new HomeworkOrganizerDtos.Candidate(
+        "数学", "口算20题", "完成口算20题", "", "今天", 10, "口算20题", .9,
+        "", "", "", 0.0, "");
+    when(model.organizeImage(eq(student), eq("图片"), startsWith("data:image/png;base64,"),
+        eq("数学口算20题")))
+        .thenReturn(Optional.of(new HomeworkOrganizerDtos.ImageResponse(
+            List.of(todayCandidate), "AI_IMAGE", "图片文字")));
+
+    service.organizeImage(family, "student-1",
+        new HomeworkOrganizerDtos.ImageRequest(png(), "image/png", "图片", "数学口算20题"));
+
+    verify(model, times(1)).organizeImage(
+        eq(student), eq("图片"), startsWith("data:image/png;base64,"), eq("数学口算20题"));
   }
 
   static String png() throws Exception {
@@ -83,8 +92,12 @@ class HomeworkImageInputTest {
     assertThrows(ApiExceptions.NotFound.class, () -> service.organizeImage(UUID.randomUUID(), "student-1", request));
     verifyNoInteractions(model);
     when(model.imageAvailable()).thenReturn(true);
-    var chinese = new HomeworkOrganizerDtos.Candidate("语文", "朗读", "朗读课文", "", "今天", 10, "朗读", .9);
-    var math = new HomeworkOrganizerDtos.Candidate("数学", "口算", "口算20题", "", "今天", 10, "口算", .9);
+    var chinese = new HomeworkOrganizerDtos.Candidate(
+        "语文", "朗读", "朗读课文", "", "今天", 10, "朗读", .9,
+        "", "", "", 0.0, "");
+    var math = new HomeworkOrganizerDtos.Candidate(
+        "数学", "口算", "口算20题", "", "今天", 10, "口算", .9,
+        "", "", "", 0.0, "");
     var expected = new HomeworkOrganizerDtos.ImageResponse(List.of(chinese, math), "AI_IMAGE", "语文朗读；数学口算");
     when(model.organizeImage(eq(student), eq("图片"), startsWith("data:image/png;base64,"), isNull()))
         .thenReturn(Optional.of(expected));

@@ -2,12 +2,12 @@ package com.xiaoban.homework.assignment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 class AssignmentV2DtoTest {
   @Test
-  void responseCarriesV2AndLegacyCompatibilityFields() {
+  void responseCarriesTaskDateAndV2Fields() {
     AssignmentEntity entity = new AssignmentEntity();
     entity.id = "a-v2-1";
     entity.studentId = "student-1";
@@ -18,9 +18,7 @@ class AssignmentV2DtoTest {
     entity.title = "口算 20 题";
     entity.instruction = "独立完成";
     entity.textbookRef = "数学三年级";
-    entity.dueAt = Instant.ofEpochMilli(1_800_000L);
-    entity.dueTimezone = "Asia/Shanghai";
-    entity.dueText = "今晚 20:30";
+    entity.taskDate = LocalDate.of(2026, 10, 13);
     entity.status = "NOT_STARTED";
     entity.sourceLabel = "老师消息";
     entity.sourceExcerpt = "完成口算 20 题";
@@ -33,10 +31,8 @@ class AssignmentV2DtoTest {
     assertEquals("SCHOOL", response.assignmentType());
     assertEquals("MATH", response.subjectCode());
     assertEquals("AUDIO_IMAGE", response.contentType());
-    assertEquals(1_800_000L, response.dueAtEpochMs());
-    assertEquals("Asia/Shanghai", response.dueTimezone());
+    assertEquals("2026-10-13", response.taskDate());
     assertEquals("数学", response.subject());
-    assertEquals("今晚 20:30", response.dueText());
     assertEquals(2L, response.version());
   }
 }

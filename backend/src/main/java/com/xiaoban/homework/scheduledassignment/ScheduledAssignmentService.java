@@ -72,7 +72,7 @@ public class ScheduledAssignmentService {
     plan.familyId = familyId;
     plan.studentId = studentId;
     plan.status = "ENABLED";
-    applyPlanInput(plan, input.planType(), input.name(), input.scheduleType(),
+    applyPlanInput(plan, input.planType(), input.subjectCode(), input.name(), input.scheduleType(),
         input.timeOfDay(), input.weekdays(), input.startDate(), input.endDate(), null);
     ensureVoicePlanUnique(plan);
     plan.createdAt = now;
@@ -94,7 +94,7 @@ public class ScheduledAssignmentService {
       throw new ApiExceptions.Conflict("定时计划已在其他设备更新，请刷新后重试");
     }
     students.requireOwnedForUpdate(familyId, plan.studentId);
-    applyPlanInput(plan, input.planType(), input.name(), input.scheduleType(),
+    applyPlanInput(plan, input.planType(), input.subjectCode(), input.name(), input.scheduleType(),
         input.timeOfDay(), input.weekdays(), input.startDate(), input.endDate(), plan.id);
     ensureVoicePlanUnique(plan);
     if ("ENDED".equals(plan.status)) plan.status = "ENABLED";
@@ -230,9 +230,10 @@ public class ScheduledAssignmentService {
   }
 
   private void applyPlanInput(ScheduledAssignmentPlanEntity plan,
-      String planType, String name, String scheduleType, String timeOfDay,
+      String planType, String subjectCode, String name, String scheduleType, String timeOfDay,
       List<String> weekdays, String startDate, String endDate, UUID selfId) {
     plan.planType = planType(planType);
+    plan.subjectCode = subjectCode(subjectCode);
     plan.name = name.trim();
     plan.scheduleType = scheduleType(scheduleType);
     plan.scheduleTime = time(timeOfDay, "创建时间");
@@ -259,27 +260,11 @@ public class ScheduledAssignmentService {
       template.createdAt = now;
     }
     template.assignmentType = assignmentType(input.assignmentType());
-    template.subject = input.subject().trim();
-    template.subjectCode = input.subjectCode().trim().toUpperCase(Locale.ROOT);
+    template.subject = subjectDisplay(plan.subjectCode);
+    template.subjectCode = plan.subjectCode;
     template.title = input.title().trim();
     template.instruction = input.instruction().trim();
     template.expectedMinutes = expectedMinutes(input.expectedMinutes());
-    template.duePolicy = duePolicy(input.duePolicy());
-    template.dueTime = null;
-    template.dueOffsetMinutes = null;
-    if ("SAME_DAY_AT".equals(template.duePolicy) || "NEXT_DAY_AT".equals(template.duePolicy)) {
-      template.dueTime = time(input.dueTime(), "截止时间");
-      if ("SAME_DAY_AT".equals(template.duePolicy) &&
-          !template.dueTime.isAfter(plan.scheduleTime)) {
-        throw new ApiExceptions.BadRequest("当天截止时间必须晚于创建时间");
-      }
-    } else if ("AFTER_MINUTES".equals(template.duePolicy)) {
-      int offset = input.dueOffsetMinutes() == null ? 0 : input.dueOffsetMinutes();
-      if (offset < 1 || offset > 10080) {
-        throw new ApiExceptions.BadRequest("创建后截止分钟数必须在 1 到 10080 之间");
-      }
-      template.dueOffsetMinutes = offset;
-    }
     template.updatedAt = now;
     templates.saveAndFlush(template);
   }
@@ -299,7 +284,7 @@ public class ScheduledAssignmentService {
     ScheduledAssignmentDtos.TemplateResponse template = templates.findById(plan.id)
         .map(this::templateResponse).orElse(null);
     return new ScheduledAssignmentDtos.PlanResponse(
-        plan.id.toString(), plan.studentId, plan.planType, plan.name,
+        plan.id.toString(), plan.studentId, plan.planType, plan.subjectCode, plan.name,
         plan.scheduleType, plan.scheduleTime.format(TIME_FORMAT),
         weekdayList(plan.weekdays), plan.startDate.toString(),
         plan.endDate == null ? "" : plan.endDate.toString(),
@@ -311,10 +296,7 @@ public class ScheduledAssignmentService {
       ScheduledAssignmentTemplateEntity template) {
     return new ScheduledAssignmentDtos.TemplateResponse(
         template.assignmentType, template.subject, template.subjectCode,
-        template.title, template.instruction, template.expectedMinutes,
-        template.duePolicy,
-        template.dueTime == null ? "" : template.dueTime.format(TIME_FORMAT),
-        template.dueOffsetMinutes == null ? 0 : template.dueOffsetMinutes);
+        template.title, template.instruction, template.expectedMinutes);
   }
 
   private ScheduledAssignmentDtos.RunResponse runResponse(ScheduledAssignmentRunEntity run) {
@@ -350,6 +332,24 @@ public class ScheduledAssignmentService {
     return normalized;
   }
 
+  private String subjectCode(String value) {
+    String normalized = text(value).trim().toUpperCase(Locale.ROOT);
+    if (!"CHINESE".equals(normalized) && !"MATH".equals(normalized) &&
+        !"ENGLISH".equals(normalized) && !"OTHER".equals(normalized)) {
+      throw new ApiExceptions.BadRequest("不支持的科目: " + value);
+    }
+    return normalized;
+  }
+
+  private String subjectDisplay(String value) {
+    return switch (value) {
+      case "CHINESE" -> "语文";
+      case "MATH" -> "数学";
+      case "ENGLISH" -> "英语";
+      default -> "其他";
+    };
+  }
+
   private String scheduleType(String value) {
     String normalized = text(value).trim().toUpperCase(Locale.ROOT);
     if (!"ONCE".equals(normalized) && !"DAILY".equals(normalized) &&
@@ -364,15 +364,6 @@ public class ScheduledAssignmentService {
     if (normalized.isBlank()) return "EXTRA";
     if (!"SCHOOL".equals(normalized) && !"EXTRA".equals(normalized)) {
       throw new ApiExceptions.BadRequest("不支持的作业类型: " + value);
-    }
-    return normalized;
-  }
-
-  private String duePolicy(String value) {
-    String normalized = text(value).trim().toUpperCase(Locale.ROOT);
-    if (!"SAME_DAY_AT".equals(normalized) && !"NEXT_DAY_AT".equals(normalized) &&
-        !"AFTER_MINUTES".equals(normalized) && !"NONE".equals(normalized)) {
-      throw new ApiExceptions.BadRequest("不支持的截止规则: " + value);
     }
     return normalized;
   }

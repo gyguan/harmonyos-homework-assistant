@@ -2,14 +2,15 @@ import { AppTheme } from '../common/theme/AppTheme';
 import { CenteredTextBadge } from '../components/family/CenteredTextBadge';
 import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../domain/model/HomeworkModels';
+import { ParentIdentity, ParentIdentityHelper } from '../domain/model/ParentIdentity';
 import { FamilyContextRepository } from '../domain/port/FamilyContextRepository';
 
 @Component
 export struct PersonEntryPage {
   @Prop revision: number = 0;
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
-  onSelectParent: () => void = () => {};
-  onSelectStudent: (studentId: string) => void = () => {};
+  onSelectParent: (identity: ParentIdentity) => void = (_identity: ParentIdentity) => {};
+  onSelectStudent: (studentId: string) => void = (_studentId: string) => {};
 
   private students(): StudentProfile[] {
     let currentRevision = this.revision;
@@ -46,10 +47,10 @@ export struct PersonEntryPage {
   }
 
   @Builder
-  private ParentRow() {
+  private ParentRow(identity: ParentIdentity) {
     Row({ space: 13 }) {
       CenteredTextBadge({
-        badgeText: '家',
+        badgeText: ParentIdentityHelper.badge(identity),
         badgeWidth: 40,
         badgeHeight: 40,
         badgeFontSize: 15,
@@ -59,14 +60,14 @@ export struct PersonEntryPage {
         badgeBackground: AppTheme.PRIMARY
       });
       Column({ space: 3 }) {
-        Text('家长')
+        Text(ParentIdentityHelper.label(identity))
           .width('100%')
           .fontSize(AppTheme.CARD_TITLE_SIZE)
           .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
           .fontColor(AppTheme.TEXT);
-        Text('收作业、确认任务、查看孩子完成情况')
+        Text('布置作业、确认任务、查看孩子完成情况')
           .width('100%')
           .fontSize(AppTheme.CAPTION_SIZE)
           .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
@@ -82,8 +83,8 @@ export struct PersonEntryPage {
     .padding({ top: 12, bottom: 12 })
     .accessibilityGroup(true)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText('家长，收作业、确认任务、查看孩子完成情况')
-    .onClick(() => this.onSelectParent());
+    .accessibilityText(ParentIdentityHelper.label(identity) + '，进入家长界面')
+    .onClick(() => this.onSelectParent(identity));
   }
 
   @Builder
@@ -139,7 +140,9 @@ export struct PersonEntryPage {
           .fontColor(AppTheme.SUBTEXT)
           .margin({ left: 4 });
         Column() {
-          this.ParentRow();
+          this.ParentRow(ParentIdentity.DAD);
+          Divider().color(AppTheme.DIVIDER);
+          this.ParentRow(ParentIdentity.MOM);
         }
         .width('100%')
         .padding({ left: 16, right: 16 })
@@ -165,7 +168,6 @@ export struct PersonEntryPage {
         .padding({ left: 16, right: 16 })
         .backgroundColor(AppTheme.SURFACE)
         .borderRadius(AppTheme.CONTROL_RADIUS);
-
       }
       .width('100%')
       .constraintSize({ maxWidth: 560 })

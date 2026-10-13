@@ -100,8 +100,6 @@ public class VoiceMaterialService {
     item.title = input.title() == null || input.title().isBlank()
         ? defaultTitle(directoryName) : input.title().trim();
     item.expectedMinutes = input.expectedMinutes() == null ? 15 : input.expectedMinutes();
-    item.dueAt = input.dueAtEpochMs() == null || input.dueAtEpochMs() <= 0
-        ? null : Instant.ofEpochMilli(input.dueAtEpochMs());
     item.assignmentType = input.assignmentType() == null || input.assignmentType().isBlank()
         ? "EXTRA" : input.assignmentType().trim().toUpperCase(Locale.ROOT);
     if (!"EXTRA".equals(item.assignmentType) && !"SCHOOL".equals(item.assignmentType)) {
@@ -304,7 +302,7 @@ public class VoiceMaterialService {
     return new VoiceMaterialDtos.PackageResponse(
         item.id.toString(), item.batchId.toString(), item.studentId,
         item.directoryName, item.subjectCode, item.title, item.expectedMinutes,
-        item.dueAt == null ? 0L : item.dueAt.toEpochMilli(), item.assignmentType,
+        item.assignmentType,
         responseStatus, item.errorMessage,
         latestAssignmentId,
         hasCreatedBefore, hasActiveAssignment,
