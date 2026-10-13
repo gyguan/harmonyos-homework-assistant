@@ -16,6 +16,21 @@ public class AuthController {
   private final AuthTokenService tokens;
   public AuthController(AuthService service, AuthTokenService tokens) { this.service = service; this.tokens = tokens; }
 
+  @GetMapping("/family-accounts")
+  public FamilyAccountDtos.Response familyAccounts(
+      @RequestAttribute(AuthInterceptor.ACCOUNT_ID) UUID accountId,
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId) {
+    return service.familyAccounts(familyId, accountId);
+  }
+
+  @PostMapping("/family-accounts")
+  public FamilyAccountDtos.Item createFamilyAccount(
+      @RequestAttribute(AuthInterceptor.ACCOUNT_ID) UUID accountId,
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @Valid @RequestBody FamilyAccountDtos.CreateRequest request) {
+    return service.createFamilyAccount(familyId, accountId, request);
+  }
+
   @PostMapping("/login")
   public LoginResponse login(@Valid @RequestBody LoginRequest request) { return service.login(request); }
 
