@@ -2,6 +2,7 @@ import { AppTheme } from '../../../common/theme/AppTheme';
 import { HomeworkTextImportResult } from '../../../domain/model/ImportModels';
 import { Subject } from '../../../domain/model/HomeworkModels';
 import { ChoiceSelectionChip, SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
+import { PhotoPreviewDialog } from '../../../components/submission/PhotoPreviewDialog';
 import { HomeworkImportViewModel } from './HomeworkImportViewModel';
 
 enum HomeworkAssignmentInputMode {
@@ -23,6 +24,13 @@ export struct HomeworkImportPage {
   @State private selectedSubject: Subject | null = null;
   @State private subjectOptionsOpen: boolean = false;
   @State private inputMode: HomeworkAssignmentInputMode = HomeworkAssignmentInputMode.TEXT;
+  @State private previewImageUri: string = '';
+  private previewController: CustomDialogController = new CustomDialogController({
+    builder: PhotoPreviewDialog({ uri: $previewImageUri }),
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
   onOpenConfirmation: () => void = () => {};
   onOpenRecords: () => void = () => {};
   onStoreChanged: () => void = () => {};
@@ -172,6 +180,12 @@ export struct HomeworkImportPage {
     this.textDraft = '';
     this.parseMessage = '';
     this.parseError = false;
+  }
+
+  private openImagePreview(uri: string): void {
+    if (uri.length === 0) return;
+    this.previewImageUri = uri;
+    this.previewController.open();
   }
 
   private removeSourceImage(): void {
@@ -415,7 +429,10 @@ export struct HomeworkImportPage {
         .height(200)
         .objectFit(ImageFit.Contain)
         .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS);
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText('全屏查看已添加作业图片')
+        .onClick(() => this.openImagePreview(this.sourceImageRef));
       Text('图片将直接交给 AI 解析，不再与文字混合提交')
         .width('100%')
         .fontSize(AppTheme.CAPTION_SIZE)
