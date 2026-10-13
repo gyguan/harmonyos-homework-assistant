@@ -17,6 +17,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 @Service
@@ -33,7 +34,6 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   record StructuredResult(List<StructuredCandidate> assignments) {}
   record ImageStructuredCandidate(String subject, String title, String instruction,
       String textbookRef, String sourceExcerpt) {}
-  record ImageStructuredResult(List<ImageStructuredCandidate> assignments) {}
   record ConversionResult(List<HomeworkOrganizerDtos.Candidate> candidates, int sourceCount,
       int unsupportedSubjectCount, int blankTitleCount, List<String> unsupportedSubjects) {}
 
@@ -82,10 +82,23 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   }
 
   Optional<HomeworkOrganizerDtos.ImageResponse> parseImageOutput(String output) {
-    ImageStructuredResult parsed = jsonMapper.readValue(stripCodeFence(output), ImageStructuredResult.class);
-    if (parsed == null || parsed.assignments() == null || parsed.assignments().size() > 30) return Optional.empty();
+    JsonNode root = jsonMapper.readTree(stripCodeFence(output));
+    List<JsonNode> nodes = imageAssignmentNodes(root);
+    if (nodes.isEmpty() || nodes.size() > 30) return Optional.empty();
+
+    List<ImageStructuredCandidate> parsed = new ArrayList<>();
+    for (JsonNode node : nodes) {
+      ImageStructuredCandidate candidate = imageCandidate(node);
+      if (candidate != null) parsed.add(candidate);
+    }
     List<HomeworkOrganizerDtos.Candidate> converted = toImageCandidates(parsed);
-    if (converted.size() != parsed.assignments().size() || converted.isEmpty()) return Optional.empty();
+    if (converted.isEmpty()) return Optional.empty();
+
+    int dropped = nodes.size() - converted.size();
+    if (dropped > 0) {
+      log.warn("homework_import image_parse_normalized model={} assignments={} accepted={} dropped={}",
+          properties.getImageOrganizerModel(), nodes.size(), converted.size(), dropped);
+    }
     return Optional.of(new HomeworkOrganizerDtos.ImageResponse(
         converted, "AI_IMAGE", recognizedText(converted)));
   }
@@ -127,10 +140,10 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     return schema;
   }
 
-  static List<HomeworkOrganizerDtos.Candidate> toImageCandidates(ImageStructuredResult result) {
+  static List<HomeworkOrganizerDtos.Candidate> toImageCandidates(List<ImageStructuredCandidate> items) {
     List<HomeworkOrganizerDtos.Candidate> output = new ArrayList<>();
-    if (result == null || result.assignments() == null) return output;
-    for (ImageStructuredCandidate item : result.assignments()) {
+    if (items == null) return output;
+    for (ImageStructuredCandidate item : items) {
       if (item == null) continue;
       String subject = normalizeSubject(item.subject());
       if (subject == null || blank(item.title())) continue;
@@ -147,6 +160,104 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       if (output.size() >= 30) break;
     }
     return output;
+  }
+
+  static List<JsonNode> imageAssignmentNodes(JsonNode root) {
+    List<JsonNode> result = new ArrayList<>();
+    if (root == null || root.isNull()) return result;
+
+    JsonNode container = root;
+    if (root.isObject()) {
+      JsonNode selected = firstNode(root, "assignments", "tasks", "items", "data");
+      if (selected != null) container = selected;
+      else if (!looksLikeImageCandidate(root)) return result;
+    }
+
+    if (container.isObject()) {
+      JsonNode nested = firstNode(container, "assignments", "tasks", "items", "list", "data");
+      if (nested != null) container = nested;
+    }
+
+    if (container.isArray()) {
+      for (JsonNode item : container) {
+        if (item != null && item.isObject()) result.add(item);
+        if (result.size() > 30) break;
+      }
+    } else if (container.isObject() && looksLikeImageCandidate(container)) {
+      result.add(container);
+    }
+    return result;
+  }
+
+  static ImageStructuredCandidate imageCandidate(JsonNode node) {
+    if (node == null || !node.isObject()) return null;
+    String subject = imageFieldText(node, 80, "subject", "subjectName", "course", "category");
+    String title = imageFieldText(node, 80, "title", "task", "taskTitle", "name");
+    String instruction = imageFieldText(
+        node, 600, "instruction", "content", "description", "requirement", "requirements");
+    String textbookRef = imageFieldText(
+        node, 120, "textbookRef", "textbook", "book", "page", "reference");
+    String sourceExcerpt = imageFieldText(
+        node, 300, "sourceExcerpt", "excerpt", "source", "originalText", "rawText");
+
+    if (blank(subject) || blank(title)) return null;
+    return new ImageStructuredCandidate(
+        subject, title, value(instruction, title),
+        value(textbookRef, "待家长确认"), value(sourceExcerpt, title));
+  }
+
+  static String imageFieldText(JsonNode object, int maxLength, String... names) {
+    if (object == null || !object.isObject()) return "";
+    for (String name : names) {
+      JsonNode value = object.get(name);
+      String normalized = jsonText(value, maxLength);
+      if (!blank(normalized)) return normalized;
+    }
+    return "";
+  }
+
+  static String jsonText(JsonNode node, int maxLength) {
+    if (node == null || node.isNull()) return "";
+    String text;
+    if (node.isTextual() || node.isNumber() || node.isBoolean()) {
+      text = node.asText();
+    } else if (node.isArray()) {
+      LinkedHashSet<String> values = new LinkedHashSet<>();
+      for (JsonNode item : node) {
+        String value = jsonText(item, maxLength);
+        if (!blank(value)) values.add(value);
+        if (values.size() >= 8) break;
+      }
+      text = String.join("；", values);
+    } else if (node.isObject()) {
+      LinkedHashSet<String> values = new LinkedHashSet<>();
+      for (String key : List.of(
+          "text", "value", "name", "label", "content", "description",
+          "book", "page", "excerpt", "title")) {
+        String value = jsonText(node.get(key), maxLength);
+        if (!blank(value)) values.add(value);
+      }
+      text = String.join("；", values);
+    } else {
+      text = "";
+    }
+    String compact = compact(text, maxLength);
+    return compact.length() <= maxLength ? compact : compact.substring(0, maxLength);
+  }
+
+  static JsonNode firstNode(JsonNode object, String... names) {
+    if (object == null || !object.isObject()) return null;
+    for (String name : names) {
+      JsonNode value = object.get(name);
+      if (value != null && !value.isNull()) return value;
+    }
+    return null;
+  }
+
+  static boolean looksLikeImageCandidate(JsonNode node) {
+    if (node == null || !node.isObject()) return false;
+    return firstNode(node, "subject", "subjectName", "course", "category") != null
+        && firstNode(node, "title", "task", "taskTitle", "name") != null;
   }
 
   static int imageExpectedMinutes(String subject, String title, String instruction, String excerpt) {
