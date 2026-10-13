@@ -61,15 +61,16 @@ public class HomeworkOrganizerService {
     if (candidates == null || candidates.isEmpty()) {
       return candidates == null ? List.of() : candidates;
     }
-    if (hasExplicitTaskDate(sourceText)) return candidates;
 
+    boolean keepRecognizedDate = hasExplicitTaskDate(sourceText);
     String today = LocalDate.now(BUSINESS_ZONE).toString();
     List<HomeworkOrganizerDtos.Candidate> result = new ArrayList<>();
     for (HomeworkOrganizerDtos.Candidate candidate : candidates) {
       if (candidate == null) continue;
+      String taskDate = keepRecognizedDate ? candidate.taskDate() : today;
       result.add(new HomeworkOrganizerDtos.Candidate(
           candidate.subject(), candidate.title(), candidate.instruction(), candidate.textbookRef(),
-          today, candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
+          taskDate, candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
           "", "", "", 0.0, ""));
     }
     return result;
