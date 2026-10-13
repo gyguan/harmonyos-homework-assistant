@@ -6,6 +6,7 @@ import {
 } from '../../../domain/model/HomeworkModels';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
 import { AssignmentRepository } from '../../../domain/port/AssignmentRepository';
+import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
 import { AssignmentAttentionKind, AssignmentAttentionPolicy, AssignmentAttentionResult } from '../../../domain/service/AssignmentAttentionPolicy';
 
 export class StudentHomeViewModel {
@@ -53,9 +54,10 @@ export class StudentHomeViewModel {
     return this.attention().kind;
   }
 
-  pendingAssignments(studentId: string = ''): Assignment[] {
+  todayPendingAssignments(studentId: string = ''): Assignment[] {
     let result: Assignment[] = [];
     for (let item of this.assignments(studentId)) {
+      if (!StudentHomeViewModel.isToday(item)) continue;
       if (!StudentHomeViewModel.isUnfinished(item.status)) continue;
       StudentHomeViewModel.insertByPriority(result, item);
     }
@@ -64,6 +66,12 @@ export class StudentHomeViewModel {
 
   async refresh(): Promise<boolean> {
     return this.repository.refresh();
+  }
+
+  private static isToday(item: Assignment): boolean {
+    if (item.dueAtEpochMs <= 0) return false;
+    return AssignmentDueDate.businessDayStart(item.dueAtEpochMs) ===
+      AssignmentDueDate.businessDayStart(Date.now());
   }
 
   private static isUnfinished(status: AssignmentStatus): boolean {

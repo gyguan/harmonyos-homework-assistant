@@ -154,11 +154,11 @@ export struct StudentHomePage {
     new StudentHomeViewModel(DefaultAssignmentRepository.instance);
 
   aboutToAppear(): void {
-    this.refreshPendingSnapshot();
+    this.refreshTodaySnapshot();
   }
 
   private onRevisionChanged(): void {
-    this.refreshPendingSnapshot();
+    this.refreshTodaySnapshot();
   }
 
   private onStudentIdChanged(): void {
@@ -169,7 +169,7 @@ export struct StudentHomePage {
     this.subjectGroups = [];
     this.attentionMessage = '';
     this.attentionCategory = AssignmentAttentionKind.NONE;
-    this.refreshPendingSnapshot();
+    this.refreshTodaySnapshot();
   }
 
   private subjectOrder(): Subject[] {
@@ -199,7 +199,7 @@ export struct StudentHomePage {
     return result;
   }
 
-  private refreshPendingSnapshot(): void {
+  private refreshTodaySnapshot(): void {
     if (this.studentId.length === 0) {
       this.pendingTaskItems = [];
       this.subjectGroups = [];
@@ -207,7 +207,7 @@ export struct StudentHomePage {
       this.attentionCategory = AssignmentAttentionKind.NONE;
       return;
     }
-    let items = this.viewModel.pendingAssignments(this.studentId);
+    let items = this.viewModel.todayPendingAssignments(this.studentId);
     let attention = this.viewModel.attention(this.studentId);
     this.pendingTaskItems = items;
     this.subjectGroups = this.buildSubjectGroups(items);
@@ -216,7 +216,7 @@ export struct StudentHomePage {
     this.attentionCategory = attention.kind;
     let firstTaskId = items.length > 0 ? items[0].id : '';
     console.info('[STUDENT-HOME] refresh studentId=' + this.studentId +
-      ' pendingTasks=' + String(items.length) + ' subjectGroups=' + String(this.subjectGroups.length) +
+      ' todayPendingTasks=' + String(items.length) + ' subjectGroups=' + String(this.subjectGroups.length) +
       ' firstTaskId=' + firstTaskId + ' revision=' + String(this.revision) +
       ' renderEpoch=' + String(this.taskRenderEpoch));
   }
@@ -265,7 +265,7 @@ export struct StudentHomePage {
     if (this.offlineMode) {
       Row({ space: 8 }) {
         SymbolGlyph($r('sys.symbol.wifi_slash')).fontSize(17).fontColor([AppTheme.WARNING]);
-        Text('当前离线，可以查看已缓存的待完成作业。')
+        Text('当前离线，可以查看已缓存的今日作业。')
           .layoutWeight(1)
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
@@ -315,12 +315,12 @@ export struct StudentHomePage {
         .fontSize(27)
         .fontColor([AppTheme.SUCCESS]);
       Column({ space: 3 }) {
-        Text('作业都完成啦')
+        Text('今天的作业都完成啦')
           .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text('首页只保留还需要完成的作业。')
+        Text('今天没有待完成的作业。')
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
@@ -369,7 +369,7 @@ export struct StudentHomePage {
   private PendingTasks() {
     Column({ space: AppTheme.SECTION_GAP_STANDARD }) {
       Row() {
-        Text('待完成作业')
+        Text('今日待完成')
           .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Bold)
