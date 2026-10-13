@@ -99,6 +99,53 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
+  void imageParserToleratesProviderFieldTypeDrift() {
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), null, JsonMapper.builder().build());
+    String output = """
+        {"assignments":[
+          {"subject":{"name":"数学"},"title":"口算20题",
+           "instruction":["完成口算20题","订正错题"],
+           "textbookRef":{"book":"数学练习册","page":"第12页"},
+           "sourceExcerpt":["数学","口算20题"]},
+          {"subject":"语文","title":"朗读课文","instruction":"朗读两遍",
+           "textbookRef":"","sourceExcerpt":{"text":"明天朗读第8课"}}
+        ]}
+        """;
+
+    var result = client.parseImageOutput(output).orElseThrow();
+
+    assertEquals(2, result.assignments().size());
+    assertEquals("数学", result.assignments().get(0).subject());
+    assertTrue(result.assignments().get(0).instruction().contains("完成口算20题"));
+    assertTrue(result.assignments().get(0).instruction().contains("订正错题"));
+    assertTrue(result.assignments().get(0).textbookRef().contains("数学练习册"));
+    assertEquals(LocalDate.now(ZoneId.of("Asia/Shanghai")).plusDays(1).toString(),
+        result.assignments().get(1).taskDate());
+  }
+
+  @Test
+  void imageParserAcceptsWrappedAssignmentsAndDropsOnlyInvalidItems() {
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), null, JsonMapper.builder().build());
+    String output = """
+        {"assignments":{"items":[
+          {"subject":"数学","title":"计算","instruction":"完成10题",
+           "textbookRef":"","sourceExcerpt":"数学10题"},
+          {"subject":"科学","title":"无效科目","instruction":"忽略",
+           "textbookRef":"","sourceExcerpt":"无效"},
+          {"subject":"英语","title":"朗读","instruction":"朗读课文",
+           "textbookRef":"","sourceExcerpt":"英语朗读"}
+        ]}}
+        """;
+
+    var result = client.parseImageOutput(output).orElseThrow();
+
+    assertEquals(List.of("数学", "英语"),
+        result.assignments().stream().map(HomeworkOrganizerDtos.Candidate::subject).toList());
+  }
+
+  @Test
   void promptKeepsOnlyNecessaryStudentContext() {
     TestStudent student = new TestStudent();
     student.name = "小宇";
