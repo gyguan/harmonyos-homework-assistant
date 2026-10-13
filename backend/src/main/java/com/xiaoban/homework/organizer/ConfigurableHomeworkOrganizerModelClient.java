@@ -558,9 +558,11 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         continue;
       }
       String sameTaskGroup = compact(item.sameTaskGroup(), 32);
+      LocalDate parsedTaskDate = candidateTaskDate(item.taskDate());
+      String taskDate = parsedTaskDate == null ? LocalDate.now(BUSINESS_ZONE).toString() : parsedTaskDate.toString();
       output.add(new HomeworkOrganizerDtos.Candidate(
           subject, item.title().trim(), value(item.instruction(), item.title()),
-          value(candidateTaskDate(item.taskDate()).toString(), LocalDate.now(BUSINESS_ZONE).toString()),
+          value(item.textbookRef(), "待家长确认"), taskDate,
           expectedMinutes(item.expectedMinutes()), value(item.sourceExcerpt(), item.title()),
           clamp(item.confidence()), sameTaskGroup, "", "", 0.0, ""));
       if (output.size() >= 30) break;
@@ -784,9 +786,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       HomeworkOrganizerDtos.ExistingAssignment existing) {
     LocalDate candidateDate = candidateTaskDate(candidateTaskDateText);
     if (candidateDate == null || existing == null) return false;
-    LocalDate existingDate = existing.dueAtEpochMs() > 0
-        ? Instant.ofEpochMilli(existing.dueAtEpochMs()).atZone(BUSINESS_ZONE).toLocalDate()
-        : candidateTaskDate(existing.taskDate());
+    LocalDate existingDate = candidateTaskDate(existing.taskDate());
     return existingDate != null && candidateDate.equals(existingDate);
   }
 
