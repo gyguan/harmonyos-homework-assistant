@@ -12,6 +12,7 @@ import {
   Subject,
   TodaySummary
 } from '../domain/model/HomeworkModels';
+import { AssignmentTaskDate } from '../domain/service/AssignmentTaskDate';
 
 export class MockData {
   static readonly students: StudentProfile[] = [
@@ -61,9 +62,7 @@ export class MockData {
       title: '练习册 P26 第 1～6 题',
       instruction: '先独立完成，再用红笔订正。完成后拍照上传。',
       textbookRef: '北师大版二年级上册 · 第三单元 加与减',
-      dueAtEpochMs: Date.now() + 60 * 60 * 1000,
-      dueTimezone: 'Asia/Shanghai',
-      dueText: '20:30 前',
+      taskDate: AssignmentTaskDate.today(),
       status: AssignmentStatus.IN_PROGRESS,
       expectedMinutes: 25,
       startedAtEpochMs: Date.now() - 5 * 60 * 1000,
@@ -86,9 +85,7 @@ export class MockData {
       title: '朗读课文指定自然段',
       instruction: '有感情朗读两遍并提交录音。',
       textbookRef: '部编版二年级上册 · 第二单元',
-      dueAtEpochMs: Date.now() - 60 * 60 * 1000,
-      dueTimezone: 'Asia/Shanghai',
-      dueText: '已完成',
+      taskDate: AssignmentTaskDate.today(),
       status: AssignmentStatus.COMPLETED,
       expectedMinutes: 15,
       startedAtEpochMs: Date.now() - 18 * 60 * 1000,
@@ -111,9 +108,7 @@ export class MockData {
       title: '听读 Unit 3 Look and learn',
       instruction: '跟读两遍，注意单词发音。',
       textbookRef: '沪教版二年级上册 · Unit 3',
-      dueAtEpochMs: Date.now() + 2 * 60 * 60 * 1000,
-      dueTimezone: 'Asia/Shanghai',
-      dueText: '21:00 前',
+      taskDate: AssignmentTaskDate.today(),
       status: AssignmentStatus.NOT_STARTED,
       expectedMinutes: 15,
       startedAtEpochMs: 0,
@@ -136,9 +131,7 @@ export class MockData {
       title: '错题订正 3 题',
       instruction: '订正并写出错误原因。',
       textbookRef: '北师大版二年级上册',
-      dueAtEpochMs: Date.now() - 24 * 60 * 60 * 1000,
-      dueTimezone: 'Asia/Shanghai',
-      dueText: '昨天 21:00',
+      taskDate: AssignmentTaskDate.addDays(AssignmentTaskDate.today(), -1),
       status: AssignmentStatus.OVERDUE,
       expectedMinutes: 20,
       startedAtEpochMs: 0,
@@ -161,9 +154,7 @@ export class MockData {
       title: '拼音 a o e 各读三遍',
       instruction: '指读并录音一次。',
       textbookRef: '部编版一年级上册 · 拼音单元',
-      dueAtEpochMs: Date.now() + 2 * 60 * 60 * 1000,
-      dueTimezone: 'Asia/Shanghai',
-      dueText: '今晚',
+      taskDate: AssignmentTaskDate.today(),
       status: AssignmentStatus.NOT_STARTED,
       expectedMinutes: 10,
       startedAtEpochMs: 0,
@@ -186,9 +177,7 @@ export class MockData {
       title: '口算 10 题',
       instruction: '独立完成 10 以内加减法。',
       textbookRef: '北师大版一年级上册',
-      dueAtEpochMs: Date.now() + 3 * 60 * 60 * 1000,
-      dueTimezone: 'Asia/Shanghai',
-      dueText: '今晚',
+      taskDate: AssignmentTaskDate.today(),
       status: AssignmentStatus.NOT_STARTED,
       expectedMinutes: 10,
       startedAtEpochMs: 0,
@@ -206,7 +195,6 @@ export class MockData {
     completed: 1,
     total: 3,
     attention: 1,
-    undated: 0,
     nextAssignmentId: 'a-math-001'
   };
 
@@ -248,7 +236,7 @@ export class MockData {
       title: '朗读课文并复习字词',
       instruction: '按老师要求完成朗读和字词复习，明天检查。',
       textbookRef: '部编版二年级上册 · 当周课文',
-      dueText: '明天',
+      taskDate: AssignmentTaskDate.tomorrow(),
       expectedMinutes: 15,
       sourceEvidence: {
         sourceLabel: '二（2）班微信群截图 · 19:01',
@@ -263,7 +251,7 @@ export class MockData {
       title: '完成练习册 P32',
       instruction: '完成练习册第 32 页，明天检查。',
       textbookRef: '北师大版二年级上册 · 待家长确认页码',
-      dueText: '明天',
+      taskDate: AssignmentTaskDate.tomorrow(),
       expectedMinutes: 20,
       sourceEvidence: {
         sourceLabel: '二（2）班微信群截图 · 19:01',
@@ -278,7 +266,7 @@ export class MockData {
       title: '听读 Unit 4',
       instruction: '完成 Unit 4 听读，明天检查。',
       textbookRef: '沪教版二年级上册 · Unit 4',
-      dueText: '明天',
+      taskDate: AssignmentTaskDate.tomorrow(),
       expectedMinutes: 15,
       sourceEvidence: {
         sourceLabel: '二（2）班微信群截图 · 19:01',
