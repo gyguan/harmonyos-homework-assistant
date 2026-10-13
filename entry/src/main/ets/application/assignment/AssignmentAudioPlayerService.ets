@@ -10,9 +10,8 @@ export interface AssignmentAudioPlayerCallbacks {
 }
 
 /**
- * AVPlayer and Media.Core are required product capabilities because voice/video playback is a core app feature.
- * The matching production SysCaps are declared in syscap.json so unsupported devices are filtered
- * at distribution/install time. Keep canIUse as a defensive runtime guard for device variations.
+ * AVPlayer is required in production while Media.Core remains optional for broader device coverage.
+ * Both capabilities are guarded directly at runtime before the MediaKit creation path.
  */
 export class AssignmentAudioPlayerService {
   private player: media.AVPlayer | null = null;
@@ -22,42 +21,43 @@ export class AssignmentAudioPlayerService {
   async prepare(sourceUri: string, callbacks: AssignmentAudioPlayerCallbacks): Promise<void> {
     await this.release();
     this.callbacks = callbacks;
-    if (!canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
-      callbacks.onError('当前设备不支持语音播放');
-      this.callbacks = null;
-      return;
-    }
     try {
-      let player = await media.createAVPlayer();
-        this.player = player;
-        player.on('stateChange', (state: media.AVPlayerState) => {
-          if (this.player !== player) return;
-          callbacks.onState(state);
-          if (state === 'initialized') {
-            void player.prepare();
-          } else if (state === 'prepared') {
-            callbacks.onPrepared(player.duration > 0 ? player.duration : 0);
-          } else if (state === 'completed') {
-            callbacks.onTime(player.duration > 0 ? player.duration : 0);
-          }
-        });
-        player.on('timeUpdate', (timeMs: number) => {
-          if (this.player === player) callbacks.onTime(timeMs);
-        });
-        player.on('error', (error: BusinessError) => {
-          if (this.player === player) callbacks.onError(error.message);
-        });
+      if (canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
+        if (canIUse('SystemCapability.Multimedia.Media.Core')) {
+          let player = await media.createAVPlayer();
+          this.player = player;
+          player.on('stateChange', (state: media.AVPlayerState) => {
+            if (this.player !== player) return;
+            callbacks.onState(state);
+            if (state === 'initialized') {
+              void player.prepare();
+            } else if (state === 'prepared') {
+              callbacks.onPrepared(player.duration > 0 ? player.duration : 0);
+            } else if (state === 'completed') {
+              callbacks.onTime(player.duration > 0 ? player.duration : 0);
+            }
+          });
+          player.on('timeUpdate', (timeMs: number) => {
+            if (this.player === player) callbacks.onTime(timeMs);
+          });
+          player.on('error', (error: BusinessError) => {
+            if (this.player === player) callbacks.onError(error.message);
+          });
 
-        let source = await fileIo.open(sourceUri, fileIo.OpenMode.READ_ONLY);
-        this.sourceFile = source;
-        let descriptor: media.AVFileDescriptor = { fd: source.fd, offset: 0, length: -1 };
-      player.fdSrc = descriptor;
-      return;
+          let source = await fileIo.open(sourceUri, fileIo.OpenMode.READ_ONLY);
+          this.sourceFile = source;
+          let descriptor: media.AVFileDescriptor = { fd: source.fd, offset: 0, length: -1 };
+          player.fdSrc = descriptor;
+          return;
+        }
+      }
     } catch {
       callbacks.onError('语音准备失败');
       await this.release();
       return;
     }
+    callbacks.onError('当前设备不支持语音播放');
+    this.callbacks = null;
   }
 
   async play(): Promise<void> {

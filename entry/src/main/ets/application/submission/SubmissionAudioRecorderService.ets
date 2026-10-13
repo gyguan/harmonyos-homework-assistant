@@ -45,46 +45,51 @@ export class SubmissionAudioRecorderService {
     if (!(await this.requestMicrophonePermission())) {
       throw new Error('需要麦克风权限才能录制作业');
     }
-    if (!canIUse('SystemCapability.Multimedia.Media.AVRecorder')) {
-      throw new Error('当前设备不支持录音');
-    }
 
-    let safeAssignmentId = assignmentId.replace(/[^a-zA-Z0-9_-]/g, '-');
-    let path = `${this.context.filesDir}/submission-${safeAssignmentId}-${Date.now()}.m4a`;
-    let file = await this.openOutputFile(path);
-    this.outputFile = file;
-    this.outputUri = this.outputUriFromPath(path);
+    if (canIUse('SystemCapability.Multimedia.Media.AVRecorder')) {
+      if (canIUse('SystemCapability.Multimedia.Media.Core')) {
+        let safeAssignmentId = assignmentId.replace(/[^a-zA-Z0-9_-]/g, '-');
+        let path = `${this.context.filesDir}/submission-${safeAssignmentId}-${Date.now()}.m4a`;
+        let file = await this.openOutputFile(path);
+        this.outputFile = file;
+        this.outputUri = this.outputUriFromPath(path);
 
-    try {
-      let recorder = await media.createAVRecorder();
-      this.recorder = recorder;
-      recorder.on('error', (error: BusinessError) => {
-        console.error(`student submission recorder error: ${error.code} ${error.message}`);
-        this.stateValue = 'ERROR';
-      });
-      let profile: media.AVRecorderProfile = {
-        audioBitrate: 96000,
-        audioChannels: 1,
-        audioCodec: media.CodecMimeType.AUDIO_AAC,
-        audioSampleRate: 48000,
-        fileFormat: media.ContainerFormatType.CFT_MPEG_4A
-      };
-      let config: media.AVRecorderConfig = {
-        audioSourceType: media.AudioSourceType.AUDIO_SOURCE_TYPE_MIC,
-        profile: profile,
-        url: 'fd://' + file.fd.toString()
-      };
-      await recorder.prepare(config);
-      await recorder.start();
-      this.accumulatedMs = 0;
-      this.activeStartedAtMs = Date.now();
-      this.stateValue = 'RECORDING';
-    } catch (error) {
-      this.stateValue = 'ERROR';
-      await this.releaseRecorderOnly();
-      await this.closeOutput();
-      throw error instanceof Error ? error : new Error('录音启动失败');
+        try {
+          let recorder = await media.createAVRecorder();
+          this.recorder = recorder;
+          recorder.on('error', (error: BusinessError) => {
+            console.error(`student submission recorder error: ${error.code} ${error.message}`);
+            this.stateValue = 'ERROR';
+          });
+          let profile: media.AVRecorderProfile = {
+            audioBitrate: 96000,
+            audioChannels: 1,
+            audioCodec: media.CodecMimeType.AUDIO_AAC,
+            audioSampleRate: 48000,
+            fileFormat: media.ContainerFormatType.CFT_MPEG_4A
+          };
+          let config: media.AVRecorderConfig = {
+            audioSourceType: media.AudioSourceType.AUDIO_SOURCE_TYPE_MIC,
+            profile: profile,
+            url: 'fd://' + file.fd.toString()
+          };
+          await recorder.prepare(config);
+          await recorder.start();
+          this.accumulatedMs = 0;
+          this.activeStartedAtMs = Date.now();
+          this.stateValue = 'RECORDING';
+          return;
+        } catch (error) {
+          this.stateValue = 'ERROR';
+          await this.releaseRecorderOnly();
+          await this.closeOutput();
+          let err = error as BusinessError;
+          console.error(`student submission recorder start failed: ${err.code} ${err.message}`);
+          throw new Error('录音启动失败，请重试');
+        }
+      }
     }
+    throw new Error('当前设备不支持录音');
   }
 
   async pause(): Promise<void> {
