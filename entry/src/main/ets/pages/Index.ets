@@ -5,6 +5,7 @@ import { FamilyCloudService } from '../application/remote/FamilyCloudService';
 import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
 import { ParentAccessDialog } from '../components/family/ParentAccessDialog';
 import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
+import { ParentIdentity } from '../domain/model/ParentIdentity';
 import { FamilyContextRepository } from '../domain/port/FamilyContextRepository';
 import { AppRole, AppShell } from './AppShell';
 import { PersonEntryPage } from './PersonEntryPage';
@@ -13,6 +14,8 @@ import { PersonEntryPage } from './PersonEntryPage';
 @Component
 struct Index {
   @State private selectedRole: AppRole = AppRole.NONE;
+  @State private selectedParentIdentity: ParentIdentity = ParentIdentity.DAD;
+  @State private pendingParentIdentity: ParentIdentity = ParentIdentity.DAD;
   @StorageLink('shareImportForceParent') @Watch('onShareImportForceParentChanged')
   private shareImportForceParent: boolean = false;
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
@@ -49,7 +52,7 @@ struct Index {
   private applyShareImportParentRole(): void {
     if (!this.shareImportForceParent) return;
     this.shareImportForceParent = false;
-    this.requestParentAccess();
+    this.requestParentAccess(this.selectedParentIdentity);
   }
 
   onBackPress(): boolean {
@@ -67,10 +70,11 @@ struct Index {
     }
   }
 
-  private requestParentAccess(): void {
+  private requestParentAccess(identity: ParentIdentity): void {
+    this.pendingParentIdentity = identity;
     let configuredCode = this.familyContext.getSettings().parentAccessCode;
     if (configuredCode.length === 0) {
-      this.enterParent();
+      this.enterParent(identity);
       return;
     }
     this.parentAccessCodeInput = '';
@@ -87,10 +91,11 @@ struct Index {
     this.parentAccessController.close();
     this.parentAccessCodeInput = '';
     this.parentAccessMessage = '';
-    this.enterParent();
+    this.enterParent(this.pendingParentIdentity);
   }
 
-  private enterParent(): void {
+  private enterParent(identity: ParentIdentity): void {
+    this.selectedParentIdentity = identity;
     this.selectedRole = AppRole.PARENT;
     DefaultAssignmentRepository.instance.requestSync();
   }
@@ -120,15 +125,16 @@ struct Index {
       if (this.selectedRole === AppRole.NONE) {
         PersonEntryPage({
           revision: this.cloudRevision,
-          onSelectParent: () => this.requestParentAccess(),
+          onSelectParent: (identity: ParentIdentity) => this.requestParentAccess(identity),
           onSelectStudent: (studentId: string) => this.enterStudent(studentId)
         });
       } else {
         AppShell({
           role: this.selectedRole,
+          parentIdentity: this.selectedParentIdentity,
           studentContextRevision: this.studentContextRevision,
           rootStudentId: this.selectedStudentId,
-          onSwitchParent: () => this.requestParentAccess(),
+          onSwitchParent: (identity: ParentIdentity) => this.requestParentAccess(identity),
           onSwitchStudent: (studentId: string) => this.enterStudent(studentId),
           onRegisterBackHandler: (handler: () => boolean) => this.shellBackHandler = handler
         });

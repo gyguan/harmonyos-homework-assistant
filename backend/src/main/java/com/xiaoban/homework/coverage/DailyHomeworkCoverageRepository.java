@@ -10,6 +10,6 @@ public interface DailyHomeworkCoverageRepository
   List<DailyHomeworkCoverageEntity> findByFamilyIdAndStudentIdAndTaskDateOrderByUpdatedAtDesc(
       UUID familyId, String studentId, LocalDate taskDate);
 
-  void deleteByFamilyIdAndStudentIdAndTaskDateAndAccountId(
-      UUID familyId, String studentId, LocalDate taskDate, UUID accountId);
+  void deleteByFamilyIdAndStudentIdAndTaskDateAndParentIdentity(
+      UUID familyId, String studentId, LocalDate taskDate, String parentIdentity);
 }

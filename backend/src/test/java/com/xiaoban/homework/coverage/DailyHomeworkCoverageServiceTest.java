@@ -1,14 +1,12 @@
 package com.xiaoban.homework.coverage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.xiaoban.homework.auth.AccountEntity;
-import com.xiaoban.homework.auth.AccountRepository;
 import com.xiaoban.homework.student.StudentEntity;
 import com.xiaoban.homework.student.StudentRepository;
 import java.time.Instant;
@@ -36,11 +34,17 @@ class DailyHomeworkCoverageServiceTest {
   }
 
   @Test
-  void updateMineReplacesOnlyCurrentParentCoverage() {
+  void parentIdentityIsLimitedToDadAndMom() {
+    assertEquals("DAD", DailyHomeworkCoverageService.normalizeParentIdentity("dad"));
+    assertEquals("MOM", DailyHomeworkCoverageService.normalizeParentIdentity(" MOM "));
+    assertEquals("DAD", DailyHomeworkCoverageService.normalizeParentIdentity(null));
+  }
+
+  @Test
+  void updateReplacesOnlySelectedParentIdentity() {
     var repository = mock(DailyHomeworkCoverageRepository.class);
     var students = mock(StudentRepository.class);
-    var accounts = mock(AccountRepository.class);
-    var service = new DailyHomeworkCoverageService(repository, students, accounts);
+    var service = new DailyHomeworkCoverageService(repository, students);
 
     UUID familyId = UUID.randomUUID();
     UUID accountId = UUID.randomUUID();
@@ -52,19 +56,15 @@ class DailyHomeworkCoverageServiceTest {
     student.familyId = familyId;
     student.name = "小宇";
     when(students.findById(studentId)).thenReturn(Optional.of(student));
-
-    AccountEntity account = new AccountEntity(
-        accountId, familyId, "dad", "hash", "爸爸", Instant.now());
-    when(accounts.findById(accountId)).thenReturn(Optional.of(account));
     when(repository.findByFamilyIdAndStudentIdAndTaskDateOrderByUpdatedAtDesc(
         familyId, studentId, date)).thenReturn(List.of());
 
     service.updateMine(
         familyId, accountId, studentId, date,
-        new DailyHomeworkCoverageDtos.UpdateRequest(List.of("CHINESE", "MATH")));
+        new DailyHomeworkCoverageDtos.UpdateRequest("DAD", List.of("CHINESE", "MATH")));
 
-    verify(repository).deleteByFamilyIdAndStudentIdAndTaskDateAndAccountId(
-        familyId, studentId, date, accountId);
+    verify(repository).deleteByFamilyIdAndStudentIdAndTaskDateAndParentIdentity(
+        familyId, studentId, date, "DAD");
     verify(repository).flush();
 
     @SuppressWarnings("unchecked")
@@ -73,32 +73,24 @@ class DailyHomeworkCoverageServiceTest {
     verify(repository).saveAll(captor.capture());
 
     int count = 0;
-    boolean chinese = false;
-    boolean math = false;
     for (DailyHomeworkCoverageEntity entity : captor.getValue()) {
       count++;
-      chinese = chinese || "CHINESE".equals(entity.subjectCode);
-      math = math || "MATH".equals(entity.subjectCode);
       assertEquals(accountId, entity.accountId);
       assertEquals(familyId, entity.familyId);
       assertEquals(studentId, entity.studentId);
       assertEquals(date, entity.taskDate);
+      assertEquals("DAD", entity.parentIdentity);
     }
     assertEquals(2, count);
-    assertTrue(chinese);
-    assertTrue(math);
   }
 
   @Test
-  void currentParentIsMarkedAndReturnedBeforeOtherParents() {
+  void responseAlwaysShowsDadAndMomAndMarksCurrentIdentity() {
     var repository = mock(DailyHomeworkCoverageRepository.class);
     var students = mock(StudentRepository.class);
-    var accounts = mock(AccountRepository.class);
-    var service = new DailyHomeworkCoverageService(repository, students, accounts);
+    var service = new DailyHomeworkCoverageService(repository, students);
 
     UUID familyId = UUID.randomUUID();
-    UUID dadId = UUID.randomUUID();
-    UUID momId = UUID.randomUUID();
     LocalDate date = LocalDate.of(2026, 10, 13);
 
     TestStudent student = new TestStudent();
@@ -108,34 +100,40 @@ class DailyHomeworkCoverageServiceTest {
     when(students.findById("student-1")).thenReturn(Optional.of(student));
 
     DailyHomeworkCoverageEntity dad = row(
-        familyId, student.id, date, dadId, "MATH", Instant.parse("2026-10-13T08:00:00Z"));
-    DailyHomeworkCoverageEntity mom = row(
-        familyId, student.id, date, momId, "ENGLISH", Instant.parse("2026-10-13T09:00:00Z"));
+        familyId, student.id, date, UUID.randomUUID(), "DAD", "MATH",
+        Instant.parse("2026-10-13T08:00:00Z"));
     when(repository.findByFamilyIdAndStudentIdAndTaskDateOrderByUpdatedAtDesc(
-        familyId, student.id, date)).thenReturn(List.of(mom, dad));
+        familyId, student.id, date)).thenReturn(List.of(dad));
 
-    AccountEntity dadAccount = new AccountEntity(
-        dadId, familyId, "dad", "hash", "爸爸", Instant.now());
-    AccountEntity momAccount = new AccountEntity(
-        momId, familyId, "mom", "hash", "妈妈", Instant.now());
-    when(accounts.findAllById(any())).thenReturn(List.of(dadAccount, momAccount));
+    var response = service.get(familyId, "MOM", student.id, date);
 
-    var response = service.get(familyId, dadId, student.id, date);
-
-    assertEquals("爸爸", response.parents().getFirst().displayName());
+    assertEquals(2, response.parents().size());
+    assertEquals("MOM", response.parents().getFirst().parentIdentity());
+    assertEquals("妈妈", response.parents().getFirst().displayName());
     assertTrue(response.parents().getFirst().mine());
-    assertEquals(List.of("MATH"), response.parents().getFirst().subjects());
-    assertEquals("妈妈", response.parents().get(1).displayName());
+    assertTrue(response.parents().getFirst().subjects().isEmpty());
+
+    assertEquals("DAD", response.parents().get(1).parentIdentity());
+    assertEquals("爸爸", response.parents().get(1).displayName());
+    assertFalse(response.parents().get(1).mine());
+    assertEquals(List.of("MATH"), response.parents().get(1).subjects());
   }
 
   private static DailyHomeworkCoverageEntity row(
-      UUID familyId, String studentId, LocalDate date, UUID accountId, String subject, Instant updatedAt) {
+      UUID familyId,
+      String studentId,
+      LocalDate date,
+      UUID accountId,
+      String parentIdentity,
+      String subject,
+      Instant updatedAt) {
     DailyHomeworkCoverageEntity entity = new DailyHomeworkCoverageEntity();
     entity.id = UUID.randomUUID();
     entity.familyId = familyId;
     entity.studentId = studentId;
     entity.taskDate = date;
     entity.accountId = accountId;
+    entity.parentIdentity = parentIdentity;
     entity.subjectCode = subject;
     entity.createdAt = updatedAt;
     entity.updatedAt = updatedAt;

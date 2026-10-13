@@ -13,6 +13,7 @@ public class DailyHomeworkCoverageEntity {
   public String studentId;
   public LocalDate taskDate;
   public UUID accountId;
+  public String parentIdentity;
   public String subjectCode;
   public Instant createdAt;
   public Instant updatedAt;

@@ -27,11 +27,11 @@ public class DailyHomeworkCoverageController {
   @GetMapping
   public DailyHomeworkCoverageDtos.Response get(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @RequestAttribute(AuthInterceptor.ACCOUNT_ID) UUID accountId,
       @PathVariable String studentId,
+      @RequestParam(defaultValue = "DAD") String parentIdentity,
       @RequestParam(required = false) LocalDate taskDate) {
     LocalDate date = taskDate == null ? LocalDate.now(BUSINESS_ZONE) : taskDate;
-    return service.get(familyId, accountId, studentId, date);
+    return service.get(familyId, parentIdentity, studentId, date);
   }
 
   @PutMapping("/{taskDate}/me")

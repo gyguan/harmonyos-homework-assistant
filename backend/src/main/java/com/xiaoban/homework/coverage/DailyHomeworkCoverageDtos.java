@@ -10,9 +10,11 @@ public final class DailyHomeworkCoverageDtos {
   private DailyHomeworkCoverageDtos() {}
 
   public record UpdateRequest(
+      String parentIdentity,
       @NotNull @Size(max = 4) List<String> subjects) {}
 
   public record ParentCoverage(
+      String parentIdentity,
       String displayName,
       boolean mine,
       List<String> subjects,

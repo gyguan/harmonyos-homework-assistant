@@ -4,6 +4,8 @@ import { CenteredTextBadge } from './CenteredTextBadge';
 @Component
 export struct IdentityContextBar {
   @Prop isParent: boolean = false;
+  @Prop parentName: string = '家长';
+  @Prop parentBadge: string = '家';
   @Prop studentName: string = '';
   @Prop studentGrade: string = '';
   @Prop studentClassName: string = '';
@@ -14,7 +16,7 @@ export struct IdentityContextBar {
   build() {
     Row({ space: 10 }) {
       CenteredTextBadge({
-        badgeText: this.isParent ? '家' :
+        badgeText: this.isParent ? this.parentBadge :
           (this.studentName.length > 0 ? this.studentName.substring(0, 1) : '伴'),
         badgeWidth: 34,
         badgeHeight: 34,
@@ -26,7 +28,7 @@ export struct IdentityContextBar {
       });
 
       Column({ space: 1 }) {
-        Text(this.isParent ? '家长' : this.studentName)
+        Text(this.isParent ? this.parentName : this.studentName)
           .fontSize(AppTheme.LABEL_TITLE_SIZE)
           .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
@@ -69,7 +71,7 @@ export struct IdentityContextBar {
       .borderRadius(AppTheme.CHIP_RADIUS)
       .accessibilityRole(AccessibilityRoleType.BUTTON)
       .accessibilityText(this.isParent ?
-        '当前身份家长，点击切换身份' : '当前身份 ' + this.studentName + '，点击切换身份')
+        '当前身份' + this.parentName + '，点击切换身份' : '当前身份 ' + this.studentName + '，点击切换身份')
       .onClick(() => this.onSwitchIdentity());
     }
     .width('100%')
