@@ -127,6 +127,43 @@ class VoiceMaterialAssignmentServiceTest {
   }
 
   @Test
+  void automaticCreationCanFilterMaterialByRequestedSubject() {
+    UUID familyId = UUID.randomUUID();
+    UUID chineseId = UUID.randomUUID();
+    UUID mathId = UUID.randomUUID();
+    VoiceMaterialPackageEntity chinese = packageEntity(familyId, chineseId, "001-语文", "READY");
+    VoiceMaterialPackageEntity math = packageEntity(familyId, mathId, "002-数学", "READY");
+    math.subjectCode = "MATH";
+    math.title = "口算练习";
+    AssignmentDtos.Response created = response("a-voice-math", "数学 · 语音作业");
+
+    when(autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(Optional.empty());
+    when(assignments.findFirstVoiceMaterialTaskForDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(null);
+    when(packages.findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
+        familyId, "student-1")).thenReturn(List.of(chinese, math));
+    when(links.findByFamilyIdAndStudentIdOrderByCreatedAtDesc(
+        familyId, "student-1")).thenReturn(List.of());
+    when(packages.lockOwned(familyId, mathId)).thenReturn(Optional.of(math));
+    when(assignments.nextVoiceMaterialTaskTitle(
+        any(UUID.class), anyString(), org.mockito.ArgumentMatchers.eq("MATH"),
+        any(LocalDate.class), anyString())).thenReturn("数学 · 语音作业");
+    when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
+        .thenReturn(created);
+    when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
+        familyId, mathId)).thenReturn(List.of());
+
+    VoiceMaterialDtos.AutoCreateResponse result =
+        service().autoCreateNext(familyId, "student-1", "MATH");
+
+    assertTrue(result.created());
+    assertEquals(mathId.toString(), result.packageId());
+    verify(packages).lockOwned(familyId, mathId);
+    verify(packages, never()).lockOwned(familyId, chineseId);
+  }
+
+  @Test
   void manualCreationCanReusePreviouslyUsedReadyFolder() {
     UUID familyId = UUID.randomUUID();
     UUID packageId = UUID.randomUUID();

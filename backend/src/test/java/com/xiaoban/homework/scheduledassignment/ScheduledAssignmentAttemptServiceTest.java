@@ -57,7 +57,7 @@ class ScheduledAssignmentAttemptServiceTest {
 
     when(plans.lockById(planId)).thenReturn(Optional.of(plan));
     when(runs.findByPlanIdAndScheduledFireAt(planId, fireAt)).thenReturn(Optional.of(run));
-    when(voiceAssignments.autoCreateNext(familyId, "student-1")).thenReturn(created);
+    when(voiceAssignments.autoCreateNext(familyId, "student-1", "CHINESE")).thenReturn(created);
 
     VoiceMaterialDtos.AutoCreateResponse result =
         service().executeStudentEntry(familyId, "student-1", planId, fireAt, executionAt);
@@ -65,7 +65,7 @@ class ScheduledAssignmentAttemptServiceTest {
     assertTrue(result.created());
     assertEquals("SUCCESS", run.status);
     assertEquals("a-voice-1", run.assignmentId);
-    verify(voiceAssignments).autoCreateNext(familyId, "student-1");
+    verify(voiceAssignments).autoCreateNext(familyId, "student-1", "CHINESE");
   }
 
   @Test
@@ -171,6 +171,7 @@ class ScheduledAssignmentAttemptServiceTest {
     plan.familyId = familyId;
     plan.studentId = "student-1";
     plan.planType = "VOICE_MATERIAL_AUTO";
+    plan.subjectCode = "CHINESE";
     plan.name = "每日语音作业";
     plan.scheduleType = "DAILY";
     plan.scheduleTime = LocalTime.of(6, 30);
@@ -190,6 +191,7 @@ class ScheduledAssignmentAttemptServiceTest {
     plan.familyId = familyId;
     plan.studentId = "student-1";
     plan.planType = "MANUAL_ASSIGNMENT";
+    plan.subjectCode = "CHINESE";
     plan.name = "每天阅读";
     plan.scheduleType = "ONCE";
     plan.scheduleTime = LocalTime.of(17, 0);

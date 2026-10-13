@@ -39,6 +39,7 @@ export interface ScheduledAssignmentPlan {
   id: string;
   studentId: string;
   planType: string;
+  subjectCode: string;
   name: string;
   scheduleType: string;
   timeOfDay: string;
@@ -67,6 +68,7 @@ export interface ScheduledAssignmentRun {
 
 export interface ScheduledAssignmentPlanDraft {
   planType: string;
+  subjectCode: string;
   name: string;
   scheduleType: string;
   timeOfDay: string;

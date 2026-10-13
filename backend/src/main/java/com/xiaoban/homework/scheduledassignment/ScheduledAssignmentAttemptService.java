@@ -227,10 +227,10 @@ public class ScheduledAssignmentAttemptService {
       return emptyVoiceResponse();
     }
 
-    log.info("scheduled_assignment voice_auto_create_start planId={} studentId={} triggerSource={} fireAt={}",
-        plan.id, plan.studentId, triggerSource, fireAt);
+    log.info("scheduled_assignment voice_auto_create_start planId={} studentId={} subjectCode={} triggerSource={} fireAt={}",
+        plan.id, plan.studentId, plan.subjectCode, triggerSource, fireAt);
     VoiceMaterialDtos.AutoCreateResponse result =
-        voiceAssignments.autoCreateNext(plan.familyId, plan.studentId);
+        voiceAssignments.autoCreateNext(plan.familyId, plan.studentId, plan.subjectCode);
     if (result.created()) {
       run.status = "SUCCESS";
       run.assignmentId = blankToNull(result.assignmentId());

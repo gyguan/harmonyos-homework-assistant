@@ -14,6 +14,7 @@ public class ScheduledAssignmentPlanEntity {
   public UUID familyId;
   public String studentId;
   public String planType;
+  public String subjectCode;
   public String name;
   public String scheduleType;
   public LocalTime scheduleTime;

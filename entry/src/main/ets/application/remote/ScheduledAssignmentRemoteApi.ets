@@ -23,6 +23,7 @@ interface RemoteScheduledPlan {
   id: string;
   studentId: string;
   planType: string;
+  subjectCode: string;
   name: string;
   scheduleType: string;
   timeOfDay: string;
@@ -57,6 +58,7 @@ interface ScheduledActionBody {
 interface ScheduledUpdateBody {
   version: number;
   planType: string;
+  subjectCode: string;
   name: string;
   scheduleType: string;
   timeOfDay: string;
@@ -94,6 +96,7 @@ export class ScheduledAssignmentRemoteApi {
     let body: ScheduledUpdateBody = {
       version: version,
       planType: draft.planType,
+      subjectCode: draft.subjectCode,
       name: draft.name,
       scheduleType: draft.scheduleType,
       timeOfDay: draft.timeOfDay,
@@ -171,6 +174,7 @@ export class ScheduledAssignmentRemoteApi {
       id: item.id,
       studentId: item.studentId,
       planType: item.planType,
+      subjectCode: item.subjectCode,
       name: item.name,
       scheduleType: item.scheduleType,
       timeOfDay: item.timeOfDay,
