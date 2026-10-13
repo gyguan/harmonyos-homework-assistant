@@ -32,7 +32,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
     when(transport.completeWithImage(anyString(), anyString(), anyString(), anyString(), anyInt(),
         anyString(), anyMap())).thenReturn(java.util.Optional.of(
-            "{\"assignments\":[{\"subject\":\"数学\",\"title\":\"口算20题\",\"instruction\":\"完成口算20题\",\"textbookRef\":\"\",\"taskDate\":\"今天\",\"expectedMinutes\":10,\"sourceExcerpt\":\"数学口算20题\",\"confidence\":0.9}]}"));
+            "{\"assignments\":[{\"subject\":\"数学\",\"title\":\"口算20题\",\"instruction\":\"完成口算20题\",\"textbookRef\":\"\",\"sourceExcerpt\":\"数学口算20题\"}]}"));
     var client = new ConfigurableHomeworkOrganizerModelClient(
         new AiProviderProperties(), transport, JsonMapper.builder().build());
 
@@ -43,7 +43,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     var input = org.mockito.ArgumentCaptor.forClass(String.class);
     verify(transport).completeWithImage(
         anyString(), instructions.capture(), input.capture(),
-        eq("data:image/jpeg;base64,PRIVATE"), eq(3000), anyString(), anyMap());
+        eq("data:image/jpeg;base64,PRIVATE"), eq(2200), anyString(), anyMap());
 
     assertTrue(input.getValue().contains("补充文字（可能为空）：\n数学口算20题"));
     assertFalse(instructions.getValue().contains("sameTaskGroup"));
@@ -78,10 +78,10 @@ class ConfigurableHomeworkOrganizerModelClientTest {
         new AiProviderProperties(), null, JsonMapper.builder().build());
     String output = """
         {"assignments":[
-          {"subject":"语文","title":"背诵","instruction":"背诵课文","textbookRef":"","taskDate":"今天",
-           "expectedMinutes":10,"sourceExcerpt":"语文背诵","confidence":0.9},
-          {"subject":"数学","title":"口算","instruction":"口算20题","textbookRef":"","taskDate":"今天",
-           "expectedMinutes":15,"sourceExcerpt":"数学口算","confidence":0.8}
+          {"subject":"语文","title":"背诵","instruction":"明天背诵课文","textbookRef":"",
+           "sourceExcerpt":"明天语文背诵"},
+          {"subject":"数学","title":"口算","instruction":"口算20题","textbookRef":"",
+           "sourceExcerpt":"数学口算20题"}
         ]}
         """;
 
@@ -89,7 +89,11 @@ class ConfigurableHomeworkOrganizerModelClientTest {
 
     assertEquals(List.of("语文", "数学"),
         result.assignments().stream().map(HomeworkOrganizerDtos.Candidate::subject).toList());
-    assertEquals("语文背诵\n数学口算", result.recognizedText());
+    assertEquals("明天语文背诵\n数学口算20题", result.recognizedText());
+    assertEquals(LocalDate.now(ZoneId.of("Asia/Shanghai")).plusDays(1).toString(),
+        result.assignments().getFirst().taskDate());
+    assertEquals(15, result.assignments().get(1).expectedMinutes());
+    assertEquals(0.85, result.assignments().getFirst().confidence(), 0.0001);
     assertTrue(client.parseImageOutput("{\"assignments\":[]}").isEmpty());
     assertTrue(client.parseImageOutput(output.replace("\"数学\"", "\"InvalidSubject\"")).isEmpty());
   }
@@ -169,7 +173,12 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertFalse(schema.contains("duplicateAssignmentId"));
     assertFalse(schema.contains("duplicateConfidence"));
     assertFalse(schema.contains("duplicateReason"));
-    assertFalse(ConfigurableHomeworkOrganizerModelClient.imageSchema().toString().contains("recognizedText"));
+    String imageSchema = ConfigurableHomeworkOrganizerModelClient.imageSchema().toString();
+    assertFalse(imageSchema.contains("recognizedText"));
+    assertFalse(imageSchema.contains("taskDate"));
+    assertFalse(imageSchema.contains("expectedMinutes"));
+    assertFalse(imageSchema.contains("confidence"));
+    assertTrue(imageSchema.contains("sourceExcerpt"));
     assertTrue(schema.contains("maxLength=80"));
     assertTrue(schema.contains("maxLength=400"));
   }
@@ -191,6 +200,18 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertEquals(1, result.size());
     verify(transport).complete(
         anyString(), anyString(), anyString(), eq(1400), eq("homework_organization"), anyMap());
+  }
+
+  @Test
+  void imageMetadataIsInferredLocallyWithoutModelFields() {
+    assertEquals(10, ConfigurableHomeworkOrganizerModelClient.imageExpectedMinutes(
+        "朗读", "朗读课文", "朗读两遍", "语文朗读"));
+    assertEquals(15, ConfigurableHomeworkOrganizerModelClient.imageExpectedMinutes(
+        "数学", "口算", "完成30题", "口算30题"));
+    assertEquals(25, ConfigurableHomeworkOrganizerModelClient.imageExpectedMinutes(
+        "数学", "练习", "完成50道题", "数学50道题"));
+    assertEquals(40, ConfigurableHomeworkOrganizerModelClient.imageExpectedMinutes(
+        "语文", "习作", "完成一篇作文", "作文"));
   }
 
   @Test
