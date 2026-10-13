@@ -42,6 +42,9 @@ export class AssignmentTaskDate {
     if (text.indexOf('明天') >= 0 || text.indexOf('明日') >= 0) return AssignmentTaskDate.addDays(today, 1);
     if (text.indexOf('今天') >= 0 || text.indexOf('今日') >= 0 || text.indexOf('今晚') >= 0) return today;
 
+    let weekdayDate = AssignmentTaskDate.resolveWeekday(text, today);
+    if (weekdayDate.length > 0) return weekdayDate;
+
     let full = text.match(/(\d{4})年(\d{1,2})月(\d{1,2})[日号]?/);
     if (full !== null && full.length >= 4) {
       let result = AssignmentTaskDate.format(Number(full[1]), Number(full[2]), Number(full[3]));
@@ -54,6 +57,35 @@ export class AssignmentTaskDate {
       return AssignmentTaskDate.isValid(result) ? result : today;
     }
     return today;
+  }
+
+  private static resolveWeekday(text: string, today: string): string {
+    let match = text.match(/(下周|下星期|本周|本星期|这周|这星期|周|星期)([一二三四五六日天])/);
+    if (match === null || match.length < 3) return '';
+    let target = AssignmentTaskDate.weekdayNumber(match[2]);
+    if (target < 0) return '';
+
+    let current = AssignmentTaskDate.weekday(today);
+    if (current < 0) return '';
+    let prefix = match[1];
+    if (prefix === '下周' || prefix === '下星期') {
+      let currentMondayBased = current === 0 ? 7 : current;
+      let targetMondayBased = target === 0 ? 7 : target;
+      return AssignmentTaskDate.addDays(today, (8 - currentMondayBased) + targetMondayBased - 1);
+    }
+    let delta = (target - current + 7) % 7;
+    return AssignmentTaskDate.addDays(today, delta);
+  }
+
+  private static weekdayNumber(value: string): number {
+    if (value === '一') return 1;
+    if (value === '二') return 2;
+    if (value === '三') return 3;
+    if (value === '四') return 4;
+    if (value === '五') return 5;
+    if (value === '六') return 6;
+    if (value === '日' || value === '天') return 0;
+    return -1;
   }
 
   static weekday(taskDate: string): number {

@@ -94,7 +94,7 @@ class HomeworkImageInputTest {
     var students = mock(StudentRepository.class);
     var model = mock(HomeworkOrganizerModelClient.class);
     var assignments = mock(AssignmentService.class);
-    when(assignments.list(any(), anyString(), any(), any(), any(), any(), any(), any()))
+    when(assignments.list(any(), anyString(), any(), any(), any(), any(), any()))
         .thenReturn(List.of());
     var service = new HomeworkOrganizerService(students, assignments, model);
     var family = UUID.randomUUID();
