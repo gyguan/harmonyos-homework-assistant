@@ -5,6 +5,7 @@ import {
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
 import { AssignmentRepository } from '../../../domain/port/AssignmentRepository';
 import { AssignmentDateRange } from '../../../domain/service/AssignmentDateRange';
+import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { AssignmentFilterFactory } from '../../../domain/service/AssignmentFilterFactory';
 
 export class StudentAssignmentsViewModel {
@@ -21,11 +22,10 @@ export class StudentAssignmentsViewModel {
 
   assignmentsOnDay(typeFilter: AssignmentTypeFilter, subjectCode: string, dayEpochMs: number): Assignment[] {
     let source = this.assignments(typeFilter, subjectCode, AssignmentDateFilter.ALL);
-    let targetDay = AssignmentDateRange.startOfDay(dayEpochMs);
+    let targetDate = AssignmentTaskDate.fromEpochMs(dayEpochMs);
     let result: Assignment[] = [];
     for (let item of source) {
-      if (item.dueAtEpochMs <= 0) continue;
-      if (AssignmentDateRange.startOfDay(item.dueAtEpochMs) === targetDay) result.push(item);
+      if (item.taskDate === targetDate) result.push(item);
     }
     return result;
   }

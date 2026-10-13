@@ -136,7 +136,7 @@ export struct ParentProgressPage {
   }
 
   private assignmentRenderKey(item: Assignment): string {
-    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.taskDate}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
   }
 
   private canDelete(item: Assignment): boolean {
