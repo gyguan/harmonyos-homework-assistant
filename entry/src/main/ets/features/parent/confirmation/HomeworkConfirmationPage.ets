@@ -39,6 +39,7 @@ export struct HomeworkConfirmationPage {
 
   aboutToAppear(): void {
     this.coverageSubjects = this.suggestCoverageSubjects();
+    void this.mergeExistingCoverage();
   }
 
 
@@ -64,6 +65,30 @@ export struct HomeworkConfirmationPage {
       }
     }
     return HomeworkCoverageSubject.order(suggested);
+  }
+
+  private async mergeExistingCoverage(): Promise<void> {
+    let items = this.viewModel.candidates();
+    if (items.length === 0) return;
+    try {
+      let response = await this.coverageApi.get(items[0].studentId, AssignmentTaskDate.today());
+      let mine: string[] = [];
+      for (let parent of response.parents) {
+        if (parent.mine) {
+          mine = parent.subjects.slice();
+          break;
+        }
+      }
+      if (HomeworkCoverageSubject.contains(mine, HomeworkCoverageSubject.ALL)) {
+        this.coverageSubjects = [HomeworkCoverageSubject.ALL];
+        return;
+      }
+      let merged = this.coverageSubjects.slice();
+      for (let subject of mine) {
+        if (!HomeworkCoverageSubject.contains(merged, subject)) merged.push(subject);
+      }
+      this.coverageSubjects = HomeworkCoverageSubject.order(merged);
+    } catch {}
   }
 
   private editingCandidate(): CandidateAssignment | null {
