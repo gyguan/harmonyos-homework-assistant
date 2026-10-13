@@ -7,6 +7,7 @@ import com.xiaoban.homework.student.StudentEntity;
 import com.xiaoban.homework.student.StudentRepository;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DailyHomeworkCoverageService {
+  private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai");
   private static final Set<String> ALLOWED =
       Set.of("ALL", "CHINESE", "MATH", "ENGLISH");
 
@@ -86,6 +88,9 @@ public class DailyHomeworkCoverageService {
       LocalDate taskDate,
       DailyHomeworkCoverageDtos.UpdateRequest input) {
     requireStudent(familyId, studentId);
+    if (!LocalDate.now(BUSINESS_ZONE).equals(taskDate)) {
+      throw new ApiExceptions.BadRequest("只能修改今天的作业协同状态");
+    }
     AccountEntity account = accounts.findById(accountId)
         .orElseThrow(() -> new ApiExceptions.Unauthorized("登录状态已失效，请重新登录"));
     if (!familyId.equals(account.familyId)) {
