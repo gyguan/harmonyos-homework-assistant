@@ -25,7 +25,6 @@ student_home = read("entry/src/main/ets/features/student/home/StudentHomePage.et
 parent_import = read("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
 parent_confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 voice_create = read("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
-study_route = read("entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets")
 deadline = read("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
 review = read("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
 person_entry = read("entry/src/main/ets/pages/PersonEntryPage.ets")
@@ -148,7 +147,6 @@ require("CandidatePane" not in parent_import and "继续确认" not in parent_im
 for source, token, message in [
     (parent_confirmation, "发布采用整批原子提交", "publish page must not expose atomic-submit implementation details"),
     (voice_create, "学生端会按图片文件名排序", "voice create page must not expose student-side sorting implementation"),
-    (study_route, "不建立第二套任务流程", "study page must not expose architecture implementation copy"),
     (student_assignments, "共用 Assignment", "student assignment UI must not expose domain-model terminology"),
     (deadline, "日期和时间均使用北京时间", "deadline picker should not show redundant timezone implementation copy"),
     (student_home, "首页只显示今天要做的任务", "student home should not carry persistent navigation guidance"),

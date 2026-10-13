@@ -110,13 +110,7 @@ if settings_path.exists():
 
 study_route_path = ROOT / "entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets"
 if study_route_path.exists():
-    study_route = study_route_path.read_text(encoding="utf-8")
-    if "AssignmentType.EXTRA" not in study_route or "课外任务" not in study_route:
-        fail("study workspace must surface EXTRA assignment context")
-    if "StudyWorkspacePage" not in study_route or "StudyWorkspaceViewModel" not in study_route:
-        fail("EXTRA context must reuse the standard study workspace and repository-backed execution chain")
-    if "AssignmentAction.START" in study_route or "activateAssignment" in study_route:
-        fail("study route must not auto-start any assignment before the student presses the action button")
+    fail("separate StudyWorkspaceRoutePage must be deleted after Assignment Detail and Study merge")
 
 student_home_path = ROOT / "entry/src/main/ets/features/student/home/StudentHomePage.ets"
 if student_home_path.exists():

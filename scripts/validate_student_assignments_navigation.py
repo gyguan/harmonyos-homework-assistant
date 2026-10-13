@@ -26,7 +26,6 @@ selection_controls = read("entry/src/main/ets/components/selection/SelectionCont
 detail = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
 detail_pane = read("entry/src/main/ets/features/student/assignments/AssignmentDetailPane.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
-study_route = read("entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets")
 view_model = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsViewModel.ets")
 filter_model = read("entry/src/main/ets/domain/model/AssignmentFilter.ets")
 query = read("entry/src/main/ets/domain/service/AssignmentQuery.ets")
@@ -36,33 +35,31 @@ remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
 service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
 
-# Navigation: root tabs remain in Shell; Phone assignment detail/study stay true deep destinations.
+# Navigation: Assignment Detail is the only assignment deep destination; execution stays in-place.
 require("ASSIGNMENTS = 'ASSIGNMENTS'" in shell and "ASSIGNMENT_DETAIL = 'ASSIGNMENT_DETAIL'" not in shell and
         "STUDY = 'STUDY'" not in shell,
         "student root routes must contain only top-level surfaces")
-require("STUDENT_ASSIGNMENT_DETAIL" in routes and "STUDENT_STUDY" in routes and "AssignmentRouteParam" in routes,
-        "typed assignment deep routes must exist")
+require("STUDENT_ASSIGNMENT_DETAIL" in routes and "STUDENT_STUDY" not in routes and "AssignmentRouteParam" in routes,
+        "typed Assignment Detail route must exist without a second Study route")
 require(".navDestination(this.AppNavDestination)" in shell and "NavDestination()" in shell,
         "AppShell must register NavDestination builder")
 require("pushPathByName" in shell and "AppRoute.STUDENT_ASSIGNMENT_DETAIL" in shell and
-        "AppRoute.STUDENT_STUDY" in shell,
-        "detail/study must push onto NavPathStack")
+        "AppRoute.STUDENT_STUDY" not in shell,
+        "assignment navigation must push only the unified detail destination")
 require("selectedAssignmentId" not in shell and "studentStudyReturnRoute" not in shell,
         "AppShell must not retain selected-id or manual return-route state")
 require("this.navPathStack.size() > 0" in shell and "this.navPathStack.pop()" in shell,
         "system back must pop the Navigation stack")
 require("StudentAssignmentsPage" in shell and "StudentAssignmentDetailPage" in shell and
-        "StudyWorkspaceRoutePage" in shell,
-        "AppShell must wire list plus deep-page destination components")
-require("AssignmentAction.START" in study and "StudyWorkspaceViewModel" in study_route and
+        "StudyWorkspaceRoutePage" not in shell,
+        "AppShell must wire list plus one unified assignment deep-page destination")
+require("StudyWorkspacePage" in detail_pane and
         "this.viewModel.performAction(this.assignmentId, action)" in study,
-        "Study Workspace must preserve explicit start/continue semantics through the ViewModel command path")
-require("AssignmentAction.START" not in study_route and "activateAssignment" not in study_route,
-        "study route boundary must never auto-start timing on page entry")
+        "Assignment Detail must embed explicit start/continue execution through the ViewModel command path")
 require("HomeworkStore.instance.startAssignment" not in shell,
         "AppShell must not execute assignment business commands")
-require("onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)" in shell,
-        "embedded Pad assignment detail must keep the existing Study navigation action")
+require("onStoreChanged: () => this.notifyUiChanged()" in shell,
+        "unified assignment workspace must invalidate shell state after execution commands")
 
 # Slice 2 list/filter behavior plus Pad master-detail composition.
 require("HomeworkStore.instance" not in page and "HomeworkStore.instance" not in detail and
@@ -147,10 +144,9 @@ require("@State private historyExpanded: boolean = false;" in page and
 require("snapshotRevision" in page and "currentVisibleAssignments" in page,
         "assignment list must invalidate cached groups when repository revision changes")
 
-require("SingleColumnWorkspace" in study and "SplitWorkspace" in study and "Button('问小伴'" in study,
-        "Study must keep Phone standalone Tutor flow and add Pad Study+Tutor split composition")
-require("LayoutPolicy.studyTutorRequirement()" in study and "this.TutorPane();" in study,
-        "Study Pad split must use shared content capability and the existing Tutor pane")
+require("private UnifiedWorkspace()" in study and "Button('问小伴'" not in study and
+        "TutorPane" not in study and "教材 / 页码" not in study,
+        "assignment execution must stay in one focused workspace without Tutor/textbook-page UI")
 
 # Query contract remains shared by local cache and backend.
 require("export interface AssignmentFilter" in filter_model and "statuses: AssignmentStatus[]" in filter_model and

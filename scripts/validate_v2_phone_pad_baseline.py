@@ -27,7 +27,6 @@ assignments = read("entry/src/main/ets/features/student/assignments/StudentAssig
 filter_dialog = read("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
 detail = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
-study_route = read("entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets")
 practice_attempt = read("entry/src/main/ets/features/student/practice/PracticeAttemptPage.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 spec = read("docs/product/v2-phone-pad-baseline-standard.md")
@@ -76,11 +75,10 @@ require("AppTheme.FILTER_DIALOG_MAX_WIDTH" in filter_dialog,
         "Assignment filter dialog must be width-capped on wide containers")
 require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in detail,
         "Assignment Detail must use the shared standard-width token")
-require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in study and
-        "AppTheme.CONTENT_WIDE_MAX_WIDTH" in study and
-        "AppTheme.PAGE_TITLE_SIZE" in study and
-        "AppTheme.PAGE_TITLE_LINE_HEIGHT" in study,
-        "Study Workspace must keep shared readable-width and semantic business-title tokens")
+require("AppTheme.PAGE_TITLE_SIZE" in study and
+        "AppTheme.PAGE_TITLE_LINE_HEIGHT" in study and
+        "private UnifiedWorkspace()" in study,
+        "Unified assignment workspace must keep semantic business-title tokens without a second page shell")
 require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in practice_attempt,
         "Practice Attempt must use the shared standard readable width")
 require("ResponsiveContext.areaLengthToVp" in practice_attempt and "contentScale()" in practice_attempt,
@@ -88,24 +86,12 @@ require("ResponsiveContext.areaLengthToVp" in practice_attempt and "contentScale
 require("WindowSizeClass." not in practice_attempt and "@Prop sizeClass" not in practice_attempt,
         "Practice Attempt must not branch on shell size classes")
 
-for text, path in [
-    (study, "StudyWorkspacePage.ets"),
-    (study_route, "StudyWorkspaceRoutePage.ets"),
-]:
-    require("WindowSizeClass." not in text,
-            f"migrated Study surface must not branch on WindowSizeClass enum values: {path}")
-    require("@Prop sizeClass" not in text and "this.sizeClass" not in text,
-            f"migrated Study surface must not branch on sizeClass: {path}")
+require("WindowSizeClass." not in study and "@Prop sizeClass" not in study and "this.sizeClass" not in study,
+        "unified assignment workspace must not branch on shell size classes")
+require("StudyWorkspaceRoutePage" not in app_shell and "STUDENT_STUDY" not in app_shell,
+        "AppShell must not keep a separate Study destination after detail/workspace merge")
 
-study_destination = app_shell.split("StudyWorkspaceRoutePage({", 1)
-require(len(study_destination) == 2,
-        "AppShell must still route to StudyWorkspaceRoutePage")
-if len(study_destination) == 2:
-    study_call = study_destination[1].split("});", 1)[0]
-    require("sizeClass:" not in study_call,
-            "AppShell must not pass a shell size class into the migrated Study feature")
-
-feature_texts = [home, assignments, filter_dialog, detail, study, study_route, practice_attempt]
+feature_texts = [home, assignments, filter_dialog, detail, study, practice_attempt]
 magic_breakpoint = re.compile(r"(?:<=|>=|<|>)\s*(?:600|840|1080)\b")
 for text in feature_texts:
     require(magic_breakpoint.search(text) is None,
