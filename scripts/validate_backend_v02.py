@@ -175,8 +175,10 @@ require("AppConfig.BACKEND_BASE_URL" in backend_session and
         "HarmonyOS backend default must be centralized in AppConfig without shipping a plaintext LAN endpoint")
 require("FamilyCloudService" in settings_page and "StudentRemoteApi" in family_cloud,
         "parent settings must manage cloud-backed family members")
-require("TutorRemoteApi" in study and "/tutor/messages" in tutor_remote,
-        "student workspace must use the real backend Tutor API")
+require("/tutor/messages" in tutor_remote,
+        "Tutor backend client must remain available even when the student workspace no longer exposes Tutor UI")
+require("TutorRemoteApi" not in study and "问小伴" not in study,
+        "student assignment workspace must not expose Tutor after the focused UI simplification")
 require("RemoteSubmissionCache" in parent_evidence and "RemoteSubmissionCache" in submission_cache and
         "RemoteSubmissionApi.instance.latest" in parent_evidence and
         "ParentSubmissionEvidenceService" in parent_review and "CloudSubmissionPhotoStrip" in parent_review,
