@@ -6,7 +6,7 @@ import {
 } from '../../../domain/model/HomeworkModels';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
 import { AssignmentRepository } from '../../../domain/port/AssignmentRepository';
-import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
+import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { AssignmentAttentionKind, AssignmentAttentionPolicy, AssignmentAttentionResult } from '../../../domain/service/AssignmentAttentionPolicy';
 
 export class StudentHomeViewModel {
@@ -69,9 +69,7 @@ export class StudentHomeViewModel {
   }
 
   private static isToday(item: Assignment): boolean {
-    if (item.dueAtEpochMs <= 0) return false;
-    return AssignmentDueDate.businessDayStart(item.dueAtEpochMs) ===
-      AssignmentDueDate.businessDayStart(Date.now());
+    return item.taskDate === AssignmentTaskDate.today();
   }
 
   private static isUnfinished(status: AssignmentStatus): boolean {
@@ -103,9 +101,6 @@ export class StudentHomeViewModel {
     let currentPriority = StudentHomeViewModel.priority(current.status);
     if (candidatePriority !== currentPriority) return candidatePriority < currentPriority;
 
-    let candidateDue = candidate.dueAtEpochMs > 0 ? candidate.dueAtEpochMs : Number.MAX_SAFE_INTEGER;
-    let currentDue = current.dueAtEpochMs > 0 ? current.dueAtEpochMs : Number.MAX_SAFE_INTEGER;
-    if (candidateDue !== currentDue) return candidateDue < currentDue;
     return candidate.id < current.id;
   }
 }

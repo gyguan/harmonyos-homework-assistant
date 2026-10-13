@@ -19,14 +19,14 @@ def require(condition: bool, message: str) -> None:
         errors.append(message)
 
 
-due = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
+task_date = read("entry/src/main/ets/domain/service/AssignmentTaskDate.ets")
 list_item = read("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
 metrics = read("entry/src/main/ets/components/assignment/AssignmentMetricSummary.ets")
 home = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
 progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 student = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 query_dialog = read("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
-deadline_dialog = read("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
+task_date_dialog = read("entry/src/main/ets/components/assignment/TaskDatePickerField.ets")
 student_switcher = read("entry/src/main/ets/components/family/StudentSwitcherDialog.ets")
 photo_preview = read("entry/src/main/ets/components/submission/PhotoPreviewDialog.ets")
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
@@ -35,15 +35,15 @@ confirmation_components = read(
 parent_edit = read("entry/src/main/ets/features/parent/review/ParentAssignmentEditPanel.ets")
 sheet_header = read("entry/src/main/ets/components/navigation/EditSheetHeader.ets")
 
-# 1. Assignment list deadlines use one concrete date/time format.
-require("static displayText(item: Assignment): string" in due and
-        "return `${year}-${month}-${day} ${hour}:${minute}`" in due,
-        "deadline display helper must use concrete YYYY-MM-DD HH:mm format")
-require("AssignmentDueDate.displayText(this.assignment)" in list_item and
-        "this.deadlineText()" in list_item,
-        "assignment list item must use the shared concrete deadline formatter even inside compact metadata")
-require("Text(this.assignment.dueText)" not in list_item,
-        "assignment list item must not show raw relative due text")
+# 1. Assignment list uses one shared date-only task-date formatter.
+require("static displayText(taskDate: string" in task_date and
+        "return '今天'" in task_date and "return '明天'" in task_date,
+        "task-date display helper must provide shared date-only labels")
+require("AssignmentTaskDate.displayText(this.assignment.taskDate)" in list_item and
+        "this.taskDateText()" in list_item,
+        "assignment list item must use the shared task-date formatter")
+require("dueText" not in list_item and "截止" not in list_item,
+        "assignment list item must not restore deadline semantics")
 
 # 2. Parent Home and Progress stay compact: navigation already names the surface.
 require("AssignmentMetricSummary({" not in home and "今天的学习" not in home and "需要我处理" not in home,
@@ -100,9 +100,9 @@ for removed in ["private TypeOption", "private DateOption", "今天", "明天", 
 require(query_dialog.index("Text('关闭')") < query_dialog.index("DatePicker({") <
         query_dialog.index("Button('查询'"),
         "task query dialog must keep close top-right and query action at bottom")
-require(deadline_dialog.index("Text('关闭')") < deadline_dialog.index("DatePicker({") <
-        deadline_dialog.index("Button('确定'"),
-        "deadline dialog must keep close top-right and confirm action at bottom")
+require(task_date_dialog.index("Text('关闭')") < task_date_dialog.index("DatePicker({") <
+        task_date_dialog.index("Button('确定'"),
+        "task-date dialog must keep close top-right and confirm action at bottom")
 require("Text('关闭')" in student_switcher,
         "student switcher must keep a top-right close action")
 require("Text('关闭')" in photo_preview,

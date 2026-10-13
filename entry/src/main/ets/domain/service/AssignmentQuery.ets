@@ -1,5 +1,6 @@
 import { Assignment, AssignmentStatus, AssignmentType } from '../model/HomeworkModels';
 import { AssignmentFilter, AssignmentTypeFilter } from '../model/AssignmentFilter';
+import { AssignmentTaskDate } from './AssignmentTaskDate';
 
 export class AssignmentQuery {
   static filter(items: Assignment[], filter: AssignmentFilter): Assignment[] {
@@ -7,7 +8,7 @@ export class AssignmentQuery {
     for (let item of items) {
       if (!AssignmentQuery.matchesType(item, filter.assignmentType)) continue;
       if (filter.subjectCode !== 'ALL' && item.subjectCode !== filter.subjectCode) continue;
-      if (!AssignmentQuery.matchesDate(item, filter.fromEpochMs, filter.toEpochMs, filter.undatedOnly)) continue;
+      if (!AssignmentQuery.matchesDate(item, filter.fromEpochMs, filter.toEpochMs)) continue;
       if (!AssignmentQuery.matchesStatus(item, filter.statuses)) continue;
       AssignmentQuery.insertSorted(result, item);
     }
@@ -26,12 +27,12 @@ export class AssignmentQuery {
     return item.assignmentType === AssignmentType.EXTRA;
   }
 
-  private static matchesDate(item: Assignment, fromEpochMs: number, toEpochMs: number, undatedOnly: boolean): boolean {
-    if (undatedOnly) return item.dueAtEpochMs <= 0;
+  private static matchesDate(item: Assignment, fromEpochMs: number, toEpochMs: number): boolean {
     if (fromEpochMs <= 0 && toEpochMs <= 0) return true;
-    if (item.dueAtEpochMs <= 0) return false;
-    if (fromEpochMs > 0 && item.dueAtEpochMs < fromEpochMs) return false;
-    if (toEpochMs > 0 && item.dueAtEpochMs > toEpochMs) return false;
+    let fromDate = fromEpochMs > 0 ? AssignmentTaskDate.fromEpochMs(fromEpochMs) : '';
+    let toDate = toEpochMs > 0 ? AssignmentTaskDate.fromEpochMs(toEpochMs) : '';
+    if (fromDate.length > 0 && item.taskDate < fromDate) return false;
+    if (toDate.length > 0 && item.taskDate > toDate) return false;
     return true;
   }
 
@@ -56,11 +57,7 @@ export class AssignmentQuery {
     let leftPriority = AssignmentQuery.statusPriority(left.status);
     let rightPriority = AssignmentQuery.statusPriority(right.status);
     if (leftPriority !== rightPriority) return leftPriority - rightPriority;
-    if (left.dueAtEpochMs > 0 && right.dueAtEpochMs <= 0) return -1;
-    if (left.dueAtEpochMs <= 0 && right.dueAtEpochMs > 0) return 1;
-    if (left.dueAtEpochMs > 0 && right.dueAtEpochMs > 0 && left.dueAtEpochMs !== right.dueAtEpochMs) {
-      return left.dueAtEpochMs < right.dueAtEpochMs ? -1 : 1;
-    }
+    if (left.taskDate !== right.taskDate) return left.taskDate < right.taskDate ? -1 : 1;
     if (left.title !== right.title) return left.title < right.title ? -1 : 1;
     if (left.id === right.id) return 0;
     return left.id < right.id ? -1 : 1;

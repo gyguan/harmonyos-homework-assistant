@@ -55,7 +55,7 @@ export interface HomeworkTaskDraft {
   subject: Subject;
   title: string;
   instruction: string;
-  dueText: string;
+  taskDate: string;
   expectedMinutes: number;
   classification: HomeworkMessageClassification;
   sourceMessageIds: string[];

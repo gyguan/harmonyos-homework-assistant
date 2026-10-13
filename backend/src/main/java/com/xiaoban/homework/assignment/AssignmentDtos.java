@@ -12,22 +12,21 @@ public final class AssignmentDtos {
   private AssignmentDtos() {}
 
   public record Create(@NotBlank String id, @NotBlank String subject, @NotBlank String title,
-      @NotBlank String instruction, String textbookRef, String dueText,
-      String assignmentType, String subjectCode, String contentType, Long dueAtEpochMs, String dueTimezone,
+      @NotBlank String instruction, String textbookRef, @NotBlank String taskDate,
+      String assignmentType, String subjectCode, String contentType,
       @NotBlank String status, String sourceLabel, String sourceExcerpt,
       @Min(1) @Max(240) Integer expectedMinutes,
       Long startedAtEpochMs, Long finishedAtEpochMs, Long elapsedSeconds,
       @Size(max = 1000) String reviewNote) {}
 
   public record Update(@NotNull Long version, String subject, String title, String instruction,
-      String textbookRef, String dueText, String assignmentType, String subjectCode, String contentType,
-      Long dueAtEpochMs, String dueTimezone, String status, String sourceLabel, String sourceExcerpt,
+      String textbookRef, String taskDate, String assignmentType, String subjectCode, String contentType,
+      String status, String sourceLabel, String sourceExcerpt,
       @Min(1) @Max(240) Integer expectedMinutes, Long startedAtEpochMs,
       Long finishedAtEpochMs, Long elapsedSeconds, @Size(max = 1000) String reviewNote) {}
 
   public record DetailsUpdate(@NotNull Long version, @NotBlank String title, String instruction,
-      String textbookRef, String dueText, Long dueAtEpochMs, String dueTimezone,
-      @Min(1) @Max(240) Integer expectedMinutes) {}
+      String textbookRef, String taskDate, @Min(1) @Max(240) Integer expectedMinutes) {}
 
   public record ActionRequest(@NotBlank String action, @NotNull Long version) {}
 
@@ -54,19 +53,16 @@ public final class AssignmentDtos {
 
   public record Response(String id, String studentId, String assignmentType, String subjectCode,
       String contentType, String subject, String title, String instruction, String textbookRef,
-      long dueAtEpochMs, String dueTimezone, String dueText, String status,
-      String sourceLabel, String sourceExcerpt, int expectedMinutes,
+      String taskDate, String status, String sourceLabel, String sourceExcerpt, int expectedMinutes,
       long startedAtEpochMs, long finishedAtEpochMs, long elapsedSeconds,
       String reviewNote, long version) {
     public static Response from(AssignmentEntity e) {
       return new Response(e.id, e.studentId, e.assignmentType, e.subjectCode, e.contentType, e.subject,
-          e.title, e.instruction, e.textbookRef,
-          e.dueAt == null ? 0L : e.dueAt.toEpochMilli(), e.dueTimezone, e.dueText,
+          e.title, e.instruction, e.textbookRef, e.taskDate.toString(),
           e.status, e.sourceLabel, e.sourceExcerpt, e.expectedMinutes,
           e.startedAtEpochMs, e.finishedAtEpochMs, e.elapsedSeconds, e.reviewNote, e.version);
     }
   }
 
-  public record TodaySummary(int total, int completed, int attention,
-      int undated, String nextAssignmentId) {}
+  public record TodaySummary(int total, int completed, int attention, String nextAssignmentId) {}
 }

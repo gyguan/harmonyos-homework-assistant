@@ -21,8 +21,7 @@ export interface VoiceAssignmentDraft {
   subject: Subject;
   title: string;
   instruction: string;
-  dueAtEpochMs: number;
-  dueText: string;
+  taskDate: string;
   expectedMinutes: number;
 }
 
@@ -49,8 +48,7 @@ export class ParentVoiceAssignmentViewModel {
       studentId: this.student().id,
       subjectCode: this.subjectCode(draft.subject),
       expectedMinutes: draft.expectedMinutes,
-      dueAtEpochMs: draft.dueAtEpochMs,
-      dueText: draft.dueText,
+      taskDate: draft.taskDate,
       title: draft.title.trim(),
       instruction: draft.instruction.trim(),
       requestId: requestId
@@ -77,9 +75,7 @@ export class ParentVoiceAssignmentViewModel {
       title: draft.title.trim(),
       instruction: draft.instruction.trim(),
       textbookRef: '',
-      dueAtEpochMs: draft.dueAtEpochMs,
-      dueTimezone: 'Asia/Shanghai',
-      dueText: draft.dueText,
+      taskDate: draft.taskDate,
       status: AssignmentStatus.NOT_STARTED,
       expectedMinutes: draft.expectedMinutes,
       startedAtEpochMs: 0,

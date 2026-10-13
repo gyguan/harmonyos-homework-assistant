@@ -20,7 +20,7 @@ import {
 } from '../domain/model/HomeworkModels';
 import { HomeworkSnapshot } from '../domain/model/PersistenceModels';
 import { HomeworkPersistence } from '../domain/port/HomeworkPersistence';
-import { AssignmentDueDate } from '../domain/service/AssignmentDueDate';
+import { AssignmentTaskDate } from '../domain/service/AssignmentTaskDate';
 import { AssignmentStateMachine } from '../domain/service/AssignmentStateMachine';
 import {
   HOMEWORK_SNAPSHOT_SCHEMA_VERSION,
@@ -175,10 +175,7 @@ export class HomeworkStore {
       title: source.title,
       instruction: source.instruction,
       textbookRef: source.textbookRef,
-      dueAtEpochMs: source.dueAtEpochMs > 0 ? source.dueAtEpochMs : 0,
-      dueTimezone: source.dueTimezone.length > 0 ? source.dueTimezone : 'Asia/Shanghai',
-      dueText: source.dueText,
-      dueDateKey: source.dueDateKey,
+      taskDate: AssignmentTaskDate.isValid(source.taskDate) ? source.taskDate : AssignmentTaskDate.today(),
       status: source.status,
       expectedMinutes: source.expectedMinutes > 0 ? source.expectedMinutes : 20,
       startedAtEpochMs: source.startedAtEpochMs > 0 ? source.startedAtEpochMs : 0,
@@ -194,7 +191,8 @@ export class HomeworkStore {
 
   private cloneCandidate(source: CandidateAssignment): CandidateAssignment {
     return { id: source.id, studentId: source.studentId, subject: source.subject, title: source.title,
-      instruction: source.instruction, textbookRef: source.textbookRef, dueText: source.dueText,
+      instruction: source.instruction, textbookRef: source.textbookRef,
+      taskDate: AssignmentTaskDate.isValid(source.taskDate) ? source.taskDate : AssignmentTaskDate.today(),
       expectedMinutes: source.expectedMinutes > 0 ? source.expectedMinutes : 20,
       sourceEvidence: {
         sourceLabel: source.sourceEvidence.sourceLabel,
@@ -437,9 +435,7 @@ export class HomeworkStore {
         title: candidate.title,
         instruction: candidate.instruction,
         textbookRef: candidate.textbookRef,
-        dueAtEpochMs: 0,
-        dueTimezone: 'Asia/Shanghai',
-        dueText: candidate.dueText,
+        taskDate: candidate.taskDate,
         status: AssignmentStatus.NOT_STARTED,
         expectedMinutes: candidate.expectedMinutes > 0 ? candidate.expectedMinutes : 20,
         startedAtEpochMs: 0,
@@ -552,24 +548,23 @@ export class HomeworkStore {
   }
 
   getTodaySummary(): TodaySummary {
-    let todayStart = AssignmentDueDate.businessDayStart(Date.now());
+    let today = AssignmentTaskDate.today();
     let completed = 0;
     let total = 0;
     let attention = 0;
-    let undated = 0;
     for (let assignment of this.getAssignments()) {
-      if (assignment.status === AssignmentStatus.OVERDUE || assignment.status === AssignmentStatus.NEEDS_REWORK) attention++;
-      let dueDay = AssignmentDueDate.dayStart(assignment);
-      if (dueDay < 0) {
-        if (assignment.status !== AssignmentStatus.COMPLETED) undated++;
-        continue;
+      if (assignment.status === AssignmentStatus.NEEDS_REWORK ||
+        (assignment.taskDate < today &&
+          assignment.status !== AssignmentStatus.COMPLETED &&
+          assignment.status !== AssignmentStatus.SUBMITTED)) {
+        attention++;
       }
-      if (dueDay !== todayStart) continue;
+      if (assignment.taskDate !== today) continue;
       total++;
       if (assignment.status === AssignmentStatus.COMPLETED) completed++;
     }
     let next = this.getNextAssignment();
-    return { completed: completed, total: total, attention: attention, undated: undated,
+    return { completed: completed, total: total, attention: attention,
       nextAssignmentId: next === null ? '' : next.id };
   }
 

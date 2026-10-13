@@ -1,7 +1,7 @@
 import { AppTheme } from '../../common/theme/AppTheme';
 import { Assignment, AssignmentStatus } from '../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../domain/service/AssignmentStateMachine';
-import { AssignmentDueDate } from '../../domain/service/AssignmentDueDate';
+import { AssignmentTaskDate } from '../../domain/service/AssignmentTaskDate';
 
 @Component
 export struct AssignmentListItem {
@@ -44,12 +44,12 @@ export struct AssignmentListItem {
     return `预计 ${this.assignment.expectedMinutes} 分钟`;
   }
 
-  private deadlineText(): string {
-    return AssignmentDueDate.displayText(this.assignment);
+  private taskDateText(): string {
+    return AssignmentTaskDate.displayText(this.assignment.taskDate);
   }
 
   private accessibilityLabel(): string {
-    let base = `${this.assignment.subject}，${this.assignment.title}，${this.deadlineText()}，${this.timingText()}，${AssignmentStateMachine.label(this.assignment.status)}`;
+    let base = `${this.assignment.subject}，${this.assignment.title}，${this.taskDateText()}，${this.timingText()}，${AssignmentStateMachine.label(this.assignment.status)}`;
     if (!this.selectionMode) return base;
     if (!this.selectionAvailable) return `不可删除，${base}`;
     return `${this.selected ? '已选择' : '未选择'}，${base}`;
@@ -124,7 +124,7 @@ export struct AssignmentListItem {
         .width('100%')
         .alignItems(VerticalAlign.Top);
 
-        Text(`${this.assignment.subject} · ${this.deadlineText()} · ${this.timingText()}`)
+        Text(`${this.assignment.subject} · ${this.taskDateText()} · ${this.timingText()}`)
           .width('100%')
           .maxLines(1)
           .lineHeight(AppTheme.META_LINE_HEIGHT)

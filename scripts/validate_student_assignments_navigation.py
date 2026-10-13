@@ -150,10 +150,12 @@ require("private UnifiedWorkspace()" in study and "Button('问小伴'" not in st
 
 # Query contract remains shared by local cache and backend.
 require("export interface AssignmentFilter" in filter_model and "statuses: AssignmentStatus[]" in filter_model and
-        "undatedOnly: boolean" in filter_model and "UNDATED = 'UNDATED'" in filter_model,
-        "AssignmentFilter must explicitly represent undated work")
-require("dueAtEpochMs" in query and "dueText" not in query and "filter.undatedOnly" in query,
-        "date filtering must use structured dueAt semantics")
+        "fromEpochMs: number" in filter_model and "toEpochMs: number" in filter_model and
+        "undatedOnly" not in filter_model and "UNDATED = 'UNDATED'" not in filter_model,
+        "AssignmentFilter must model required task-date ranges without an undated mode")
+require("item.taskDate" in query and "AssignmentTaskDate.fromEpochMs" in query and
+        "dueAtEpochMs" not in query and "dueText" not in query,
+        "date filtering must use structured taskDate semantics")
 require("query(filter: AssignmentFilter): Promise<Assignment[]>" in repository_port,
         "Repository must expose filtered query")
 require("HomeworkRemoteApi.instance.listFiltered" in repository_impl and "RemoteAssignmentMapper.toLocal" in repository_impl,
@@ -163,15 +165,21 @@ require("!BackendSession.instance.isConnected()" in repository_impl and
         "offline query must fall back to the originating child's cache")
 require("async listFiltered(studentId: string, filter: AssignmentFilter)" in remote_api and
         "type=${encodeURIComponent(filter.assignmentType)}" in remote_api and
-        "subjectCode=${encodeURIComponent(filter.subjectCode)}" in remote_api and "undated=true" in remote_api,
-        "remote API must transmit combined filters")
+        "subjectCode=${encodeURIComponent(filter.subjectCode)}" in remote_api and
+        "from=${filter.fromEpochMs}" in remote_api and "to=${filter.toEpochMs}" in remote_api and
+        "status=${encodeURIComponent(filter.statuses[0])}" in remote_api and
+        "undated=true" not in remote_api,
+        "remote API must transmit combined task-date filters")
 require("queryOnDay(subjectCode: string, dayEpochMs: number" in view_model and "this.repository.query" in view_model,
         "ViewModel must delegate selected-day queries to Repository")
-for param in ["String type", "String subjectCode", "Long from", "Long to", "String status", "Boolean undated"]:
+for param in ["String type", "String subjectCode", "Long from", "Long to", "String status"]:
     require(param in controller, f"backend assignment query missing parameter: {param}")
+require("Boolean undated" not in controller,
+        "backend assignment query must not expose an undated mode once taskDate is required")
 require("listSpecification" in service and "statusFilter" in service and "compareForList" in service and
-        "undatedOnly" in service and "repository.findAll(listSpecification" in service,
-        "backend must push combined filtering to the database while preserving stable legacy ordering")
+        'root.get("taskDate")' in service and "undatedOnly" not in service and
+        "repository.findAll(listSpecification" in service,
+        "backend must push combined taskDate filtering to the database while preserving stable ordering")
 
 if errors:
     print("STUDENT_ASSIGNMENTS_NAVIGATION_GATE_FAIL")

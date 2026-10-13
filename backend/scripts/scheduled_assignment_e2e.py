@@ -45,14 +45,9 @@ def main() -> int:
                 "endDate": "",
                 "template": {
                     "assignmentType": "EXTRA",
-                    "subject": "语文",
-                    "subjectCode": "CHINESE",
                     "title": "E2E 定时阅读任务",
                     "instruction": "阅读后复述主要内容",
                     "expectedMinutes": 20,
-                    "duePolicy": "AFTER_MINUTES",
-                    "dueTime": "",
-                    "dueOffsetMinutes": 60,
                 },
             }), (200,), "create scheduled plan").json()
 
@@ -82,8 +77,8 @@ def main() -> int:
         require(created.get("subjectCode") == "CHINESE", "scheduled assignment must keep plan subject")
         require(created.get("title") == expected_title,
                 "scheduled assignment title must include scheduled fire date")
-        require(created.get("dueAtEpochMs", 0) > plan["nextFireAtEpochMs"],
-                "AFTER_MINUTES due time must be after scheduled fire time")
+        require(created.get("taskDate") == target.strftime("%Y-%m-%d"),
+                "scheduled assignment taskDate must equal the scheduled fire date")
 
         plans = expect(http(base_url, "GET",
             "/api/v1/scheduled-assignment-plans?studentId=" + student_id,

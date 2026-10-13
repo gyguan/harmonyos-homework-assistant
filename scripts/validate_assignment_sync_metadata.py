@@ -42,9 +42,12 @@ for token in ["remoteVersion: 0", "syncDirty: true", "lastSyncedAtEpochMs: 0"]:
 require("this.assignments[index].syncDirty = true" in store,
         "local assignment transitions must mark the assignment dirty")
 
-for field in ("assignmentType", "subjectCode", "dueAtEpochMs", "dueTimezone"):
+for field in ("assignmentType", "subjectCode", "taskDate"):
     require(field in mapper and field in remote_api,
-            f"Assignment V2 field must survive remote sync: {field}")
+            f"Assignment field must survive remote sync: {field}")
+for legacy in ("dueAtEpochMs", "dueTimezone", "dueText"):
+    require(legacy not in mapper and legacy not in remote_api,
+            f"legacy assignment deadline field must not return through remote sync: {legacy}")
 require("remoteVersion: remote.version" in mapper and "backing: AssignmentBacking.REMOTE" in mapper,
         "remote refresh must establish server version and explicit remote backing")
 require("syncDirty: false" in mapper,

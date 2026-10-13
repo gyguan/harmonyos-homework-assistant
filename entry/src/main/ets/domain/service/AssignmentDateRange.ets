@@ -1,4 +1,4 @@
-import { AssignmentDueDate } from './AssignmentDueDate';
+import { AssignmentTaskDate } from './AssignmentTaskDate';
 
 export interface AssignmentEpochRange {
   fromEpochMs: number;
@@ -7,11 +7,10 @@ export interface AssignmentEpochRange {
 
 export class AssignmentDateRange {
   static forDay(dayEpochMs: number): AssignmentEpochRange {
-    let dayStart = AssignmentDueDate.businessDayStart(dayEpochMs);
-    return {
-      fromEpochMs: dayStart,
-      toEpochMs: AssignmentDueDate.addBusinessDays(dayStart, 1) - 1
-    };
+    let taskDate = AssignmentTaskDate.fromEpochMs(dayEpochMs);
+    let dayStart = AssignmentTaskDate.toDayStartEpochMs(taskDate);
+    let nextDayStart = AssignmentTaskDate.toDayStartEpochMs(AssignmentTaskDate.addDays(taskDate, 1));
+    return { fromEpochMs: dayStart, toEpochMs: nextDayStart - 1 };
   }
 
   static today(nowEpochMs: number = Date.now()): AssignmentEpochRange {
@@ -19,21 +18,22 @@ export class AssignmentDateRange {
   }
 
   static tomorrow(nowEpochMs: number = Date.now()): AssignmentEpochRange {
-    let today = AssignmentDueDate.businessDayStart(nowEpochMs);
-    return AssignmentDateRange.forDay(AssignmentDueDate.addBusinessDays(today, 1));
+    let date = AssignmentTaskDate.addDays(AssignmentTaskDate.today(nowEpochMs), 1);
+    return AssignmentDateRange.forDay(AssignmentTaskDate.toDayStartEpochMs(date));
   }
 
   static thisWeek(nowEpochMs: number = Date.now()): AssignmentEpochRange {
-    let today = AssignmentDueDate.businessDayStart(nowEpochMs);
-    let weekday = AssignmentDueDate.businessWeekday(today);
+    let today = AssignmentTaskDate.today(nowEpochMs);
+    let weekday = AssignmentTaskDate.weekday(today);
     let mondayBased = weekday === 0 ? 7 : weekday;
+    let endExclusive = AssignmentTaskDate.addDays(today, 8 - mondayBased);
     return {
-      fromEpochMs: today,
-      toEpochMs: AssignmentDueDate.addBusinessDays(today, 8 - mondayBased) - 1
+      fromEpochMs: AssignmentTaskDate.toDayStartEpochMs(today),
+      toEpochMs: AssignmentTaskDate.toDayStartEpochMs(endExclusive) - 1
     };
   }
 
   static startOfDay(epochMs: number): number {
-    return AssignmentDueDate.businessDayStart(epochMs);
+    return AssignmentTaskDate.toDayStartEpochMs(AssignmentTaskDate.fromEpochMs(epochMs));
   }
 }

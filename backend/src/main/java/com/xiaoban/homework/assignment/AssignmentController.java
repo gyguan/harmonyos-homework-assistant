@@ -46,9 +46,8 @@ public class AssignmentController {
       @RequestParam(required = false) String subjectCode,
       @RequestParam(required = false) Long from,
       @RequestParam(required = false) Long to,
-      @RequestParam(required = false) String status,
-      @RequestParam(required = false) Boolean undated) {
-    return service.list(familyId, studentId, type, subjectCode, from, to, status, undated);
+      @RequestParam(required = false) String status) {
+    return service.list(familyId, studentId, type, subjectCode, from, to, status);
   }
 
   @GetMapping("/students/{studentId}/assignments/page")
@@ -59,10 +58,9 @@ public class AssignmentController {
       @RequestParam(required = false) Long from,
       @RequestParam(required = false) Long to,
       @RequestParam(required = false) String status,
-      @RequestParam(required = false) Boolean undated,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "50") int limit) {
-    return service.page(familyId, studentId, type, subjectCode, from, to, status, undated, page, limit);
+    return service.page(familyId, studentId, type, subjectCode, from, to, status, page, limit);
   }
 
   @GetMapping("/students/{studentId}/assignments/summary")

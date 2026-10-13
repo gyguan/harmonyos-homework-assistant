@@ -1,11 +1,11 @@
 import { VoiceAssignmentMediaService } from '../../../application/assignment/VoiceAssignmentMediaService';
 import { RemoteVoiceFolderItem } from '../../../application/remote/RemoteVoiceMaterialApi';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { DeadlinePickerField } from '../../../components/assignment/DeadlinePickerField';
+import { TaskDatePickerField } from '../../../components/assignment/TaskDatePickerField';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Subject } from '../../../domain/model/HomeworkModels';
-import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
+import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { ParentVoiceAssignmentViewModel, VoiceAssignmentDraft } from './ParentVoiceAssignmentViewModel';
 
 const VOICE_SOURCE_LOCAL: string = 'LOCAL';
@@ -17,7 +17,7 @@ export struct ParentVoiceAssignmentPage {
   @State private subject: Subject = Subject.ENGLISH;
   @State private title: string = '英语 · 语音练习';
   @State private instruction: string = '先听语音，再结合情景图片完成跟读练习。';
-  @State private dueText: string = '今天';
+  @State private taskDate: string = AssignmentTaskDate.today();
   @State private expectedMinutesText: string = '15';
   @State private audioUri: string = '';
   @State private audioName: string = '';
@@ -47,13 +47,6 @@ export struct ParentVoiceAssignmentPage {
     let value = Number(this.expectedMinutesText.trim());
     if (!Number.isFinite(value) || value < 1 || value > 240 || Math.floor(value) !== value) return -1;
     return value;
-  }
-
-  private dueAtEpochMs(): number {
-    let text = this.dueText.trim();
-    if (text.length === 0) return 0;
-    let value = AssignmentDueDate.resolveDueAtEpochMs(text, Date.now());
-    return value > 0 ? value : -1;
   }
 
   private selectedFolder(): RemoteVoiceFolderItem | null {
@@ -201,8 +194,7 @@ export struct ParentVoiceAssignmentPage {
     if (this.busy) return;
     let expectedMinutes = this.expectedMinutes();
     if (expectedMinutes < 0) return this.showError('预计完成时长请输入 1～240 分钟的整数');
-    let dueAt = this.dueAtEpochMs();
-    if (dueAt < 0) return this.showError('请选择有效的截止时间');
+    if (!AssignmentTaskDate.isValid(this.taskDate)) return this.showError('请选择有效的任务日期');
 
     let taskTitle = this.title.trim();
     let taskInstruction = this.instruction.trim();
@@ -224,8 +216,7 @@ export struct ParentVoiceAssignmentPage {
         subject: this.subject,
         title: taskTitle,
         instruction: taskInstruction,
-        dueAtEpochMs: dueAt,
-        dueText: dueAt > 0 ? this.dueText.trim() : '未定',
+        taskDate: this.taskDate,
         expectedMinutes: expectedMinutes
       };
 
@@ -381,11 +372,10 @@ export struct ParentVoiceAssignmentPage {
       .alignItems(HorizontalAlign.Start);
 
       Column({ space: 6 }) {
-        Text('截止时间').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-        DeadlinePickerField({
-          value: this.dueText,
-          allowClear: true,
-          onChange: (value: string) => this.dueText = value
+        Text('任务日期').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+        TaskDatePickerField({
+          value: this.taskDate,
+          onChange: (value: string) => this.taskDate = value
         });
       }
       .width('100%')

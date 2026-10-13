@@ -4,6 +4,7 @@ import { ExtractedHomeworkText } from '../../domain/model/ImportModels';
 import { BackendHttpClient } from './BackendHttpClient';
 import { BackendSession } from './BackendSession';
 import { HomeworkImageEncoder } from '../../infrastructure/ai/HomeworkImageEncoder';
+import { AssignmentTaskDate } from '../../domain/service/AssignmentTaskDate';
 
 interface OrganizePayload {
   text: string;
@@ -15,7 +16,7 @@ interface RemoteCandidate {
   title: string;
   instruction: string;
   textbookRef: string;
-  dueText: string;
+  taskDate: string;
   expectedMinutes: number;
   sourceExcerpt: string;
   confidence: number;
@@ -135,7 +136,7 @@ export class HomeworkOrganizerRemoteApi {
         title: remote.title.trim(),
         instruction: this.value(remote.instruction, remote.title),
         textbookRef: this.value(remote.textbookRef, '待家长确认'),
-        dueText: this.value(remote.dueText, '今天'),
+        taskDate: AssignmentTaskDate.resolve(this.value(remote.taskDate, AssignmentTaskDate.today())),
         expectedMinutes: this.expectedMinutes(remote.expectedMinutes),
         sourceEvidence: {
           sourceLabel: input.sourceLabel,

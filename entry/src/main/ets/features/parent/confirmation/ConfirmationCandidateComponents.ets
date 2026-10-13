@@ -144,7 +144,7 @@ export struct ConfirmationCandidateCard {
           }
         }
         Blank();
-        Text(this.item.dueText)
+        Text(this.item.taskDate)
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT)
@@ -270,7 +270,7 @@ export struct ConfirmationCandidateEditor {
   @State private subjectDraft: Subject = Subject.CHINESE;
   @State private titleDraft: string = '';
   @State private instructionDraft: string = '';
-  @State private dueTextDraft: string = '';
+  @State private taskDateDraft: string = '';
   @State private expectedMinutesDraft: number = 20;
   @State private textbookRefDraft: string = '';
   @State private confirmDiscard: boolean = false;
@@ -284,7 +284,7 @@ export struct ConfirmationCandidateEditor {
     this.subjectDraft = this.item.subject;
     this.titleDraft = this.item.title;
     this.instructionDraft = this.item.instruction;
-    this.dueTextDraft = this.item.dueText;
+    this.taskDateDraft = this.item.taskDate;
     this.expectedMinutesDraft = this.item.expectedMinutes;
     this.textbookRefDraft = this.item.textbookRef;
     this.confirmDiscard = false;
@@ -296,7 +296,7 @@ export struct ConfirmationCandidateEditor {
       subject: this.item.subject,
       title: this.item.title,
       instruction: this.item.instruction,
-      dueText: this.item.dueText,
+      taskDate: this.item.taskDate,
       expectedMinutes: this.item.expectedMinutes,
       textbookRef: this.item.textbookRef
     };
@@ -307,7 +307,7 @@ export struct ConfirmationCandidateEditor {
       subject: this.subjectDraft,
       title: this.titleDraft,
       instruction: this.instructionDraft,
-      dueText: this.dueTextDraft,
+      taskDate: this.taskDateDraft,
       expectedMinutes: this.expectedMinutesDraft,
       textbookRef: this.textbookRefDraft
     };
@@ -330,7 +330,7 @@ export struct ConfirmationCandidateEditor {
       title: this.titleDraft,
       instruction: this.instructionDraft,
       textbookRef: this.textbookRefDraft,
-      dueText: this.dueTextDraft,
+      taskDate: this.taskDateDraft,
       expectedMinutes: this.expectedMinutesDraft,
       sourceEvidence: {
         sourceLabel: this.item.sourceEvidence.sourceLabel,
@@ -460,7 +460,7 @@ export struct ConfirmationCandidateEditor {
             subjectEditable: true,
             title: this.titleDraft,
             instruction: this.instructionDraft,
-            dueText: this.dueTextDraft,
+            taskDate: this.taskDateDraft,
             expectedMinutes: this.expectedMinutesDraft,
             onSubjectChange: (subject: Subject) => {
               this.subjectDraft = subject;
@@ -474,8 +474,8 @@ export struct ConfirmationCandidateEditor {
               this.instructionDraft = value;
               this.markChanged();
             },
-            onDueTextChange: (value: string) => {
-              this.dueTextDraft = value;
+            onTaskDateChange: (value: string) => {
+              this.taskDateDraft = value;
               this.markChanged();
             },
             onMinutesChange: (minutes: number) => {

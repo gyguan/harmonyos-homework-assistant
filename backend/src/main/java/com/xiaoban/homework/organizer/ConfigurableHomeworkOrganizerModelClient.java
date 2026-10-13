@@ -36,7 +36,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   private final Map<String, StructuredOutputMode> duplicateReviewModeCache = new ConcurrentHashMap<>();
 
   record StructuredCandidate(String subject, String title, String instruction, String textbookRef,
-      String dueText, int expectedMinutes, String sourceExcerpt, double confidence,
+      String taskDate, int expectedMinutes, String sourceExcerpt, double confidence,
       String sameTaskGroup, String duplicateAssignmentId, Double duplicateConfidence,
       String duplicateReason) {}
   record StructuredResult(List<StructuredCandidate> assignments) {}
@@ -347,7 +347,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     int candidateCount = 0;
     for (int i = 0; i < candidates.size(); i++) {
       HomeworkOrganizerDtos.Candidate candidate = candidates.get(i);
-      if (candidate == null || !today.equals(candidateDueDate(candidate.dueText()))) continue;
+      if (candidate == null || !today.equals(candidateTaskDate(candidate.taskDate()))) continue;
       subjects.add(candidate.subject());
       input.append("\n- candidateIndex=").append(i)
           .append("；科目=").append(value(candidate.subject(), "其他"))
@@ -383,7 +383,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     LocalDate today = LocalDate.now(BUSINESS_ZONE);
     for (int i = 0; i < candidates.size(); i++) {
       HomeworkOrganizerDtos.Candidate candidate = candidates.get(i);
-      if (candidate != null && today.equals(candidateDueDate(candidate.dueText()))) result.add(i);
+      if (candidate != null && today.equals(candidateTaskDate(candidate.taskDate()))) result.add(i);
     }
     return List.copyOf(result);
   }
@@ -395,7 +395,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     Set<String> subjects = new LinkedHashSet<>();
     LocalDate today = LocalDate.now(BUSINESS_ZONE);
     for (HomeworkOrganizerDtos.Candidate candidate : candidates) {
-      if (candidate == null || !today.equals(candidateDueDate(candidate.dueText()))) continue;
+      if (candidate == null || !today.equals(candidateTaskDate(candidate.taskDate()))) continue;
       if (!blank(candidate.subject())) subjects.add(candidate.subject());
     }
     List<String> result = new ArrayList<>();
@@ -474,7 +474,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       if (candidate == null || existing == null) continue;
       String existingSubject = normalizeSubject(existing.subject());
       if (existingSubject == null || !existingSubject.equals(candidate.subject())) continue;
-      if (!sameDue(candidate.dueText(), existing)) continue;
+      if (!sameTaskDate(candidate.taskDate(), existing)) continue;
 
       DuplicateDecision current = bestByCandidate.get(decision.candidateIndex());
       if (current == null || decision.confidence() > current.confidence()) {
@@ -494,7 +494,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
           existingById.get(decision.duplicateAssignmentId());
       result.add(new HomeworkOrganizerDtos.Candidate(
           candidate.subject(), candidate.title(), candidate.instruction(), candidate.textbookRef(),
-          candidate.dueText(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
+          candidate.taskDate(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
           candidate.sameTaskGroup(), existing.id(), existing.title(), clamp(decision.confidence()),
           compact(decision.reason(), 240)));
     }
@@ -507,8 +507,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         + "把输入拆成可以逐项完成的任务。subject 字段必须严格填写语文、数学、英语、阅读、朗读、体育、实践、兴趣、其他之一。"
         + "学校学科任务优先使用语文、数学、英语；非学科家庭任务按内容选择阅读、朗读、体育、实践、兴趣或其他。"
         + "同一类任务一句话里有多个独立动作时要拆开；通知、缴费、带物品、家长会、值日等非任务内容忽略。"
-        + "不得编造原文没有的页码、课次、截止时间或教材版本。"
-        + "若原文未说明截止时间，dueText 使用今天；没有明确教材位置时 textbookRef 使用待家长确认。"
+        + "不得编造原文没有的页码、课次、任务日期或教材版本。"
+        + "taskDate 必须输出 YYYY-MM-DD；若原文未说明任务日期，使用今天对应的日期；没有明确教材位置时 textbookRef 使用待家长确认。"
         + "请结合学生年级、任务类型和原文明确的题量、页数、遍数，为每一项给出 expectedMinutes。"
         + "expectedMinutes 只估算孩子独立完成该项任务的专注时间，不包含休息、等待、家长检查或上传时间，范围 5 到 120 分钟。"
         + "简单听读、朗读或少量口算通常可短一些；写作、大量练习或综合任务可长一些；信息不足时给出保守合理值，不为估时编造任务量。"
@@ -523,7 +523,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     String grade = student.grade == null ? "" : student.grade;
     String semester = student.semester == null ? "" : student.semester;
     String textbooks = student.textbookSummary == null ? "" : student.textbookSummary;
-    return "学生年级：" + grade + "\n学期：" + semester + "\n已知教材：" + textbooks
+    return "当前日期：" + LocalDate.now(BUSINESS_ZONE) + "\n学生年级：" + grade + "\n学期：" + semester + "\n已知教材：" + textbooks
         + "\n来源：" + (sourceLabel == null ? "" : sourceLabel) + "\n老师原文：\n" + text;
   }
 
@@ -558,9 +558,11 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         continue;
       }
       String sameTaskGroup = compact(item.sameTaskGroup(), 32);
+      LocalDate parsedTaskDate = candidateTaskDate(item.taskDate());
+      String taskDate = parsedTaskDate == null ? LocalDate.now(BUSINESS_ZONE).toString() : parsedTaskDate.toString();
       output.add(new HomeworkOrganizerDtos.Candidate(
           subject, item.title().trim(), value(item.instruction(), item.title()),
-          value(item.textbookRef(), "待家长确认"), value(item.dueText(), "今天"),
+          value(item.textbookRef(), "待家长确认"), taskDate,
           expectedMinutes(item.expectedMinutes()), value(item.sourceExcerpt(), item.title()),
           clamp(item.confidence()), sameTaskGroup, "", "", 0.0, ""));
       if (output.size() >= 30) break;
@@ -576,7 +578,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     candidateProperties.put("title", Map.of("type", "string"));
     candidateProperties.put("instruction", Map.of("type", "string"));
     candidateProperties.put("textbookRef", Map.of("type", "string"));
-    candidateProperties.put("dueText", Map.of("type", "string"));
+    candidateProperties.put("taskDate", Map.of("type", "string"));
     candidateProperties.put("expectedMinutes", Map.of("type", "integer", "minimum", 5, "maximum", 120));
     candidateProperties.put("sourceExcerpt", Map.of("type", "string"));
     candidateProperties.put("confidence", Map.of("type", "number", "minimum", 0, "maximum", 1));
@@ -586,7 +588,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     candidate.put("type", "object");
     candidate.put("additionalProperties", false);
     candidate.put("properties", candidateProperties);
-    candidate.put("required", List.of("subject", "title", "instruction", "textbookRef", "dueText",
+    candidate.put("required", List.of("subject", "title", "instruction", "textbookRef", "taskDate",
         "expectedMinutes", "sourceExcerpt", "confidence", "sameTaskGroup"));
 
     Map<String, Object> schema = new LinkedHashMap<>();
@@ -656,13 +658,13 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       if (candidate == null) continue;
       result.add(new HomeworkOrganizerDtos.Candidate(
           candidate.subject(), candidate.title(), candidate.instruction(), candidate.textbookRef(),
-          candidate.dueText(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
+          candidate.taskDate(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
           candidate.sameTaskGroup(), "", "", 0.0, ""));
     }
     return result;
   }
 
-  static List<HomeworkOrganizerDtos.Candidate> enforceSameDueForModelHints(
+  static List<HomeworkOrganizerDtos.Candidate> enforceSameTaskDateForModelHints(
       List<HomeworkOrganizerDtos.Candidate> candidates,
       List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments) {
     if (candidates == null || candidates.isEmpty()) return candidates == null ? List.of() : candidates;
@@ -681,13 +683,13 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       }
       HomeworkOrganizerDtos.ExistingAssignment existing =
           existingById.get(candidate.duplicateAssignmentId());
-      if (existing != null && sameDue(candidate.dueText(), existing)) {
+      if (existing != null && sameTaskDate(candidate.taskDate(), existing)) {
         result.add(candidate);
         continue;
       }
       result.add(new HomeworkOrganizerDtos.Candidate(
           candidate.subject(), candidate.title(), candidate.instruction(), candidate.textbookRef(),
-          candidate.dueText(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
+          candidate.taskDate(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
           candidate.sameTaskGroup(), "", "", 0.0, ""));
     }
     return result;
@@ -712,7 +714,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         if (existing == null || blank(existing.id())) continue;
         String existingSubject = normalizeSubject(existing.subject());
         if (existingSubject == null || !existingSubject.equals(candidate.subject())) continue;
-        if (!sameDue(candidate.dueText(), existing)) continue;
+        if (!sameTaskDate(candidate.taskDate(), existing)) continue;
         if (!sameEvidence(sourceText, existing.sourceExcerpt())) continue;
         if (best == null || sameStructuredTask(candidate, existing)) {
           best = existing;
@@ -725,7 +727,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       }
       result.add(new HomeworkOrganizerDtos.Candidate(
           candidate.subject(), candidate.title(), candidate.instruction(), candidate.textbookRef(),
-          candidate.dueText(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
+          candidate.taskDate(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
           candidate.sameTaskGroup(), best.id(), best.title(), 1.0,
           "与已有任务来自同一份作业原文且完成日期一致"));
     }
@@ -750,7 +752,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         if (existing == null || blank(existing.id())) continue;
         String existingSubject = normalizeSubject(existing.subject());
         if (existingSubject == null || !existingSubject.equals(candidate.subject())) continue;
-        if (!sameDue(candidate.dueText(), existing)) continue;
+        if (!sameTaskDate(candidate.taskDate(), existing)) continue;
 
         if (sameEvidence(candidate.sourceExcerpt(), existing.sourceExcerpt())) {
           match = existing;
@@ -774,23 +776,21 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       }
       result.add(new HomeworkOrganizerDtos.Candidate(
           candidate.subject(), candidate.title(), candidate.instruction(), candidate.textbookRef(),
-          candidate.dueText(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
+          candidate.taskDate(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
           candidate.sameTaskGroup(), match.id(), match.title(), 1.0, reason));
     }
     return result;
   }
 
-  private static boolean sameDue(String candidateDueText,
+  private static boolean sameTaskDate(String candidateTaskDateText,
       HomeworkOrganizerDtos.ExistingAssignment existing) {
-    LocalDate candidateDate = candidateDueDate(candidateDueText);
+    LocalDate candidateDate = candidateTaskDate(candidateTaskDateText);
     if (candidateDate == null || existing == null) return false;
-    LocalDate existingDate = existing.dueAtEpochMs() > 0
-        ? Instant.ofEpochMilli(existing.dueAtEpochMs()).atZone(BUSINESS_ZONE).toLocalDate()
-        : candidateDueDate(existing.dueText());
+    LocalDate existingDate = candidateTaskDate(existing.taskDate());
     return existingDate != null && candidateDate.equals(existingDate);
   }
 
-  static LocalDate candidateDueDate(String value) {
+  static LocalDate candidateTaskDate(String value) {
     if (blank(value)) return null;
     String text = value.trim();
     LocalDate today = LocalDate.now(BUSINESS_ZONE);

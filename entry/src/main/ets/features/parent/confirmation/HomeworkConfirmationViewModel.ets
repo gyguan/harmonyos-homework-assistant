@@ -4,6 +4,7 @@ import { DefaultHomeworkImportInboxRepository } from '../../../data/repository/D
 import { CandidateAssignment, RawHomeworkImport, Subject } from '../../../domain/model/HomeworkModels';
 import { HomeworkImportDraftRepository } from '../../../domain/port/HomeworkImportDraftRepository';
 
+import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 export class HomeworkConfirmationViewModel {
   private readonly drafts: HomeworkImportDraftRepository;
 
@@ -48,7 +49,7 @@ export class HomeworkConfirmationViewModel {
       title: '新作业',
       instruction: '新作业',
       textbookRef: '待家长确认',
-      dueText: '今天',
+      taskDate: AssignmentTaskDate.today(),
       expectedMinutes: 20,
       sourceEvidence: {
         sourceLabel: raw.sourceLabel.length > 0 ? raw.sourceLabel : '家长手工新增',

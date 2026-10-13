@@ -16,7 +16,7 @@ public final class HomeworkOrganizerDtos {
       String title,
       String instruction,
       String textbookRef,
-      String dueText,
+      String taskDate,
       int expectedMinutes,
       String sourceExcerpt,
       double confidence,
@@ -32,8 +32,7 @@ public final class HomeworkOrganizerDtos {
       String title,
       String instruction,
       String textbookRef,
-      String dueText,
-      long dueAtEpochMs,
+      String taskDate,
       String sourceExcerpt) {}
 
   public record Response(List<Candidate> assignments, String mode) {}

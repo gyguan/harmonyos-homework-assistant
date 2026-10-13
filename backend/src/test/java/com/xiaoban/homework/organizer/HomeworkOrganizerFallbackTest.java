@@ -39,20 +39,16 @@ class HomeworkOrganizerFallbackTest {
     when(model.reviewDuplicates(anyList(), anyList(), anyString()))
         .thenReturn(Optional.empty());
 
-    long todayNoon = LocalDate.now(ZoneId.of("Asia/Shanghai"))
-        .atTime(12, 0).atZone(ZoneId.of("Asia/Shanghai")).toInstant().toEpochMilli();
     var existing = new AssignmentDtos.Response(
         "a-existing", "student-1", "SCHOOL", "MATH", "TEXT", "数学",
-        "口算20题", "完成口算20题", "", todayNoon, "Asia/Shanghai", "今天",
+        "口算20题", "完成口算20题", "",
+        LocalDate.now(ZoneId.of("Asia/Shanghai")).toString(),
         "NOT_STARTED", "老师通知", "口算20题", 10,
         0L, 0L, 0L, "", 1L);
 
     when(assignments.list(eq(family), eq("student-1"), isNull(), isNull(),
-        anyLong(), anyLong(), contains("NOT_STARTED"), eq(false)))
+        anyLong(), anyLong(), contains("NOT_STARTED")))
         .thenReturn(List.of(existing));
-    when(assignments.list(eq(family), eq("student-1"), isNull(), isNull(),
-        isNull(), isNull(), contains("NOT_STARTED"), eq(true)))
-        .thenReturn(List.of());
 
     var result = service.organize(
         family, "student-1", new HomeworkOrganizerDtos.Request("数学：口算20题", "老师通知"));

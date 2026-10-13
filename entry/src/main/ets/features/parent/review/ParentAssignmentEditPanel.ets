@@ -4,7 +4,6 @@ import { AssignmentAttachmentEditor } from '../../../components/assignment/Assig
 import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
 import { EditSheetHeader } from '../../../components/navigation/EditSheetHeader';
 import { Assignment } from '../../../domain/model/HomeworkModels';
-import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
 
 @Component
 export struct ParentAssignmentEditPanel {
@@ -13,7 +12,7 @@ export struct ParentAssignmentEditPanel {
   @State private titleDraft: string = '';
   @State private instructionDraft: string = '';
   @State private textbookRefDraft: string = '';
-  @State private dueTextDraft: string = '';
+  @State private taskDateDraft: string = '';
   @State private minutesDraft: string = '20';
   @State private confirmDiscard: boolean = false;
 
@@ -24,7 +23,7 @@ export struct ParentAssignmentEditPanel {
     this.titleDraft = this.item.title;
     this.instructionDraft = this.item.instruction;
     this.textbookRefDraft = this.item.textbookRef;
-    this.dueTextDraft = this.item.dueText;
+    this.taskDateDraft = this.item.taskDate;
     this.minutesDraft = `${this.item.expectedMinutes}`;
     this.confirmDiscard = false;
   }
@@ -45,7 +44,7 @@ export struct ParentAssignmentEditPanel {
       subject: this.item.subject,
       title: this.item.title,
       instruction: this.item.instruction,
-      dueText: this.item.dueText,
+      taskDate: this.item.taskDate,
       expectedMinutes: this.item.expectedMinutes,
       textbookRef: this.item.textbookRef
     };
@@ -56,7 +55,7 @@ export struct ParentAssignmentEditPanel {
       subject: this.item.subject,
       title: this.titleDraft,
       instruction: this.instructionDraft,
-      dueText: this.dueTextDraft,
+      taskDate: this.taskDateDraft,
       expectedMinutes: this.parsedMinutes(),
       textbookRef: this.textbookRefDraft
     };
@@ -84,9 +83,6 @@ export struct ParentAssignmentEditPanel {
   }
 
   private buildAssignment(): Assignment {
-    let dueText = this.dueTextDraft.trim();
-    let dueAt = dueText.length === 0 ? 0 : AssignmentDueDate.resolveDueAtEpochMs(dueText);
-    let dueDateKey = dueText.length === 0 ? '' : AssignmentDueDate.resolveDateKey(dueText);
     return {
       id: this.item.id,
       studentId: this.item.studentId,
@@ -99,10 +95,7 @@ export struct ParentAssignmentEditPanel {
       title: this.titleDraft.trim(),
       instruction: this.instructionDraft.trim(),
       textbookRef: this.textbookRefDraft,
-      dueAtEpochMs: dueAt > 0 ? dueAt : 0,
-      dueTimezone: this.item.dueTimezone,
-      dueText: dueText,
-      dueDateKey: dueDateKey,
+      taskDate: this.taskDateDraft,
       status: this.item.status,
       expectedMinutes: this.parsedMinutes(),
       startedAtEpochMs: this.item.startedAtEpochMs,
@@ -180,7 +173,7 @@ export struct ParentAssignmentEditPanel {
           subjectEditable: false,
           title: this.titleDraft,
           instruction: this.instructionDraft,
-          dueText: this.dueTextDraft,
+          taskDate: this.taskDateDraft,
           expectedMinutes: this.parsedMinutes() > 0 ? this.parsedMinutes() : 20,
           onTitleChange: (value: string) => {
             this.titleDraft = value;
@@ -190,8 +183,8 @@ export struct ParentAssignmentEditPanel {
             this.instructionDraft = value;
             this.markChanged();
           },
-          onDueTextChange: (value: string) => {
-            this.dueTextDraft = value;
+          onTaskDateChange: (value: string) => {
+            this.taskDateDraft = value;
             this.markChanged();
           },
           onMinutesChange: (minutes: number) => this.setMinutes(minutes)

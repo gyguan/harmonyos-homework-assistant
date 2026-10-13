@@ -236,7 +236,7 @@ export struct StudentAssignmentsPage {
   }
 
   private assignmentRenderKey(item: Assignment): string {
-    return `${item.studentId}|${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+    return `${item.studentId}|${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.taskDate}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
   }
 
   private syncSelectedAssignment(items: Assignment[]): void {

@@ -25,16 +25,15 @@ for token in [
     "todayPendingAssignments(studentId: string = '')",
     "item.studentId === studentId",
     "private static isToday(item: Assignment)",
-    "AssignmentDueDate.businessDayStart(item.dueAtEpochMs)",
-    "AssignmentDueDate.businessDayStart(Date.now())",
+    "item.taskDate === AssignmentTaskDate.today()",
     "private static isUnfinished(status: AssignmentStatus)",
     "status !== AssignmentStatus.SUBMITTED",
     "status !== AssignmentStatus.COMPLETED",
     "private static insertByPriority",
 ]:
     require(token in view_model, f"Student Home ViewModel missing pending-work contract: {token}")
-require("dueText" not in view_model,
-        "Student Home must use structured completion date instead of legacy dueText")
+require("dueText" not in view_model and "dueAtEpochMs" not in view_model,
+        "Student Home must use required taskDate instead of legacy deadline fields")
 
 # Tasks are grouped by subject but remain direct, one-action cards (no accordion/drill-down).
 for token in [

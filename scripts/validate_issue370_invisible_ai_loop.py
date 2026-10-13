@@ -15,7 +15,7 @@ def require(condition: bool, message: str) -> None:
 submission = read("entry/src/main/ets/application/submission/HomeworkSubmissionService.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 attention = read("entry/src/main/ets/domain/service/AssignmentAttentionPolicy.ets")
-due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
+task_date = read("entry/src/main/ets/domain/service/AssignmentTaskDate.ets")
 student_vm = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
 student_home = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
 parent_home = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
@@ -33,10 +33,11 @@ require(study.find("HomeworkSubmissionService.instance.preflight") <
         study.find("HomeworkSubmissionService.instance.submit"),
         "photo preflight must execute before submission")
 require("class AssignmentAttentionPolicy" in attention and "AssignmentAttentionPolicy.student" in student_vm and
-        "AssignmentDueDate.matches" in attention and "DueDateFilterKey.OVERDUE" in attention,
-        "attention must reuse the canonical due-date policy for overdue detection")
-require("if (item.dueAtEpochMs > 0) return item.dueAtEpochMs <= nowEpochMs;" in due_date,
-        "canonical overdue detection must honor precise dueAt time, not only calendar day")
+        "AssignmentTaskDate.today" in attention and "isHistoricalUnfinished" in attention,
+        "attention must derive historical unfinished work from canonical taskDate")
+require("static today(" in task_date and "static isValid(" in task_date and
+        "STUDENT_NEAR_DUE" not in attention and "截止时间" not in attention,
+        "task-date attention must not restore hour-level deadline reminders")
 require("AttentionBanner" in student_home and "AttentionBanner" in parent_home,
         "attention must stay embedded in existing home pages")
 require("AssignmentAttentionKind" in attention and "studentResult" in attention and "parentResult" in attention and

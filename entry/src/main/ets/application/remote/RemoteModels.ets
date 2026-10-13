@@ -10,9 +10,7 @@ export interface RemoteAssignment {
   title: string;
   instruction: string;
   textbookRef: string;
-  dueAtEpochMs: number;
-  dueTimezone: string;
-  dueText: string;
+  taskDate: string;
   status: string;
   sourceLabel: string;
   sourceExcerpt: string;
@@ -40,9 +38,7 @@ export class RemoteAssignmentMapper {
       title: remote.title,
       instruction: remote.instruction,
       textbookRef: remote.textbookRef,
-      dueAtEpochMs: remote.dueAtEpochMs > 0 ? remote.dueAtEpochMs : 0,
-      dueTimezone: remote.dueTimezone === undefined || remote.dueTimezone.length === 0 ? 'Asia/Shanghai' : remote.dueTimezone,
-      dueText: remote.dueText,
+      taskDate: remote.taskDate,
       status: remote.status as AssignmentStatus,
       expectedMinutes: remote.expectedMinutes > 0 ? remote.expectedMinutes : 20,
       startedAtEpochMs: remote.startedAtEpochMs > 0 ? remote.startedAtEpochMs : 0,

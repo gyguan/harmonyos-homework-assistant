@@ -265,22 +265,6 @@ public class ScheduledAssignmentService {
     template.title = input.title().trim();
     template.instruction = input.instruction().trim();
     template.expectedMinutes = expectedMinutes(input.expectedMinutes());
-    template.duePolicy = duePolicy(input.duePolicy());
-    template.dueTime = null;
-    template.dueOffsetMinutes = null;
-    if ("SAME_DAY_AT".equals(template.duePolicy) || "NEXT_DAY_AT".equals(template.duePolicy)) {
-      template.dueTime = time(input.dueTime(), "截止时间");
-      if ("SAME_DAY_AT".equals(template.duePolicy) &&
-          !template.dueTime.isAfter(plan.scheduleTime)) {
-        throw new ApiExceptions.BadRequest("当天截止时间必须晚于创建时间");
-      }
-    } else if ("AFTER_MINUTES".equals(template.duePolicy)) {
-      int offset = input.dueOffsetMinutes() == null ? 0 : input.dueOffsetMinutes();
-      if (offset < 1 || offset > 10080) {
-        throw new ApiExceptions.BadRequest("创建后截止分钟数必须在 1 到 10080 之间");
-      }
-      template.dueOffsetMinutes = offset;
-    }
     template.updatedAt = now;
     templates.saveAndFlush(template);
   }
@@ -312,10 +296,7 @@ public class ScheduledAssignmentService {
       ScheduledAssignmentTemplateEntity template) {
     return new ScheduledAssignmentDtos.TemplateResponse(
         template.assignmentType, template.subject, template.subjectCode,
-        template.title, template.instruction, template.expectedMinutes,
-        template.duePolicy,
-        template.dueTime == null ? "" : template.dueTime.format(TIME_FORMAT),
-        template.dueOffsetMinutes == null ? 0 : template.dueOffsetMinutes);
+        template.title, template.instruction, template.expectedMinutes);
   }
 
   private ScheduledAssignmentDtos.RunResponse runResponse(ScheduledAssignmentRunEntity run) {
@@ -383,15 +364,6 @@ public class ScheduledAssignmentService {
     if (normalized.isBlank()) return "EXTRA";
     if (!"SCHOOL".equals(normalized) && !"EXTRA".equals(normalized)) {
       throw new ApiExceptions.BadRequest("不支持的作业类型: " + value);
-    }
-    return normalized;
-  }
-
-  private String duePolicy(String value) {
-    String normalized = text(value).trim().toUpperCase(Locale.ROOT);
-    if (!"SAME_DAY_AT".equals(normalized) && !"NEXT_DAY_AT".equals(normalized) &&
-        !"AFTER_MINUTES".equals(normalized) && !"NONE".equals(normalized)) {
-      throw new ApiExceptions.BadRequest("不支持的截止规则: " + value);
     }
     return normalized;
   }

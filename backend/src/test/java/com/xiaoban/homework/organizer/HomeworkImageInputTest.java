@@ -39,7 +39,7 @@ class HomeworkImageInputTest {
     var students = mock(StudentRepository.class);
     var model = mock(HomeworkOrganizerModelClient.class);
     var assignments = mock(AssignmentService.class);
-    when(assignments.list(any(), anyString(), any(), any(), any(), any(), any(), any()))
+    when(assignments.list(any(), anyString(), any(), any(), any(), any(), any()))
         .thenReturn(List.of());
     var service = new HomeworkOrganizerService(students, assignments, model);
     var family = UUID.randomUUID();
@@ -64,10 +64,8 @@ class HomeworkImageInputTest {
     order.verify(model).organizeImage(eq(student), eq("图片"), startsWith("data:image/png;base64,"),
         eq("数学口算20题"));
     order.verify(assignments).list(eq(family), eq("student-1"), isNull(), isNull(),
-        from.capture(), to.capture(), contains("NOT_STARTED"), eq(false));
+        from.capture(), to.capture(), contains("NOT_STARTED"));
     assertTrue(to.getValue() - from.getValue() < 24L * 60L * 60L * 1000L);
-    verify(assignments, times(1)).list(eq(family), eq("student-1"), isNull(), isNull(),
-        isNull(), isNull(), contains("NOT_STARTED"), eq(true));
   }
 
   static String png() throws Exception {
@@ -96,7 +94,7 @@ class HomeworkImageInputTest {
     var students = mock(StudentRepository.class);
     var model = mock(HomeworkOrganizerModelClient.class);
     var assignments = mock(AssignmentService.class);
-    when(assignments.list(any(), anyString(), any(), any(), any(), any(), any(), any()))
+    when(assignments.list(any(), anyString(), any(), any(), any(), any(), any()))
         .thenReturn(List.of());
     var service = new HomeworkOrganizerService(students, assignments, model);
     var family = UUID.randomUUID();

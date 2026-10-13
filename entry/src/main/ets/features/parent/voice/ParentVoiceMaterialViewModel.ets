@@ -87,7 +87,6 @@ export class ParentVoiceMaterialViewModel {
           subjectCode: item.subjectCode,
           title: '',
           expectedMinutes: item.expectedMinutes,
-          dueAtEpochMs: 0,
           assignmentType: 'EXTRA'
         });
         registeredCount++;

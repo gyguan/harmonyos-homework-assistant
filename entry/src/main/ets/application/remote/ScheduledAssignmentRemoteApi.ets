@@ -14,9 +14,6 @@ interface RemoteScheduledTemplate {
   title: string;
   instruction: string;
   expectedMinutes: number;
-  duePolicy: string;
-  dueTime: string;
-  dueOffsetMinutes: number;
 }
 
 interface RemoteScheduledPlan {
@@ -160,14 +157,9 @@ export class ScheduledAssignmentRemoteApi {
     if (item.template !== null) {
       template = {
         assignmentType: item.template.assignmentType,
-        subject: item.template.subject,
-        subjectCode: item.template.subjectCode,
         title: item.template.title,
         instruction: item.template.instruction,
-        expectedMinutes: item.template.expectedMinutes,
-        duePolicy: item.template.duePolicy,
-        dueTime: item.template.dueTime,
-        dueOffsetMinutes: item.template.dueOffsetMinutes
+        expectedMinutes: item.template.expectedMinutes
       };
     }
     return {

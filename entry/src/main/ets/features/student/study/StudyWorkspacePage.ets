@@ -11,6 +11,7 @@ import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAss
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
 import { Assignment, AssignmentContentType, AssignmentStatus, Submission } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
+import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { StudyWorkspaceViewModel } from './StudyWorkspaceViewModel';
 
 @Component
@@ -779,7 +780,7 @@ export struct StudyWorkspacePage {
                 .fontSize(AppTheme.CAPTION_SIZE)
                 .fontColor(AppTheme.SUBTEXT);
               Blank();
-              Text(`截至 ${this.assignment()!.dueText}`).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+              Text(`任务日期 ${AssignmentTaskDate.displayText(this.assignment()!.taskDate)}`).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
             }
             .width('100%');
           }

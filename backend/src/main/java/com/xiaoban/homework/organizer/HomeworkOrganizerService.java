@@ -99,7 +99,7 @@ public class HomeworkOrganizerService {
       }
       result.add(new HomeworkOrganizerDtos.Candidate(
           candidate.subject(), candidate.title(), candidate.instruction(), candidate.textbookRef(),
-          candidate.dueText(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
+          candidate.taskDate(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
           candidate.sameTaskGroup(), candidate.duplicateAssignmentId(), candidate.duplicateAssignmentTitle(),
           candidate.duplicateConfidence(), reason));
     }
@@ -111,7 +111,7 @@ public class HomeworkOrganizerService {
     LocalDate today = LocalDate.now(BUSINESS_ZONE);
     for (HomeworkOrganizerDtos.Candidate candidate : candidates) {
       if (candidate == null) continue;
-      LocalDate dueDate = ConfigurableHomeworkOrganizerModelClient.candidateDueDate(candidate.dueText());
+      LocalDate dueDate = ConfigurableHomeworkOrganizerModelClient.candidateTaskDate(candidate.taskDate());
       if (today.equals(dueDate)) return true;
     }
     return false;
@@ -126,15 +126,9 @@ public class HomeworkOrganizerService {
         "NOT_STARTED,IN_PROGRESS,PAUSED,READY_TO_SUBMIT,NEEDS_REWORK,OVERDUE";
 
     List<HomeworkOrganizerDtos.ExistingAssignment> result = new ArrayList<>();
-    List<AssignmentDtos.Response> dueToday = assignments.list(
-        familyId, studentId, null, null, from, toInclusive, activeStatuses, false);
-    appendExisting(result, dueToday, false);
-
-    if (result.size() < 30) {
-      List<AssignmentDtos.Response> undated = assignments.list(
-          familyId, studentId, null, null, null, null, activeStatuses, true);
-      appendExisting(result, undated, true);
-    }
+    List<AssignmentDtos.Response> todayItems = assignments.list(
+        familyId, studentId, null, null, from, toInclusive, activeStatuses);
+    appendExisting(result, todayItems);
 
     long evidenceCount =
         result.stream().filter(item -> item.sourceExcerpt() != null && !item.sourceExcerpt().isBlank()).count();
@@ -144,16 +138,12 @@ public class HomeworkOrganizerService {
   }
 
   private void appendExisting(List<HomeworkOrganizerDtos.ExistingAssignment> result,
-      List<AssignmentDtos.Response> items, boolean requireTextualToday) {
+      List<AssignmentDtos.Response> items) {
     for (AssignmentDtos.Response item : items) {
       if (result.size() >= 30) break;
-      if (requireTextualToday &&
-          (item.dueText() == null || (!item.dueText().contains("今天") && !item.dueText().contains("今日")))) {
-        continue;
-      }
       result.add(new HomeworkOrganizerDtos.ExistingAssignment(
           item.id(), item.subject(), item.title(), item.instruction(), item.textbookRef(),
-          item.dueText(), item.dueAtEpochMs(), item.sourceExcerpt()));
+          item.taskDate(), item.sourceExcerpt()));
     }
   }
 }

@@ -40,12 +40,13 @@ require("AssignmentFilterDialog" in page and "更多筛选：" in page,
 # Structured selected-day query semantics remain useful for quick/custom filters.
 require("assignmentsOnDay" in view_model and "queryOnDay" in view_model,
         "Assignment list filters must retain selected-day query semantics")
-require("item.dueAtEpochMs <= 0" in view_model and
-        "AssignmentDateRange.startOfDay(item.dueAtEpochMs)" in view_model,
-        "selected-day filtering must continue to use structured dueAt")
-require("dueText" not in view_model and "dueDateKey" not in view_model,
-        "Assignment filtering must never infer dates from legacy display strings")
-require("AssignmentFilterFactory" in view_model and "AssignmentDateRange" in view_model,
+require("item.taskDate === targetDate" in view_model and
+        "AssignmentTaskDate.fromEpochMs(dayEpochMs)" in view_model,
+        "selected-day filtering must continue to use structured taskDate")
+require("dueText" not in view_model and "dueDateKey" not in view_model and
+        "dueAtEpochMs" not in view_model,
+        "Assignment filtering must never infer dates from legacy deadline fields")
+require("AssignmentFilterFactory" in view_model and "AssignmentTaskDate" in view_model,
         "Assignment filters must reuse shared date/query services")
 
 require("Validate V2 Slice 6 calendar" in workflow and "validate_v2_slice6_calendar.py" in workflow,

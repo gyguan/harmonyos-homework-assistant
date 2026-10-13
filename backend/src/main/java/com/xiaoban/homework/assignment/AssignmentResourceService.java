@@ -49,8 +49,8 @@ public class AssignmentResourceService {
 
     AssignmentDtos.Create voiceInput = new AssignmentDtos.Create(
         input.id(), input.subject(), input.title(), input.instruction(), input.textbookRef(),
-        input.dueText(), input.assignmentType(), input.subjectCode(), "AUDIO_IMAGE",
-        input.dueAtEpochMs(), input.dueTimezone(), input.status(), input.sourceLabel(),
+        input.taskDate(), input.assignmentType(), input.subjectCode(), "AUDIO_IMAGE",
+        input.status(), input.sourceLabel(),
         input.sourceExcerpt(), input.expectedMinutes(), input.startedAtEpochMs(),
         input.finishedAtEpochMs(), input.elapsedSeconds(), input.reviewNote());
 

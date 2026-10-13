@@ -4,6 +4,7 @@ from __future__ import annotations
 import sys
 import time
 import uuid
+from datetime import datetime, timedelta, timezone
 
 from e2e_smoke import DEFAULT_BASE_URL, SmokeFailure, expect, http, require
 
@@ -51,6 +52,8 @@ def main() -> int:
             "create command student",
         )
 
+        task_date = datetime.now(timezone(timedelta(hours=8))).date().isoformat()
+
         def create_assignment(assignment_id: str, title: str) -> dict:
             return expect(
                 http(
@@ -66,9 +69,7 @@ def main() -> int:
                         "title": title,
                         "instruction": "验证服务端权威计时",
                         "textbookRef": "P1",
-                        "dueText": "今天",
-                        "dueAtEpochMs": int(time.time() * 1000) + 3600000,
-                        "dueTimezone": "Asia/Shanghai",
+                        "taskDate": task_date,
                         "status": "NOT_STARTED",
                         "sourceLabel": "command e2e",
                         "sourceExcerpt": "",

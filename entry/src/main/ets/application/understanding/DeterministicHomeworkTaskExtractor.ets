@@ -3,6 +3,7 @@ import {
   HomeworkTaskDraft
 } from '../../domain/model/HomeworkUnderstandingModels';
 import { Subject } from '../../domain/model/HomeworkModels';
+import { AssignmentTaskDate } from '../../domain/service/AssignmentTaskDate';
 
 export class DeterministicHomeworkTaskExtractor {
   extractHomework(text: string, subject: Subject, messageId: string,
@@ -17,7 +18,7 @@ export class DeterministicHomeworkTaskExtractor {
         subject: subject,
         title: clean,
         instruction: clean,
-        dueText: this.dueText(text),
+        taskDate: this.taskDate(text),
         expectedMinutes: 20,
         classification: HomeworkMessageClassification.HOMEWORK,
         sourceMessageIds: [messageId],
@@ -35,7 +36,7 @@ export class DeterministicHomeworkTaskExtractor {
       subject: subject,
       title: `明日准备：${clean}`,
       instruction: clean,
-      dueText: '明天',
+      taskDate: AssignmentTaskDate.tomorrow(),
       expectedMinutes: 5,
       classification: HomeworkMessageClassification.PREPARATION,
       sourceMessageIds: [messageId],
@@ -215,10 +216,8 @@ export class DeterministicHomeworkTaskExtractor {
     return result;
   }
 
-  private dueText(text: string): string {
-    if (text.indexOf('明天') >= 0 || text.indexOf('明日') >= 0) return '明天';
-    if (text.indexOf('今晚') >= 0 || text.indexOf('晚上') >= 0) return '今晚';
-    return '今天';
+  private taskDate(text: string): string {
+    return AssignmentTaskDate.resolve(text);
   }
 
   private trimSeparators(value: string): string {

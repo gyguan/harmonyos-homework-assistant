@@ -60,7 +60,7 @@ export struct HomeworkConfirmationPage {
   }
 
   private candidateRenderKey(item: CandidateAssignment): string {
-    return `${item.id}|${item.subject}|${item.title}|${item.instruction}|${item.dueText}|${item.textbookRef}|${item.expectedMinutes}|${item.sameTaskGroup}|${item.duplicateAssignmentId}|${item.duplicateAssignmentTitle}|${item.duplicateConfidence}|${item.duplicateReason}`;
+    return `${item.id}|${item.subject}|${item.title}|${item.instruction}|${item.taskDate}|${item.textbookRef}|${item.expectedMinutes}|${item.sameTaskGroup}|${item.duplicateAssignmentId}|${item.duplicateAssignmentTitle}|${item.duplicateConfidence}|${item.duplicateReason}`;
   }
 
   private openEditor(candidateId: string): void {
@@ -99,7 +99,7 @@ export struct HomeworkConfirmationPage {
       title: item.title,
       instruction: item.instruction,
       textbookRef: item.textbookRef,
-      dueText: item.dueText,
+      taskDate: item.taskDate,
       expectedMinutes: minutes,
       sourceEvidence: {
         sourceLabel: item.sourceEvidence.sourceLabel,

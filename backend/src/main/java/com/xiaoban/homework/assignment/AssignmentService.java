@@ -9,7 +9,6 @@ import com.xiaoban.homework.submission.SubmissionPhotoRepository;
 import com.xiaoban.homework.submission.SubmissionRepository;
 import com.xiaoban.homework.submission.SubmissionResourceEntity;
 import com.xiaoban.homework.submission.SubmissionResourceRepository;
-import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -38,7 +37,7 @@ public class AssignmentService {
   private static final String DEFAULT_ASSIGNMENT_TYPE = "SCHOOL";
   private static final String DEFAULT_SUBJECT_CODE = "OTHER";
   private static final String DEFAULT_CONTENT_TYPE = "NORMAL";
-  private static final String DEFAULT_DUE_TIMEZONE = "Asia/Shanghai";
+  private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai");
 
   private final AssignmentRepository repository;
   private final StudentService students;
@@ -63,7 +62,7 @@ public class AssignmentService {
 
   @Transactional(readOnly = true)
   public List<AssignmentDtos.Response> list(UUID familyId, String studentId) {
-    return list(familyId, studentId, null, null, null, null, null, false);
+    return list(familyId, studentId, null, null, null, null, null);
   }
 
   @Transactional(readOnly = true)
@@ -73,9 +72,9 @@ public class AssignmentService {
 
   @Transactional(readOnly = true)
   public List<AssignmentDtos.Response> list(UUID familyId, String studentId, String type, String subjectCode,
-      Long fromEpochMs, Long toEpochMs, String status, Boolean undated) {
+      Long fromEpochMs, Long toEpochMs, String status) {
     students.requireOwned(familyId, studentId);
-    ListFilters filters = listFilters(type, subjectCode, fromEpochMs, toEpochMs, status, undated);
+    ListFilters filters = listFilters(type, subjectCode, fromEpochMs, toEpochMs, status);
     List<AssignmentEntity> filtered = repository.findAll(listSpecification(familyId, studentId, filters));
     filtered.sort(this::compareForList);
     return filtered.stream().map(AssignmentDtos.Response::from).toList();
@@ -83,12 +82,12 @@ public class AssignmentService {
 
   @Transactional(readOnly = true)
   public AssignmentDtos.PageResponse page(UUID familyId, String studentId, String type, String subjectCode,
-      Long fromEpochMs, Long toEpochMs, String status, Boolean undated, int page, int limit) {
+      Long fromEpochMs, Long toEpochMs, String status, int page, int limit) {
     students.requireOwned(familyId, studentId);
     if (page < 0) throw new ApiExceptions.BadRequest("page 不能小于 0");
     if (limit < 1 || limit > 100) throw new ApiExceptions.BadRequest("limit 必须在 1 到 100 之间");
 
-    ListFilters filters = listFilters(type, subjectCode, fromEpochMs, toEpochMs, status, undated);
+    ListFilters filters = listFilters(type, subjectCode, fromEpochMs, toEpochMs, status);
     PageRequest pageable = PageRequest.of(page, limit,
         Sort.by(Sort.Order.desc("updatedAt"), Sort.Order.asc("id")));
     Page<AssignmentEntity> result = repository.findAll(listSpecification(familyId, studentId, filters), pageable);
@@ -104,28 +103,27 @@ public class AssignmentService {
     int total = 0;
     int completed = 0;
     int attention = 0;
-    int undated = 0;
     AssignmentEntity next = null;
 
     for (AssignmentEntity assignment : assignments) {
-      if (assignment.dueAt == null) {
-        if (!"COMPLETED".equals(assignment.status)) undated++;
-      } else if (isOnDate(assignment, date)) {
+      if (assignment.taskDate.equals(date)) {
         total++;
         if ("COMPLETED".equals(assignment.status)) completed++;
       }
-      if ("NEEDS_REWORK".equals(assignment.status) || "OVERDUE".equals(assignment.status)) attention++;
+      if ("NEEDS_REWORK".equals(assignment.status) ||
+          (assignment.taskDate.isBefore(date) && !"COMPLETED".equals(assignment.status) &&
+              !"SUBMITTED".equals(assignment.status))) attention++;
       if (isBetterNext(assignment, next)) next = assignment;
     }
 
-    return new AssignmentDtos.TodaySummary(total, completed, attention, undated, next == null ? "" : next.id);
+    return new AssignmentDtos.TodaySummary(total, completed, attention, next == null ? "" : next.id);
   }
 
   @Transactional(readOnly = true)
   public String nextVoiceMaterialTaskTitle(UUID familyId, String studentId, String subjectCode,
       LocalDate businessDate, String materialTitle) {
     students.requireOwned(familyId, studentId);
-    ZoneId zone = ZoneId.of(DEFAULT_DUE_TIMEZONE);
+    ZoneId zone = BUSINESS_ZONE;
     Instant from = businessDate.atStartOfDay(zone).toInstant();
     Instant to = businessDate.plusDays(1).atStartOfDay(zone).toInstant();
     String dateLabel = businessDate.getMonthValue() + "月" + businessDate.getDayOfMonth() + "日";
@@ -167,12 +165,9 @@ public class AssignmentService {
   public AssignmentDtos.Response findFirstVoiceMaterialTaskForDate(
       UUID familyId, String studentId, LocalDate businessDate) {
     students.requireOwned(familyId, studentId);
-    ZoneId zone = ZoneId.of(DEFAULT_DUE_TIMEZONE);
-    Instant dueFrom = businessDate.atStartOfDay(zone).toInstant();
-    Instant dueTo = businessDate.plusDays(1).atStartOfDay(zone).toInstant();
     AssignmentEntity current = repository
-        .findFirstByFamilyIdAndStudentIdAndContentTypeAndStatusNotAndDueAtGreaterThanEqualAndDueAtLessThanOrderByUpdatedAtDesc(
-            familyId, studentId, "AUDIO_IMAGE", "COMPLETED", dueFrom, dueTo)
+        .findFirstByFamilyIdAndStudentIdAndContentTypeAndStatusNotAndTaskDateOrderByUpdatedAtDesc(
+            familyId, studentId, "AUDIO_IMAGE", "COMPLETED", businessDate)
         .orElse(null);
     return current == null ? null : AssignmentDtos.Response.from(current);
   }
@@ -205,9 +200,7 @@ public class AssignmentService {
     e.title = input.title();
     e.instruction = input.instruction();
     e.textbookRef = text(input.textbookRef());
-    e.dueText = text(input.dueText());
-    e.dueAt = dueAt(input.dueAtEpochMs());
-    e.dueTimezone = dueTimezone(input.dueTimezone());
+    e.taskDate = taskDate(input.taskDate());
     e.status = initialStatus(input.status());
     e.sourceLabel = text(input.sourceLabel());
     e.sourceExcerpt = text(input.sourceExcerpt());
@@ -254,9 +247,7 @@ public class AssignmentService {
     if (input.title() != null) e.title = input.title();
     if (input.instruction() != null) e.instruction = input.instruction();
     if (input.textbookRef() != null) e.textbookRef = input.textbookRef();
-    if (input.dueText() != null) e.dueText = input.dueText();
-    if (input.dueAtEpochMs() != null) e.dueAt = dueAt(input.dueAtEpochMs());
-    if (input.dueTimezone() != null) e.dueTimezone = dueTimezone(input.dueTimezone());
+    if (input.taskDate() != null) e.taskDate = taskDate(input.taskDate());
     if (input.status() != null) e.status = input.status();
     if (input.sourceLabel() != null) e.sourceLabel = input.sourceLabel();
     if (input.sourceExcerpt() != null) e.sourceExcerpt = input.sourceExcerpt();
@@ -307,9 +298,7 @@ public class AssignmentService {
     e.title = input.title().trim();
     if (input.instruction() != null) e.instruction = input.instruction();
     if (input.textbookRef() != null) e.textbookRef = input.textbookRef();
-    if (input.dueText() != null) e.dueText = input.dueText();
-    if (input.dueAtEpochMs() != null) e.dueAt = dueAt(input.dueAtEpochMs());
-    if (input.dueTimezone() != null) e.dueTimezone = dueTimezone(input.dueTimezone());
+    if (input.taskDate() != null) e.taskDate = taskDate(input.taskDate());
     if (input.expectedMinutes() != null) e.expectedMinutes = expectedMinutes(input.expectedMinutes());
     e.updatedAt = Instant.now();
     return AssignmentDtos.Response.from(repository.saveAndFlush(e));
@@ -434,23 +423,19 @@ public class AssignmentService {
     if (e.finishedAtEpochMs == 0) e.finishedAtEpochMs = nowMs;
   }
 
-  private record ListFilters(String type, String subjectCode, Instant from, Instant to,
-      Set<String> statuses, boolean undatedOnly) {}
+  private record ListFilters(String type, String subjectCode, LocalDate from, LocalDate to,
+      Set<String> statuses) {}
 
   private ListFilters listFilters(String type, String subjectCode, Long fromEpochMs, Long toEpochMs,
-      String status, Boolean undated) {
+      String status) {
     String normalizedType = type == null || type.isBlank() ? null : assignmentType(type);
     String normalizedSubject = subjectCode == null || subjectCode.isBlank() ? null : subjectCode.trim().toUpperCase();
-    Instant from = dueAt(fromEpochMs);
-    Instant to = dueAt(toEpochMs);
-    boolean undatedOnly = Boolean.TRUE.equals(undated);
+    LocalDate from = epochDate(fromEpochMs);
+    LocalDate to = epochDate(toEpochMs);
     if (from != null && to != null && from.isAfter(to)) {
-      throw new ApiExceptions.BadRequest("作业筛选开始时间不能晚于结束时间");
+      throw new ApiExceptions.BadRequest("任务日期筛选开始日期不能晚于结束日期");
     }
-    if (undatedOnly && (from != null || to != null)) {
-      throw new ApiExceptions.BadRequest("未定日期筛选不能同时指定日期范围");
-    }
-    return new ListFilters(normalizedType, normalizedSubject, from, to, statusFilter(status), undatedOnly);
+    return new ListFilters(normalizedType, normalizedSubject, from, to, statusFilter(status));
   }
 
   private Specification<AssignmentEntity> listSpecification(UUID familyId, String studentId, ListFilters filters) {
@@ -460,13 +445,8 @@ public class AssignmentService {
       predicates.add(builder.equal(root.get("studentId"), studentId));
       if (filters.type() != null) predicates.add(builder.equal(root.get("assignmentType"), filters.type()));
       if (filters.subjectCode() != null) predicates.add(builder.equal(root.get("subjectCode"), filters.subjectCode()));
-      if (filters.undatedOnly()) {
-        predicates.add(builder.isNull(root.get("dueAt")));
-      } else if (filters.from() != null || filters.to() != null) {
-        predicates.add(builder.isNotNull(root.get("dueAt")));
-      }
-      if (filters.from() != null) predicates.add(builder.greaterThanOrEqualTo(root.get("dueAt"), filters.from()));
-      if (filters.to() != null) predicates.add(builder.lessThanOrEqualTo(root.get("dueAt"), filters.to()));
+      if (filters.from() != null) predicates.add(builder.greaterThanOrEqualTo(root.get("taskDate"), filters.from()));
+      if (filters.to() != null) predicates.add(builder.lessThanOrEqualTo(root.get("taskDate"), filters.to()));
       if (!filters.statuses().isEmpty()) predicates.add(root.get("status").in(filters.statuses()));
       return builder.and(predicates.toArray(Predicate[]::new));
     };
@@ -476,11 +456,7 @@ public class AssignmentService {
     int leftPriority = listPriority(left.status);
     int rightPriority = listPriority(right.status);
     if (leftPriority != rightPriority) return Integer.compare(leftPriority, rightPriority);
-    if (left.dueAt != null && right.dueAt == null) return -1;
-    if (left.dueAt == null && right.dueAt != null) return 1;
-    if (left.dueAt != null && right.dueAt != null && !left.dueAt.equals(right.dueAt)) {
-      return left.dueAt.compareTo(right.dueAt);
-    }
+    if (!left.taskDate.equals(right.taskDate)) return left.taskDate.compareTo(right.taskDate);
     int titleCompare = text(left.title).compareTo(text(right.title));
     if (titleCompare != 0) return titleCompare;
     return left.id.compareTo(right.id);
@@ -529,26 +505,13 @@ public class AssignmentService {
     return e;
   }
 
-  private boolean isOnDate(AssignmentEntity assignment, LocalDate date) {
-    try {
-      ZoneId zone = ZoneId.of(dueTimezone(assignment.dueTimezone));
-      return assignment.dueAt.atZone(zone).toLocalDate().equals(date);
-    } catch (DateTimeException error) {
-      return false;
-    }
-  }
-
   private boolean isBetterNext(AssignmentEntity candidate, AssignmentEntity current) {
     int candidatePriority = nextPriority(candidate.status);
     if (candidatePriority >= 100) return false;
     if (current == null) return true;
     int currentPriority = nextPriority(current.status);
     if (candidatePriority != currentPriority) return candidatePriority < currentPriority;
-    if (candidate.dueAt != null && current.dueAt == null) return true;
-    if (candidate.dueAt == null && current.dueAt != null) return false;
-    if (candidate.dueAt != null && current.dueAt != null && !candidate.dueAt.equals(current.dueAt)) {
-      return candidate.dueAt.isBefore(current.dueAt);
-    }
+    if (!candidate.taskDate.equals(current.taskDate)) return candidate.taskDate.isBefore(current.taskDate);
     if (candidate.updatedAt == null) return false;
     return current.updatedAt == null || candidate.updatedAt.isAfter(current.updatedAt);
   }
@@ -589,9 +552,7 @@ public class AssignmentService {
         text(input.title()),
         text(input.instruction()),
         text(input.textbookRef()),
-        text(input.dueText()),
-        Long.toString(input.dueAtEpochMs() == null ? 0L : Math.max(0L, input.dueAtEpochMs())),
-        dueTimezone(input.dueTimezone()),
+        taskDate(input.taskDate()).toString(),
         initialStatus(input.status()),
         text(input.sourceLabel()),
         text(input.sourceExcerpt()),
@@ -636,18 +597,18 @@ public class AssignmentService {
     return DEFAULT_SUBJECT_CODE;
   }
 
-  private Instant dueAt(Long value) {
-    return value == null || value <= 0 ? null : Instant.ofEpochMilli(value);
+  private LocalDate taskDate(String value) {
+    if (value == null || value.isBlank()) throw new ApiExceptions.BadRequest("任务日期不能为空");
+    try {
+      return LocalDate.parse(value.trim());
+    } catch (java.time.format.DateTimeParseException error) {
+      throw new ApiExceptions.BadRequest("任务日期格式应为 YYYY-MM-DD");
+    }
   }
 
-  private String dueTimezone(String value) {
-    String normalized = value == null || value.isBlank() ? DEFAULT_DUE_TIMEZONE : value.trim();
-    try {
-      ZoneId.of(normalized);
-      return normalized;
-    } catch (DateTimeException error) {
-      throw new ApiExceptions.BadRequest("无效的截止时间时区: " + normalized);
-    }
+  private LocalDate epochDate(Long value) {
+    if (value == null || value <= 0) return null;
+    return Instant.ofEpochMilli(value).atZone(BUSINESS_ZONE).toLocalDate();
   }
 
   private int expectedMinutes(Integer value) { return value == null ? 20 : Math.max(1, Math.min(240, value)); }

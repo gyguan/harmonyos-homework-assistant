@@ -2,7 +2,6 @@ import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
 import {
-  ScheduledAssignmentDuePolicy,
   ScheduledAssignmentPlan,
   ScheduledAssignmentPlanDraft,
   ScheduledAssignmentPlanType,
@@ -35,9 +34,6 @@ export struct ParentScheduledAssignmentPage {
   @State private taskTitle: string = '';
   @State private instruction: string = '';
   @State private expectedMinutesText: string = '20';
-  @State private duePolicy: string = ScheduledAssignmentDuePolicy.SAME_DAY_AT;
-  @State private dueTime: string = '21:00';
-  @State private dueOffsetMinutesText: string = '120';
 
   onBack: () => void = () => {};
   private readonly viewModel: ParentScheduledAssignmentViewModel =
@@ -73,9 +69,6 @@ export struct ParentScheduledAssignmentPage {
     this.taskTitle = '';
     this.instruction = '';
     this.expectedMinutesText = '20';
-    this.duePolicy = ScheduledAssignmentDuePolicy.SAME_DAY_AT;
-    this.dueTime = '21:00';
-    this.dueOffsetMinutesText = '120';
     this.recentRuns = [];
     this.message = '';
     this.messageError = false;
@@ -101,10 +94,6 @@ export struct ParentScheduledAssignmentPage {
       this.taskTitle = plan.template.title;
       this.instruction = plan.template.instruction;
       this.expectedMinutesText = String(plan.template.expectedMinutes);
-      this.duePolicy = plan.template.duePolicy;
-      this.dueTime = plan.template.dueTime.length > 0 ? plan.template.dueTime : '21:00';
-      this.dueOffsetMinutesText = plan.template.dueOffsetMinutes > 0 ?
-        String(plan.template.dueOffsetMinutes) : '120';
     }
     this.showEditor = true;
     try {
@@ -215,32 +204,11 @@ export struct ParentScheduledAssignmentPage {
         return null;
       }
 
-      let dueOffset = 0;
-      if (this.duePolicy === ScheduledAssignmentDuePolicy.SAME_DAY_AT ||
-        this.duePolicy === ScheduledAssignmentDuePolicy.NEXT_DAY_AT) {
-        if (!this.validTime(this.dueTime)) {
-          this.showFeedback('截止时间格式应为 HH:mm', true);
-          return null;
-        }
-      } else if (this.duePolicy === ScheduledAssignmentDuePolicy.AFTER_MINUTES) {
-        dueOffset = Number(this.dueOffsetMinutesText.trim());
-        if (!Number.isFinite(dueOffset) || dueOffset < 1 || dueOffset > 10080 ||
-          Math.floor(dueOffset) !== dueOffset) {
-          this.showFeedback('创建后截止分钟数请输入 1～10080 的整数', true);
-          return null;
-        }
-      }
-
       template = {
         assignmentType: 'EXTRA',
-        subject: this.subjectDisplay(this.subjectCode),
-        subjectCode: this.subjectCode,
         title: title,
         instruction: requirement,
-        expectedMinutes: expectedMinutes,
-        duePolicy: this.duePolicy,
-        dueTime: this.dueTime,
-        dueOffsetMinutes: dueOffset
+        expectedMinutes: expectedMinutes
       };
     }
 
@@ -261,7 +229,6 @@ export struct ParentScheduledAssignmentPage {
     if (kind === 'PLAN_TYPE') this.planType = value;
     else if (kind === 'SCHEDULE') this.scheduleType = value;
     else if (kind === 'SUBJECT') this.subjectCode = value;
-    else if (kind === 'DUE') this.duePolicy = value;
     else if (kind === 'WEEKDAY') this.toggleWeekday(value);
   }
 
@@ -550,36 +517,6 @@ export struct ParentScheduledAssignmentPage {
         }
         .width('100%');
 
-        Text('截止规则')
-          .width('100%')
-          .fontSize(AppTheme.LABEL_TITLE_SIZE)
-          .fontColor(AppTheme.SUBTEXT);
-        Row({ space: 5 }) {
-          SegmentedSelectionButton({ label: '当天', selected: this.duePolicy === ScheduledAssignmentDuePolicy.SAME_DAY_AT, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.SAME_DAY_AT) });
-          SegmentedSelectionButton({ label: '次日', selected: this.duePolicy === ScheduledAssignmentDuePolicy.NEXT_DAY_AT, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.NEXT_DAY_AT) });
-          SegmentedSelectionButton({ label: '创建后', selected: this.duePolicy === ScheduledAssignmentDuePolicy.AFTER_MINUTES, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.AFTER_MINUTES) });
-          SegmentedSelectionButton({ label: '不设置', selected: this.duePolicy === ScheduledAssignmentDuePolicy.NONE, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.NONE) });
-        }
-        .width('100%');
-
-        if (this.duePolicy === ScheduledAssignmentDuePolicy.SAME_DAY_AT ||
-          this.duePolicy === ScheduledAssignmentDuePolicy.NEXT_DAY_AT) {
-          TextInput({ placeholder: '截止时间 HH:mm', text: this.dueTime })
-            .width('100%')
-            .height(AppTheme.INPUT_HEIGHT)
-            .fontSize(AppTheme.FORM_TEXT_SIZE)
-            .backgroundColor(AppTheme.SURFACE_SUBTLE)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onChange((value: string) => this.dueTime = value);
-        } else if (this.duePolicy === ScheduledAssignmentDuePolicy.AFTER_MINUTES) {
-          TextInput({ placeholder: '创建后多少分钟截止', text: this.dueOffsetMinutesText })
-            .width('100%')
-            .height(AppTheme.INPUT_HEIGHT)
-            .fontSize(AppTheme.FORM_TEXT_SIZE)
-            .backgroundColor(AppTheme.SURFACE_SUBTLE)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onChange((value: string) => this.dueOffsetMinutesText = value);
-        }
       } else {
         Text('到点后只从' + this.subjectDisplay(this.subjectCode) +
           '语音素材中选择任务；存在未完成语音任务或当天已自动创建时不会重复创建。')
