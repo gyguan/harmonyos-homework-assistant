@@ -82,25 +82,28 @@ require("@State private selectedStudentId: string" in index_page and
         "@Prop @Watch('onRootStudentIdChanged') rootStudentId: string" in app_shell and
         "private onRootStudentIdChanged(): void" in app_shell,
         "root must publish observable selected student ID, not only a role/revision")
-require("@State private todayTaskItems: Assignment[]" in student_home and
+require("@State private pendingTaskItems: Assignment[]" in student_home and
+        "@State private subjectGroups: StudentHomeSubjectGroup[]" in student_home and
         "@Prop @Watch('onRevisionChanged') revision" in student_home and
         "private onRevisionChanged(): void" in student_home and
         "private onStudentIdChanged(): void" in student_home and
-        "this.todayTaskItems = [];" in student_home and
-        "this.todayTaskItems = items;" in student_home and
-        "this.viewModel.todayActionableAssignments(this.studentId)" in student_home and
-        "this.TodayTaskList();" in student_home and
-        "ForEach(this.todayTaskItems" in student_home and
-        "ForEach(this.remainingTaskItems" in student_home and
+        "this.pendingTaskItems = [];" in student_home and
+        "this.subjectGroups = [];" in student_home and
+        "this.pendingTaskItems = items;" in student_home and
+        "this.subjectGroups = this.buildSubjectGroups(items);" in student_home and
+        "this.viewModel.pendingAssignments(this.studentId)" in student_home and
+        "ForEach(this.subjectGroups" in student_home and
+        "ForEach(group.items" in student_home and
         "taskRenderEpoch" in student_home and
-        "assignment: this.todayTaskItems[0]" in student_home and
+        "private HomeContent()" in student_home and
+        "private PadHome()" not in student_home and
         "this.assignments()" not in student_home,
-        "student home must render a reactive student-owned task snapshot on phone and PAD")
+        "student home must render a reactive student-owned single-column subject snapshot on phone and PAD")
 require("assignments(studentId: string = '')" in home_vm and
         "item.studentId === studentId" in home_vm and
-        "todayActionableAssignments(studentId: string = '')" in home_vm and
+        "pendingAssignments(studentId: string = '')" in home_vm and
         "this.assignments(studentId)" in home_vm,
-        "student home view model must filter tasks by explicit active student ID")
+        "student home view model must filter unfinished tasks by explicit active student ID")
 
 # Family switching must update every student-scoped tab immediately, not only
 # when the role changes or when an unrelated network request completes.
@@ -118,7 +121,7 @@ require("@Prop @Watch('onStudentIdChanged') studentId: string = '';" in student_
         "item.studentId !== this.studentId" in student_home and
         "item.studentId}|\u0024{item.id}" in student_home and
         "actionGeneration !== this.identityGeneration" in student_home,
-        "student home must show identity-scoped today cards and reject late old-child actions")
+        "student home must show identity-scoped pending cards and reject late old-child actions")
 require("@Prop @Watch('onStudentIdChanged') studentId: string = '';" in student_assignments and
         "private onStudentIdChanged(): void" in student_assignments and
         "this.snapshotRevision = -1;" in student_assignments and
