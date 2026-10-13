@@ -66,22 +66,17 @@ require("private QuickFilterBar()" in assignments and
 require("Text('要做的')" not in assignments,
         "#291 Assignments must not repeat a redundant todo section heading above the active task list")
 
-# Detail: show authoritative content only; omit generic and empty cards; pin the main action.
-require("Scroll()" in detail and "Button(this.actionLabel(this.assignment()!)" in detail,
-        "#291 Detail must scroll content independently from its primary action")
-require("textbookRef.length > 0" in detail and
-        "resourceLabels.length > 0" in detail,
-        "#291 Detail must render optional information only when present")
-require("完成要求" not in detail and "提交方式" not in detail and "暂无老师资料" not in detail,
-        "#291 Detail must omit generic and empty-value cards")
-
-# Study/submit: task content gets the focus; Tutor and destructive resume are opt-in.
-require("private ResourcePane()" in study and
-        "this.assignment()!.textbookRef.length > 0 || this.assignment()!.resourceLabels.length > 0" in study,
-        "#291 Study resources must disappear when empty")
-require("if (this.tutorPanelOpen) this.SplitWorkspace();" in study and
-        "aboutToAppear(): void { void this.loadTutor(); }" not in study,
-        "#291 Pad Tutor must open only after the student asks for help")
+# Assignment detail and execution share one page: content stays focused and START reveals timing in place.
+require("StudyWorkspacePage" in detail and "onStoreChanged: () => void" in detail,
+        "#291 Assignment Detail must embed the unified assignment workspace")
+require("教材 / 页码" not in study and "Button('问小伴'" not in study and "TutorPane" not in study,
+        "#291 unified assignment workspace must remove textbook/page and Tutor distractions")
+require("private ResourcePane()" in study and "this.assignment()!.resourceLabels.length > 0" in study,
+        "#291 teacher resources may remain only when actual attachment metadata exists")
+require("AssignmentCountdownCard" in study and
+        "this.assignment()!.status === AssignmentStatus.IN_PROGRESS" in study and
+        "this.assignment()!.status === AssignmentStatus.PAUSED" in study,
+        "#291 countdown must appear in-place only after assignment execution starts")
 require("requestResumeFromSubmission" in study and "SubmissionResumeConfirmDialog" in study and
         "this.resumeConfirmController.open()" in study,
         "#291 Continue-work must confirm before clearing selected photos")

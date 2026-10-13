@@ -25,7 +25,6 @@ repository_impl = read("entry/src/main/ets/data/repository/DefaultAssignmentRepo
 remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 study_vm = read("entry/src/main/ets/features/student/study/StudyWorkspaceViewModel.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
-study_route = read("entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets")
 submission = read("entry/src/main/ets/application/submission/HomeworkSubmissionService.ets")
 controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
 dtos = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentDtos.java")
@@ -64,13 +63,12 @@ require("HomeworkStore.instance" not in study,
 require("this.viewModel.performAction" in study and "AssignmentAction.START" in study and
         "AssignmentAction.PAUSE" in study and "AssignmentAction.READY_TO_SUBMIT" in study,
         "Study Workspace must use explicit server-backed assignment actions")
-require("aboutToAppear(): void" not in study_route and
-        "AssignmentAction.START" not in study_route and "activateAssignment" not in study_route,
-        "entering Study Workspace must never auto-start timing before the student presses the action button")
-require("private WorkspaceActionBar(showTutorEntry: boolean)" in study and
-        "Button('暂停一下'" in study and "this.WorkspaceActionBar(true)" in study and
-        "this.WorkspaceActionBar(false)" in study,
-        "Study Workspace must keep pause beside the primary submit/progress action on Phone and Pad")
+require("private WorkspaceActionBar()" in study and
+        "Button('暂停一下'" in study and "this.WorkspaceActionBar();" in study,
+        "unified assignment workspace must keep pause beside the primary submit/progress action")
+require("AssignmentCountdownCard" in study and
+        "this.assignment()!.status === AssignmentStatus.IN_PROGRESS" in study,
+        "START must reveal countdown inside the existing Assignment Detail surface")
 require("Button('继续作业'" in study and "resumeFromSubmission" in study and
         "AssignmentStatus.READY_TO_SUBMIT" in study,
         "submit preparation must expose a reversible continue-working action")
@@ -83,8 +81,9 @@ require(study.find("private StudyContent(") < study.find("private WorkspaceActio
         "Study content must not keep a detached pause text action above resources/submission")
 require("HomeworkSubmissionService.instance.listCached" in study,
         "Study Workspace submission reads must stay behind the submission application service")
-require("TutorRemoteApi.instance" in study and "HomeworkSubmissionService.instance.submit" in study,
-        "Slice 3 execution migration must preserve Tutor and Submission flows")
+require("TutorRemoteApi.instance" not in study and "Button('问小伴'" not in study and
+        "HomeworkSubmissionService.instance.submit" in study,
+        "Slice 3 execution migration must remove Tutor UI/code while preserving Submission flows")
 require("listCached(assignmentId: string): Submission[]" in submission,
         "submission application service must expose cached submissions to migrated UI")
 

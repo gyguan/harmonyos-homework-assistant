@@ -16,7 +16,6 @@ def require(condition: bool, message: str) -> None:
     if not condition:
         errors.append(message)
 
-route = read("entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 pane = read("entry/src/main/ets/components/assignment/VoiceAssignmentPane.ets")
 parent = read("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
@@ -24,8 +23,6 @@ media_picker = read("entry/src/main/ets/application/assignment/VoiceAssignmentMe
 remote_resource = read("entry/src/main/ets/application/remote/RemoteAssignmentResourceApi.ets")
 backend_resource = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentResourceService.java")
 
-require("assignment.contentType !== AssignmentContentType.AUDIO_IMAGE" in route,
-        "voice assignments must hide the duplicated extracurricular context banner")
 require("contentType !== AssignmentContentType.AUDIO_IMAGE" in study,
         "voice assignments must hide the duplicated generic ResourcePane")
 require(study.count("contentType !== AssignmentContentType.AUDIO_IMAGE") >= 3,

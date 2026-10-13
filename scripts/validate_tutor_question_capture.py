@@ -45,27 +45,12 @@ require("onRecognized" in panel and "this.onRecognized(result.recognizedText)" i
 require("本机文字识别暂不可用" in panel and "照片读取失败" in panel and
         "无法打开系统相机" in panel,
         "Tutor capture failures must distinguish OCR, camera and image-read problems")
-require("TutorQuestionCapturePanel" in study and "题目识别结果" in study,
-        "study workspace must put OCR text into the Tutor draft")
-require(study.find("TextArea({ placeholder: '说说你卡在哪一步") < study.find("TutorQuestionCapturePanel({") <
-        study.find("Button(this.tutorSending ? '发送中…' : '发送'"),
-        "Tutor capture must live inside the bottom composer after text entry and before send")
+require("TutorQuestionCapturePanel" not in study and "TutorRemoteApi" not in study and
+        "问小伴" not in study,
+        "assignment workspace must not expose Tutor question capture after the focused UI simplification")
 require("只在本机识别" in panel and ".padding(12)" not in panel,
-        "Tutor capture must stay a compact input accessory instead of a standalone card")
-require("小伴学习助手" in study and "有哪里卡住了？" in study,
-        "Tutor panel must present a clear learning-assistant identity instead of a generic chat title")
-for suggestion in ["怎么开始？", "检查思路", "提示下一步"]:
-    require(suggestion in study, f"Tutor empty state missing quick prompt: {suggestion}")
-require("CenteredTextBadge" in study and "badgeText: '伴'" in study,
-        "Tutor assistant messages must keep a visible assistant identity")
-require("Text('你的问题')" in study and "TutorQuestionCapturePanel" in study and
-        "Button(this.tutorSending ? '发送中…' : '发送'" in study and
-        "backgroundColor(AppTheme.SURFACE_SUBTLE)" in study,
-        "Tutor composer must group text, camera and send actions into one input surface without redundant helper copy")
-require("请确认或补充后再发送" in study,
-        "captured question must require student review before sending instead of auto-submit")
-require("TutorRemoteApi.instance.ask(this.assignmentId, text)" in study,
-        "captured question must reuse the existing text Tutor API")
+        "Tutor capture component must remain a compact reusable input accessory")
+
 require("imageUri" not in tutor_api and "photo" not in tutor_api.lower(),
         "Tutor remote API must remain text-only and must not upload the question image")
 require("ohos.permission.CAMERA" not in module,

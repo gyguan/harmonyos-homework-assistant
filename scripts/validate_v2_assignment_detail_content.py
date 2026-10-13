@@ -5,7 +5,6 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 errors: list[str] = []
 
-
 def read(path: str) -> str:
     file = ROOT / path
     if not file.exists():
@@ -13,59 +12,47 @@ def read(path: str) -> str:
         return ""
     return file.read_text(encoding="utf-8")
 
-
 def require(condition: bool, message: str) -> None:
     if not condition:
         errors.append(message)
 
-
 detail = read("entry/src/main/ets/features/student/assignments/AssignmentDetailPane.ets")
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
-models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
+study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
+routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
+shell = read("entry/src/main/ets/pages/AppShell.ets")
 
-for token in ["老师要求", "教材 / 页码", "老师资料", "需要先订正"]:
-    require(token in detail, f"Assignment Detail missing focused V2 content: {token}")
-
-require("Text(this.assignment()!.instruction.length > 0 ? this.assignment()!.instruction" in detail,
-        "teacher requirement must render the authoritative Assignment instruction")
-require("if (this.assignment()!.textbookRef.length > 0)" in detail and "Text(this.assignment()!.textbookRef)" in detail,
-        "textbook/page section must render only when Assignment.textbookRef exists")
-require("if (this.assignment()!.resourceLabels.length > 0)" in detail and
-        "ForEach(this.assignment()!.resourceLabels" in detail,
-        "teacher resources must render existing Assignment.resourceLabels individually")
-require("暂无老师资料" not in detail and "Text(this.assignment()!.textbookRef)" in detail,
-        "Assignment Detail must not show empty optional-value cards to the student")
-require("完成要求" not in detail and "提交方式" not in detail,
-        "Assignment Detail must not repeat generic completion or submission instructions")
-require(detail.find("需要先订正") < detail.find("老师要求"),
-        "rework feedback must appear before the teacher instruction")
-
-require("private DetailContent()" in detail and
-        "private DetailContent(item: Assignment)" not in detail and
-        "this.DetailContent();" in detail,
-        "Assignment Detail content must stay bound to reactive assignmentId/revision instead of capturing an Assignment builder parameter")
-detail_content = detail.split("private DetailContent()", 1)[-1].split("\n  build() {", 1)[0]
-require("item" not in detail_content and "this.assignment()!" in detail_content,
-        "Assignment Detail content must resolve the current assignment from reactive props during render")
-require("Scroll()" in detail and ".layoutWeight(1)" in detail and
-        "Button(this.actionLabel(this.assignment()!)" in detail,
-        "Assignment Detail must keep content scrollable with a fixed primary action")
-require("HomeworkStore.instance" not in detail,
-        "V2 Assignment Detail must stay behind AssignmentRepository cache instead of direct Store access")
-require("AssignmentDetailPane" in page and "DeepPageHeader" in page,
-        "standalone Assignment Detail must reuse the shared pane and deep-page chrome")
-require("resourceLabels: string[]" in models,
-        "Assignment domain must retain resource metadata used by Detail/Study")
-
-# Resource labels have no URI in the current domain; they must remain non-clickable labels.
-resource_section = detail.split("this.SectionTitle('老师资料');", 1)[-1].split(".backgroundColor(AppTheme.SURFACE_SUBTLE)", 1)[0]
-require("onClick" not in resource_section,
-        "label-only teacher resources must not pretend to be clickable without a real URI")
+require("StudyWorkspacePage" in detail and
+        "assignmentId: this.assignmentId" in detail and
+        "revision: this.revision" in detail and
+        "onStoreChanged: () => this.onStoreChanged()" in detail,
+        "Assignment Detail must embed the execution workspace instead of navigating to a second page")
+require("AssignmentDetailPane" in page and "DeepPageHeader" in page and
+        "onStoreChanged: () => void" in page,
+        "Phone Assignment Detail must keep deep-page chrome around the unified workspace")
+require("private StudyContent(showPrimaryAction: boolean)" in study and
+        "this.StudyContent(false);" in study and "this.WorkspaceActionBar();" in study,
+        "unified workspace must render detail content and execution actions in one surface")
+for token in ["老师要求", "教材 / 页码", "Button('问小伴'", "TutorPane"]:
+    require(token not in study, f"unified workspace must not show removed student UI: {token}")
+require("this.assignment()!.instruction.length > 0" in study,
+        "teacher instruction must remain visible on the unified page")
+require("this.assignment()!.resourceLabels.length > 0" in study and "老师附件" in study,
+        "teacher attachments may remain when actual resources exist")
+require("AssignmentCountdownCard" in study and
+        "this.assignment()!.status === AssignmentStatus.IN_PROGRESS" in study and
+        "this.assignment()!.status === AssignmentStatus.PAUSED" in study,
+        "countdown must appear in the same page after START/RESUME")
+require("STUDENT_STUDY" not in routes and "AppRoute.STUDENT_STUDY" not in shell and
+        "StudyWorkspaceRoutePage" not in shell,
+        "separate Student Study navigation destination must be retired")
+require("HomeworkStore.instance" not in detail and "HomeworkStore.instance" not in study,
+        "unified detail/workspace must stay behind repository/application boundaries")
 
 if errors:
-    print("V2_ASSIGNMENT_DETAIL_CONTENT_GATE_FAIL")
+    print("V2_ASSIGNMENT_DETAIL_CONTENT_FAIL")
     for error in errors:
         print(f"- {error}")
     sys.exit(1)
 
-print("V2_ASSIGNMENT_DETAIL_CONTENT_GATE_PASS")
+print("V2_ASSIGNMENT_DETAIL_CONTENT_PASS")

@@ -23,8 +23,8 @@ checks = {
     'authoritative assignment mutation invalidates home summary': 'this.remoteSummary = null;' in repository and 'applyAuthoritative(updated: Assignment)' in repository,
     'study workspace still owns all execution commands': 'AssignmentAction.START' in study and 'executeAction' in study,
     'shell never starts assignment locally': 'HomeworkStore.instance.startAssignment(assignmentId);' not in app_shell,
-    'study opens through NavPathStack': 'AppRoute.STUDENT_STUDY' in app_shell and 'pushPathByName' in app_shell,
-    'home reports mutation before navigation': 'this.onStoreChanged();' in home and 'this.onOpenStudy(assignmentId);' in home,
+    'assignment execution opens through unified detail NavPathStack': 'AppRoute.STUDENT_ASSIGNMENT_DETAIL' in app_shell and 'AppRoute.STUDENT_STUDY' not in app_shell and 'pushPathByName' in app_shell,
+    'home reports mutation before unified detail navigation': 'this.onStoreChanged();' in home and 'this.onOpenStudy(assignmentId);' in home,
     'V2 home is the default student surface': 'StudentHomePage({' in app_shell and 'StudentTodayPage' not in app_shell,
 }
 
