@@ -33,7 +33,7 @@ require("this.familyContext.setActiveStudent(studentId)" in index,
         "student identity selection must bind active student through FamilyContextRepository")
 require("AppShell({" in index and "role: this.selectedRole" in index,
         "AppShell role must remain a root-owned read-only prop")
-require("onSwitchParent: (identity: ParentIdentity) => this.requestParentAccess(identity)" in index and
+require("onSwitchParent: (identity: ParentIdentity) => { void this.requestParentAccess(identity); }" in index and
         "onSwitchStudent: (studentId: string) => this.enterStudent(studentId)" in index,
         "AppShell identity changes must delegate parent/student ownership back to Index")
 require("HomeworkSyncService" not in index and
@@ -70,16 +70,16 @@ require("家长" in entry_page and "孩子" in entry_page and "谁在使用" in 
         "initial entry page must still expose parent and child choices")
 require("onSelectStudent(student.id)" in entry_page,
         "initial student selection must preserve the selected child id")
-require("onSelectParent: (identity: ParentIdentity) => this.requestParentAccess(identity)" in index and
-        "private requestParentAccess(identity: ParentIdentity): void" in index and
-        "private confirmParentAccess(): void" in index and
+require("onSelectParent: (identity: ParentIdentity) => { void this.requestParentAccess(identity); }" in index and
+        "private async requestParentAccess(identity: ParentIdentity): Promise<void>" in index and
+        "private async confirmParentAccess(): Promise<void>" in index and
         "private enterParent(identity: ParentIdentity): void" in index,
-        "dad/mom parent entry must use the root-owned parent access gate")
-require("@CustomDialog" in parent_access and "请输入设备家长码" in parent_access,
-        "parent access must use an explicit local verification dialog")
-require("updateParentAccessCode" in settings and "设备家长码" in settings and
-        "家长码只保存在当前设备" in settings,
-        "parent settings must allow enabling, changing and disabling the device access code")
+        "dad/mom parent entry must use the root-owned cloud parent access gate")
+require("@CustomDialog" in parent_access and "请输入家庭家长码" in parent_access,
+        "parent access must use an explicit family verification dialog")
+require("ParentAccessRemoteApi" in settings and "家庭家长码" in settings and
+        "加密保存到家庭云端" in settings,
+        "parent settings must manage the family cloud parent access code")
 
 require("@Prop @Watch('onRoleChanged') role: AppRole" in app_shell and
         "@State private role" not in app_shell and
