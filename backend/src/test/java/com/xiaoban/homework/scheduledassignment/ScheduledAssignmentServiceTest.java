@@ -109,6 +109,7 @@ class ScheduledAssignmentServiceTest {
     plan.familyId = familyId;
     plan.studentId = "student-1";
     plan.planType = "VOICE_MATERIAL_AUTO";
+    plan.subjectCode = "CHINESE";
     plan.name = "每日语音作业";
     plan.scheduleType = "DAILY";
     plan.scheduleTime = scheduleTime;
