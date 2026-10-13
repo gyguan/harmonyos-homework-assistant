@@ -5,6 +5,7 @@ import { image } from '@kit.ImageKit';
 export interface EncodedHomeworkImage {
   imageBase64: string;
   contentType: string;
+  encodedBytes: number;
 }
 
 export class HomeworkImageEncoder {
@@ -49,7 +50,8 @@ export class HomeworkImageEncoder {
       let helper = new util.Base64Helper();
       return {
         imageBase64: await helper.encodeToString(new Uint8Array(encoded)),
-        contentType: 'image/jpeg'
+        contentType: 'image/jpeg',
+        encodedBytes: encoded.byteLength
       };
     } finally {
       // Resource cleanup is best effort and must preserve the parse result or primary error.
