@@ -1,6 +1,6 @@
 import { AppTheme } from '../../common/theme/AppTheme';
 import { Subject } from '../../domain/model/HomeworkModels';
-import { DeadlinePickerField } from './DeadlinePickerField';
+import { TaskDatePickerField } from './TaskDatePickerField';
 import { ChoiceSelectionChip } from '../selection/SelectionControls';
 
 @Component
@@ -9,13 +9,13 @@ export struct AssignmentEditForm {
   @Prop subjectEditable: boolean = true;
   @Prop title: string = '';
   @Prop instruction: string = '';
-  @Prop dueText: string = '';
+  @Prop taskDate: string = '';
   @Prop expectedMinutes: number = 20;
 
   onSubjectChange: (subject: Subject) => void = (_subject: Subject) => {};
   onTitleChange: (value: string) => void = (_value: string) => {};
   onInstructionChange: (value: string) => void = (_value: string) => {};
-  onDueTextChange: (value: string) => void = (_value: string) => {};
+  onTaskDateChange: (value: string) => void = (_value: string) => {};
   onMinutesChange: (minutes: number) => void = (_minutes: number) => {};
 
   private applyCustomMinutes(value: string): void {
@@ -216,11 +216,10 @@ export struct AssignmentEditForm {
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .onChange((value: string) => this.onInstructionChange(value));
 
-      Text('截止时间').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-      DeadlinePickerField({
-        value: this.dueText,
-        allowClear: true,
-        onChange: (value: string) => this.onDueTextChange(value)
+      Text('任务日期').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+      TaskDatePickerField({
+        value: this.taskDate,
+        onChange: (value: string) => this.onTaskDateChange(value)
       });
 
       this.DurationSection();
