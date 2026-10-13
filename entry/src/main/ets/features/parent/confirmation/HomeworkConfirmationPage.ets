@@ -40,30 +40,6 @@ export struct HomeworkConfirmationPage {
     return this.viewModel.candidates();
   }
 
-  private sameTaskPeerTitles(item: CandidateAssignment): string {
-    let group = item.sameTaskGroup === undefined ? '' : item.sameTaskGroup.trim();
-    if (group.length === 0) return '';
-    let titles: string[] = [];
-    for (let candidate of this.candidates()) {
-      if (candidate.id === item.id) continue;
-      let candidateGroup = candidate.sameTaskGroup === undefined ? '' : candidate.sameTaskGroup.trim();
-      if (candidateGroup !== group) continue;
-      let title = candidate.title.trim().length > 0 ? candidate.title.trim() : '未命名作业';
-      titles.push(`${candidate.subject} · ${title}`);
-    }
-    return titles.join('、');
-  }
-
-  private semanticWarningCount(): number {
-    let count = 0;
-    for (let item of this.candidates()) {
-      let duplicateAssignmentId =
-        item.duplicateAssignmentId === undefined ? '' : item.duplicateAssignmentId.trim();
-      if (this.sameTaskPeerTitles(item).length > 0 || duplicateAssignmentId.length > 0) count++;
-    }
-    return count;
-  }
-
   private editingCandidate(): CandidateAssignment | null {
     if (this.manualCandidateDraft !== null && this.manualCandidateDraft.id === this.editingCandidateId) {
       return this.manualCandidateDraft;
@@ -73,7 +49,7 @@ export struct HomeworkConfirmationPage {
   }
 
   private candidateRenderKey(item: CandidateAssignment): string {
-    return `${item.id}|${item.subject}|${item.title}|${item.instruction}|${item.taskDate}|${item.textbookRef}|${item.expectedMinutes}|${item.sameTaskGroup}|${this.sameTaskPeerTitles(item)}|${item.duplicateAssignmentId}|${item.duplicateAssignmentTitle}|${item.duplicateConfidence}|${item.duplicateReason}`;
+    return `${item.id}|${item.subject}|${item.title}|${item.instruction}|${item.taskDate}|${item.textbookRef}|${item.expectedMinutes}`;
   }
 
   private openEditor(candidateId: string): void {
@@ -125,12 +101,7 @@ export struct HomeworkConfirmationPage {
         imageRef: item.sourceEvidence.imageRef,
         capturedAtEpochMs: item.sourceEvidence.capturedAtEpochMs
       },
-      confidence: item.confidence,
-      sameTaskGroup: item.sameTaskGroup,
-      duplicateAssignmentId: item.duplicateAssignmentId,
-      duplicateAssignmentTitle: item.duplicateAssignmentTitle,
-      duplicateConfidence: item.duplicateConfidence,
-      duplicateReason: item.duplicateReason
+      confidence: item.confidence
     });
   }
 
@@ -384,7 +355,6 @@ export struct HomeworkConfirmationPage {
 
               ConfirmationCandidateCard({
                 item: item,
-                sameTaskPeerTitles: this.sameTaskPeerTitles(item),
                 selected: this.bulkMode ? this.isCandidateSelected(item.id) :
                   (this.showEditorSheet && this.editingCandidateId === item.id),
                 onSelect: () => {
@@ -498,9 +468,7 @@ export struct HomeworkConfirmationPage {
       Column({ space: 10 }) {
         DeepPageHeader({
           title: '确认发布',
-          subtitle: this.semanticWarningCount() > 0 ?
-            `${this.candidates().length} 项待确认 · ${this.semanticWarningCount()} 项疑似重复` :
-            `${this.candidates().length} 项待确认`,
+          subtitle: `${this.candidates().length} 项待确认`,
           backAccessibilityText: '返回导入',
           onBack: () => this.onBack()
         });
