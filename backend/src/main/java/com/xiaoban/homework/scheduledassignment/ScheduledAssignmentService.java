@@ -320,7 +320,8 @@ public class ScheduledAssignmentService {
 
   private VoiceMaterialDtos.AutoCreateResponse emptyVoiceResponse() {
     return new VoiceMaterialDtos.AutoCreateResponse(
-        false, LocalDate.now(ScheduledAssignmentSchedule.BUSINESS_ZONE).toString(), "", "", null);
+        false, LocalDate.now(ScheduledAssignmentSchedule.BUSINESS_ZONE).toString(), "", "", null,
+        false);
   }
 
   private String planType(String value) {

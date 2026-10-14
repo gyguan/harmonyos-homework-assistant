@@ -282,7 +282,10 @@ public class ScheduledAssignmentAttemptService {
     if ("SUCCESS".equals(run.status)) return true;
     if ("FAILED".equals(run.status) && run.retryCount >= MAX_RETRIES) return true;
     if (!"SKIPPED".equals(run.status)) return false;
-    return "ALREADY_CREATED_TODAY".equals(run.skipReason);
+    // 这两种跳过都表示「今天已经有那条要做的任务了」，再试一次也只会得到同样的结论，
+    // 不该让调度器反复重试；其余跳过原因（无素材）留着让学生进入时再兜底一次。
+    return "ALREADY_CREATED_TODAY".equals(run.skipReason)
+        || "CARRIED_OVER".equals(run.skipReason);
   }
 
   private void finishSkipped(
@@ -314,6 +317,7 @@ public class ScheduledAssignmentAttemptService {
   }
 
   private String voiceSkipReason(VoiceMaterialDtos.AutoCreateResponse result) {
+    if (result.carriedOver()) return "CARRIED_OVER";
     if (result.assignment() != null) return "ACTIVE_TASK_EXISTS";
     if (!text(result.packageId()).isBlank() || !text(result.assignmentId()).isBlank()) {
       return "ALREADY_CREATED_TODAY";
@@ -324,7 +328,7 @@ public class ScheduledAssignmentAttemptService {
   private VoiceMaterialDtos.AutoCreateResponse emptyVoiceResponse() {
     return new VoiceMaterialDtos.AutoCreateResponse(
         false, LocalDate.now(ScheduledAssignmentSchedule.BUSINESS_ZONE).toString(),
-        "", "", null);
+        "", "", null, false);
   }
 
   private String text(String value) { return value == null ? "" : value; }

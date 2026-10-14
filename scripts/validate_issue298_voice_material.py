@@ -27,6 +27,7 @@ query_service = read("backend/src/main/java/com/xiaoban/homework/voicematerial/V
 controller = read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialController.java")
 resource_service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentResourceService.java")
 delete_service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
+attempt_service = read("backend/src/main/java/com/xiaoban/homework/scheduledassignment/ScheduledAssignmentAttemptService.java")
 remote = read("entry/src/main/ets/application/remote/RemoteVoiceMaterialApi.ets")
 auto = read("entry/src/main/ets/application/assignment/VoiceMaterialAutoCreateService.ets")
 index = read("entry/src/main/ets/pages/Index.ets")
@@ -79,7 +80,7 @@ if len(manual_block) == 2:
 auto_block = assignment_service.split("public VoiceMaterialDtos.AutoCreateResponse autoCreateNext", 1)
 require(len(auto_block) == 2 and
         "assignments.findFirstVoiceMaterialTaskForDate(familyId, studentId, businessDate)" in auto_block[1],
-        "automatic creation must only stop for an effective voice task due on the current business day")
+        "automatic creation must first reuse an effective voice task due on the current business day")
 require("findFirstVoiceMaterialTaskForDate" in delete_service and
         "StatusNotAndTaskDateOrderByUpdatedAtDesc" in read(
             "backend/src/main/java/com/xiaoban/homework/assignment/AssignmentRepository.java"),
@@ -93,6 +94,59 @@ if len(auto_block) == 2:
     require("new VoiceMaterialAutoCreateRecordEntity()" in auto_body and
             "orElseGet(VoiceMaterialAutoCreateRecordEntity::new)" not in auto_body,
             "daily automatic creation record must be one-shot and must not be overwritten")
+
+# Carry over: 昨天没做完的自动任务挪到今天，而不是再建一条新的。
+carried_over = auto_block[1] if len(auto_block) == 2 else ""
+require("findCarryOver(familyId, studentId, businessDate)" in carried_over and
+        "carryOver.assignmentId" in carried_over and
+        "carryOver.packageId" in carried_over,
+        "automatic creation must carry over the unfinished auto task instead of creating another")
+require("carryOverToBusinessDate(" in carried_over and
+        "recordAutoCreate(familyId, studentId, businessDate, carryOver.packageId" in carried_over,
+        "carry over must move the task date and consume the current business day quota")
+if len(auto_block) == 2:
+    auto_body = auto_block[1].split("private VoiceMaterialPackageEntity chooseAutoFolder", 1)[0]
+    require(0 <= auto_body.find("findCarryOver(familyId, studentId, businessDate)")
+            < auto_body.find("if (todayRecord != null)"),
+            "carry over must run before the daily record check, otherwise the record written by "
+            "the task's own creation would pin that task to the previous day forever")
+    require('if (!"AUTO".equals(link.createMode)) continue;' in auto_body,
+            "only automatically created tasks may be carried over; manual and legacy task dates "
+            "must never be moved by the system")
+    require("isSettled(item.status)" in auto_body, "settled tasks must not be carried over")
+
+carry_over_split = delete_service.split(
+    "public AssignmentDtos.Response carryOverToBusinessDate(", 1)
+require(len(carry_over_split) == 2 and
+        "e.taskDate = businessDate" in carry_over_split[1] and
+        "nextVoiceMaterialTaskTitle(" in carry_over_split[1],
+        "carry over must move taskDate and refresh the dated voice title")
+if len(carry_over_split) == 2:
+    carry_over_body = carry_over_split[1].split("\n  public ", 1)[0]
+    require("e.status" not in carry_over_body and "e.startedAtEpochMs" not in carry_over_body and
+            "e.elapsedSeconds" not in carry_over_body,
+            "carry over must not reset status or in-progress timing")
+    require("businessDate, materialTitle, e.id)" in carry_over_body,
+            "carry over must exclude the task itself from the same-day title counter, "
+            "otherwise a renamed task is needlessly suffixed with a sequence number")
+require("AndCreatedAtLessThanAndIdNot(" in read(
+            "backend/src/main/java/com/xiaoban/homework/assignment/AssignmentRepository.java"),
+        "the same-day title counter needs an id-excluding variant for carry over")
+
+settled_split = assignment_service.split(
+    "private static boolean isSettled(String status)", 1)
+require(len(settled_split) == 2, "settled status helper must exist")
+if len(settled_split) == 2:
+    settled_body = settled_split[1].split("}", 1)[0]
+    for settled in ("READY_TO_SUBMIT", "SUBMITTED", "COMPLETED"):
+        require(f'"{settled}".equals(status)' in settled_body,
+                f"child-submitted state {settled} must count as done and not be carried over")
+    require("NOT_STARTED" not in settled_body and "PAUSED" not in settled_body and
+            "NEEDS_REWORK" not in settled_body and "OVERDUE" not in settled_body,
+            "unfinished states must stay carry-over eligible")
+
+require('"CARRIED_OVER".equals(run.skipReason)' in attempt_service,
+        "a carried over run must be recorded as a final skip so the scheduler stops retrying it")
 require('String assignmentId = "a-voice-" + UUID.randomUUID()' in assignment_service,
         "folder reuse must create a distinct Assignment instance")
 require("link.packageId = item.id" in assignment_service and
@@ -207,6 +261,17 @@ for token in [
     "enforce daily auto-create limit after all tasks cleared",
     "create parallel manual task from same folder",
     "manual create idempotent retry",
+    # 顺延：把没做完的自动任务挪到今天，而不是再建一条。
+    "auto create must carry the unfinished task over",
+    "carry over must keep the same Assignment instance",
+    "carried task must be dated today",
+    "carry over must not create a second voice task",
+    "carry over must regenerate the task name from the new business date",
+    "carry over must not suffix the renamed task with a sequence number",
+    "a carried over task must already consume the current business day quota",
+    # 孩子已经交出去的（待提交/已提交）不再顺延。
+    "a task the child already handed in must not be carried over",
+    "a submitted task must stay on its own date and keep its status",
 ]:
     require(token in voice_e2e, f"voice material E2E missing lifecycle assertion: {token}")
 

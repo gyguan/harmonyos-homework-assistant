@@ -153,7 +153,7 @@ class VoiceMaterialAssignmentServiceTest {
   }
 
   @Test
-  void historicalVoiceTaskOutsideBusinessDayDoesNotBlockAutomaticCreation() {
+  void automaticCreationProceedsWhenNoAutoTaskNeedsCarryOver() {
     UUID familyId = UUID.randomUUID();
     UUID packageId = UUID.randomUUID();
     VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "001-语文", "READY");
@@ -180,10 +180,199 @@ class VoiceMaterialAssignmentServiceTest {
         service().autoCreateNext(familyId, "student-1");
 
     assertTrue(result.created());
+    assertFalse(result.carriedOver());
     assertEquals(packageId.toString(), result.packageId());
     assertEquals(created.id(), result.assignmentId());
     assertEquals("READY", item.status);
     verify(links).saveAndFlush(any(VoiceMaterialTaskLinkEntity.class));
+  }
+
+  @Test
+  void unfinishedAutoTaskFromPreviousDayIsCarriedOverInsteadOfCreatingAnother() {
+    UUID familyId = UUID.randomUUID();
+    UUID packageId = UUID.randomUUID();
+    LocalDate today = LocalDate.now(ZoneId.of("Asia/Shanghai"));
+    VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "001-语文", "READY");
+
+    AssignmentEntity previous = voiceAssignment("a-voice-yesterday", familyId, "PAUSED");
+    previous.taskDate = today.minusDays(1);
+    VoiceMaterialTaskLinkEntity link = link(packageId, previous.id, "student-1");
+    link.createMode = "AUTO";
+    AssignmentDtos.Response moved = response(previous.id, "语文 · 语音作业");
+
+    when(assignments.findFirstVoiceMaterialTaskForDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(null);
+    when(links.findByFamilyIdAndStudentIdOrderByCreatedAtDesc(familyId, "student-1"))
+        .thenReturn(List.of(link));
+    when(assignmentRepository.findById(previous.id)).thenReturn(Optional.of(previous));
+    when(packages.findById(packageId)).thenReturn(Optional.of(item));
+    when(assignments.carryOverToBusinessDate(
+        any(UUID.class), anyString(), any(LocalDate.class), anyString())).thenReturn(moved);
+
+    VoiceMaterialDtos.AutoCreateResponse result =
+        service().autoCreateNext(familyId, "student-1");
+
+    assertFalse(result.created());
+    assertTrue(result.carriedOver());
+    assertEquals(previous.id, result.assignmentId());
+    assertEquals(packageId.toString(), result.packageId());
+    assertEquals(moved, result.assignment());
+    // 名称必须按今天的业务日重算，素材标题取自原目录。
+    verify(assignments).carryOverToBusinessDate(familyId, previous.id, today, item.title);
+    // 顺延不是「再发一份」：既不能新建任务，也不能重新走一遍选目录。
+    verify(assignments, never()).create(any(), anyString(), any());
+    verify(packages, never()).findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
+        any(), anyString());
+  }
+
+  @Test
+  void carryOverConsumesTodaysAutoCreateQuota() {
+    UUID familyId = UUID.randomUUID();
+    UUID packageId = UUID.randomUUID();
+    LocalDate today = LocalDate.now(ZoneId.of("Asia/Shanghai"));
+    VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "001-语文", "READY");
+
+    AssignmentEntity previous = voiceAssignment("a-voice-yesterday", familyId, "NOT_STARTED");
+    previous.taskDate = today.minusDays(1);
+    VoiceMaterialTaskLinkEntity link = link(packageId, previous.id, "student-1");
+    link.createMode = "AUTO";
+
+    when(assignments.findFirstVoiceMaterialTaskForDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(null);
+    when(links.findByFamilyIdAndStudentIdOrderByCreatedAtDesc(familyId, "student-1"))
+        .thenReturn(List.of(link));
+    when(assignmentRepository.findById(previous.id)).thenReturn(Optional.of(previous));
+    when(packages.findById(packageId)).thenReturn(Optional.of(item));
+    when(assignments.carryOverToBusinessDate(
+        any(UUID.class), anyString(), any(LocalDate.class), anyString()))
+        .thenReturn(response(previous.id, "语文 · 语音作业"));
+
+    service().autoCreateNext(familyId, "student-1");
+
+    // 顺延也要占掉今天的自动额度，否则孩子今天做完这条后会立刻再拿到一份新的。
+    ArgumentCaptor<VoiceMaterialAutoCreateRecordEntity> record =
+        ArgumentCaptor.forClass(VoiceMaterialAutoCreateRecordEntity.class);
+    verify(autoRecords).saveAndFlush(record.capture());
+    assertEquals(today, record.getValue().businessDate);
+    assertEquals(packageId, record.getValue().packageId);
+    assertEquals(previous.id, record.getValue().assignmentId);
+  }
+
+  @Test
+  void carryOverDoesNotInsertASecondRecordForTheSameBusinessDay() {
+    UUID familyId = UUID.randomUUID();
+    UUID packageId = UUID.randomUUID();
+    LocalDate today = LocalDate.now(ZoneId.of("Asia/Shanghai"));
+    VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "001-语文", "READY");
+
+    // 这条任务本来就是今天自动建出来的（家长随后把日期改到了昨天），今天的额度记录早就在了。
+    AssignmentEntity previous = voiceAssignment("a-voice-today", familyId, "NOT_STARTED");
+    previous.taskDate = today.minusDays(1);
+    VoiceMaterialTaskLinkEntity link = link(packageId, previous.id, "student-1");
+    link.createMode = "AUTO";
+
+    VoiceMaterialAutoCreateRecordEntity existing = new VoiceMaterialAutoCreateRecordEntity();
+    existing.id = UUID.randomUUID();
+    existing.familyId = familyId;
+    existing.studentId = "student-1";
+    existing.businessDate = today;
+    existing.packageId = packageId;
+    existing.assignmentId = previous.id;
+
+    when(assignments.findFirstVoiceMaterialTaskForDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(null);
+    when(links.findByFamilyIdAndStudentIdOrderByCreatedAtDesc(familyId, "student-1"))
+        .thenReturn(List.of(link));
+    when(assignmentRepository.findById(previous.id)).thenReturn(Optional.of(previous));
+    when(packages.findById(packageId)).thenReturn(Optional.of(item));
+    when(assignments.carryOverToBusinessDate(
+        any(UUID.class), anyString(), any(LocalDate.class), anyString()))
+        .thenReturn(response(previous.id, "语文 · 语音作业"));
+    when(autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(Optional.of(existing));
+
+    VoiceMaterialDtos.AutoCreateResponse result =
+        service().autoCreateNext(familyId, "student-1");
+
+    assertTrue(result.carriedOver());
+    // 直接 insert 会撞上 uq_voice_material_auto_daily，把整次自动创建拖成 500。
+    verify(autoRecords, never()).saveAndFlush(any(VoiceMaterialAutoCreateRecordEntity.class));
+  }
+
+  @Test
+  void submittedAutoTaskFromPreviousDayDoesNotBlockNewAutomaticCreation() {
+    UUID familyId = UUID.randomUUID();
+    UUID packageId = UUID.randomUUID();
+    LocalDate today = LocalDate.now(ZoneId.of("Asia/Shanghai"));
+    VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "002-数学", "READY");
+    AssignmentDtos.Response created = response("a-voice-today", "数学 · 语音作业");
+
+    AssignmentEntity previous = voiceAssignment("a-voice-submitted", familyId, "SUBMITTED");
+    previous.taskDate = today.minusDays(1);
+    VoiceMaterialTaskLinkEntity link = link(UUID.randomUUID(), previous.id, "student-1");
+    link.createMode = "AUTO";
+
+    when(assignments.findFirstVoiceMaterialTaskForDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(null);
+    when(links.findByFamilyIdAndStudentIdOrderByCreatedAtDesc(familyId, "student-1"))
+        .thenReturn(List.of(link));
+    when(assignmentRepository.findById(previous.id)).thenReturn(Optional.of(previous));
+    when(autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(Optional.empty());
+    when(packages.findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
+        familyId, "student-1")).thenReturn(List.of(item));
+    when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
+    when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
+        .thenReturn(created);
+    when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
+        familyId, packageId)).thenReturn(List.of());
+
+    VoiceMaterialDtos.AutoCreateResponse result =
+        service().autoCreateNext(familyId, "student-1");
+
+    // 孩子昨天已经交出去了，今天应该照常拿到新的一份，而不是把旧的又拉回来。
+    assertTrue(result.created());
+    assertFalse(result.carriedOver());
+    assertEquals(created.id(), result.assignmentId());
+    verify(assignments, never()).carryOverToBusinessDate(any(), anyString(), any(), any());
+  }
+
+  @Test
+  void manualAndLegacyTasksAreNeverCarriedOver() {
+    UUID familyId = UUID.randomUUID();
+    UUID packageId = UUID.randomUUID();
+    LocalDate today = LocalDate.now(ZoneId.of("Asia/Shanghai"));
+    VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "003-英语", "READY");
+    AssignmentDtos.Response created = response("a-voice-today", "英语 · 语音作业");
+
+    // 家长手工建的任务带着家长自己选的日期，迁移前的历史任务语义不明，两者都不该被系统挪走。
+    AssignmentEntity manual = voiceAssignment("a-voice-manual", familyId, "NOT_STARTED");
+    manual.taskDate = today.minusDays(3);
+    VoiceMaterialTaskLinkEntity manualLink = link(UUID.randomUUID(), manual.id, "student-1");
+    manualLink.createMode = "MANUAL";
+
+    when(assignments.findFirstVoiceMaterialTaskForDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(null);
+    when(links.findByFamilyIdAndStudentIdOrderByCreatedAtDesc(familyId, "student-1"))
+        .thenReturn(List.of(manualLink));
+    when(assignmentRepository.findById(manual.id)).thenReturn(Optional.of(manual));
+    when(autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(Optional.empty());
+    when(packages.findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
+        familyId, "student-1")).thenReturn(List.of(item));
+    when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
+    when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
+        .thenReturn(created);
+    when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
+        familyId, packageId)).thenReturn(List.of());
+
+    VoiceMaterialDtos.AutoCreateResponse result =
+        service().autoCreateNext(familyId, "student-1");
+
+    assertTrue(result.created());
+    assertFalse(result.carriedOver());
+    assertEquals(today.minusDays(3), manual.taskDate);
+    verify(assignments, never()).carryOverToBusinessDate(any(), anyString(), any(), any());
   }
 
   @Test

@@ -109,8 +109,21 @@ public final class VoiceMaterialDtos {
   public record CreateAssignmentResponse(boolean created, String assignmentId,
       AssignmentDtos.Response assignment) {}
 
+  /**
+   * 自动创建语音任务的结果。
+   *
+   * <p>三种「没有新建任务」的出口必须区分开，调用方才能正确记账：
+   * <ul>
+   *   <li>{@code ACTIVE_TASK_EXISTS}：今天已经有一条未完成的语音任务，assignment 非空；</li>
+   *   <li>{@code ALREADY_CREATED_TODAY}：今天的自动额度已被 consume，assignmentId/packageId 指向当天那条；</li>
+   *   <li>{@code CARRIED_OVER}：把之前没做完的自动任务顺延到了今天，carriedOver=true，
+   *       assignment 是顺延后的任务（日期与名称已刷新）；</li>
+   *   <li>{@code NO_MATERIAL}：没有可用素材目录，四个字段都为空。</li>
+   * </ul>
+   */
   public record AutoCreateResponse(boolean created, String businessDate,
-      String packageId, String assignmentId, AssignmentDtos.Response assignment) {}
+      String packageId, String assignmentId, AssignmentDtos.Response assignment,
+      boolean carriedOver) {}
 
   /**
    * 管理台批量删除请求。调用方必须显式给出要删除的 id，服务端不接受"按条件全删"，

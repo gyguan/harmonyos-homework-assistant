@@ -25,4 +25,13 @@ public interface AssignmentRepository extends JpaRepository<AssignmentEntity, St
   long countByFamilyIdAndStudentIdAndSubjectCodeAndContentTypeAndTitleStartingWithAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
       UUID familyId, String studentId, String subjectCode, String contentType, String titlePrefix,
       Instant from, Instant to);
+  /**
+   * 与上一个方法同义，但把某个任务排除在计数之外。
+   *
+   * <p>顺延要给同一条任务重算名称，如果把它自己也数进去，明明没有同名的第二条任务，
+   * 名称也会被追加成「… ②」。
+   */
+  long countByFamilyIdAndStudentIdAndSubjectCodeAndContentTypeAndTitleStartingWithAndCreatedAtGreaterThanEqualAndCreatedAtLessThanAndIdNot(
+      UUID familyId, String studentId, String subjectCode, String contentType, String titlePrefix,
+      Instant from, Instant to, String excludedAssignmentId);
 }

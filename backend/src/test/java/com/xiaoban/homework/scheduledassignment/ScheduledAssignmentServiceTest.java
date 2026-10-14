@@ -41,7 +41,7 @@ class ScheduledAssignmentServiceTest {
   void studentEntryKeepsLegacyVoiceBehaviorWhenNoScheduleExists() {
     UUID familyId = UUID.randomUUID();
     VoiceMaterialDtos.AutoCreateResponse expected =
-        new VoiceMaterialDtos.AutoCreateResponse(false, "2026-09-28", "", "", null);
+        new VoiceMaterialDtos.AutoCreateResponse(false, "2026-09-28", "", "", null, false);
     when(plans.findByFamilyIdAndStudentIdAndPlanTypeOrderByCreatedAtDesc(
         familyId, "student-1", "VOICE_MATERIAL_AUTO")).thenReturn(List.of());
     when(voiceAssignments.autoCreateNext(familyId, "student-1")).thenReturn(expected);
@@ -80,7 +80,7 @@ class ScheduledAssignmentServiceTest {
     plan.nextFireAt = today.plusDays(1).atStartOfDay(ScheduledAssignmentSchedule.BUSINESS_ZONE).toInstant();
 
     VoiceMaterialDtos.AutoCreateResponse expected =
-        new VoiceMaterialDtos.AutoCreateResponse(true, today.toString(), "pkg-1", "a-1", null);
+        new VoiceMaterialDtos.AutoCreateResponse(true, today.toString(), "pkg-1", "a-1", null, false);
     when(plans.findByFamilyIdAndStudentIdAndPlanTypeOrderByCreatedAtDesc(
         familyId, "student-1", "VOICE_MATERIAL_AUTO")).thenReturn(List.of(plan));
     when(attempts.executeStudentEntry(

@@ -122,6 +122,19 @@ public class AssignmentService {
   @Transactional(readOnly = true)
   public String nextVoiceMaterialTaskTitle(UUID familyId, String studentId, String subjectCode,
       LocalDate businessDate, String materialTitle) {
+    return nextVoiceMaterialTaskTitle(
+        familyId, studentId, subjectCode, businessDate, materialTitle, null);
+  }
+
+  /**
+   * 生成「科目 · 月日 · 素材标题」形式的语音任务名，同日同名时追加序号。
+   *
+   * @param excludeAssignmentId 顺延重命名时传任务自己的 id：这条任务本身就是「今天的任务」，
+   *                            把它排除掉才不会因为同名计数而给自己追加序号。
+   */
+  @Transactional(readOnly = true)
+  public String nextVoiceMaterialTaskTitle(UUID familyId, String studentId, String subjectCode,
+      LocalDate businessDate, String materialTitle, String excludeAssignmentId) {
     students.requireOwned(familyId, studentId);
     ZoneId zone = BUSINESS_ZONE;
     Instant from = businessDate.atStartOfDay(zone).toInstant();
@@ -131,9 +144,14 @@ public class AssignmentService {
     String base = normalizedMaterialTitle.isBlank()
         ? subjectDisplay(subjectCode) + " · " + dateLabel + "语音作业"
         : subjectDisplay(subjectCode) + " · " + dateLabel + " · " + normalizedMaterialTitle;
-    long count = repository
-        .countByFamilyIdAndStudentIdAndSubjectCodeAndContentTypeAndTitleStartingWithAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
-            familyId, studentId, subjectCode, "AUDIO_IMAGE", base, from, to);
+    long count = excludeAssignmentId == null || excludeAssignmentId.isBlank()
+        ? repository
+            .countByFamilyIdAndStudentIdAndSubjectCodeAndContentTypeAndTitleStartingWithAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
+                familyId, studentId, subjectCode, "AUDIO_IMAGE", base, from, to)
+        : repository
+            .countByFamilyIdAndStudentIdAndSubjectCodeAndContentTypeAndTitleStartingWithAndCreatedAtGreaterThanEqualAndCreatedAtLessThanAndIdNot(
+                familyId, studentId, subjectCode, "AUDIO_IMAGE", base, from, to,
+                excludeAssignmentId);
     return count == 0 ? base : base + " " + toCircledNumber(count + 1);
   }
 
@@ -170,6 +188,39 @@ public class AssignmentService {
             familyId, studentId, "AUDIO_IMAGE", "COMPLETED", businessDate)
         .orElse(null);
     return current == null ? null : AssignmentDtos.Response.from(current);
+  }
+
+  /**
+   * 顺延：把一条自动生成的语音任务挪到新的业务日，并同步刷新任务名里的日期。
+   *
+   * <p>目的不是「重新发一份」，而是让同一份作业跟着孩子往前走，所以只动
+   * {@code taskDate / title / updatedAt}——状态、开始时间、已用时长、提交记录与照片全部保留，
+   * 孩子的作答进度不会因为跨天而丢失。
+   *
+   * <p>调用方负责只把「未完成且确实早于目标业务日」的任务传进来；这里再做一次日期单调性保护，
+   * 目标日不晚于当前日期时按幂等处理直接返回，不会把任务倒着挪。
+   *
+   * @param materialTitle 语音素材目录标题，用于按「科目 · 月日 · 素材标题」重算任务名；
+   *                      可以为空，为空时按共享语言回退成「科目 · 月日语音作业」。
+   */
+  @Transactional
+  public AssignmentDtos.Response carryOverToBusinessDate(
+      UUID familyId, String id, LocalDate businessDate, String materialTitle) {
+    AssignmentEntity e = requireOwned(familyId, id);
+    LocalDate fromDate = e.taskDate;
+    if (fromDate != null && businessDate != null && !businessDate.isAfter(fromDate)) {
+      log.info("assignment reschedule_skipped assignmentId={} studentId={} action=CARRY_OVER fromDate={} toDate={} reason=NOT_LATER",
+          e.id, e.studentId, fromDate, businessDate);
+      return AssignmentDtos.Response.from(e);
+    }
+    e.taskDate = businessDate;
+    e.title = nextVoiceMaterialTaskTitle(
+        familyId, e.studentId, e.subjectCode, businessDate, materialTitle, e.id);
+    e.updatedAt = Instant.now();
+    AssignmentEntity saved = repository.saveAndFlush(e);
+    log.info("assignment rescheduled assignmentId={} studentId={} action=CARRY_OVER fromDate={} toDate={} subjectCode={}",
+        saved.id, saved.studentId, fromDate, businessDate, saved.subjectCode);
+    return AssignmentDtos.Response.from(saved);
   }
 
   @Transactional

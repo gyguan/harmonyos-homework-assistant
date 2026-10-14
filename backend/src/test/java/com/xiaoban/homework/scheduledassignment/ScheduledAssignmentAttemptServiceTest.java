@@ -53,7 +53,7 @@ class ScheduledAssignmentAttemptServiceTest {
 
     VoiceMaterialDtos.AutoCreateResponse created =
         new VoiceMaterialDtos.AutoCreateResponse(
-            true, "2026-09-28", UUID.randomUUID().toString(), "a-voice-1", null);
+            true, "2026-09-28", UUID.randomUUID().toString(), "a-voice-1", null, false);
 
     when(plans.lockById(planId)).thenReturn(Optional.of(plan));
     when(runs.findByPlanIdAndScheduledFireAt(planId, fireAt)).thenReturn(Optional.of(run));
@@ -132,6 +132,36 @@ class ScheduledAssignmentAttemptServiceTest {
     assertEquals(3, run.retryCount);
     assertEquals("boom", run.errorMessage);
     assertEquals(Instant.parse("2026-09-29T09:00:00Z"), plan.nextFireAt);
+  }
+
+  @Test
+  void carriedOverVoiceResultIsRecordedAsFinalSkip() {
+    UUID familyId = UUID.randomUUID();
+    UUID planId = UUID.randomUUID();
+    UUID packageId = UUID.randomUUID();
+    Instant fireAt = Instant.parse("2026-09-27T22:30:00Z");
+    Instant executionAt = Instant.parse("2026-09-28T00:00:00Z");
+
+    ScheduledAssignmentPlanEntity plan = voicePlan(familyId, planId);
+    plan.nextFireAt = Instant.parse("2026-09-28T22:30:00Z");
+    ScheduledAssignmentRunEntity run = run(planId, fireAt);
+
+    VoiceMaterialDtos.AutoCreateResponse carried =
+        new VoiceMaterialDtos.AutoCreateResponse(
+            false, "2026-09-28", packageId.toString(), "a-voice-yesterday", null, true);
+
+    when(plans.lockById(planId)).thenReturn(Optional.of(plan));
+    when(runs.findByPlanIdAndScheduledFireAt(planId, fireAt)).thenReturn(Optional.of(run));
+    when(voiceAssignments.autoCreateNext(familyId, "student-1", "CHINESE")).thenReturn(carried);
+
+    VoiceMaterialDtos.AutoCreateResponse result =
+        service().executeStudentEntry(familyId, "student-1", planId, fireAt, executionAt);
+
+    assertTrue(result.carriedOver());
+    assertEquals("SKIPPED", run.status);
+    // 顺延没有新建任务，但今天的额度已经用掉，重试只会得到同样结论，所以按终态记录。
+    assertEquals("CARRIED_OVER", run.skipReason);
+    assertEquals("a-voice-yesterday", run.assignmentId);
   }
 
   private ScheduledAssignmentPlanEntity voicePlan(UUID familyId, UUID planId) {

@@ -28,7 +28,8 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - **Resource（资料）**：老师或家长提供的图片、文档、音频、视频、文本等学习材料，可与 Assignment 关联。
 - **Media Asset（媒体资产）**：家庭私有的物理媒体文件所有权实体。Assignment Resource 与语音素材目录只引用 Asset，不因创建任务而复制文件。
 - **Voice Material Package（语音素材目录）**：家长预先导入的一组“1 个语音 + 至少 1 张图片”的待发布素材，携带 studentId、subjectCode、标题和预计用时等结构化属性；目录名用于展示与队列排序，不作为科目识别来源。
-- **Daily Voice Auto Create（每日语音自动创建）**：按 studentId + Asia/Shanghai 业务日最多自动消费一个 READY Voice Material Package；家长手工创建不占每日自动额度。自动创建只检查 dueAt 落在当前业务日且未完成的有效语音任务，历史日期遗留的未完成语音任务不阻塞今天自动创建。自动生成任务名使用“科目 · 月日 · 素材标题”，素材标题为空时使用“科目 · 月日语音作业”，同日同名追加序号；不得直接使用目录名作为任务名。
+- **Daily Voice Auto Create（每日语音自动创建）**：按 studentId + Asia/Shanghai 业务日最多自动消费一个 READY Voice Material Package；家长手工创建不占每日自动额度。自动创建先看当天是否已有未完成的语音任务，有就直接复用；否则交由 Voice Task Carry Over 判断能否顺延；两者都不成立时才消费一个新目录。自动生成任务名使用“科目 · 月日 · 素材标题”，素材标题为空时使用“科目 · 月日语音作业”，同日同名追加序号；不得直接使用目录名作为任务名。
+- **Voice Task Carry Over（语音任务顺延）**：孩子当天没做完自动创建的语音任务时，第二天把**同一条**任务挪到当天，而不是再新建一条——目的是不让未完成的语音任务一天天堆积。顺延只改 taskDate 与任务名（按新业务日重算），状态、开始时间、已用时长与提交证据全部保留，作答进度不因跨天丢失；顺延同样占用当天的自动创建额度。判定为「孩子已经交出去」的状态是 READY_TO_SUBMIT / SUBMITTED / COMPLETED，这几种不再顺延，当天照常发新的一份；其余状态（含 NEEDS_REWORK、OVERDUE）都算没做完。只有 create_mode = AUTO 的任务参与顺延，家长手工创建（MANUAL）与迁移遗留（LEGACY）的任务日期不被系统改动，也不阻塞当天自动创建。
 - **Scheduled Assignment Plan（定时作业计划）**：家长配置的未来作业创建规则，只保存学生、重复方式、创建时间与任务模板；到达触发时间后才生成真实 Assignment，不是第二套 Assignment 状态机。
 - **Scheduled Assignment Run（定时作业执行）**：某个 Plan 在一个 scheduledFireAt 上的一次幂等执行记录；普通计划创建 Assignment，语音计划复用 Daily Voice Auto Create，执行成功、跳过或失败均可追溯。
 - **Requirement（完成要求）**：某项 Assignment 的结构化完成要求，如完成题目、朗读、拍照、文字说明等。

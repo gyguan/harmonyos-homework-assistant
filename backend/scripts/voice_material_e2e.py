@@ -6,7 +6,7 @@ import sys
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from urllib.parse import quote
 
@@ -415,9 +415,137 @@ def main() -> int:
         require(reimported_done.get("readyCount") == 1 and reimported_done.get("invalidCount") == 0,
                 "re-importing the same folder content after deletion must not be rejected as duplicate")
 
+        # ── 顺延：当天没做完的自动任务要挪到第二天，而不是再建一条新的 ──────────────
+        # 自动创建只处理「今天」，所以这里借家长自己的编辑入口把任务挪回昨天来制造场景。
+        shanghai = ZoneInfo("Asia/Shanghai")
+        yesterday = (datetime.now(shanghai).date() - timedelta(days=1)).isoformat()
+        today_label = f"{datetime.now(shanghai).month}月{datetime.now(shanghai).day}日"
+
+        carry_student = f"s-voice-carry-{run_id}"
+        create_student(base_url, token, carry_student)
+        carry_batch = create_batch(base_url, token, carry_student)
+        carry_folder = register_package(base_url, token, carry_batch, "001-语文朗读", "CHINESE")
+        upload(base_url, token, carry_folder["id"], "AUDIO", "carry-voice.mp3", 0,
+               AUDIO_BYTES, "audio/mpeg")
+        upload(base_url, token, carry_folder["id"], "IMAGE", "carry-scene.png", 1,
+               IMAGE_BYTES, "image/png")
+        carry_done = expect(http(base_url, "POST",
+            f"/api/v1/voice-material-batches/{carry_batch}/complete", token=token),
+            (200,), "complete carry-over folder").json()
+        require(carry_done.get("readyCount") == 1 and carry_done.get("invalidCount") == 0,
+                "carry-over folder must be ready")
+
+        carry_first = expect(http(base_url, "POST",
+            f"/api/v1/students/{carry_student}/voice-material-packages/auto-create-next", token=token),
+            (200,), "auto create for carry-over student").json()
+        require(carry_first.get("created") is True,
+                "carry-over student must get its first automatic task")
+        carry_assignment = carry_first["assignmentId"]
+
+        # 把日期挪回昨天，同时把名字改成自定义值：顺延后名称是否被重算就会一目了然。
+        carry_before = expect(http(base_url, "GET",
+            f"/api/v1/assignments/{carry_assignment}", token=token),
+            (200,), "load unfinished automatic task").json()
+        carry_setup = expect(http(base_url, "PATCH", f"/api/v1/assignments/{carry_assignment}",
+            token=token, payload={"version": carry_before["version"], "taskDate": yesterday,
+                                  "title": "旧的语音作业名字"}),
+            (200,), "move unfinished automatic task back to yesterday").json()
+        require(carry_setup.get("taskDate") == yesterday,
+                f"scenario setup must move the task to yesterday (taskDate={carry_setup.get('taskDate')})")
+
+        carried = expect(http(base_url, "POST",
+            f"/api/v1/students/{carry_student}/voice-material-packages/auto-create-next", token=token),
+            (200,), "auto create must carry the unfinished task over").json()
+        require(carried.get("created") is False and carried.get("carriedOver") is True,
+                "an unfinished automatic task must be carried over instead of duplicated "
+                f"(created={carried.get('created')} carriedOver={carried.get('carriedOver')})")
+        require(carried.get("assignmentId") == carry_assignment,
+                "carry over must keep the same Assignment instance")
+
+        carry_after = expect(http(base_url, "GET",
+            f"/api/v1/assignments/{carry_assignment}", token=token),
+            (200,), "reload carried over task").json()
+        require(carry_after.get("taskDate") == task_date,
+                f"carried task must be dated today (taskDate={carry_after.get('taskDate')})")
+        require(carry_after.get("status") == "NOT_STARTED",
+                f"carry over must not change task status (status={carry_after.get('status')})")
+        # 名称必须按新业务日重算：自定义的旧名字要消失、今天要出现在名字里，
+        # 而且不能因为把任务自己数进「同日同名」计数而多出一个序号。
+        carried_title = carry_after.get("title") or ""
+        require(today_label in carried_title and "旧的语音作业名字" not in carried_title,
+                "carry over must regenerate the task name from the new business date "
+                f"(title={carried_title})")
+        require("②" not in carried_title,
+                "carry over must not suffix the renamed task with a sequence number "
+                f"(title={carried_title})")
+
+        carry_tasks = expect(http(base_url, "GET",
+            f"/api/v1/voice-tasks?studentId={quote(carry_student)}&page=0&size=20", token=token),
+            (200,), "list carry-over tasks").json()
+        require(carry_tasks.get("totalElements") == 1,
+                "carry over must not create a second voice task "
+                f"(totalElements={carry_tasks.get('totalElements')})")
+        require(carry_tasks["items"][0].get("assignmentId") == carry_assignment,
+                "the carried task must be the original Assignment")
+
+        carry_again = expect(http(base_url, "POST",
+            f"/api/v1/students/{carry_student}/voice-material-packages/auto-create-next", token=token),
+            (200,), "auto create right after carry over").json()
+        require(carry_again.get("created") is False and carry_again.get("carriedOver") is False,
+                "a carried over task must already consume the current business day quota "
+                f"(created={carry_again.get('created')})")
+
+        # ── 孩子已经交出去的（待提交/已提交/已完成）不再顺延，当天照常发新的一份 ──────
+        settled_student = f"s-voice-settled-{run_id}"
+        create_student(base_url, token, settled_student)
+        settled_batch = create_batch(base_url, token, settled_student)
+        settled_folder = register_package(base_url, token, settled_batch, "002-数学口算", "MATH")
+        upload(base_url, token, settled_folder["id"], "AUDIO", "settled-voice.mp3", 0,
+               AUDIO_BYTES, "audio/mpeg")
+        upload(base_url, token, settled_folder["id"], "IMAGE", "settled-scene.png", 1,
+               IMAGE_BYTES, "image/png")
+        settled_done = expect(http(base_url, "POST",
+            f"/api/v1/voice-material-batches/{settled_batch}/complete", token=token),
+            (200,), "complete settled folder").json()
+        require(settled_done.get("readyCount") == 1, "settled folder must be ready")
+
+        settled_first = expect(http(base_url, "POST",
+            f"/api/v1/students/{settled_student}/voice-material-packages/auto-create-next",
+            token=token), (200,), "auto create for settled student").json()
+        require(settled_first.get("created") is True, "settled student must get its first automatic task")
+        settled_assignment = settled_first["assignmentId"]
+
+        for step in ["IN_PROGRESS", "READY_TO_SUBMIT"]:
+            current = expect(http(base_url, "GET", f"/api/v1/assignments/{settled_assignment}",
+                                  token=token), (200,), "load task before settled status patch").json()
+            patched = expect(http(base_url, "PATCH", f"/api/v1/assignments/{settled_assignment}",
+                token=token, payload={"version": current["version"], "status": step}),
+                (200,), f"patch settled task status {step}").json()
+            require(patched.get("status") == step, f"settled task status must advance to {step}")
+
+        settled_before = expect(http(base_url, "GET", f"/api/v1/assignments/{settled_assignment}",
+                                     token=token), (200,), "load settled task").json()
+        expect(http(base_url, "PATCH", f"/api/v1/assignments/{settled_assignment}", token=token,
+            payload={"version": settled_before["version"], "taskDate": yesterday}),
+            (200,), "move settled task back to yesterday")
+
+        settled_auto = expect(http(base_url, "POST",
+            f"/api/v1/students/{settled_student}/voice-material-packages/auto-create-next",
+            token=token), (200,), "auto create for settled task").json()
+        require(settled_auto.get("carriedOver") is False,
+                "a task the child already handed in must not be carried over "
+                f"(carriedOver={settled_auto.get('carriedOver')})")
+        settled_after = expect(http(base_url, "GET", f"/api/v1/assignments/{settled_assignment}",
+                                    token=token), (200,), "reload settled task").json()
+        require(settled_after.get("taskDate") == yesterday and
+                settled_after.get("status") == "READY_TO_SUBMIT",
+                "a submitted task must stay on its own date and keep its status "
+                f"(taskDate={settled_after.get('taskDate')} status={settled_after.get('status')})")
+
         print("VOICE_MATERIAL_E2E_PASS "
               f"studentId={student_id} firstAssignment={first_assignment} "
-              f"reusedAssignment={reused_assignment} parallelAssignment={parallel_assignment}")
+              f"reusedAssignment={reused_assignment} parallelAssignment={parallel_assignment} "
+              f"carriedOverAssignment={carry_assignment}")
         return 0
     except SmokeFailure as exc:
         print(f"VOICE_MATERIAL_E2E_FAIL: {exc}", file=sys.stderr)

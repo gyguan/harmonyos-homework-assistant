@@ -211,7 +211,23 @@ public class VoiceMaterialAssignmentService {
       log.info("voice_material auto_create_exit studentId={} businessDate={} reason=ACTIVE_TASK_EXISTS assignmentId={} packageId={} status={} taskDate={}",
           studentId, businessDate, current.id(), packageId, current.status(), current.taskDate());
       return new VoiceMaterialDtos.AutoCreateResponse(
-          false, businessDate.toString(), packageId, current.id(), current);
+          false, businessDate.toString(), packageId, current.id(), current, false);
+    }
+
+    // 顺延必须排在「今天已自动创建过」之前：今天那条记录很可能就是这条任务自己创建时写下的，
+    // 只要任务还没做完，就应该把它挪到今天，而不是让记录把它永远挡在昨天。
+    CarryOver carryOver = findCarryOver(familyId, studentId, businessDate);
+    if (carryOver != null) {
+      AssignmentDtos.Response moved = assignments.carryOverToBusinessDate(
+          familyId, carryOver.assignmentId, businessDate, carryOver.materialTitle);
+      recordAutoCreate(familyId, studentId, businessDate, carryOver.packageId,
+          carryOver.assignmentId);
+      log.info("voice_material auto_create_carried_over studentId={} businessDate={} assignmentId={} packageId={} fromDate={} status={}",
+          studentId, businessDate, carryOver.assignmentId, carryOver.packageId,
+          carryOver.taskDate, carryOver.status);
+      return new VoiceMaterialDtos.AutoCreateResponse(
+          false, businessDate.toString(), carryOver.packageId.toString(),
+          carryOver.assignmentId, moved, true);
     }
 
     VoiceMaterialAutoCreateRecordEntity todayRecord =
@@ -222,7 +238,7 @@ public class VoiceMaterialAssignmentService {
           studentId, businessDate, todayRecord.assignmentId, todayRecord.packageId, todayRecord.id);
       return new VoiceMaterialDtos.AutoCreateResponse(
           false, businessDate.toString(), todayRecord.packageId.toString(),
-          todayRecord.assignmentId, null);
+          todayRecord.assignmentId, null, false);
     }
 
     VoiceMaterialPackageEntity item = chooseAutoFolder(familyId, studentId, requestedSubjectCode);
@@ -230,7 +246,7 @@ public class VoiceMaterialAssignmentService {
       log.info("voice_material auto_create_exit studentId={} subjectCode={} businessDate={} reason=NO_MATERIAL",
           studentId, requestedSubjectCode, businessDate);
       return new VoiceMaterialDtos.AutoCreateResponse(
-          false, businessDate.toString(), "", "", null);
+          false, businessDate.toString(), "", "", null, false);
     }
 
     log.info("voice_material auto_create_package_selected studentId={} businessDate={} packageId={} subjectCode={} status={}",
@@ -243,22 +259,87 @@ public class VoiceMaterialAssignmentService {
         businessDate,
         "", "", "", "AUTO");
 
-    VoiceMaterialAutoCreateRecordEntity record = new VoiceMaterialAutoCreateRecordEntity();
-    record.id = UUID.randomUUID();
-    record.familyId = familyId;
-    record.studentId = studentId;
-    record.businessDate = businessDate;
-    record.packageId = item.id;
-    record.assignmentId = assignment.id();
-    record.createdAt = Instant.now();
-    autoRecords.saveAndFlush(record);
+    recordAutoCreate(familyId, studentId, businessDate, item.id, assignment.id());
 
     log.info("voice_material auto_create_success studentId={} businessDate={} packageId={} assignmentId={}",
         studentId, businessDate, item.id, assignment.id());
     return new VoiceMaterialDtos.AutoCreateResponse(
         true, businessDate.toString(), item.id.toString(),
-        assignment.id(), assignment);
+        assignment.id(), assignment, false);
   }
+
+  /**
+   * 找准这条要顺延的任务：最新一条「自动创建」产生、还没被孩子交出去、且日期早于今天的语音任务。
+   *
+   * <p>只认 {@code create_mode = AUTO} 的任务。家长手工建的任务（MANUAL）带着家长自己选定的日期，
+   * 迁移前的历史任务（LEGACY）语义不明，两者都不能被系统悄悄挪走——所以它们既不参与顺延，
+   * 也不会挡住今天的自动创建。素材目录被删除后 link 会随外键级联消失，那条遗留任务同样不再参与。
+   *
+   * <p>link 按创建时间倒序扫描，因此命中的是最新那条；孩子已经交出去的历史任务会被跳过，
+   * 不会把早该翻篇的作业又拉回今天。
+   */
+  private CarryOver findCarryOver(UUID familyId, String studentId, LocalDate businessDate) {
+    for (VoiceMaterialTaskLinkEntity link :
+        links.findByFamilyIdAndStudentIdOrderByCreatedAtDesc(familyId, studentId)) {
+      if (!"AUTO".equals(link.createMode)) continue;
+      if (link.packageId == null) continue;
+      AssignmentEntity item = assignmentRepository.findById(link.assignmentId).orElse(null);
+      if (item == null || !familyId.equals(item.familyId)) continue;
+      if (!"AUDIO_IMAGE".equals(item.contentType)) continue;
+      if (item.taskDate == null || !item.taskDate.isBefore(businessDate)) continue;
+      if (isSettled(item.status)) continue;
+      String materialTitle = packages.findById(link.packageId)
+          .map(folder -> folder.title).orElse(null);
+      return new CarryOver(item.id, link.packageId, item.taskDate, item.status, materialTitle);
+    }
+    return null;
+  }
+
+  /**
+   * 孩子已经把这份交出去了（待提交 / 已提交 / 已完成）就不再顺延——他昨天做完了，
+   * 今天应该拿到新的一份。其余状态（未开始 / 进行中 / 暂停 / 待订正 / 已逾期）都算还没做完。
+   */
+  private static boolean isSettled(String status) {
+    return "READY_TO_SUBMIT".equals(status)
+        || "SUBMITTED".equals(status)
+        || "COMPLETED".equals(status);
+  }
+
+  /**
+   * 记录「这个业务日的自动额度已经被用掉了」。
+   *
+   * <p>顺延同样要写一条今天的记录：否则孩子在今天把顺延来的任务做掉之后，
+   * 同一天再进 App 又会立刻被塞一份新任务。
+   *
+   * <p>写之前必须先查：这条任务很可能就是今天自动建出来的（家长随后把日期改早了），
+   * 那样今天的记录早就存在；直接 insert 会撞上
+   * {@code uq_voice_material_auto_daily (family_id, student_id, business_date)}，
+   * 把整次自动创建拖成 500。既有的记录一律不覆盖——它记的是「当天已用过额度」这个事实。
+   *
+   * <p>同一学生的并发自动创建由 {@code students.requireOwnedForUpdate} 的 SELECT FOR UPDATE 串行化，
+   * 所以「先查后插」在这里不会和别的请求交错。
+   */
+  private void recordAutoCreate(UUID familyId, String studentId, LocalDate businessDate,
+      UUID packageId, String assignmentId) {
+    if (autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
+        familyId, studentId, businessDate).isPresent()) {
+      log.info("voice_material auto_create_record_reused studentId={} businessDate={} assignmentId={}",
+          studentId, businessDate, assignmentId);
+      return;
+    }
+    VoiceMaterialAutoCreateRecordEntity record = new VoiceMaterialAutoCreateRecordEntity();
+    record.id = UUID.randomUUID();
+    record.familyId = familyId;
+    record.studentId = studentId;
+    record.businessDate = businessDate;
+    record.packageId = packageId;
+    record.assignmentId = assignmentId;
+    record.createdAt = Instant.now();
+    autoRecords.saveAndFlush(record);
+  }
+
+  private record CarryOver(String assignmentId, UUID packageId, LocalDate taskDate,
+      String status, String materialTitle) {}
 
   private VoiceMaterialPackageEntity chooseAutoFolder(
       UUID familyId, String studentId, String subjectCode) {
