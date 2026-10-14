@@ -6,7 +6,8 @@ import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { PendingAssignmentAttachment } from '../../../components/assignment/PendingAssignmentAttachmentPicker';
 import {
   HomeworkCoveragePicker,
-  HomeworkCoverageSubject
+  HomeworkCoverageSubject,
+  HomeworkCoverageSummaryRow
 } from '../../../components/assignment/HomeworkCoveragePicker';
 import { CandidateAssignment, Subject } from '../../../domain/model/HomeworkModels';
 import { ParentIdentity } from '../../../domain/model/ParentIdentity';
@@ -31,6 +32,7 @@ export struct HomeworkConfirmationPage {
   @State private batchDeleteConfirm: boolean = false;
   @State private pendingAttachments: PendingAssignmentAttachment[] = [];
   @State private coverageSubjects: string[] = [];
+  @State private showCoverageSheet: boolean = false;
   onBack: () => void = () => {};
   onPublished: () => void = () => {};
   onStoreChanged: () => void = () => {};
@@ -477,16 +479,90 @@ export struct HomeworkConfirmationPage {
   }
 
   @Builder
+  private CoverageSheet() {
+    Column() {
+      Column() {
+        Row({ space: 10 }) {
+          Column({ space: 3 }) {
+            Text('同步给其他家长')
+              .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
+              .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(AppTheme.TEXT);
+            Text('标记你今天已经负责布置完成的作业，其他家长进入首页即可看到')
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Start);
+          Text('关闭')
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
+            .fontColor(AppTheme.PRIMARY)
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('关闭同步设置')
+            .onClick(() => this.showCoverageSheet = false);
+        }
+        .width('100%')
+        .padding({ left: AppTheme.PANEL_PADDING, right: AppTheme.PANEL_PADDING, top: 16, bottom: 12 });
+
+        Divider().color(AppTheme.DIVIDER);
+
+        Scroll() {
+          Column({ space: 12 }) {
+            HomeworkCoveragePicker({
+              selected: this.coverageSubjects,
+              disabled: this.publishing,
+              title: '我今天已经布置',
+              description: '“全部”表示你确认这个孩子今天需要布置的作业已经全部处理完成',
+              onChange: (subjects: string[]) => this.coverageSubjects = subjects.slice()
+            });
+            Text('不选择也可以直接发布，标记只影响其他家长看到的协同状态。')
+              .width('100%')
+              .fontSize(AppTheme.META_SIZE)
+              .lineHeight(AppTheme.META_LINE_HEIGHT)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .width('100%')
+          .padding({ left: AppTheme.PANEL_PADDING, right: AppTheme.PANEL_PADDING, top: 14, bottom: 16 });
+        }
+        .width('100%')
+        .layoutWeight(1)
+        .scrollBar(BarState.Off);
+
+        Column() {
+          Button('完成', { type: ButtonType.Normal })
+            .width('100%')
+            .height(AppTheme.BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.PRIMARY)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .onClick(() => this.showCoverageSheet = false);
+        }
+        .width('100%')
+        .padding({ left: AppTheme.PANEL_PADDING, right: AppTheme.PANEL_PADDING, bottom: 18 });
+      }
+      .width('100%')
+      .constraintSize({ maxWidth: AppTheme.FILTER_DIALOG_MAX_WIDTH });
+    }
+    .width('100%')
+    .height('100%')
+    .alignItems(HorizontalAlign.Center)
+    .backgroundColor(AppTheme.SURFACE);
+  }
+
+  @Builder
   private BottomActionBar() {
     Column() {
       Column({ space: 8 }) {
         if (!this.bulkMode) {
-          HomeworkCoveragePicker({
+          HomeworkCoverageSummaryRow({
             selected: this.coverageSubjects,
             disabled: this.publishing,
-            title: '同步给其他家长',
-            description: '可选：标记你今天已经负责布置完成的作业，其他家长进入首页即可看到',
-            onChange: (subjects: string[]) => this.coverageSubjects = subjects.slice()
+            label: '同步给其他家长',
+            onOpen: () => this.showCoverageSheet = true
           });
         }
 
@@ -549,7 +625,12 @@ export struct HomeworkConfirmationPage {
     .width('100%')
     .alignItems(HorizontalAlign.Center)
     .backgroundColor(AppTheme.SURFACE)
-    .border({ width: { top: 1 }, color: AppTheme.DIVIDER });
+    .border({ width: { top: 1 }, color: AppTheme.DIVIDER })
+    .bindSheet($$this.showCoverageSheet, this.CoverageSheet(), {
+      height: 360,
+      showClose: false,
+      preferType: SheetType.BOTTOM
+    });
   }
 
   build() {

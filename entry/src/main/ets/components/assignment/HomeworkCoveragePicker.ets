@@ -22,6 +22,13 @@ export class HomeworkCoverageSubject {
     return labels.join('、');
   }
 
+  /** 单行摘要文案，供底栏折叠态使用；空选择统一显示"未标记"。 */
+  static summary(values: string[]): string {
+    if (values.length === 0) return '未标记';
+    let text = HomeworkCoverageSubject.labels(values);
+    return text.length > 0 ? text : '未标记';
+  }
+
   static contains(values: string[], target: string): boolean {
     for (let value of values) if (value === target) return true;
     return false;
@@ -102,5 +109,55 @@ export struct HomeworkCoveragePicker {
     .padding(AppTheme.CARD_PADDING_COMPACT)
     .backgroundColor(AppTheme.SURFACE_SUBTLE)
     .borderRadius(AppTheme.CONTROL_RADIUS);
+  }
+}
+
+/**
+ * 底栏折叠态入口：只用一行展示"同步给其他家长"的当前状态，点按后打开完整选择面板。
+ * 避免可选项（协同标记）在"确认并发布"这一强任务路径上长期占用大块空间。
+ */
+@Component
+export struct HomeworkCoverageSummaryRow {
+  @Prop selected: string[] = [];
+  @Prop disabled: boolean = false;
+  @Prop label: string = '同步给其他家长';
+  onOpen: () => void = () => {};
+
+  build() {
+    Row({ space: 8 }) {
+      Text(this.label)
+        .fontSize(AppTheme.LABEL_TITLE_SIZE)
+        .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT)
+        .maxLines(1);
+      Text(HomeworkCoverageSubject.summary(this.selected))
+        .layoutWeight(1)
+        .textAlign(TextAlign.End)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+        .fontColor(this.selected.length > 0 ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis });
+      Text(this.selected.length > 0 ? '修改' : '设置')
+        .fontSize(AppTheme.ACTION_TEXT_SIZE)
+        .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.PRIMARY)
+        .maxLines(1);
+    }
+    .width('100%')
+    .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+    .padding({ left: 12, right: 12 })
+    .backgroundColor(AppTheme.SURFACE_SUBTLE)
+    .borderRadius(AppTheme.CONTROL_RADIUS)
+    .enabled(!this.disabled)
+    .opacity(this.disabled ? 0.6 : 1)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(`${this.label}：${HomeworkCoverageSubject.summary(this.selected)}，点击选择`)
+    .onClick(() => {
+      if (!this.disabled) this.onOpen();
+    });
   }
 }
