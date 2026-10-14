@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>小伴管理台</title>
-  <link rel="stylesheet" href="/admin/css/admin.css?v=20260929-2">
+  <link rel="stylesheet" href="/admin/css/admin.css?v=20261014-1">
 </head>
 <body>
   <div id="login-view" class="login-shell">
@@ -262,7 +262,7 @@
   <div id="import-drawer" class="drawer" hidden>
     <div class="drawer-backdrop" data-close-import></div>
     <section class="drawer-panel import-panel" role="dialog" aria-modal="true" aria-label="导入语音文件夹">
-      <header class="drawer-header"><div><h2>导入语音文件夹</h2><p>每个目录需要包含 1 个语音文件和至少 1 张图片；批量导入建议选择这些文件夹的共同上级目录。</p></div><button id="close-import" class="icon-button" type="button">×</button></header>
+      <header class="drawer-header"><div><h2>导入语音文件夹</h2><p>每个素材目录需要包含 1 个语音文件和至少 1 张图片。选择任意一个上级目录后，下面会列出识别到的每一层目录，勾选多个即可一次导入。</p></div><button id="close-import" class="icon-button" type="button">×</button></header>
       <div class="drawer-body">
         <section id="import-select-stage">
           <div class="import-defaults">
@@ -272,12 +272,15 @@
             <button id="apply-import-defaults" class="secondary-button align-end" type="button">应用到已识别目录</button>
           </div>
           <input id="folder-input" type="file" webkitdirectory directory multiple hidden aria-label="选择语音素材目录">
-          <button id="folder-picker" class="drop-zone" type="button"><span class="folder-icon">＋</span><strong>选择共同上级目录（批量导入）</strong><span>例如父目录下有 01语文、02数学、03英语，选择父目录后会自动识别为 3 个待导入目录</span><small>也可以一次拖入多个文件夹 · 支持 mp3 / m4a / wav / jpg / jpeg / png / webp / heic</small></button>
-          <div class="folder-picker-actions"><span>文件夹不在同一父目录？</span><button id="add-folder-picker" class="secondary-button" type="button">添加一个文件夹</button></div>
-          <div class="import-list-toolbar"><div><h3>待导入目录</h3><p id="import-preview-summary">尚未选择文件夹</p></div><input id="import-folder-search" type="search" placeholder="搜索文件夹名称"></div>
+          <button id="folder-picker" class="drop-zone" type="button"><span class="folder-icon">＋</span><strong>选择素材所在目录（一次可导入其中多个文件夹）</strong><span>选一次上级目录即可：下面会把识别到的每一层目录都列出来，勾选多个文件夹一次性导入</span><small>支持共同上级目录 / 多文件夹拖入 / 连续添加 · 格式 mp3、m4a、wav、jpg、jpeg、png、webp、heic</small></button>
+          <div class="folder-picker-actions"><span>素材文件夹不在同一个位置？可以继续选择，已识别内容会持续保留</span><button id="add-folder-picker" class="secondary-button" type="button">添加一个文件夹</button></div>
+          <div class="import-list-toolbar">
+            <div><h3>导入目录</h3><p id="import-preview-summary">尚未选择文件夹</p><p id="import-list-hint" class="import-list-hint" hidden></p></div>
+            <div class="import-list-tools"><label class="inline-check"><input id="import-only-selected" type="checkbox">只看已勾选</label><button id="reset-import-selection" class="text-button" type="button">恢复默认识别</button><input id="import-folder-search" type="search" placeholder="搜索目录名称"></div>
+          </div>
           <div class="table-shell import-table-shell">
-            <table class="data-table"><thead><tr><th class="checkbox-column"><input id="select-all-import" type="checkbox"></th><th>文件夹名称</th><th>科目</th><th>预计用时</th><th>素材</th><th>校验结果</th><th class="operation-column">操作</th></tr></thead><tbody id="import-table-body"></tbody></table>
-            <div id="import-empty" class="table-empty"><strong>请选择需要导入的语音文件夹</strong><span>批量导入可选择共同上级目录；不在同一目录时可以逐个添加，已选择内容会持续保留。</span></div>
+            <table class="data-table"><thead><tr><th class="checkbox-column"><input id="select-all-import" type="checkbox"></th><th>目录（含上级路径）</th><th>科目</th><th>预计用时</th><th>素材</th><th>校验结果</th><th class="operation-column">操作</th></tr></thead><tbody id="import-table-body"></tbody></table>
+            <div id="import-empty" class="table-empty"><strong>请选择需要导入的语音文件夹</strong><span>选择一次上级目录就能列出所有层级并逐个勾选；也可以拖入多个文件夹，或连续添加，已选择内容会持续保留。</span></div>
           </div>
         </section>
         <section id="import-progress-stage" hidden><div class="progress-heading"><div><h3>正在导入</h3><p id="import-progress-text">准备上传…</p></div><strong id="import-progress-percent">0%</strong></div><div class="progress-track"><div id="import-progress-bar" class="progress-bar"></div></div></section>
@@ -292,7 +295,7 @@
 
   <div id="asset-viewer" class="asset-viewer" hidden><div class="asset-viewer-backdrop" data-close-viewer></div><section class="asset-viewer-dialog" role="dialog" aria-modal="true"><button id="close-asset-viewer" class="asset-viewer-close" type="button">×</button><div id="asset-viewer-content"></div></section></div>
 
-  <script type="module" src="/admin/js/login-shell.js?v=20260930-1"></script>
-  <script type="module" src="/admin/js/app.js?v=20260930-1"></script>
+  <script type="module" src="/admin/js/login-shell.js?v=20261014-1"></script>
+  <script type="module" src="/admin/js/app.js?v=20261014-1"></script>
 </body>
 </html>

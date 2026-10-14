@@ -1,3 +1,5 @@
+import { SUBJECTS, validatePackage } from './voice-material.js?v=20261014-1';
+
 export function taskStatusLabel(status) {
   return ({
     NOT_STARTED: '待开始',
@@ -27,6 +29,41 @@ export function folderStatusClass(status) {
   if (status === 'READY') return 'success';
   if (status === 'INVALID') return 'danger';
   return 'muted';
+}
+
+/** 单行目录的校验说明：能构成素材包就说可以导入，装的是多个子目录就提示往下选。 */
+export function importRowStatus(item) {
+  const result = validatePackage(item);
+  if (result.valid) return { valid: true, text: '可以导入' };
+  if (item.childDirectoryCount > 0 && (result.audioCount > 1 || result.audioCount === 0)) {
+    return { valid: false, text: '请勾选下面更细的目录' };
+  }
+  return { valid: false, text: result.message };
+}
+
+/**
+ * 导入抽屉的目录行。每个识别到的目录层级都是一行，勾选多个即可一次性导入多个文件夹；
+ * 层级用缩进 + 灰色上级路径表达，避免同名目录在不同层级混淆。
+ */
+export function renderImportRows(rows, esc) {
+  return rows.map(({ item, index }) => {
+    const status = importRowStatus(item);
+    const indent = Math.max(0, item.depth - 1) * 14;
+    const prefix = item.parentPath ? `<span class="dir-path">${esc(item.parentPath)}/</span>` : '';
+    const rowClass = status.valid ? (item.selected ? '' : 'unselected-row') : 'invalid-row';
+    const subjects = SUBJECTS.map(subject =>
+      `<option value="${subject.code}" ${subject.code === item.subjectCode ? 'selected' : ''}>${esc(subject.label)}</option>`
+    ).join('');
+    return `<tr data-import-index="${index}" class="${rowClass}">
+    <td><input class="import-select" type="checkbox" ${item.selected ? 'checked' : ''} ${status.valid ? '' : 'disabled'}></td>
+    <td class="primary-cell folder-cell"><span class="import-dir" style="padding-left:${indent}px">${prefix}${esc(item.name)}</span></td>
+    <td><select class="compact-select import-subject">${subjects}</select></td>
+    <td><div class="minutes-cell"><input class="compact-input import-minutes" type="number" min="1" max="240" value="${item.expectedMinutes}"><span>分钟</span></div></td>
+    <td>${item.audioCount} 音频 · ${item.imageCount} 图片</td>
+    <td><span class="validation-text ${status.valid ? 'ok' : 'bad'}">${esc(status.text)}</span></td>
+    <td><button class="link-button toggle-import${item.selected ? ' danger-link' : ''}">${item.selected ? '不导入' : '导入'}</button></td>
+  </tr>`;
+  }).join('');
 }
 
 function renderFiles(files, esc) {

@@ -112,13 +112,25 @@ require('id="folder-input" type="file" webkitdirectory directory multiple' in in
 require("openFolderInput" in app and "继续添加文件夹" in app and
         "state.importPackages.map" in app and "mergeFiles" in app,
         "repeated directory picks must accumulate in the same pending import list")
-require("multipleTopLevelRoots" in voice and "singleRootIsPackage" in voice and
-        "parts.slice(2).join('/')" in voice,
-        "multi-folder parser must distinguish direct multi-root selection from common-parent selection and preserve nested relative names")
-require("parseVoiceMaterialPackages" in app and
+
+# Browsers only allow one directory per pick, so one pick must expand into a directory tree the
+# user can multi-select: every level is a candidate row, default selection keeps only the
+# deepest directories that already form a valid package.
+for element_id in ["import-only-selected", "reset-import-selection", "import-list-hint"]:
+    require(f'id="{element_id}"' in index, f"missing multi-folder selection control: {element_id}")
+require("analyzeVoiceMaterialSelection" in voice and "defaultSelectionPaths" in voice and
+        "parts.slice(0, depth).join('/')" in voice and "parts.slice(depth).join('/')" in voice and
+        "unassignedSupportedCount" in voice,
+        "voice parser must enumerate every directory level and keep nested relative names")
+require("analyzeVoiceMaterialSelection" in app and "buildVoiceMaterialRows" in app and
+        "importChoices" in app and "rememberImportChoice" in app and
+        "renderImportRows" in app and
+        "import-select" in view and "toggle-import" in view and "importRowStatus" in view,
+        "each identified directory must be independently selectable so several folders import in one pass")
+require("parseVoiceMaterialPackages" not in voice and
         "audioCount === 0" in voice and "audioCount > 1" in voice and
         "imageCount === 0" in voice,
-        "folder import must validate 1 audio + at least 1 image")
+        "folder import must validate exactly 1 audio + at least 1 image per selected directory")
 require("renderImportResults" in app and "可用于创建语音任务" in app,
         "import must finish with a per-folder reusable result list")
 require("AdminVoiceMaterialService" not in controller + app + view + api,
