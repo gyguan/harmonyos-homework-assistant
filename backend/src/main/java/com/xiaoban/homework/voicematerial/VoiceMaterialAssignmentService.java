@@ -1,6 +1,8 @@
 package com.xiaoban.homework.voicematerial;
 
 import com.xiaoban.homework.assignment.AssignmentDtos;
+import com.xiaoban.homework.assignment.AssignmentEntity;
+import com.xiaoban.homework.assignment.AssignmentRepository;
 import com.xiaoban.homework.assignment.AssignmentResourceService;
 import com.xiaoban.homework.assignment.AssignmentService;
 import com.xiaoban.homework.common.ApiExceptions;
@@ -13,6 +15,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +31,7 @@ public class VoiceMaterialAssignmentService {
   private final VoiceMaterialFileRepository files;
   private final VoiceMaterialTaskLinkRepository links;
   private final VoiceMaterialAutoCreateRecordRepository autoRecords;
+  private final AssignmentRepository assignmentRepository;
   private final AssignmentService assignments;
   private final AssignmentResourceService assignmentResources;
   private final StudentService students;
@@ -36,6 +40,7 @@ public class VoiceMaterialAssignmentService {
       VoiceMaterialFileRepository files,
       VoiceMaterialTaskLinkRepository links,
       VoiceMaterialAutoCreateRecordRepository autoRecords,
+      AssignmentRepository assignmentRepository,
       AssignmentService assignments,
       AssignmentResourceService assignmentResources,
       StudentService students) {
@@ -43,9 +48,76 @@ public class VoiceMaterialAssignmentService {
     this.files = files;
     this.links = links;
     this.autoRecords = autoRecords;
+    this.assignmentRepository = assignmentRepository;
     this.assignments = assignments;
     this.assignmentResources = assignmentResources;
     this.students = students;
+  }
+
+  /**
+   * 批量删除语音任务（assignment.content_type = AUDIO_IMAGE）。
+   *
+   * <p>与单条删除 {@code DELETE /assignments/{id}} 的唯一行为差别是：这里允许删除「已完成」任务。
+   * 完成态任务带着孩子的提交记录和照片，会被一并永久删除，所以前端必须二次确认
+   * （输入确认词）才能提交这类 id。
+   *
+   * <p>刻意<b>不</b>清理 voice_material_task_link 与 voice_material_auto_create_record，
+   * 与单条删除保持一致：
+   * <ul>
+   *   <li>task_link 保留 → 文件夹的「已使用次数」与最近关联任务仍能看到这次记录，
+   *       历史显示为「任务已删除」（voice_material_e2e.py 对此有断言）。</li>
+   *   <li>auto_create_record 保留 → 「每个自然日最多自动建一次任务」的限额不被绕过，
+   *       否则删掉当天自动建出的任务后 App 会再补建一条。</li>
+   * </ul>
+   *
+   * <p>素材目录与 media_asset 都不动——任务与素材各自独立引用，删任务不该动素材库。
+   *
+   * <p>校验阶段用 Optional 查找、不抛异常：本方法已在事务中，任何 @Transactional 方法抛异常
+   * 都会把外层事务标记成 rollback-only，逐项容错就会变成整体失败。
+   */
+  @Transactional
+  public VoiceMaterialDtos.BatchDeleteResponse batchDeleteTasks(UUID familyId, List<String> rawIds) {
+    List<String> ids = normalizeDeleteIds(rawIds);
+    List<VoiceMaterialDtos.BatchDeleteItem> results = new ArrayList<>();
+    List<String> deletable = new ArrayList<>();
+
+    for (String id : ids) {
+      AssignmentEntity item = assignmentRepository.findById(id).orElse(null);
+      if (item == null || !familyId.equals(item.familyId)) {
+        results.add(new VoiceMaterialDtos.BatchDeleteItem(id, "", false, "语音任务不存在或无权访问"));
+        continue;
+      }
+      if (!"AUDIO_IMAGE".equals(item.contentType)) {
+        results.add(new VoiceMaterialDtos.BatchDeleteItem(
+            id, label(item), false, "不是语音任务，已跳过"));
+        continue;
+      }
+      deletable.add(id);
+      results.add(new VoiceMaterialDtos.BatchDeleteItem(id, label(item), true, ""));
+    }
+
+    for (String id : deletable) {
+      assignments.deleteAllowingCompleted(familyId, id);
+    }
+    if (!deletable.isEmpty()) {
+      log.info("voice_material tasks_batch_deleted familyId={} requested={} deleted={}",
+          familyId, ids.size(), deletable.size());
+    }
+    return VoiceMaterialDtos.BatchDeleteResponse.of(ids.size(), results);
+  }
+
+  private String label(AssignmentEntity item) {
+    return item.title == null ? "" : item.title;
+  }
+
+  private List<String> normalizeDeleteIds(List<String> rawIds) {
+    if (rawIds == null) return List.of();
+    return rawIds.stream()
+        .filter(Objects::nonNull)
+        .map(String::trim)
+        .filter(id -> !id.isBlank())
+        .distinct()
+        .toList();
   }
 
   @Transactional

@@ -164,4 +164,23 @@ public class VoiceMaterialController {
       @PathVariable String studentId) {
     return scheduledAssignments.autoCreateOnStudentEntry(familyId, studentId);
   }
+
+  /**
+   * 批量删除语音素材目录。已经由该素材生成过的语音任务会保留。
+   * 用 POST 而不是 DELETE：需要携带最多 500 个 id 的请求体。
+   */
+  @PostMapping("/voice-material-packages/batch-delete")
+  public VoiceMaterialDtos.BatchDeleteResponse batchDeletePackages(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @Valid @RequestBody VoiceMaterialDtos.BatchDeleteRequest request) {
+    return materials.batchDeletePackages(familyId, request.ids());
+  }
+
+  /** 批量删除语音任务。已完成任务也会被删除（会一并删掉提交记录与照片）。 */
+  @PostMapping("/voice-tasks/batch-delete")
+  public VoiceMaterialDtos.BatchDeleteResponse batchDeleteTasks(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @Valid @RequestBody VoiceMaterialDtos.BatchDeleteRequest request) {
+    return assignments.batchDeleteTasks(familyId, request.ids());
+  }
 }

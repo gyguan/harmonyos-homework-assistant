@@ -349,8 +349,23 @@ public class AssignmentService {
 
   @Transactional
   public void delete(UUID familyId, String id) {
+    deleteInternal(familyId, id, false);
+  }
+
+  /**
+   * 管理台批量清理专用：允许删除「已完成」作业。
+   *
+   * <p>已完成作业带有孩子的提交记录与照片，删除会一并永久移除，因此只给显式二次确认过的
+   * 批量入口使用；普通的 {@link #delete(UUID, String)} 仍然拒绝已完成作业。
+   */
+  @Transactional
+  public void deleteAllowingCompleted(UUID familyId, String id) {
+    deleteInternal(familyId, id, true);
+  }
+
+  private void deleteInternal(UUID familyId, String id, boolean allowCompleted) {
     AssignmentEntity assignment = requireOwned(familyId, id);
-    if ("COMPLETED".equals(assignment.status)) {
+    if (!allowCompleted && "COMPLETED".equals(assignment.status)) {
       throw new ApiExceptions.BadRequest("已完成作业不能删除");
     }
     Set<String> submissionStoragePaths = new HashSet<>();

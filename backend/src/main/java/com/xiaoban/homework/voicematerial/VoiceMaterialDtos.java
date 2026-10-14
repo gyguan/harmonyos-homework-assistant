@@ -4,6 +4,7 @@ import com.xiaoban.homework.assignment.AssignmentDtos;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 
@@ -110,4 +111,23 @@ public final class VoiceMaterialDtos {
 
   public record AutoCreateResponse(boolean created, String businessDate,
       String packageId, String assignmentId, AssignmentDtos.Response assignment) {}
+
+  /**
+   * 管理台批量删除请求。调用方必须显式给出要删除的 id，服务端不接受"按条件全删"，
+   * 以免筛选条件写错时一次清空整个家庭的素材。
+   */
+  public record BatchDeleteRequest(
+      @NotNull(message = "请提供要删除的 id 列表")
+      @Size(min = 1, max = 500, message = "一次最多删除 500 项")
+      List<String> ids) {}
+
+  public record BatchDeleteItem(String id, String label, boolean deleted, String reason) {}
+
+  public record BatchDeleteResponse(int requested, int deleted, int skipped,
+      List<BatchDeleteItem> items) {
+    static BatchDeleteResponse of(int requested, List<BatchDeleteItem> items) {
+      int deleted = (int) items.stream().filter(BatchDeleteItem::deleted).count();
+      return new BatchDeleteResponse(requested, deleted, requested - deleted, items);
+    }
+  }
 }

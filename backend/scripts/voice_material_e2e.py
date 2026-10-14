@@ -304,6 +304,106 @@ def main() -> int:
         require(second_legacy.get("hasActiveAssignment") is False,
                 "deleted second automatic task must not remain active")
 
+        # ---------- 管理台批量删除 ----------
+        # 这一段是本次新增功能的回归重点。最容易踩的坑是
+        # voice_material_auto_create_record.package_id 的外键没有 on delete cascade：
+        # 不先删记录就删目录，PostgreSQL 会直接报外键冲突，整批回滚。
+        expect(http(base_url, "POST", "/api/v1/voice-material-packages/batch-delete",
+                    payload={"ids": [first["id"]]}), (401,), "batch delete must require auth")
+        expect(http(base_url, "POST", "/api/v1/voice-material-packages/batch-delete",
+                    token=token, payload={"ids": []}), (400,), "empty id list must be rejected")
+        expect(http(base_url, "POST", "/api/v1/voice-tasks/batch-delete",
+                    token=token, payload={"ids": []}), (400,), "empty id list must be rejected")
+
+        # 独立批次放一个专属文件夹，用来验证"删素材不删任务"。
+        batch2 = create_batch(base_url, token, student_id)
+        third = register_package(base_url, token, batch2, "003-英语听力", "ENGLISH")
+        upload(base_url, token, third["id"], "AUDIO", "english-voice.mp3", 0, AUDIO_BYTES, "audio/mpeg")
+        upload(base_url, token, third["id"], "IMAGE", "english-scene.png", 1, IMAGE_BYTES, "image/png")
+        third_completed = expect(http(base_url, "POST",
+            f"/api/v1/voice-material-batches/{batch2}/complete", token=token),
+            (200,), "complete third folder batch").json()
+        require(third_completed.get("readyCount") == 1, "third folder must become READY")
+
+        third_task = expect(http(base_url, "POST",
+            f"/api/v1/voice-material-packages/{third['id']}/create-assignment",
+            token=token, payload={"studentId": student_id, "expectedMinutes": 15,
+                                  "taskDate": task_date, "title": "英语 · 素材保留验证",
+                                  "requestId": f"third-{run_id}"}),
+            (200,), "create task from third folder").json()
+        third_assignment = third_task["assignmentId"]
+
+        deleted_folder = expect(http(base_url, "POST", "/api/v1/voice-material-packages/batch-delete",
+            token=token, payload={"ids": [third["id"]]}), (200,), "batch delete folder").json()
+        require(deleted_folder.get("requested") == 1 and deleted_folder.get("deleted") == 1 and
+                deleted_folder.get("skipped") == 0,
+                "folder batch delete must remove the folder despite the auto-create record FK")
+        require([x.get("id") for x in deleted_folder.get("items", [])] == [third["id"]],
+                "folder batch delete result must echo the requested id")
+        folders_after = expect(http(base_url, "GET",
+            f"/api/v1/voice-material-folders?studentId={quote(student_id)}&page=0&size=50", token=token),
+            (200,), "folder list after batch delete").json()
+        require(third["id"] not in {x.get("packageId") for x in folders_after.get("items", [])},
+                "deleted folder must not appear in the folder list")
+
+        # 删素材必须保留任务本身：素材文件是独立引用的，任务要能照常打开和取素材。
+        survivor = expect(http(base_url, "GET", f"/api/v1/voice-tasks/{third_assignment}", token=token),
+                          (200,), "task must survive folder deletion").json()
+        require(survivor["item"].get("assignmentId") == third_assignment,
+                "voice task must survive deletion of its source folder")
+        require(survivor["item"].get("packageId") == "" and
+                survivor["item"].get("directoryName") == "本地上传",
+                "task whose source folder was deleted must fall back to local-upload display")
+        list_resources(base_url, token, third_assignment, ["english-voice.mp3", "english-scene.png"])
+
+        # 批量删任务：未知 id 要跳过并给出原因，而不是整批失败。
+        unknown_id = f"missing-{run_id}"
+        deleted_tasks = expect(http(base_url, "POST", "/api/v1/voice-tasks/batch-delete",
+            token=token, payload={"ids": [reused_assignment, parallel_assignment, unknown_id]}),
+            (200,), "batch delete voice tasks").json()
+        require(deleted_tasks.get("deleted") == 2 and deleted_tasks.get("skipped") == 1,
+                "batch task delete must skip unknown ids instead of failing the whole batch")
+        skipped_item = next(x for x in deleted_tasks["items"] if not x.get("deleted"))
+        require(skipped_item.get("id") == unknown_id and skipped_item.get("reason"),
+                "skipped id must carry a reason")
+
+        # 与单条删除保持一致：删任务不清 task_link，文件夹的"已使用次数"历史必须保留。
+        history = expect(http(base_url, "GET", f"/api/v1/voice-material-folders/{first['id']}",
+                              token=token), (200,), "folder usage history after batch task delete").json()
+        require(history["item"].get("usageCount") == 1,
+                "batch task delete must keep folder usage history like the single delete path")
+        require(history["item"].get("activeTaskCount") == 0,
+                "batch deleted tasks must not remain active")
+
+        # 已完成任务：单条 DELETE 仍然拒绝，批量入口允许（管理台二次确认后走这条）。
+        for step in ["IN_PROGRESS", "READY_TO_SUBMIT", "SUBMITTED", "COMPLETED"]:
+            current = expect(http(base_url, "GET", f"/api/v1/assignments/{third_assignment}", token=token),
+                             (200,), "load assignment before status patch").json()
+            patched = expect(http(base_url, "PATCH", f"/api/v1/assignments/{third_assignment}",
+                token=token, payload={"version": current["version"], "status": step}),
+                (200,), f"patch assignment status {step}").json()
+            require(patched.get("status") == step, f"assignment status must advance to {step}")
+
+        expect(http(base_url, "DELETE", f"/api/v1/assignments/{third_assignment}", token=token),
+               (400,), "single delete must still reject a completed assignment")
+        completed_delete = expect(http(base_url, "POST", "/api/v1/voice-tasks/batch-delete",
+            token=token, payload={"ids": [third_assignment]}), (200,), "batch delete completed task").json()
+        require(completed_delete.get("deleted") == 1 and completed_delete.get("skipped") == 0,
+                "batch delete must allow removing a completed voice task")
+        expect(http(base_url, "GET", f"/api/v1/assignments/{third_assignment}", token=token),
+               (404,), "completed task must be gone after batch delete")
+
+        # 删掉目录后重新导入同一份内容不能被判重（package_fingerprint 已随目录释放）。
+        batch3 = create_batch(base_url, token, student_id)
+        reimported = register_package(base_url, token, batch3, "003-英语听力", "ENGLISH")
+        upload(base_url, token, reimported["id"], "AUDIO", "english-voice.mp3", 0, AUDIO_BYTES, "audio/mpeg")
+        upload(base_url, token, reimported["id"], "IMAGE", "english-scene.png", 1, IMAGE_BYTES, "image/png")
+        reimported_done = expect(http(base_url, "POST",
+            f"/api/v1/voice-material-batches/{batch3}/complete", token=token),
+            (200,), "complete re-imported batch").json()
+        require(reimported_done.get("readyCount") == 1 and reimported_done.get("invalidCount") == 0,
+                "re-importing the same folder content after deletion must not be rejected as duplicate")
+
         print("VOICE_MATERIAL_E2E_PASS "
               f"studentId={student_id} firstAssignment={first_assignment} "
               f"reusedAssignment={reused_assignment} parallelAssignment={parallel_assignment}")

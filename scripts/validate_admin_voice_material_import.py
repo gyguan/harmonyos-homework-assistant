@@ -138,6 +138,76 @@ require("AdminVoiceMaterialService" not in controller + app + view + api,
 require("#1456b8" in css and "#fff" in css and ".data-table" in css and ".drawer-panel" in css,
         "admin must keep the white/deep-blue Web management visual baseline")
 
+# ---------- 批量删除语音素材 / 语音任务 ----------
+# 删除是不可逆操作，闸门要盯住三件事：只接受显式 id 列表、素材与任务的引用关系不被误删、
+# 以及"已完成"任务的二次确认不能被绕过。
+material_service = read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialService.java")
+auto_record_repo = read(
+    "backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialAutoCreateRecordRepository.java")
+assignment_core = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
+e2e = read("backend/scripts/voice_material_e2e.py")
+
+require('@PostMapping("/voice-material-packages/batch-delete")' in controller and
+        '@PostMapping("/voice-tasks/batch-delete")' in controller,
+        "batch delete endpoints must exist for both voice folders and voice tasks")
+require("record BatchDeleteRequest(" in dtos and "record BatchDeleteItem(" in dtos and
+        "record BatchDeleteResponse(" in dtos and "min = 1, max = 500" in dtos,
+        "batch delete must take an explicit bounded id list and report per-item results")
+require("batchDeletePackages" in material_service and "batchDeleteTasks" in assignment_service,
+        "batch delete must be implemented in the voice material services")
+# 调用方必须显式给出 id，服务端不接受按条件全删，避免筛选条件写错时清空整个家庭的素材。
+require("selectAllMatching" in app and "selectionListHtml" in app,
+        "Web must resolve select-all into explicit ids and show them before deleting")
+
+# voice_material_auto_create_record.package_id 没有 on delete cascade：
+# 不先删记录就删目录会整批撞外键。顺序必须保留。
+require("deleteByFamilyIdAndPackageIdIn" in material_service and
+        "autoRecords.deleteByFamilyIdAndPackageIdIn" in material_service and
+        "autoRecords.flush()" in material_service and
+        "deleteByFamilyIdAndPackageIdIn" in auto_record_repo,
+        "folder batch delete must purge auto-create records before deleting the folder")
+require("deleteByFamilyIdAndAssignmentId" not in assignment_service + auto_record_repo,
+        "batch task delete must keep folder-task history and the daily auto-create limit")
+
+# 删任务允许"已完成"，单条删除保持原有拒绝语义。
+require("deleteAllowingCompleted" in assignment_core and
+        "deleteInternal(familyId, id, false)" in assignment_core and
+        "deleteInternal(familyId, id, true)" in assignment_core and
+        '"已完成作业不能删除"' in assignment_core,
+        "batch task delete must allow completed tasks while single delete keeps rejecting them")
+require("completed" in app and "requirePhrase" in app and "CONFIRM_WORD" in app and
+        "syncConfirmOk" in app,
+        "Web must require a typed confirmation before deleting completed voice tasks")
+require("由这些素材生成的语音任务<strong>会保留</strong>" in app,
+        "folder delete copy must state that generated voice tasks are kept")
+
+require("data-select-task" in view and "data-select-folder" in view and
+        "selectedIds" in view and "selected-row" in view,
+        "voice list rows must expose an independently selectable checkbox")
+for element_id in [
+    "task-select-all", "folder-select-all", "task-select-all-matching", "folder-select-all-matching",
+    "task-bulk-bar", "folder-bulk-bar", "task-batch-delete", "folder-batch-delete",
+    "task-clear-selection", "folder-clear-selection",
+    "confirm-dialog", "confirm-body", "confirm-phrase-field", "confirm-phrase-input",
+    "confirm-cancel", "confirm-ok"
+]:
+    require(f'id="{element_id}"' in index, f"missing batch delete UI: {element_id}")
+require("batchDeleteVoiceTasks" in api and "batchDeleteVoiceMaterialPackages" in api and
+        "batchDeleteVoiceTasks" in app and "batchDeleteVoiceMaterialPackages" in app,
+        "Web must use the canonical batch delete APIs")
+require("confirmDeleteTasks" in app and "confirmDeleteFolders" in app and
+        "submitBatchDelete" in app,
+        "Web must route bulk deletion through explicit confirm flows")
+require(".bulk-bar" in css and ".danger-button" in css and ".confirm-panel" in css and
+        ".row-select" in css,
+        "batch delete UI must be styled with the shared admin baseline")
+# 真实数据库回归：外键级联、已完成可删、重建后不判重，只有 E2E 能覆盖。
+require("/api/v1/voice-material-packages/batch-delete" in e2e and
+        "/api/v1/voice-tasks/batch-delete" in e2e and
+        "must survive deletion of its source folder" in e2e and
+        "must not be rejected as duplicate" in e2e,
+        "voice material E2E must cover batch delete semantics against a real database")
+
 if errors:
     print("ADMIN_VOICE_IMPORT_GATE_FAIL")
     for e in errors:

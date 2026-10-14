@@ -53,6 +53,11 @@ export async function uploadVoiceMaterialFile(packageId, item, sortOrder) {
 export const completeVoiceMaterialBatch = batchId => request(`/api/v1/voice-material-batches/${encodeURIComponent(batchId)}/complete`, { method: 'POST' });
 export const createVoiceMaterialAssignment = (packageId, payload) => request(`/api/v1/voice-material-packages/${encodeURIComponent(packageId)}/create-assignment`, { method: 'POST', body: JSON.stringify(payload) });
 
+// 批量删除。两个接口都要求显式给出 id 列表，服务端不接受"按条件全删"。
+// 删素材会保留由它生成的语音任务；删任务会连带删掉提交记录与照片。
+export const batchDeleteVoiceMaterialPackages = ids => request('/api/v1/voice-material-packages/batch-delete', { method: 'POST', body: JSON.stringify({ ids }) });
+export const batchDeleteVoiceTasks = ids => request('/api/v1/voice-tasks/batch-delete', { method: 'POST', body: JSON.stringify({ ids }) });
+
 export async function fetchVoiceMaterialAsset(assetId) {
   const headers = new Headers(); const token = getToken(); if (token) headers.set('Authorization', `Bearer ${token}`);
   const response = await fetch(`/api/v1/media-assets/${encodeURIComponent(assetId)}`, { headers });

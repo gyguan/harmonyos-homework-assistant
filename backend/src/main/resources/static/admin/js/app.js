@@ -1,25 +1,30 @@
 import {
+  batchDeleteVoiceMaterialPackages, batchDeleteVoiceTasks,
   completeVoiceMaterialBatch, createVoiceMaterialAssignment, createVoiceMaterialBatch,
   fetchAssignmentResource, fetchVoiceMaterialAsset, getVoiceFolderDetail, getVoiceTaskDetail, listStudents,
   logout, registerVoiceMaterialPackage, searchVoiceFolders, searchVoiceTasks,
   uploadVoiceMaterialFile
-} from './api.js?v=20261014-1';
-import { SUBJECTS, analyzeVoiceMaterialSelection, buildVoiceMaterialRows, fileIdentity, unassignedSupportedCount, uploadOrder, validatePackage } from './voice-material.js?v=20261014-1';
+} from './api.js?v=20261014-2';
+import { SUBJECTS, analyzeVoiceMaterialSelection, buildVoiceMaterialRows, fileIdentity, unassignedSupportedCount, uploadOrder, validatePackage } from './voice-material.js?v=20261014-2';
 import {
   folderStatusClass, folderStatusLabel, renderFolderDetailContent, renderFolderRows, renderImportRows,
   renderTaskDetailContent, renderTaskRows, taskStatusClass, taskStatusLabel
-} from './voice-management-view.js?v=20261014-1';
+} from './voice-management-view.js?v=20261014-2';
 
 const el = id => document.getElementById(id);
 const state = {
   initialized: false, students: [], activeTab: 'tasks',
-  tasks: { items: [], page: 0, size: 20, totalPages: 0, totalElements: 0 },
-  folders: { items: [], page: 0, size: 20, totalPages: 0, totalElements: 0 },
+  // selected 跨页保留选中项；labels 缓存 id→名称，离开页面后仍能在确认弹框里显示名字。
+  tasks: { items: [], page: 0, size: 20, totalPages: 0, totalElements: 0, selected: new Set(), labels: new Map() },
+  folders: { items: [], page: 0, size: 20, totalPages: 0, totalElements: 0, selected: new Set(), labels: new Map() },
   create: { items: [], page: 0, size: 10, totalPages: 0, totalElements: 0, selected: null, requestId: '' },
   taskDetail: null, folderDetail: null,
   importFiles: [], importChoices: {}, importIgnoredCount: 0, importUnassignedCount: 0,
   importPackages: [], importing: false, importResults: [], importResultFilter: 'ALL'
 };
+const bulkStore = kind => (kind === 'tasks' ? state.tasks : state.folders);
+const idOf = (kind, item) => (kind === 'tasks' ? item.assignmentId : item.packageId);
+const nameOf = (kind, item) => (kind === 'tasks' ? item.taskName : item.directoryName);
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const subjectLabel = code => SUBJECTS.find(x => x.code === code)?.label || '其他';
@@ -64,8 +69,10 @@ async function loadTasks() {
 }
 function renderTasks() {
   el('task-result-summary').textContent=`共 ${state.tasks.totalElements} 条`; el('task-empty').hidden=state.tasks.items.length>0;
-  el('task-table-body').innerHTML=renderTaskRows(state.tasks.items,{esc,subjectLabel,formatDateTime});
+  rememberLabels('tasks');
+  el('task-table-body').innerHTML=renderTaskRows(state.tasks.items,{esc,subjectLabel,formatDateTime,selectedIds:state.tasks.selected});
   renderPager(el('task-pagination'),state.tasks.page,state.tasks.totalPages);
+  renderBulkBar('tasks');
 }
 
 function folderFilters(prefix='folder') {
@@ -84,8 +91,10 @@ async function loadFolders() {
 }
 function renderFolders() {
   el('folder-result-summary').textContent=`共 ${state.folders.totalElements} 条`;el('folder-empty').hidden=state.folders.items.length>0;
-  el('folder-table-body').innerHTML=renderFolderRows(state.folders.items,{esc,subjectLabel,formatDateTime});
+  rememberLabels('folders');
+  el('folder-table-body').innerHTML=renderFolderRows(state.folders.items,{esc,subjectLabel,formatDateTime,selectedIds:state.folders.selected});
   renderPager(el('folder-pagination'),state.folders.page,state.folders.totalPages);
+  renderBulkBar('folders');
 }
 
 function switchTab(tab) {
@@ -170,12 +179,196 @@ function renderImportResults(){const ok=state.importResults.filter(x=>x.resultSt
 async function openAsset(assetId,resourceId,name,type){el('asset-viewer').hidden=false;const box=el('asset-viewer-content');box.innerHTML='<p class="muted">正在加载素材…</p>';try{const blob=assetId?await fetchVoiceMaterialAsset(assetId):await fetchAssignmentResource(resourceId),url=URL.createObjectURL(blob);box.innerHTML=`<h3 class="asset-viewer-title">${esc(name)}</h3>`;const node=type==='AUDIO'?document.createElement('audio'):document.createElement('img');node.controls=type==='AUDIO';node.autoplay=type==='AUDIO';node.src=url;if(type!=='AUDIO')node.alt=name;box.append(node);box.dataset.objectUrl=url;}catch(e){box.innerHTML=`<p class="error-text">${esc(e.message)}</p>`;}}
 function closeAsset(){const box=el('asset-viewer-content'),url=box.dataset.objectUrl;if(url)URL.revokeObjectURL(url);box.innerHTML='';box.dataset.objectUrl='';el('asset-viewer').hidden=true;}
 
-el('tab-tasks').onclick=()=>switchTab('tasks');el('tab-folders').onclick=()=>switchTab('folders');
-el('task-search-form').onsubmit=e=>{e.preventDefault();state.tasks.page=0;void loadTasks();};el('task-reset').onclick=()=>{el('task-status').value='';el('task-subject').value='';el('task-keyword').value='';el('task-created-from').value='';el('task-created-to').value='';state.tasks.page=0;void loadTasks();};el('task-student').onchange=()=>{state.tasks.page=0;void loadTasks();};el('task-refresh').onclick=()=>void loadTasks();el('task-page-size').onchange=()=>{state.tasks.size=Number(el('task-page-size').value);state.tasks.page=0;void loadTasks();};el('task-pagination').onclick=e=>{const b=e.target.closest('[data-page]');if(!b||b.disabled)return;state.tasks.page=Number(b.dataset.page);void loadTasks();};
-el('folder-search-form').onsubmit=e=>{e.preventDefault();state.folders.page=0;void loadFolders();};el('folder-reset').onclick=()=>{el('folder-status').value='';el('folder-subject').value='';el('folder-usage').value='ALL';el('folder-keyword').value='';el('folder-imported-from').value='';el('folder-imported-to').value='';state.folders.page=0;void loadFolders();};el('folder-student').onchange=()=>{state.folders.page=0;void loadFolders();};el('folder-refresh').onclick=()=>void loadFolders();el('folder-page-size').onchange=()=>{state.folders.size=Number(el('folder-page-size').value);state.folders.page=0;void loadFolders();};el('folder-pagination').onclick=e=>{const b=e.target.closest('[data-page]');if(!b||b.disabled)return;state.folders.page=Number(b.dataset.page);void loadFolders();};
+// ---------- 批量删除 ----------
+// 设计约束：管理台删除是不可逆的，所以
+//   1) 永远只提交"看得见"的显式 id 列表，服务端不接受按条件全删；
+//   2) 删语音任务时若涉及「已完成」，或选中的项跨了页（无法逐条核对状态），
+//      必须手工输入确认词；删素材只需要普通确认（素材可以重新导入）。
+//   3) 删素材时后端会保留由它生成的语音任务，这一点要在弹框里说清楚。
 
-el('task-table-body').onclick=e=>{const id=e.target.closest('[data-open-task]')?.dataset.openTask||e.target.closest('[data-task-id]')?.dataset.taskId;if(id)void openTaskDetail(id);};
-el('folder-table-body').onclick=e=>{const id=e.target.closest('[data-open-folder]')?.dataset.openFolder||e.target.closest('[data-folder-id]')?.dataset.folderId;if(id)void openFolderDetail(id);};
+const CONFIRM_WORD = '删除';
+let dialogConfirm = null;
+
+// 勾选需要的确认词没输对时，确认按钮保持禁用。
+function syncConfirmOk() {
+  const needPhrase = !el('confirm-phrase-field').hidden;
+  el('confirm-ok').disabled = needPhrase && el('confirm-phrase-input').value.trim() !== CONFIRM_WORD;
+}
+function openDialog({ title, body, okLabel = '确认删除', danger = true, requirePhrase = false, showCancel = true, onConfirm = null }) {
+  el('confirm-title').textContent = title;
+  el('confirm-body').innerHTML = body;
+  el('confirm-ok').className = danger ? 'danger-button' : 'primary-button';
+  el('confirm-ok').textContent = okLabel;
+  el('confirm-cancel').hidden = !showCancel;
+  el('confirm-phrase-field').hidden = !requirePhrase;
+  el('confirm-phrase-word').textContent = CONFIRM_WORD;
+  el('confirm-phrase-input').value = '';
+  el('confirm-error').hidden = true;
+  dialogConfirm = onConfirm;
+  el('confirm-dialog').hidden = false;
+  syncConfirmOk();
+  if (requirePhrase) el('confirm-phrase-input').focus();
+  else el('confirm-ok').focus();
+}
+function closeDialog() { el('confirm-dialog').hidden = true; dialogConfirm = null; }
+function showDeleteResult(title, merged, store) {
+  const skipped = (merged.items || []).filter(x => !x.deleted);
+  const parts = [`<p>已删除 <strong>${merged.deleted}</strong> 项${skipped.length ? `，有 <strong>${skipped.length}</strong> 项被跳过` : ''}。</p>`];
+  if (skipped.length) {
+    parts.push(`<div class="confirm-list">${skipped.map(x => `<div>${esc(x.label || store.labels.get(x.id) || x.id)} — <span class="muted">${esc(x.reason || '未删除')}</span></div>`).join('')}</div>`);
+  }
+  openDialog({ title, body: parts.join(''), okLabel: '知道了', danger: false, showCancel: false });
+}
+
+// 列表上每页都会给出 id→名称，记下来，跨页选中时确认弹框也能显示名字。
+function rememberLabels(kind) {
+  const store = bulkStore(kind);
+  for (const item of store.items) {
+    const name = nameOf(kind, item);
+    if (name) store.labels.set(idOf(kind, item), name);
+  }
+}
+function clearSelection(kind) { bulkStore(kind).selected.clear(); }
+function renderBulkBar(kind) {
+  const store = bulkStore(kind);
+  const isTasks = kind === 'tasks';
+  const prefix = isTasks ? 'task' : 'folder';
+  const count = store.selected.size;
+  el(`${prefix}-bulk-bar`).hidden = count === 0;
+  el(`${prefix}-selected-count`).textContent = `已选 ${count} 项`;
+  const pageIds = store.items.map(item => idOf(kind, item));
+  el(`${prefix}-select-all`).checked = pageIds.length > 0 && pageIds.every(id => store.selected.has(id));
+  const remaining = Number(store.totalElements || 0) - count;
+  const more = el(`${prefix}-select-all-matching`);
+  more.hidden = !(store.totalElements > count && store.totalElements > 1);
+  more.textContent = `选择全部 ${store.totalElements} 项`;
+  el(`${prefix}-batch-delete`).disabled = count === 0;
+}
+function selectionListHtml(kind) {
+  const store = bulkStore(kind);
+  const ids = [...store.selected];
+  const shown = ids.slice(0, 8);
+  const rows = shown.map(id => `<div>${esc(store.labels.get(id) || id)}</div>`);
+  if (ids.length > shown.length) rows.push(`<div class="muted">…等共 ${ids.length} 项</div>`);
+  return `<div class="confirm-list">${rows.join('')}</div>`;
+}
+
+// 后端单次上限 500，这里按 200 分片提交，顺便避免一次请求体过大。
+async function submitBatchDelete(kind, ids) {
+  const api = kind === 'tasks' ? batchDeleteVoiceTasks : batchDeleteVoiceMaterialPackages;
+  const merged = { requested: 0, deleted: 0, skipped: 0, items: [] };
+  for (let i = 0; i < ids.length; i += 200) {
+    const result = await api(ids.slice(i, i + 200));
+    merged.requested += Number(result?.requested || 0);
+    merged.items.push(...(result?.items || []));
+  }
+  merged.deleted = merged.items.filter(x => x.deleted).length;
+  merged.skipped = merged.items.length - merged.deleted;
+  return merged;
+}
+
+async function confirmDeleteTasks() {
+  const store = state.tasks;
+  const ids = [...store.selected];
+  if (!ids.length) return;
+  // 只有当前页能拿到状态；跨页选中时无法逐条核对，一律要求输入确认词。
+  const pageStatus = new Map(store.items.map(x => [x.assignmentId, x.assignmentStatus]));
+  const completed = ids.filter(id => pageStatus.get(id) === 'COMPLETED').length;
+  const crossesPages = ids.some(id => !pageStatus.has(id));
+  const requirePhrase = crossesPages || completed > 0;
+  const body = [
+    `<p>将永久删除选中的 <strong>${ids.length}</strong> 条语音任务。</p>`,
+    completed > 0 ? `<p>其中 <strong>${completed}</strong> 条是「已完成」任务，会连同孩子的提交记录与照片一起删除，<strong>无法恢复</strong>。</p>` : '',
+    crossesPages ? `<p>选中的任务跨了多页，无法逐条核对状态，请确认后输入确认词。</p>` : '',
+    selectionListHtml('tasks')
+  ].join('');
+  openDialog({
+    title: '删除语音任务', body, requirePhrase, okLabel: '确认删除',
+    onConfirm: async () => {
+      const merged = await submitBatchDelete('tasks', ids);
+      closeDialog();
+      clearSelection('tasks');
+      await loadTasks();
+      showDeleteResult('语音任务删除完成', merged, store);
+    }
+  });
+}
+
+async function confirmDeleteFolders() {
+  const store = state.folders;
+  const ids = [...store.selected];
+  if (!ids.length) return;
+  const body = [
+    `<p>将删除选中的 <strong>${ids.length}</strong> 个语音素材文件夹及其素材文件。</p>`,
+    `<p>由这些素材生成的语音任务<strong>会保留</strong>，孩子仍能正常做题；这些任务详情里的「来源文件夹」会变成 APP 本地上传。</p>`,
+    `<p>删除后重新导入同样的文件夹不会再被判为重复导入。</p>`,
+    selectionListHtml('folders')
+  ].join('');
+  openDialog({
+    title: '删除语音素材', body, requirePhrase: false, okLabel: '确认删除',
+    onConfirm: async () => {
+      const merged = await submitBatchDelete('folders', ids);
+      closeDialog();
+      clearSelection('folders');
+      // 素材被删后任务的"来源文件夹"和使用次数都会变，两个列表一起刷新。
+      await Promise.all([loadFolders(), loadTasks()]);
+      showDeleteResult('语音素材删除完成', merged, store);
+    }
+  });
+}
+
+async function selectAllMatching(kind) {
+  const store = bulkStore(kind);
+  const isTasks = kind === 'tasks';
+  const button = el(isTasks ? 'task-select-all-matching' : 'folder-select-all-matching');
+  const label = button.textContent;
+  button.disabled = true;
+  button.textContent = '正在选择…';
+  try {
+    // 后端 size 上限 100，逐页拉到选中全部为止（上限 500，与接口单次限制一致）。
+    let page = 0, totalPages = 1;
+    while (page < totalPages && store.selected.size < 500) {
+      const result = isTasks
+        ? await searchVoiceTasks({ ...taskFilters(), page, size: 100 })
+        : await searchVoiceFolders({ ...folderFilters(), page, size: 100 });
+      totalPages = Number(result.totalPages || 0);
+      for (const item of result.items || []) {
+        store.selected.add(idOf(kind, item));
+        const name = nameOf(kind, item);
+        if (name) store.labels.set(idOf(kind, item), name);
+      }
+      page++;
+    }
+  } finally {
+    button.textContent = label;
+    button.disabled = false;
+    if (kind === 'tasks') renderTasks(); else renderFolders();
+  }
+}
+
+el('tab-tasks').onclick=()=>switchTab('tasks');el('tab-folders').onclick=()=>switchTab('folders');
+el('task-search-form').onsubmit=e=>{e.preventDefault();state.tasks.page=0;clearSelection('tasks');void loadTasks();};el('task-reset').onclick=()=>{el('task-status').value='';el('task-subject').value='';el('task-keyword').value='';el('task-created-from').value='';el('task-created-to').value='';state.tasks.page=0;clearSelection('tasks');void loadTasks();};el('task-student').onchange=()=>{state.tasks.page=0;clearSelection('tasks');void loadTasks();};el('task-refresh').onclick=()=>void loadTasks();el('task-page-size').onchange=()=>{state.tasks.size=Number(el('task-page-size').value);state.tasks.page=0;void loadTasks();};el('task-pagination').onclick=e=>{const b=e.target.closest('[data-page]');if(!b||b.disabled)return;state.tasks.page=Number(b.dataset.page);void loadTasks();};
+el('folder-search-form').onsubmit=e=>{e.preventDefault();state.folders.page=0;clearSelection('folders');void loadFolders();};el('folder-reset').onclick=()=>{el('folder-status').value='';el('folder-subject').value='';el('folder-usage').value='ALL';el('folder-keyword').value='';el('folder-imported-from').value='';el('folder-imported-to').value='';state.folders.page=0;clearSelection('folders');void loadFolders();};el('folder-student').onchange=()=>{state.folders.page=0;clearSelection('folders');void loadFolders();};el('folder-refresh').onclick=()=>void loadFolders();el('folder-page-size').onchange=()=>{state.folders.size=Number(el('folder-page-size').value);state.folders.page=0;void loadFolders();};el('folder-pagination').onclick=e=>{const b=e.target.closest('[data-page]');if(!b||b.disabled)return;state.folders.page=Number(b.dataset.page);void loadFolders();};
+
+el('task-select-all').onchange=()=>{const checked=el('task-select-all').checked;for(const item of state.tasks.items){if(checked)state.tasks.selected.add(item.assignmentId);else state.tasks.selected.delete(item.assignmentId);}renderTasks();};
+el('folder-select-all').onchange=()=>{const checked=el('folder-select-all').checked;for(const item of state.folders.items){if(checked)state.folders.selected.add(item.packageId);else state.folders.selected.delete(item.packageId);}renderFolders();};
+el('task-clear-selection').onclick=()=>{clearSelection('tasks');renderTasks();};
+el('folder-clear-selection').onclick=()=>{clearSelection('folders');renderFolders();};
+el('task-select-all-matching').onclick=()=>void selectAllMatching('tasks');
+el('folder-select-all-matching').onclick=()=>void selectAllMatching('folders');
+el('task-batch-delete').onclick=()=>void confirmDeleteTasks();
+el('folder-batch-delete').onclick=()=>void confirmDeleteFolders();
+
+el('confirm-cancel').onclick=closeDialog;
+el('confirm-dialog').onclick=e=>{if(e.target.hasAttribute('data-close-confirm'))closeDialog();};
+el('confirm-phrase-input').oninput=syncConfirmOk;
+el('confirm-phrase-input').onkeydown=e=>{if(e.key==='Enter'&&!el('confirm-ok').disabled){e.preventDefault();el('confirm-ok').click();}};
+el('confirm-ok').onclick=async()=>{const run=dialogConfirm;if(!run)return;const button=el('confirm-ok');const label=button.textContent;button.disabled=true;button.textContent='正在删除…';el('confirm-error').hidden=true;try{await run();}catch(error){el('confirm-error').hidden=false;el('confirm-error').textContent=error.message||'删除失败';}finally{if(!el('confirm-dialog').hidden){button.textContent=label;syncConfirmOk();}}};
+
+el('task-table-body').onclick=e=>{if(e.target.closest('.checkbox-column'))return;const id=e.target.closest('[data-open-task]')?.dataset.openTask||e.target.closest('[data-task-id]')?.dataset.taskId;if(id)void openTaskDetail(id);};
+el('folder-table-body').onclick=e=>{if(e.target.closest('.checkbox-column'))return;const id=e.target.closest('[data-open-folder]')?.dataset.openFolder||e.target.closest('[data-folder-id]')?.dataset.folderId;if(id)void openFolderDetail(id);};
+el('task-table-body').onchange=e=>{const box=e.target.closest('[data-select-task]');if(!box)return;const id=box.dataset.selectTask;if(box.checked)state.tasks.selected.add(id);else state.tasks.selected.delete(id);renderTasks();};
+el('folder-table-body').onchange=e=>{const box=e.target.closest('[data-select-folder]');if(!box)return;const id=box.dataset.selectFolder;if(box.checked)state.folders.selected.add(id);else state.folders.selected.delete(id);renderFolders();};
 el('close-task-detail').onclick=closeTaskDetail;el('task-detail-drawer').onclick=e=>{if(e.target.hasAttribute('data-close-task-detail'))closeTaskDetail();const p=e.target.closest('[data-preview-asset]');if(p)void openAsset(p.dataset.previewAsset,p.dataset.previewResource,p.dataset.previewName,p.dataset.previewType);const f=e.target.closest('[data-jump-folder]');if(f){closeTaskDetail();switchTab('folders');void openFolderDetail(f.dataset.jumpFolder);}};
 el('close-folder-detail').onclick=closeFolderDetail;el('folder-detail-drawer').onclick=e=>{if(e.target.hasAttribute('data-close-folder-detail'))closeFolderDetail();const p=e.target.closest('[data-preview-asset]');if(p)void openAsset(p.dataset.previewAsset,p.dataset.previewResource,p.dataset.previewName,p.dataset.previewType);const t=e.target.closest('[data-jump-task]');if(t){closeFolderDetail();switchTab('tasks');void openTaskDetail(t.dataset.jumpTask);}if(e.target.id==='create-from-folder-detail')openCreate(state.folderDetail.item);};
 

@@ -1,4 +1,4 @@
-import { SUBJECTS, validatePackage } from './voice-material.js?v=20261014-1';
+import { SUBJECTS, validatePackage } from './voice-material.js?v=20261014-2';
 
 export function taskStatusLabel(status) {
   return ({
@@ -71,9 +71,19 @@ function renderFiles(files, esc) {
   return files.map(file => `<div class="detail-file-row"><div><span class="file-kind">${file.resourceType === 'AUDIO' ? '语音' : '图片'}</span><strong>${esc(file.relativeName)}</strong></div><button class="link-button" data-preview-asset="${esc(file.assetId || '')}" data-preview-resource="${esc(file.id || '')}" data-preview-name="${esc(file.relativeName)}" data-preview-type="${esc(file.resourceType)}">${file.resourceType === 'AUDIO' ? '播放' : '预览'}</button></div>`).join('');
 }
 
+/**
+ * 列表勾选单元格。勾选框自带宽高样式（见 .row-select），
+ * 点击它不应该触发整行的"打开详情"，由 app.js 的事件处理里屏蔽。
+ */
+function selectCell(attribute, id, selectedIds, esc) {
+  const checked = selectedIds && selectedIds.has(id) ? 'checked' : '';
+  return `<td class="checkbox-column"><input class="row-select" type="checkbox" ${attribute}="${esc(id)}" ${checked}></td>`;
+}
+
 export function renderTaskRows(items, helpers) {
-  const { esc, subjectLabel, formatDateTime } = helpers;
-  return items.map(item => `<tr class="clickable-row" data-task-id="${esc(item.assignmentId)}" tabindex="0">
+  const { esc, subjectLabel, formatDateTime, selectedIds } = helpers;
+  return items.map(item => `<tr class="clickable-row${selectedIds && selectedIds.has(item.assignmentId) ? ' selected-row' : ''}" data-task-id="${esc(item.assignmentId)}" tabindex="0">
+    ${selectCell('data-select-task', item.assignmentId, selectedIds, esc)}
     <td class="primary-cell">${esc(item.taskName)}</td>
     <td><span class="status-badge ${taskStatusClass(item.assignmentStatus)}">${esc(taskStatusLabel(item.assignmentStatus))}</span></td>
     <td>${esc(item.studentName)}</td>
@@ -86,8 +96,9 @@ export function renderTaskRows(items, helpers) {
 }
 
 export function renderFolderRows(items, helpers) {
-  const { esc, subjectLabel, formatDateTime } = helpers;
-  return items.map(item => `<tr class="clickable-row" data-folder-id="${esc(item.packageId)}" tabindex="0">
+  const { esc, subjectLabel, formatDateTime, selectedIds } = helpers;
+  return items.map(item => `<tr class="clickable-row${selectedIds && selectedIds.has(item.packageId) ? ' selected-row' : ''}" data-folder-id="${esc(item.packageId)}" tabindex="0">
+    ${selectCell('data-select-folder', item.packageId, selectedIds, esc)}
     <td class="primary-cell folder-cell">${esc(item.directoryName)}</td>
     <td><span class="status-badge ${folderStatusClass(item.folderStatus)}">${esc(folderStatusLabel(item.folderStatus))}</span></td>
     <td>${esc(item.studentName)}</td>

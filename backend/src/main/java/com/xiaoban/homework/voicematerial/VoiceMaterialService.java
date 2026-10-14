@@ -11,10 +11,12 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,7 @@ public class VoiceMaterialService {
   private final VoiceMaterialPackageRepository packages;
   private final VoiceMaterialFileRepository files;
   private final VoiceMaterialTaskLinkRepository taskLinks;
+  private final VoiceMaterialAutoCreateRecordRepository autoRecords;
   private final AssignmentRepository assignments;
   private final MediaAssetRepository assets;
   private final MediaAssetService mediaAssets;
@@ -39,6 +42,7 @@ public class VoiceMaterialService {
       VoiceMaterialPackageRepository packages,
       VoiceMaterialFileRepository files,
       VoiceMaterialTaskLinkRepository taskLinks,
+      VoiceMaterialAutoCreateRecordRepository autoRecords,
       AssignmentRepository assignments,
       MediaAssetRepository assets,
       MediaAssetService mediaAssets,
@@ -48,6 +52,7 @@ public class VoiceMaterialService {
     this.packages = packages;
     this.files = files;
     this.taskLinks = taskLinks;
+    this.autoRecords = autoRecords;
     this.assignments = assignments;
     this.assets = assets;
     this.mediaAssets = mediaAssets;
@@ -264,6 +269,69 @@ public class VoiceMaterialService {
     students.requireOwned(familyId, studentId);
     return packages.findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(familyId, studentId)
         .stream().map(this::response).toList();
+  }
+
+  /**
+   * 批量删除语音素材目录。
+   *
+   * <p>已经由该素材生成过的语音任务<b>保留不动</b>：任务引用的是去重后的 media_asset，
+   * 与目录本身没有强依赖，删目录不会影响任务播放。因此这里不触碰 media_asset，
+   * 删掉目录后重新上传同一批文件夹不会再被判重（判重依据就是目录上的 package_fingerprint）。
+   *
+   * <p>删除顺序有硬性要求：voice_material_auto_create_record.package_id 的外键
+   * 没有 on delete cascade，必须先删记录再删目录，否则整批都会因外键冲突回滚。
+   * voice_material_file 与 voice_material_task_link 都是级联，无需手动处理。
+   *
+   * <p>校验阶段全部走 Optional 查找、绝不抛异常：这里已经处在一个事务里，
+   * 任何带 @Transactional 的方法抛异常都会把外层事务标记成 rollback-only，
+   * 之后再提交就会炸 UnexpectedRollbackException，逐项容错就失效了。
+   */
+  @Transactional
+  public VoiceMaterialDtos.BatchDeleteResponse batchDeletePackages(
+      UUID familyId, List<String> rawIds) {
+    List<String> ids = normalizeIds(rawIds);
+    List<VoiceMaterialDtos.BatchDeleteItem> results = new ArrayList<>();
+    List<VoiceMaterialPackageEntity> deletable = new ArrayList<>();
+
+    for (String id : ids) {
+      UUID packageId;
+      try {
+        packageId = UUID.fromString(id);
+      } catch (IllegalArgumentException error) {
+        results.add(new VoiceMaterialDtos.BatchDeleteItem(id, "", false, "ID 格式不正确"));
+        continue;
+      }
+      VoiceMaterialPackageEntity item = packages.findById(packageId).orElse(null);
+      if (item == null || !familyId.equals(item.familyId)) {
+        results.add(new VoiceMaterialDtos.BatchDeleteItem(id, "", false, "素材目录不存在或无权访问"));
+        continue;
+      }
+      deletable.add(item);
+      results.add(new VoiceMaterialDtos.BatchDeleteItem(id, item.directoryName, true, ""));
+    }
+
+    if (!deletable.isEmpty()) {
+      List<UUID> packageIds = deletable.stream().map(item -> item.id).toList();
+      long removedRecords = autoRecords.deleteByFamilyIdAndPackageIdIn(familyId, packageIds);
+      // 必须先落库：Hibernate 会重排 action queue，不 flush 有可能先删目录再删记录而撞上外键。
+      autoRecords.flush();
+      packages.deleteAll(deletable);
+      packages.flush();
+      log.info("voice_material packages_batch_deleted familyId={} requested={} deleted={} autoCreateRecordsRemoved={}",
+          familyId, ids.size(), deletable.size(), removedRecords);
+    }
+
+    return VoiceMaterialDtos.BatchDeleteResponse.of(ids.size(), results);
+  }
+
+  private List<String> normalizeIds(List<String> rawIds) {
+    if (rawIds == null) return List.of();
+    return rawIds.stream()
+        .filter(Objects::nonNull)
+        .map(String::trim)
+        .filter(id -> !id.isBlank())
+        .distinct()
+        .toList();
   }
 
   VoiceMaterialPackageEntity requirePackage(UUID familyId, UUID packageId) {

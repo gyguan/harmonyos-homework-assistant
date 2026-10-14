@@ -9,9 +9,12 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.xiaoban.homework.assignment.AssignmentDtos;
+import com.xiaoban.homework.assignment.AssignmentEntity;
+import com.xiaoban.homework.assignment.AssignmentRepository;
 import com.xiaoban.homework.assignment.AssignmentResourceService;
 import com.xiaoban.homework.assignment.AssignmentService;
 import com.xiaoban.homework.common.ApiExceptions;
@@ -32,6 +35,7 @@ class VoiceMaterialAssignmentServiceTest {
   private final VoiceMaterialTaskLinkRepository links = mock(VoiceMaterialTaskLinkRepository.class);
   private final VoiceMaterialAutoCreateRecordRepository autoRecords =
       mock(VoiceMaterialAutoCreateRecordRepository.class);
+  private final AssignmentRepository assignmentRepository = mock(AssignmentRepository.class);
   private final AssignmentService assignments = mock(AssignmentService.class);
   private final AssignmentResourceService assignmentResources =
       mock(AssignmentResourceService.class);
@@ -39,7 +43,62 @@ class VoiceMaterialAssignmentServiceTest {
 
   private VoiceMaterialAssignmentService service() {
     return new VoiceMaterialAssignmentService(
-        packages, files, links, autoRecords, assignments, assignmentResources, students);
+        packages, files, links, autoRecords, assignmentRepository, assignments,
+        assignmentResources, students);
+  }
+
+  /** AssignmentEntity 的构造器是 protected，测试用 Mockito 造实例（字段都是 public）。 */
+  private AssignmentEntity voiceAssignment(String id, UUID familyId, String status) {
+    AssignmentEntity entity = mock(AssignmentEntity.class);
+    entity.id = id;
+    entity.familyId = familyId;
+    entity.studentId = "student-1";
+    entity.contentType = "AUDIO_IMAGE";
+    entity.title = "语文 · 语音作业";
+    entity.status = status;
+    return entity;
+  }
+
+  @Test
+  void batchDeleteTasksAllowsCompletedAndSkipsUnknownIds() {
+    UUID familyId = UUID.randomUUID();
+    AssignmentEntity active = voiceAssignment("a-voice-active", familyId, "NOT_STARTED");
+    AssignmentEntity completed = voiceAssignment("a-voice-done", familyId, "COMPLETED");
+    when(assignmentRepository.findById("a-voice-active")).thenReturn(Optional.of(active));
+    when(assignmentRepository.findById("a-voice-done")).thenReturn(Optional.of(completed));
+    when(assignmentRepository.findById("missing")).thenReturn(Optional.empty());
+
+    VoiceMaterialDtos.BatchDeleteResponse result = service().batchDeleteTasks(
+        familyId, List.of("a-voice-active", "a-voice-done", "missing"));
+
+    assertEquals(3, result.requested());
+    assertEquals(2, result.deleted());
+    assertEquals(1, result.skipped());
+    assertEquals("语音任务不存在或无权访问", result.items().get(2).reason());
+    // 「已完成」任务单条 DELETE 会被拒绝，批量入口必须显式放行。
+    verify(assignments).deleteAllowingCompleted(familyId, "a-voice-active");
+    verify(assignments).deleteAllowingCompleted(familyId, "a-voice-done");
+    // 与单条删除保持一致：保留 task_link 与自动建任务记录，文件夹使用历史与每日限额不受影响。
+    verifyNoInteractions(links, autoRecords);
+  }
+
+  @Test
+  void batchDeleteTasksSkipsNonVoiceAndForeignAssignments() {
+    UUID familyId = UUID.randomUUID();
+    AssignmentEntity ordinary = voiceAssignment("a-normal", familyId, "NOT_STARTED");
+    ordinary.contentType = "NORMAL";
+    AssignmentEntity foreign = voiceAssignment("a-foreign", UUID.randomUUID(), "NOT_STARTED");
+    when(assignmentRepository.findById("a-normal")).thenReturn(Optional.of(ordinary));
+    when(assignmentRepository.findById("a-foreign")).thenReturn(Optional.of(foreign));
+
+    VoiceMaterialDtos.BatchDeleteResponse result = service().batchDeleteTasks(
+        familyId, List.of("a-normal", "a-foreign"));
+
+    assertEquals(0, result.deleted());
+    assertEquals(2, result.skipped());
+    assertEquals("不是语音任务，已跳过", result.items().get(0).reason());
+    assertEquals("语音任务不存在或无权访问", result.items().get(1).reason());
+    verify(assignments, never()).deleteAllowingCompleted(any(), anyString());
   }
 
   @Test
