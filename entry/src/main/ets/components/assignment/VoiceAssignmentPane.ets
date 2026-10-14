@@ -480,7 +480,10 @@ export struct VoiceAssignmentPane {
                 Image(uri)
                   .width('100%')
                   .height(286)
-                  .objectFit(ImageFit.Contain);
+                  .objectFit(ImageFit.Contain)
+                  .accessibilityRole(AccessibilityRoleType.BUTTON)
+                  .accessibilityText('全屏查看当前情景图片')
+                  .onClick(() => this.openFullscreen());
               } else {
                 LoadingProgress()
                   .width(28)
