@@ -357,6 +357,13 @@ def main() -> int:
         list_resources(base_url, token, third_assignment, ["english-voice.mp3", "english-scene.png"])
 
         # 批量删任务：未知 id 要跳过并给出原因，而不是整批失败。
+        before_delete = expect(http(base_url, "GET", f"/api/v1/voice-material-folders/{first['id']}",
+                                    token=token), (200,),
+                               "folder usage before batch task delete").json()["item"]
+        require(before_delete.get("usageCount") == 3,
+                f"first folder must hold three task links before batch delete "
+                f"(usageCount={before_delete.get('usageCount')})")
+
         unknown_id = f"missing-{run_id}"
         deleted_tasks = expect(http(base_url, "POST", "/api/v1/voice-tasks/batch-delete",
             token=token, payload={"ids": [reused_assignment, parallel_assignment, unknown_id]}),
@@ -367,13 +374,17 @@ def main() -> int:
         require(skipped_item.get("id") == unknown_id and skipped_item.get("reason"),
                 "skipped id must carry a reason")
 
-        # 与单条删除保持一致：删任务不清 task_link，文件夹的"已使用次数"历史必须保留。
+        # 与单条删除保持一致：删任务不清 task_link，所以"已使用次数"历史必须原样保留，
+        # 只是这些任务不再计入 activeTaskCount。
         history = expect(http(base_url, "GET", f"/api/v1/voice-material-folders/{first['id']}",
                               token=token), (200,), "folder usage history after batch task delete").json()
-        require(history["item"].get("usageCount") == 1,
-                "batch task delete must keep folder usage history like the single delete path")
-        require(history["item"].get("activeTaskCount") == 0,
-                "batch deleted tasks must not remain active")
+        detail = history["item"]
+        require(detail.get("usageCount") == before_delete.get("usageCount"),
+                "batch task delete must keep folder usage history like the single delete path "
+                f"(before={before_delete.get('usageCount')} after={detail.get('usageCount')})")
+        require(detail.get("activeTaskCount") == 0,
+                "batch deleted tasks must not remain active "
+                f"(activeTaskCount={detail.get('activeTaskCount')})")
 
         # 已完成任务：单条 DELETE 仍然拒绝，批量入口允许（管理台二次确认后走这条）。
         for step in ["IN_PROGRESS", "READY_TO_SUBMIT", "SUBMITTED", "COMPLETED"]:
