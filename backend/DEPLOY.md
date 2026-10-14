@@ -298,6 +298,9 @@ AI_STRUCTURED_OUTPUT=false
 
 所以线上配的是 `glm-4-flash` 而非更新的 `glm-4.7-flash`。若 4.7 后续恢复，改 `AI_TUTOR_MODEL` / `AI_ORGANIZER_MODEL` 即可切换。
 
+> ⚠️ **2026-10-14 更新**：本节测得的 `glm-4-flash` 1.8 s **已失效**——同一个模型现在要 20–31 s。
+> 免费档的延迟随时间劣化，选型时不要引用旧数据，务必按 **§9.10** 的方法现场重测。
+
 ### 9.6 端到端验证结果（`mode = AI`，非降级）
 
 用家长账号真实调用后端接口：
@@ -362,6 +365,56 @@ AI_IMAGE_ORGANIZER_MODEL=glm-4.6v-flashx
 ### 9.9 成本
 
 `glm-4-flash` 单价 0 元，但**免费档有并发与速率限制**（智谱免费模型并发很低），适合家庭单用户场景，**不要用于多用户并发**。
+
+### 9.10 ⚠️ 作业整理延迟优化：把 `AI_ORGANIZER_MODEL` 从免费档换成 flashx（2026-10-14 实测）
+
+**现象**：家长反馈"AI 整理作业很慢"。后端日志 `[AI] response ok ... elapsedMs=` 显示文本整理要
+**20–31 秒**（`glm-4-flash`），而同样复杂的**图片**整理只用 **7 秒**（`glm-4.6v-flashx`）。
+
+**基准方法**：把线上提示词原样喂给各家模型，同一段 4 类混合作业文本、`max_tokens=1400`，各跑 2–4 次。
+脚本见 `build/bench_organizer.py`（从 Java 源码正则还原提示词，避免手抄走样）。
+
+| 模型 | 均值延迟 | 可用性 | 输出 | 备注 |
+|---|---|---|---|---|
+| `glm-4-flash`（原线上值） | **26.7 s** | 4/4 | 7 项，617 tok | 免费档，2026-09-19 时只要 1.8 s，已明显劣化 |
+| **`glm-4-flashx`** | **9.0 s** | 4/4 | 7 项，620 tok | ✅ **选它**，输出与免费档完全一致 |
+| `glm-4-flash-250414` | 17.5 s | 4/4 | 6–7 项，612 tok | 略慢且偶尔少拆一项 |
+| `glm-4.7-flashx` | 58.3 s | 4/4 | ❌ 4/4 解析失败 | 思考型，1400 tokens 全被思考吃掉，JSON 截断 |
+| `glm-4.7-flash` | 56.2 s | **2/4**（429/500） | ❌ 解析失败 | 免费档，限流 + 思考型双重问题 |
+| `glm-4.5-flash` | 80.4 s | 4/4 | ❌ 解析失败 | 免费档，思考型 |
+| `glm-4.6` / `glm-5-turbo` / `glm-4.5-air` / `glm-5.3-flash(x)` | 22–41 s | 4/4 | ❌ 解析失败 | 均为思考型，撞 1400 上限 |
+
+**两个结论**：
+
+1. **免费档不能用于家长等待路径**。同一模型从 9 月 19 日的 1.8 s 劣化到今天的 26.7 s，是额度被挤压，不是代码变慢。
+2. **整理任务必须用「非思考型」模型**。`glm-4.7-flashx` / `glm-4.6` / `glm-5.x` 会先在思考上烧完
+   `max_tokens`，正文 JSON 被截断——`MismatchedInputException` 那样报 503 都算"好"的，
+   更常见的是拿不到完整对象。这类模型要么关思考（`glm-5.3-flash` 会返回 1210 不支持关闭），要么别用。
+   `glm-4-flashx` 是这一代里少见的**非思考快档**，正好合适。
+
+**改动只有一行 `.env`**（键已在 `docker-compose.prod.yml` 透传）：
+
+```bash
+AI_ORGANIZER_MODEL=glm-4-flashx
+```
+
+> ⚠️ **副作用（已确认）**：`app.ai.practice-model` 与 `app.ai.media-sync-alignment-model`
+> 留空时都会**回退到 `organizer-model`**（`AiProviderProperties.getPracticeModel()`）。
+> 所以这一行会同时把 practice 生成也切到 flashx —— 属于顺带提速，但要知道自己在改什么。
+> 启动日志核对：`[AI] config ... organizerModel=glm-4-flashx practiceModel=glm-4-flashx`。
+
+**线上验证**（改完 `docker compose up -d` 重建容器后，家长账号真实调用）：
+
+| | 改前 | 改后 |
+|---|---|---|
+| 端到端耗时（3 次） | 26.4 / 29.8 / 31.1 s | **9.8 / 10.6 / 10.2 s** |
+| 整理结果 | 7 项 `mode=AI` | 7 项 `mode=AI`（无变化） |
+
+**成本**：按 `GLM-4-FlashX-250414` 档 ¥0.1/¥0.1 每百万 tokens 估算，
+一次作业整理（约 500 in + 620 out）≈ **0.0001 元**；即便按 `GLM-4.7-FlashX` 的 ¥0.5/¥3 算也只有 0.002 元/次。
+
+**仍未处理**：`AI_TUTOR_MODEL` 还是 `glm-4-flash`（同一条免费档）。AI 答疑是对话式交互，
+20 s 以上基本不可用，建议一并切到 `glm-4-flashx`，但改模型会影响答疑话术风格，需单独回归。
 
 
 ---
