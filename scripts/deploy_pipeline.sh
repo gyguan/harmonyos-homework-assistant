@@ -16,7 +16,10 @@
 set -uo pipefail
 
 REPO_DIR="D:/code/harmonyos-homework-assistant"
-GIT_TOOLS="/c/Users/guang/.workbuddy/binaries/PortableGit/versions/1.2.0/usr/bin"
+# Git 工具目录：PortableGit 会随版本升级改名（1.2.0 → 1.3.0 ...），这里自动探测最新版，
+# 避免写死版本号后 ssh.exe/tar.exe/scp.exe 突然找不到导致部署中止。
+GIT_TOOLS="$(ls -d /c/Users/guang/.workbuddy/binaries/PortableGit/versions/*/usr/bin 2>/dev/null | sort -V | tail -1)"
+[ -n "$GIT_TOOLS" ] || GIT_TOOLS="/usr/bin"
 # 非交互式 Git Bash 的 PATH 可能不含 coreutils，显式补上
 export PATH="$GIT_TOOLS:$PATH"
 SSH_KEY="$HOME/.ssh/id_ed25519_tencent_lighthouse"

@@ -24,16 +24,27 @@ import tools.jackson.databind.json.JsonMapper;
 public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganizerModelClient {
   private static final Logger log = LoggerFactory.getLogger(ConfigurableHomeworkOrganizerModelClient.class);
   private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai");
+  /** 模型漏填 confidence 时的兜底置信度：任务确实是模型整理出来的，不能当成"低置信度猜测"。 */
+  private static final double DEFAULT_CONFIDENCE = 0.8;
 
   private final AiProviderProperties properties;
   private final OpenAiCompatibleTransport transport;
   private final JsonMapper jsonMapper;
 
+  /**
+   * 注意：expectedMinutes / confidence 必须用装箱类型。
+   * Spring Boot 4 用的是 Jackson 3，其默认开启 {@code FAIL_ON_NULL_FOR_PRIMITIVES}，
+   * 模型只要省略这两个字段中的一个（不发 response_format 时模型经常省略），
+   * 基本类型就会在 `null` 处直接抛 MismatchedInputException，
+   * 导致整条 AI 整理链路降级（文本整理回 503、App 退化成"只能整理出一个任务"）。
+   * 这里用包装类型 + 转换期兜底，避免模型字段缺失被当成致命错误。
+   */
   record StructuredCandidate(String subject, String title, String instruction, String textbookRef,
-      String taskDate, int expectedMinutes, String sourceExcerpt, double confidence) {}
+      String taskDate, Integer expectedMinutes, String sourceExcerpt, Double confidence) {}
   record StructuredResult(List<StructuredCandidate> assignments) {}
   record ConversionResult(List<HomeworkOrganizerDtos.Candidate> candidates, int sourceCount,
-      int unsupportedSubjectCount, int blankTitleCount, List<String> unsupportedSubjects) {}
+      int unsupportedSubjectCount, int blankTitleCount, int missingFieldCount,
+      List<String> unsupportedSubjects) {}
 
   public ConfigurableHomeworkOrganizerModelClient(AiProviderProperties properties,
       OpenAiCompatibleTransport transport, JsonMapper jsonMapper) {
@@ -163,9 +174,10 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       StructuredResult structured = readStructured(outputText.get());
       ConversionResult converted = toCandidates(structured);
       log.info(
-          "[AI] organizer parsed model={} assignments={} accepted={} unsupportedSubject={} blankTitle={} unsupportedValues={}",
+          "[AI] organizer parsed model={} assignments={} accepted={} unsupportedSubject={} blankTitle={} missingField={} unsupportedValues={}",
           properties.getOrganizerModel(), converted.sourceCount(), converted.candidates().size(),
-          converted.unsupportedSubjectCount(), converted.blankTitleCount(), converted.unsupportedSubjects());
+          converted.unsupportedSubjectCount(), converted.blankTitleCount(), converted.missingFieldCount(),
+          converted.unsupportedSubjects());
       if (converted.sourceCount() > 0 && converted.candidates().isEmpty()) {
         log.warn(
             "[AI] organizer rejected all model assignments model={} assignments={} unsupportedSubject={} blankTitle={} unsupportedValues={}",
@@ -195,6 +207,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         + "sourceExcerpt 必须尽量直接摘取对应老师原文，confidence 为 0 到 1。"
         + "title 要简洁，instruction 保留完成任务所需信息。"
         + "明显属于同一任务的重复表述直接合并，不做重复任务对比或额外标记。"
+        + "每一项都必须输出完整的 subject、title、instruction、textbookRef、taskDate、expectedMinutes、sourceExcerpt、confidence 八个字段，一个都不能省略；"
+        + "某一项信息确实缺失时按上面的默认值填写，但字段名必须保留。"
         + "最终只输出一个 JSON 对象（以 { 开头、以 } 结尾），根字段为 assignments、其值为数组；"
         + "不要直接把数组当根输出，不要输出 Markdown 代码围栏或额外解释。";
   }
@@ -210,14 +224,18 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   static ConversionResult toCandidates(StructuredResult result) {
     List<HomeworkOrganizerDtos.Candidate> output = new ArrayList<>();
     if (result == null || result.assignments() == null) {
-      return new ConversionResult(output, 0, 0, 0, List.of());
+      return new ConversionResult(output, 0, 0, 0, 0, List.of());
     }
 
     int unsupportedSubjectCount = 0;
     int blankTitleCount = 0;
+    int missingFieldCount = 0;
     Set<String> unsupportedSubjects = new LinkedHashSet<>();
     for (StructuredCandidate item : result.assignments()) {
       if (item == null) continue;
+      if (item.expectedMinutes() == null || item.confidence() == null || blank(item.textbookRef())) {
+        missingFieldCount++;
+      }
       String subject = normalizeSubject(item.subject());
       if (subject == null) {
         unsupportedSubjectCount++;
@@ -233,12 +251,14 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       output.add(new HomeworkOrganizerDtos.Candidate(
           subject, item.title().trim(), value(item.instruction(), item.title()),
           value(item.textbookRef(), "待家长确认"), taskDate,
-          expectedMinutes(item.expectedMinutes()), value(item.sourceExcerpt(), item.title()),
-          clamp(item.confidence()), "", "", "", 0.0, ""));
+          expectedMinutes(item.expectedMinutes() == null ? 0 : item.expectedMinutes()),
+          value(item.sourceExcerpt(), item.title()),
+          clamp(item.confidence() == null ? DEFAULT_CONFIDENCE : item.confidence()),
+          "", "", "", 0.0, ""));
       if (output.size() >= 30) break;
     }
     return new ConversionResult(output, result.assignments().size(), unsupportedSubjectCount, blankTitleCount,
-        List.copyOf(unsupportedSubjects));
+        missingFieldCount, List.copyOf(unsupportedSubjects));
   }
 
   static Map<String, Object> structuredSchema() {

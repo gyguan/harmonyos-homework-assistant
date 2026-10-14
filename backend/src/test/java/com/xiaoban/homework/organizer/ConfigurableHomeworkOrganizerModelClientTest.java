@@ -188,6 +188,54 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
+  void textOrganizerKeepsEveryAssignmentWhenModelOmitsFields() {
+    // 2026-10-14 线上回归：AI_STRUCTURED_OUTPUT=false 时不发 response_format，
+    // glm-4-flash 只输出 subject/title/instruction/taskDate/expectedMinutes/sourceExcerpt，
+    // 经常省略 confidence 与 textbookRef。Spring Boot 4 用 Jackson 3，
+    // 其 FAIL_ON_NULL_FOR_PRIMITIVES 默认为 true，会因 confidence 缺失直接抛
+    // MismatchedInputException，导致 /homework/organize 返回 503，
+    // App 静默退回本地解析后"一段话只整理出一个任务"。
+    var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
+    when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
+        .thenReturn(java.util.Optional.of("""
+            {"assignments":[
+              {"subject":"语文","taskDate":"2026-10-14","expectedMinutes":30,
+               "sourceExcerpt":"语文抄写第12课生字表两遍","title":"语文作业","instruction":"抄写生字表两遍"},
+              {"subject":"数学","taskDate":"2026-10-14",
+               "sourceExcerpt":"数学练习册P34-P35","title":"数学作业","instruction":"完成P34-P35"},
+              {"subject":"英语","taskDate":"2026-10-14","expectedMinutes":15,
+               "sourceExcerpt":"英语跟读Unit 3","title":"英语作业","instruction":"跟读三遍",
+               "textbookRef":"沪教版","confidence":0.9}
+            ]}
+            """));
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), transport, JsonMapper.builder().build());
+
+    var result = client.organize(new TestStudent(), "家长录入文字", "语文数学英语三段作业").orElseThrow();
+
+    assertEquals(3, result.size());
+    assertEquals(List.of("语文", "数学", "英语"),
+        result.stream().map(HomeworkOrganizerDtos.Candidate::subject).toList());
+    assertEquals(List.of(30, 20, 15),
+        result.stream().map(HomeworkOrganizerDtos.Candidate::expectedMinutes).toList());
+    assertEquals(0.8, result.get(1).confidence(), 0.0001);
+  }
+
+  @Test
+  void conversionFallsBackWhenPrimitiveFieldsAreAbsentOrNull() {
+    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "语文", "背诵第12课", "背诵课文", null, "2026-10-14", null, null, null))));
+
+    assertEquals(1, result.candidates().size());
+    assertEquals(20, result.candidates().getFirst().expectedMinutes());
+    assertEquals(0.8, result.candidates().getFirst().confidence(), 0.0001);
+    assertEquals("待家长确认", result.candidates().getFirst().textbookRef());
+    assertEquals(1, result.missingFieldCount());
+  }
+
+  @Test
   void normalizesSchoolAndExtracurricularSubjectLabels() {
     assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("语文作业"));
     assertEquals("数学", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Math"));
