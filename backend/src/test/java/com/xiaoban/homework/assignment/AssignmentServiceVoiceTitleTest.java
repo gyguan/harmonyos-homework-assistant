@@ -31,12 +31,12 @@ class AssignmentServiceVoiceTitleTest {
       mock(FileTransactionCoordinator.class));
 
   @Test
-  void generatedVoiceTitleUsesBusinessDateAndMaterialTitle() {
+  void generatedVoiceTitleUsesFolderNameAfterStorybookPrefix() {
     UUID familyId = UUID.randomUUID();
     LocalDate businessDate = LocalDate.of(2026, 9, 28);
     Instant from = Instant.parse("2026-09-27T16:00:00Z");
     Instant to = Instant.parse("2026-09-28T16:00:00Z");
-    String base = "语文 · 9月28日 · 课文朗读";
+    String base = "绘本-01 AtTheMarket";
 
     when(repository
         .countByFamilyIdAndStudentIdAndSubjectCodeAndContentTypeAndTitleStartingWithAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
@@ -44,7 +44,7 @@ class AssignmentServiceVoiceTitleTest {
         .thenReturn(0L);
 
     String title = service.nextVoiceMaterialTaskTitle(
-        familyId, "student-1", "CHINESE", businessDate, "课文朗读");
+        familyId, "student-1", "CHINESE", businessDate, "01 AtTheMarket");
 
     assertEquals(base, title);
     verify(repository)
@@ -58,7 +58,7 @@ class AssignmentServiceVoiceTitleTest {
     LocalDate businessDate = LocalDate.of(2026, 9, 28);
     Instant from = Instant.parse("2026-09-27T16:00:00Z");
     Instant to = Instant.parse("2026-09-28T16:00:00Z");
-    String base = "数学 · 9月28日语音作业";
+    String base = "绘本-语音作业";
 
     when(repository
         .countByFamilyIdAndStudentIdAndSubjectCodeAndContentTypeAndTitleStartingWithAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
@@ -68,7 +68,7 @@ class AssignmentServiceVoiceTitleTest {
     String title = service.nextVoiceMaterialTaskTitle(
         familyId, "student-1", "MATH", businessDate, "");
 
-    assertEquals("数学 · 9月28日语音作业 ②", title);
+    assertEquals("绘本-语音作业 ②", title);
   }
 
   @Test
@@ -76,7 +76,7 @@ class AssignmentServiceVoiceTitleTest {
     UUID familyId = UUID.randomUUID();
     LocalDate taskDate = LocalDate.of(2026, 9, 27);
     LocalDate businessDate = LocalDate.of(2026, 9, 28);
-    String base = "语文 · 9月28日 · 课文朗读";
+    String base = "绘本-01 AtTheMarket";
     AssignmentEntity entity = voiceTask("a-voice-1", familyId, "PAUSED", taskDate);
 
     when(repository.findById("a-voice-1")).thenReturn(Optional.of(entity));
@@ -95,7 +95,7 @@ class AssignmentServiceVoiceTitleTest {
         .thenReturn(0L);
 
     AssignmentDtos.Response result =
-        service.carryOverToBusinessDate(familyId, "a-voice-1", businessDate, "课文朗读");
+        service.carryOverToBusinessDate(familyId, "a-voice-1", businessDate, "01 AtTheMarket");
 
     assertEquals(businessDate, entity.taskDate);
     assertEquals(base, entity.title);
@@ -113,7 +113,7 @@ class AssignmentServiceVoiceTitleTest {
     when(repository.findById("a-voice-1")).thenReturn(Optional.of(entity));
 
     AssignmentDtos.Response result = service.carryOverToBusinessDate(
-        familyId, "a-voice-1", taskDate, "课文朗读");
+        familyId, "a-voice-1", taskDate, "01 AtTheMarket");
 
     assertEquals(taskDate.toString(), result.taskDate());
     verify(repository, never()).saveAndFlush(any(AssignmentEntity.class));
@@ -127,7 +127,7 @@ class AssignmentServiceVoiceTitleTest {
     entity.studentId = "student-1";
     entity.contentType = "AUDIO_IMAGE";
     entity.subjectCode = "CHINESE";
-    entity.title = "语文 · 9月27日 · 课文朗读";
+    entity.title = "绘本-02 Rex";
     entity.status = status;
     entity.taskDate = taskDate;
     entity.createdAt = Instant.now();

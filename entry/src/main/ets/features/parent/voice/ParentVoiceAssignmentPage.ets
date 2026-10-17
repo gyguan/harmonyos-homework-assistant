@@ -14,9 +14,9 @@ const VOICE_SOURCE_SERVER: string = 'SERVER';
 
 @Component
 export struct ParentVoiceAssignmentPage {
-  @State private sourceMode: string = VOICE_SOURCE_LOCAL;
+  @State private sourceMode: string = VOICE_SOURCE_SERVER;
   @State private subject: Subject = Subject.ENGLISH;
-  @State private title: string = '英语 · 语音练习';
+  @State private title: string = '绘本-';
   @State private instruction: string = '先听语音，再结合情景图片完成跟读练习。';
   @State private taskDate: string = AssignmentTaskDate.today();
   @State private expectedMinutesText: string = '15';
@@ -37,7 +37,7 @@ export struct ParentVoiceAssignmentPage {
   });
 
   @State private folderKeyword: string = '';
-  @State private folderUsage: string = 'ALL';
+  @State private folderUsage: string = 'UNUSED';
   @State private folders: RemoteVoiceFolderItem[] = [];
   @State private folderPage: number = 0;
   @State private folderTotalPages: number = 0;
@@ -93,7 +93,18 @@ export struct ParentVoiceAssignmentPage {
   }
 
   private generatedTitle(): string {
-    return `${this.subjectText(this.subject)} · 语音练习`;
+    // 语音作业标题统一成「绘本-文件夹目录」，与自动创建出来的名字一致
+    let folder = this.selectedFolder();
+    if (folder !== null && folder.directoryName.length > 0) {
+      return `绘本-${folder.directoryName}`;
+    }
+    return '绘本-';
+  }
+
+  aboutToAppear(): void {
+    if (this.sourceMode === VOICE_SOURCE_SERVER && this.folders.length === 0) {
+      void this.loadFolders(true);
+    }
   }
 
   private generatedInstruction(): string {
@@ -121,6 +132,7 @@ export struct ParentVoiceAssignmentPage {
     this.requestId = '';
     this.message = '';
     this.messageError = false;
+    this.title = this.generatedTitle();
   }
 
   private async loadFolders(reset: boolean): Promise<void> {

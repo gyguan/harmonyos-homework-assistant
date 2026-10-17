@@ -397,7 +397,7 @@ class VoiceMaterialAssignmentServiceTest {
     when(packages.lockOwned(familyId, mathId)).thenReturn(Optional.of(math));
     when(assignments.nextVoiceMaterialTaskTitle(
         any(UUID.class), anyString(), org.mockito.ArgumentMatchers.eq("MATH"),
-        any(LocalDate.class), anyString())).thenReturn("数学 · 语音作业");
+        any(LocalDate.class), anyString())).thenReturn("绘本-002-数学");
     when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
         .thenReturn(created);
     when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
@@ -410,6 +410,10 @@ class VoiceMaterialAssignmentServiceTest {
     assertEquals(mathId.toString(), result.packageId());
     verify(packages).lockOwned(familyId, mathId);
     verify(packages, never()).lockOwned(familyId, chineseId);
+    // 标题统一成「绘本-文件夹目录」：这里传的必须是目录名，不是素材标题（math.title 是「口算练习」）
+    verify(assignments).nextVoiceMaterialTaskTitle(
+        any(UUID.class), anyString(), org.mockito.ArgumentMatchers.eq("MATH"),
+        any(LocalDate.class), org.mockito.ArgumentMatchers.eq("002-数学"));
   }
 
   @Test

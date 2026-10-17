@@ -390,9 +390,14 @@ public class VoiceMaterialAssignmentService {
       String createMode) {
     String assignmentId = "a-voice-" + UUID.randomUUID();
 
+    // 标题统一成「绘本-文件夹目录」：家长要求自动与手动创建出来的名字一致，
+    // 目录名缺失时才退回素材标题。
+    String folderName = item.directoryName == null || item.directoryName.isBlank()
+        ? item.title
+        : item.directoryName;
     String title = requestedTitle == null || requestedTitle.isBlank()
         ? assignments.nextVoiceMaterialTaskTitle(
-            familyId, targetStudentId, subjectCode, businessDate, item.title)
+            familyId, targetStudentId, subjectCode, businessDate, folderName)
         : requestedTitle.trim();
 
     AssignmentDtos.Create create = new AssignmentDtos.Create(
