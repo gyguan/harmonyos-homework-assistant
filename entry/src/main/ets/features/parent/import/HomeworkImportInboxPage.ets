@@ -49,15 +49,38 @@ export struct HomeworkImportInboxPage {
     this.localRevision++;
   }
 
-  private allBatches(): ImportBatch[] {
+  /**
+   * 批次列表缓存。
+   *
+   * build() 里 allBatches()/batches() 会被调用 4 次，而 listBatches() 每次都做
+   * 「遍历 + cloneBatch() 深拷贝 + sort()」，等于每帧跑 4 遍全量深拷贝+排序，
+   * 收件箱上百条后滑动会掉帧。这里按「revision + 筛选条件」缓存，
+   * 同一帧内重复调用直接命中。
+   */
+  private cacheRevision: number = -1;
+  private cacheFilterKey: string = '';
+  private cacheAll: ImportBatch[] = [];
+  private cacheBatches: ImportBatch[] = [];
+
+  private refreshBatchCache(): void {
     let currentRevision = this.revision + this.localRevision;
-    if (currentRevision < 0) return [];
-    return this.viewModel.listBatches();
+    let key = `${this.selectedSource}|${this.selectedStatus}|${this.selectedTime}`;
+    if (this.cacheRevision === currentRevision && this.cacheFilterKey === key) return;
+    this.cacheRevision = currentRevision;
+    this.cacheFilterKey = key;
+    this.cacheAll = currentRevision < 0 ? [] : this.viewModel.listBatches();
+    this.cacheBatches = this.viewModel.filterBatches(
+      this.cacheAll, this.selectedSource, this.selectedStatus, this.selectedTime);
+  }
+
+  private allBatches(): ImportBatch[] {
+    this.refreshBatchCache();
+    return this.cacheAll;
   }
 
   private batches(): ImportBatch[] {
-    return this.viewModel.filterBatches(
-      this.allBatches(), this.selectedSource, this.selectedStatus, this.selectedTime);
+    this.refreshBatchCache();
+    return this.cacheBatches;
   }
 
   private hasActiveFilters(): boolean {

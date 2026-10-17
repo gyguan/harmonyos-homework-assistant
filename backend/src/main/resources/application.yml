@@ -24,8 +24,9 @@ spring:
     enabled: true
   servlet:
     multipart:
-      max-file-size: 200MB
-      max-request-size: 205MB
+      # 单文件最大 50MB（视频上限已收紧到 50MB）；整请求放宽以容纳语音作业多文件。
+      max-file-size: 60MB
+      max-request-size: 70MB
 
 app:
   bootstrap:

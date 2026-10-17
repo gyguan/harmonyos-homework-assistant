@@ -74,6 +74,9 @@ export struct StudentAssignmentsPage {
     this.querySequence++;
     this.querying = false;
     this.selectedAssignmentId = '';
+    // 换孩子时「已提交/已完成」的展开态要跟着收起，否则上一个孩子的展开状态
+    // 会带到下一个孩子身上，历史区直接铺开在页面上。
+    this.historyExpanded = false;
     this.snapshotRevision = -1;
     this.needHandlingAssignments = [];
     this.notStartedAssignments = [];

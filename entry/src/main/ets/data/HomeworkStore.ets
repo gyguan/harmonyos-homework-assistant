@@ -119,18 +119,26 @@ export class HomeworkStore {
   private requestPersist(): void {
     if (this.persistence === null) return;
     this.persistRequested = true;
-    if (!this.persistRunning) this.flushPersistQueue();
+    if (!this.persistRunning) void this.flushPersistQueue();
   }
 
   private async flushPersistQueue(): Promise<void> {
     let persistence = this.persistence;
     if (persistence === null || this.persistRunning) return;
     this.persistRunning = true;
-    while (this.persistRequested) {
-      this.persistRequested = false;
-      await persistence.save(this.createSnapshot());
+    try {
+      while (this.persistRequested) {
+        this.persistRequested = false;
+        await persistence.save(this.createSnapshot());
+      }
+    } catch {
+      // 落盘失败绝不能让持久化队列停摆：persistRunning 一旦卡在 true，
+      // 之后每次作业改动都只是改内存、永不写盘，重启后全部丢失，而界面毫无异常。
+      // 内存态仍然可用，把请求挂起等下一次改动重试。
+      this.persistRequested = true;
+    } finally {
+      this.persistRunning = false;
     }
-    this.persistRunning = false;
   }
 
   private cloneStudent(source: StudentProfile): StudentProfile {

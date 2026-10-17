@@ -136,7 +136,12 @@ require("replacePracticeResultWithAttempt" in shell and
         "onRepeatStarted: (attemptId: string) => {" in shell and
         "this.replacePracticeResultWithAttempt(attemptId);" in shell,
         "repeat and wrong-only flows must replace the old result route instead of stacking it")
-require("onBack: () => this.navPathStack.pop()" in shell,
+require("onBack: () => this.popBack()" in shell and
+        "private popBack(): void {" in shell and
+        "this.navPathStack.pop();" in shell and
+        "this.invalidateAfterNavigation();" in shell,
+        # 契约意图：结果页返回只做「出栈」，不得 push 固定路由。
+        # 实现已从逐处 navPathStack.pop() 收敛到统一出口 popBack()（出栈 + 刷新），意图不变。
         "Practice result back action must preserve the caller navigation context")
 
 # ArkTS declarations/routes must stay explicitly typed.

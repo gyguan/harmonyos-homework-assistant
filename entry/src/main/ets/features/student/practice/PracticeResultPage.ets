@@ -22,23 +22,35 @@ export struct PracticeResultPage {
   onBack: () => void = () => {};
   onRepeatStarted: (attemptId: string) => void = (_attemptId: string) => {};
   private readonly viewModel: PracticeResultViewModel = new PracticeResultViewModel();
+  private lifecycleVersion: number = 0;
 
   aboutToAppear(): void {
-    void this.load();
+    this.lifecycleVersion++;
+    void this.load(this.lifecycleVersion);
   }
 
-  private async load(): Promise<void> {
+  aboutToDisappear(): void {
+    this.lifecycleVersion++;
+  }
+
+  private async load(lifecycleVersion: number): Promise<void> {
     this.errorMessage = '';
     this.paperTitle = '';
     this.progress = null;
     this.feedbackVisible = false;
     try {
       let loaded = await this.viewModel.load(this.attemptId);
+      if (lifecycleVersion !== this.lifecycleVersion) return;
       this.result = loaded;
-      this.paperTitle = await this.viewModel.paperTitle(loaded);
-      this.progress = await this.viewModel.progress(loaded);
+      let title = await this.viewModel.paperTitle(loaded);
+      if (lifecycleVersion !== this.lifecycleVersion) return;
+      this.paperTitle = title;
+      let progress = await this.viewModel.progress(loaded);
+      if (lifecycleVersion !== this.lifecycleVersion) return;
+      this.progress = progress;
       this.feedbackVisible = true;
     } catch {
+      if (lifecycleVersion !== this.lifecycleVersion) return;
       this.result = null;
       this.errorMessage = '结果加载失败，请检查网络后重试。';
     }

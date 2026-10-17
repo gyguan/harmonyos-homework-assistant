@@ -37,6 +37,8 @@ export struct PracticeAttemptPage {
   onBack: () => void = () => {};
   onSubmitted: (attemptId: string) => void = (_attemptId: string) => {};
   private readonly viewModel: PracticeAttemptViewModel = new PracticeAttemptViewModel();
+  /** 页面存活代号：销毁后自增，用来作废已经发出的异步回调（写法沿用 VoiceAssignmentPane）。 */
+  private lifecycleVersion: number = 0;
 
   private submitDialogController: CustomDialogController = new CustomDialogController({
     builder: PracticeSubmitConfirmDialog({
@@ -49,7 +51,15 @@ export struct PracticeAttemptPage {
   });
 
   aboutToAppear(): void {
-    void this.load();
+    this.lifecycleVersion++;
+    void this.load(this.lifecycleVersion);
+  }
+
+  aboutToDisappear(): void {
+    // 必须作废在途回调。load() 发现练习已交卷时会直接 onSubmitted()，交给 AppShell 后
+    // 是「先 pop 再 push 结果页」；页面已经销毁还执行的话，会多弹掉一层（把练习历史/
+    // 套卷详情一起弹出栈）并把结果页强行压进来。
+    this.lifecycleVersion++;
   }
 
   private contentScale(): number {
@@ -73,10 +83,11 @@ export struct PracticeAttemptPage {
     return `第 ${this.currentIndex + 1} / ${this.attempt.questionCount} 题`;
   }
 
-  private async load(): Promise<void> {
+  private async load(lifecycleVersion: number): Promise<void> {
     this.errorMessage = '';
     try {
       let loaded = await this.viewModel.load(this.attemptId);
+      if (lifecycleVersion !== this.lifecycleVersion) return;
       this.attempt = loaded;
       this.answers = loaded.answers.slice();
       this.notes = loaded.notes.slice();
@@ -85,6 +96,7 @@ export struct PracticeAttemptPage {
       this.syncCurrentDraft();
       if (loaded.status === PracticeAttemptStatus.SUBMITTED) this.onSubmitted(loaded.id);
     } catch {
+      if (lifecycleVersion !== this.lifecycleVersion) return;
       this.errorMessage = '练习加载失败，请检查网络后重试。';
     }
   }
@@ -233,20 +245,26 @@ export struct PracticeAttemptPage {
   private async moveTo(index: number): Promise<void> {
     if (this.saving || this.submitting || this.attempt === null) return;
     if (index < 0 || index >= this.attempt.questions.length || index === this.currentIndex) return;
+    let version = this.lifecycleVersion;
     if (!await this.saveCurrentDraft()) return;
+    if (version !== this.lifecycleVersion) return;
     this.currentIndex = index;
     this.syncCurrentDraft();
   }
 
   private async requestBack(): Promise<void> {
     if (this.saving || this.submitting) return;
+    let version = this.lifecycleVersion;
     if (!await this.saveCurrentDraft()) return;
+    if (version !== this.lifecycleVersion) return;
     this.onBack();
   }
 
   private async requestSubmit(): Promise<void> {
     if (this.submitting || this.saving || this.attempt === null) return;
+    let version = this.lifecycleVersion;
     if (!await this.saveCurrentDraft()) return;
+    if (version !== this.lifecycleVersion) return;
     let answered = 0;
     for (let question of this.attempt.questions) if (this.isAnswered(question.id)) answered++;
     this.unansweredCount = this.attempt.questions.length - answered;
@@ -261,10 +279,13 @@ export struct PracticeAttemptPage {
     if (this.submitting) return;
     this.submitting = true;
     this.errorMessage = '';
+    let version = this.lifecycleVersion;
     try {
       await this.viewModel.submit(this.attemptId);
+      if (version !== this.lifecycleVersion) return;
       this.onSubmitted(this.attemptId);
     } catch {
+      if (version !== this.lifecycleVersion) return;
       this.errorMessage = '交卷失败，请检查网络后重试。';
     } finally {
       this.submitting = false;

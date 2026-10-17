@@ -32,6 +32,16 @@ interface MultipartPayload {
   body: ArrayBuffer;
 }
 
+// 与后端 AssignmentResourceService.classifyAttachment 的限制保持一致（VIDEO 由 200MB 收紧为 50MB）。
+const MAX_ATTACHMENT_VIDEO_BYTES: number = 50 * 1024 * 1024;
+const MAX_ATTACHMENT_AUDIO_BYTES: number = 30 * 1024 * 1024;
+const MAX_ATTACHMENT_IMAGE_BYTES: number = 10 * 1024 * 1024;
+// 与后端 VoiceMediaPolicy 保持一致：语音作业音频 20MB、情景图片单张 5MB。
+const MAX_VOICE_AUDIO_BYTES: number = 20 * 1024 * 1024;
+const MAX_VOICE_IMAGE_BYTES: number = 5 * 1024 * 1024;
+// 下载的作业资料缓存上限：超过后按最旧优先清理，避免 cacheDir 只增不减。
+const MAX_RESOURCE_CACHE_ENTRIES: number = 12;
+
 interface VoiceAssignmentMetadata {
   id: string;
   subject: string;
@@ -56,7 +66,10 @@ export class RemoteAssignmentResourceApi {
   static readonly instance: RemoteAssignmentResourceApi = new RemoteAssignmentResourceApi();
   private context: common.UIAbilityContext | null = null;
   private cache: Map<string, string> = new Map<string, string>();
+  private cachePaths: Map<string, string> = new Map<string, string>();
+  private cacheOrder: string[] = [];
   private pendingDownloads: Map<string, Promise<string>> = new Map<string, Promise<string>>();
+  private tempSeq: number = 0;
 
   private constructor() {}
 
@@ -83,6 +96,10 @@ export class RemoteAssignmentResourceApi {
     if (!BackendSession.instance.isConnected()) throw new Error('当前离线，联网后才能发布语音作业');
     if (audioUri.length === 0) throw new Error('请选择语音文件');
     if (imageUris.length === 0) throw new Error('请至少选择 1 张情景图片');
+    await this.validateSourceSize(audioUri, MAX_VOICE_AUDIO_BYTES, '语音文件不能超过 20MB，请压缩后重试');
+    for (let i = 0; i < imageUris.length; i++) {
+      await this.validateSourceSize(imageUris[i], MAX_VOICE_IMAGE_BYTES, '情景图片不能超过 5MB，请压缩后重试');
+    }
 
     let payload = await this.buildMultipartPayload(assignment, audioUri, imageUris);
     let client = http.createHttp();
@@ -123,12 +140,16 @@ export class RemoteAssignmentResourceApi {
     if (this.context === null || !BackendSession.instance.isConnected()) {
       throw new Error('上传附件需要连接家庭云端');
     }
+    let maxSize = resourceType === AssignmentResourceType.VIDEO ? MAX_ATTACHMENT_VIDEO_BYTES :
+      (resourceType === AssignmentResourceType.AUDIO ? MAX_ATTACHMENT_AUDIO_BYTES : MAX_ATTACHMENT_IMAGE_BYTES);
+    // 先校验源文件大小再组包：避免把大文件整个读进内存造成 OOM，也避免白做一次上传缓存。
+    await this.validateSourceSize(sourceUri, maxSize, this.attachmentSizeError(resourceType, maxSize));
     let name = this.fileName(sourceUri, resourceType === AssignmentResourceType.VIDEO ? 'video.mp4' :
       (resourceType === AssignmentResourceType.AUDIO ? 'audio.mp3' : 'image.jpg'));
     let mime = resourceType === AssignmentResourceType.VIDEO ? 'video/mp4' :
       (resourceType === AssignmentResourceType.AUDIO ? this.audioContentType(sourceUri) : this.imageContentType(sourceUri));
-    let boundary = '----xiaoban-resource-' + Date.now();
-    let temp = this.context.cacheDir + '/upload-resource-' + Date.now() + '.bin';
+    let boundary = '----xiaoban-resource-' + this.uniqueToken();
+    let temp = this.context.cacheDir + '/upload-resource-' + this.uniqueToken() + '.bin';
     let writer = await this.openFile(temp,
       fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC,
       '无法创建上传缓存');
@@ -139,11 +160,10 @@ export class RemoteAssignmentResourceApi {
     } finally {
       try { await fileIo.close(writer); } catch {}
     }
-    let maxSize = resourceType === AssignmentResourceType.VIDEO ? 200 * 1024 * 1024 :
-      (resourceType === AssignmentResourceType.AUDIO ? 30 * 1024 * 1024 : 10 * 1024 * 1024);
-    if (size > maxSize + 1024) {
+    // 源文件已提前校验；这里只防御 multipart 封装后的体积异常（头部开销极小）。
+    if (size > maxSize + 64 * 1024) {
       try { await fileIo.unlink(temp); } catch {}
-      throw new Error('附件超过大小限制');
+      throw new Error(this.attachmentSizeError(resourceType, maxSize));
     }
     let bytes = new ArrayBuffer(size);
     let reader = await this.openFile(temp, fileIo.OpenMode.READ_ONLY, '无法读取上传缓存');
@@ -197,6 +217,27 @@ export class RemoteAssignmentResourceApi {
 
   invalidate(resourceId: string): void {
     this.cache.delete(resourceId);
+    this.cachePaths.delete(resourceId);
+    let remaining: string[] = [];
+    for (let id of this.cacheOrder) {
+      if (id !== resourceId) remaining.push(id);
+    }
+    this.cacheOrder = remaining;
+  }
+
+  private evictOverflowCache(): void {
+    while (this.cacheOrder.length > MAX_RESOURCE_CACHE_ENTRIES) {
+      let oldest = this.cacheOrder.shift();
+      if (oldest === undefined) break;
+      this.cache.delete(oldest);
+      let path = this.cachePaths.get(oldest);
+      this.cachePaths.delete(oldest);
+      if (path !== undefined) {
+        try { fileIo.unlinkSync(path); } catch {
+          // 清理失败不影响本次下载结果；残留文件在下次驱逐时再试。
+        }
+      }
+    }
   }
 
   async preload(resource: AssignmentResource): Promise<string> {
@@ -256,7 +297,11 @@ export class RemoteAssignmentResourceApi {
         try { await fileIo.close(file); } catch {}
       }
       let uri = fileUri.getUriFromPath(cachePath);
+      this.invalidate(resource.id);
       this.cache.set(resource.id, uri);
+      this.cachePaths.set(resource.id, cachePath);
+      this.cacheOrder.push(resource.id);
+      this.evictOverflowCache();
       return uri;
     } catch {
       return '';
@@ -304,8 +349,8 @@ export class RemoteAssignmentResourceApi {
   private async buildMultipartPayload(assignment: Assignment, audioUri: string,
     imageUris: string[]): Promise<MultipartPayload> {
     if (this.context === null) throw new Error('语音作业服务尚未初始化');
-    let boundary = `----xiaoban-voice-${Date.now()}`;
-    let multipartPath = `${this.context.cacheDir}/voice-assignment-${Date.now()}.bin`;
+    let boundary = `----xiaoban-voice-${this.uniqueToken()}`;
+    let multipartPath = `${this.context.cacheDir}/voice-assignment-${this.uniqueToken()}.bin`;
 
     try {
       let writer = await this.openFile(
@@ -389,6 +434,32 @@ export class RemoteAssignmentResourceApi {
     } catch {
       throw new Error(errorMessage);
     }
+  }
+
+  /** 临时文件名/边界令牌：毫秒时间戳 + 自增序号，杜绝同毫秒并发时互相截断。 */
+  private uniqueToken(): string {
+    this.tempSeq++;
+    return `${Date.now()}-${this.tempSeq}`;
+  }
+
+  private async validateSourceSize(uri: string, maxBytes: number, errorMessage: string): Promise<void> {
+    let source = await this.openFile(uri, fileIo.OpenMode.READ_ONLY, '无法读取待上传的文件');
+    let size = 0;
+    try {
+      size = fileIo.statSync(source.fd).size;
+    } catch {
+      // 取不到大小就让服务端兜底判定，不在客户端把流程掐死。
+      size = 0;
+    }
+    try { await fileIo.close(source); } catch {}
+    if (size > maxBytes) throw new Error(errorMessage);
+  }
+
+  private attachmentSizeError(resourceType: AssignmentResourceType, maxBytes: number): string {
+    let label = resourceType === AssignmentResourceType.VIDEO ? '视频' :
+      (resourceType === AssignmentResourceType.AUDIO ? '语音' : '图片');
+    let mb = Math.round(maxBytes / (1024 * 1024));
+    return `${label}附件不能超过 ${mb}MB`;
   }
 
   private async writeText(fd: number, value: string, errorMessage: string): Promise<number> {

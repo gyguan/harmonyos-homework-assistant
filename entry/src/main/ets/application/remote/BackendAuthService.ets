@@ -19,7 +19,18 @@ export class BackendAuthService {
       BackendSession.instance.disconnect();
       throw new Error('登录失败，请检查后端地址、账号和密码');
     }
-    let parsed: LoginResult = JSON.parse(response.body) as LoginResult;
+    // 网关/Captive Portal 会返回 HTML 或空串，JSON.parse 一抛异常就变成"点了没反应"。
+    let parsed: LoginResult;
+    try {
+      parsed = JSON.parse(response.body) as LoginResult;
+    } catch {
+      BackendSession.instance.disconnect();
+      throw new Error('登录返回的内容不是合法数据，请确认服务地址指向小伴作业后端');
+    }
+    if (typeof parsed.token !== 'string' || parsed.token.length === 0) {
+      BackendSession.instance.disconnect();
+      throw new Error('登录返回的内容缺少登录凭证，请重新连接');
+    }
     BackendSession.instance.connect(baseUrl, parsed.token, parsed.displayName);
     return parsed.displayName;
   }

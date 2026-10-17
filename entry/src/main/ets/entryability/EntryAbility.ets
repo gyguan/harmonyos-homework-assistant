@@ -12,6 +12,7 @@ import { HomeworkSubmissionService } from '../application/submission/HomeworkSub
 import { SubmissionAudioRecorderService } from '../application/submission/SubmissionAudioRecorderService';
 import { HomeworkLocalBootstrap } from '../data/local/HomeworkLocalBootstrap';
 import { HomeworkImportInboxBootstrap } from '../data/local/HomeworkImportInboxBootstrap';
+import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
 import { CoreVisionHomeworkTextExtractor } from '../infrastructure/ai/CoreVisionHomeworkTextExtractor';
 import { LocalHomeworkAssignmentParser } from '../infrastructure/ai/LocalHomeworkAssignmentParser';
 import { PreferencesBackendSessionStorage } from '../infrastructure/persistence/PreferencesBackendSessionStorage';
@@ -92,6 +93,13 @@ export default class EntryAbility extends UIAbility {
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void { void this.bootstrap(windowStage); }
+
+  onForeground(): void {
+    // 回到前台时重新取一次数。App 在后台挂很久再切回来，页面上还是上次打开时的
+    // 旧数据：孩子这段时间交的作业、家长在别的设备上改的任务都看不到。
+    // repository 的变更监听会把新数据推给已经挂载的页面。
+    void DefaultAssignmentRepository.instance.refresh();
+  }
 
   onDestroy(): void {}
 }

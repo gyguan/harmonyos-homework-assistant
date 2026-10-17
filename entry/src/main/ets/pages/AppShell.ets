@@ -60,6 +60,9 @@ export enum AppRole {
   PARENT = 'PARENT'
 }
 
+/** 停留在主界面时重新取数的间隔。 */
+const POLL_INTERVAL_MS = 30000;
+
 enum StudentRoute {
   HOME = 'HOME',
   ASSIGNMENTS = 'ASSIGNMENTS',
@@ -95,6 +98,9 @@ export struct AppShell {
   @State private familyStudents: StudentProfile[] = [];
   @State private identityParentActive: boolean = false;
   @State private identityParentIdentity: ParentIdentity = ParentIdentity.DAD;
+  private refreshing: boolean = false;
+  private refreshQueued: boolean = false;
+  private pollTimer: number = -1;
   @StorageLink('shareImportToken') private shareImportToken: string = '';
   onSwitchParent: (identity: ParentIdentity) => void = (_identity: ParentIdentity) => {};
   onSwitchStudent: (studentId: string) => void = (_studentId: string) => {};
@@ -157,11 +163,34 @@ export struct AppShell {
     this.syncFamilyContext();
     this.onRegisterBackHandler(() => this.handleSystemBack());
     void this.refreshActiveStudent();
+    this.startPolling();
   }
 
   aboutToDisappear(): void {
     DefaultAssignmentRepository.instance.clearChangeListener();
     this.onRegisterBackHandler(() => false);
+    this.stopPolling();
+  }
+
+  /**
+   * 停留在主界面不动时也隔一段时间取一次数。
+   *
+   * 家长常把 App 停在首页等孩子交作业，孩子在另一台设备上交了，这边不动手就永远
+   * 看不到。只在主界面轮询：子页里用户可能正在答题或填作业，中途重建会把输入和
+   * 选中状态冲掉。后端未连接时 refresh 会直接返回，不产生额外开销。
+   */
+  private startPolling(): void {
+    this.stopPolling();
+    this.pollTimer = setInterval(() => {
+      if (this.navPathStack.size() > 0) return;
+      void this.refreshFromServer();
+    }, POLL_INTERVAL_MS);
+  }
+
+  private stopPolling(): void {
+    if (this.pollTimer < 0) return;
+    clearInterval(this.pollTimer);
+    this.pollTimer = -1;
   }
 
   private get sizeClass(): WindowSizeClass {
@@ -170,10 +199,54 @@ export struct AppShell {
 
   private handleSystemBack(): boolean {
     if (this.navPathStack.size() > 0) {
-      this.navPathStack.pop();
+      this.popBack();
       return true;
     }
     return false;
+  }
+
+  /**
+   * 子页返回的唯一出口。
+   *
+   * NavPathStack 会保留下层页面实例：从子页返回时，根 Tab 页和栈里更下方的页面
+   * 都不会重建，aboutToAppear 也就不会重跑，界面会停在进入子页之前的旧数据上。
+   * 所以返回必须显式失效缓存并重新取一次数，否则「孩子交了作业家长看不到」
+   * 「布置完语音任务首页还是空」这类问题会反复出现。
+   */
+  private popBack(): void {
+    if (this.navPathStack.size() === 0) return;
+    this.navPathStack.pop();
+    this.invalidateAfterNavigation();
+  }
+
+  /** 返回后统一失效：先重建本地视图，再拉一次服务端，保证跨设备改动也能看到。 */
+  private invalidateAfterNavigation(): void {
+    this.notifyUiChanged();
+    this.notifyPracticeChanged();
+    this.notifyImportChanged();
+    void this.refreshFromServer();
+  }
+
+  /**
+   * 串行拉取服务端。快速连续切 Tab 或连续返回会同时发起多个同步请求，
+   * 先返回的未必是最后发起的，晚到的旧响应会把界面改回去。这里防重入，
+   * 期间又来了新的刷新诉求就在当前这次结束后补跑一次。
+   */
+  private async refreshFromServer(): Promise<void> {
+    if (this.refreshing) {
+      this.refreshQueued = true;
+      return;
+    }
+    this.refreshing = true;
+    try {
+      await DefaultAssignmentRepository.instance.refresh();
+    } finally {
+      this.refreshing = false;
+    }
+    if (this.refreshQueued) {
+      this.refreshQueued = false;
+      void this.refreshFromServer();
+    }
   }
 
   private nextDemoScenario(): void {
@@ -216,25 +289,33 @@ export struct AppShell {
   }
 
   private selectStudentRoute(route: StudentRoute): void {
+    let changed = this.studentRoute !== route;
     this.studentAttentionKind = AssignmentAttentionKind.NONE;
     this.studentRoute = route;
+    // 目标页会重建并读本地缓存，但缓存可能是上一次进这个 Tab 时留下的。
+    // 切 Tab 是用户主动看数据的动作，顺带取一次服务端。
+    if (changed) this.invalidateAfterNavigation();
   }
 
   private selectParentRoute(route: ParentRoute): void {
+    let changed = this.parentRoute !== route;
     this.parentAttentionKind = AssignmentAttentionKind.NONE;
     this.parentRoute = route;
+    if (changed) this.invalidateAfterNavigation();
   }
 
   private openStudentAttention(kind: AssignmentAttentionKind): void {
     if (kind === AssignmentAttentionKind.NONE) return;
     this.studentAttentionKind = kind;
     this.studentRoute = StudentRoute.ASSIGNMENTS;
+    this.invalidateAfterNavigation();
   }
 
   private openParentAttention(kind: AssignmentAttentionKind): void {
     if (kind === AssignmentAttentionKind.NONE) return;
     this.parentAttentionKind = kind;
     this.parentRoute = ParentRoute.PROGRESS;
+    this.invalidateAfterNavigation();
   }
 
   private onRoleChanged(): void {
@@ -349,12 +430,12 @@ export struct AppShell {
   }
 
   private replacePracticeAttemptWithResult(attemptId: string): void {
-    this.navPathStack.pop();
+    this.popBack();
     this.openPracticeResult(attemptId);
   }
 
   private replacePracticeResultWithAttempt(attemptId: string): void {
-    this.navPathStack.pop();
+    this.popBack();
     this.openPracticeAttempt(attemptId);
   }
 
@@ -415,8 +496,8 @@ export struct AppShell {
   }
 
   private finishParentPracticePublished(): void {
-    if (this.navPathStack.size() > 0) this.navPathStack.pop();
-    if (this.navPathStack.size() > 0) this.navPathStack.pop();
+    if (this.navPathStack.size() > 0) this.popBack();
+    if (this.navPathStack.size() > 0) this.popBack();
     this.notifyPracticeChanged();
   }
 
@@ -470,7 +551,7 @@ export struct AppShell {
         StudentAssignmentDetailPage({
           assignmentId: this.routeAssignmentId(param),
           revision: this.storeRevision,
-          onBack: () => this.navPathStack.pop(),
+          onBack: () => this.popBack(),
           onStoreChanged: () => this.notifyUiChanged()
         });
       }
@@ -481,7 +562,7 @@ export struct AppShell {
         PracticeHistoryPage({
           paperId: (param as PracticeHistoryRouteParam).paperId,
           revision: this.practiceRevision,
-          onBack: () => this.navPathStack.pop(),
+          onBack: () => this.popBack(),
           onOpenAttempt: (attemptId: string) => this.openPracticeAttempt(attemptId),
           onOpenResult: (attemptId: string) => this.openPracticeResult(attemptId)
         });
@@ -494,7 +575,7 @@ export struct AppShell {
           paperId: (param as PracticePaperRouteParam).paperId,
           version: (param as PracticePaperRouteParam).version,
           revision: this.practiceRevision,
-          onBack: () => this.navPathStack.pop(),
+          onBack: () => this.popBack(),
           onStarted: (attemptId: string) => {
             this.notifyPracticeChanged();
             this.openPracticeAttempt(attemptId);
@@ -509,7 +590,7 @@ export struct AppShell {
       NavDestination() {
         PracticeAttemptPage({
           attemptId: (param as PracticeAttemptRouteParam).attemptId,
-          onBack: () => this.navPathStack.pop(),
+          onBack: () => this.popBack(),
           onSubmitted: (attemptId: string) => {
             this.notifyPracticeChanged();
             this.replacePracticeAttemptWithResult(attemptId);
@@ -522,7 +603,7 @@ export struct AppShell {
       NavDestination() {
         PracticeResultPage({
           attemptId: (param as PracticeAttemptRouteParam).attemptId,
-          onBack: () => this.navPathStack.pop(),
+          onBack: () => this.popBack(),
           onRepeatStarted: (attemptId: string) => {
             this.notifyPracticeChanged();
             this.replacePracticeResultWithAttempt(attemptId);
@@ -536,9 +617,9 @@ export struct AppShell {
         ParentReviewPage({
           assignmentId: this.routeAssignmentId(param),
           revision: this.storeRevision,
-          onBack: () => this.navPathStack.pop(),
+          onBack: () => this.popBack(),
           onReviewed: () => {},
-          onDeleted: () => this.navPathStack.pop()
+          onDeleted: () => this.popBack()
         });
       }
       .hideTitleBar(true)
@@ -547,7 +628,7 @@ export struct AppShell {
       NavDestination() {
         HomeworkImportRoutePage({
           revision: this.storeRevision,
-          onBack: () => this.navPathStack.pop(),
+          onBack: () => this.popBack(),
           onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack),
           onOpenRecords: () => ParentImportNavigator.openRecords(this.navPathStack),
           onStoreChanged: () => this.notifyUiChanged()
@@ -559,7 +640,7 @@ export struct AppShell {
       NavDestination() {
         HomeworkImportInboxPage({
           revision: this.importRevision,
-          onBack: () => this.navPathStack.pop(),
+          onBack: () => this.popBack(),
           onOpenBatch: (batchId: string) => ParentImportNavigator.openBatch(
             this.navPathStack, batchId)
         });
@@ -571,7 +652,7 @@ export struct AppShell {
         HomeworkImportBatchDetailPage({
           batchId: ParentImportNavigator.batchId(param),
           revision: this.importRevision,
-          onBack: () => this.navPathStack.pop(),
+          onBack: () => this.popBack(),
           onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack),
           onChanged: () => this.notifyImportChanged()
         });
@@ -583,7 +664,7 @@ export struct AppShell {
         HomeworkConfirmationPage({
           revision: this.storeRevision,
           parentIdentity: this.parentIdentity,
-          onBack: () => this.navPathStack.pop(),
+          onBack: () => this.popBack(),
           onPublished: () => this.finishParentImportPublished(),
           onStoreChanged: () => this.notifyUiChanged()
         });
@@ -593,7 +674,7 @@ export struct AppShell {
     } else if (name === AppRoute.PARENT_SCHEDULED_ASSIGNMENTS) {
       NavDestination() {
         ParentScheduledAssignmentPage({
-          onBack: () => this.navPathStack.pop()
+          onBack: () => this.popBack()
         });
       }
       .hideTitleBar(true)
@@ -601,7 +682,7 @@ export struct AppShell {
     } else if (name === AppRoute.PARENT_PRACTICE_GENERATION) {
       NavDestination() {
         ParentPracticeGenerationPage({
-          onBack: () => this.navPathStack.pop(),
+          onBack: () => this.popBack(),
           onGenerate: (
             subject,
             track,
@@ -626,7 +707,7 @@ export struct AppShell {
           difficulty: (param as ParentPracticeGenerationResultRouteParam).difficulty as PracticeDifficulty,
           questionCount: (param as ParentPracticeGenerationResultRouteParam).questionCount,
           requirement: (param as ParentPracticeGenerationResultRouteParam).requirement,
-          onBack: () => this.navPathStack.pop(),
+          onBack: () => this.popBack(),
           onPublished: () => this.finishParentPracticePublished()
         });
       }
@@ -635,9 +716,9 @@ export struct AppShell {
     } else if (name === AppRoute.PARENT_VOICE_CREATE) {
       NavDestination() {
         ParentVoiceAssignmentPage({
-          onBack: () => this.navPathStack.pop(),
+          onBack: () => this.popBack(),
           onCreated: () => {
-            this.navPathStack.pop();
+            this.popBack();
             this.notifyUiChanged();
           }
         });

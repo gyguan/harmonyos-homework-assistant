@@ -47,6 +47,12 @@ export struct ParentReviewPane {
     void this.refreshEvidence();
   }
 
+  aboutToDisappear(): void {
+    // 销毁后作废在途的证据加载：refreshEvidence() 在 await 之后还会 localRevision++，
+    // 面板已经不存在时写状态属于脏写。
+    this.evidenceLoadSequence++;
+  }
+
   private onAssignmentChanged(): void {
     this.reviewNoteDraft = '';
     this.operationNotice = '';
