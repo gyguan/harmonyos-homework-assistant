@@ -201,6 +201,50 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
+  void splitsMergedNumberedItemsIntoOneTaskEach() {
+    // 线上真实黑板图：语文格子里写了「1、复习P28-38 周一练习」「2、预习8、10课 订正小白张」，
+    // glm-4.6v-flashx 把它们并成一条，第 2 点只剩在 instruction 里，家长直接漏做。
+    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "语文", "复习P28-38 周一练习",
+                "1、复习P28-38，周一练习 2、预习8、10课，订正小白张", "部编版", "2026-10-16",
+                15, "1、复习P28-38. 周一练习 2、预习8、10课 订小白张", 0.9))));
+
+    assertEquals(2, result.candidates().size());
+    assertEquals("复习P28-38，周一练习", result.candidates().get(0).title());
+    assertEquals("预习8、10课，订正小白张", result.candidates().get(1).title());
+    assertEquals("语文", result.candidates().get(1).subject());
+    assertEquals(15, result.candidates().get(1).expectedMinutes());
+  }
+
+  @Test
+  void splitsCircledNumberedItems() {
+    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "语文", "抄写和背诵", "①抄写第12课生字表两遍 ②背诵《古诗二首》并默写", "部编版",
+                "2026-10-16", 20, "①抄写 …②背诵 …", 0.9))));
+
+    assertEquals(2, result.candidates().size());
+    assertEquals("抄写第12课生字表两遍", result.candidates().get(0).title());
+    assertEquals("背诵《古诗二首》并默写", result.candidates().get(1).title());
+  }
+
+  @Test
+  void keepsSingleTaskWhenDigitsAreNotAnOrdinalList() {
+    // 「第1、2课」「P32-34」都不是序号，不能被拆成多条
+    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "语文", "预习第1、2课", "预习课本第1、2课，读熟P32-34", "部编版", "2026-10-16",
+                20, "预习第1、2课", 0.9))));
+
+    assertEquals(1, result.candidates().size());
+    assertEquals("预习第1、2课", result.candidates().getFirst().title());
+  }
+
+  @Test
   void conversionClampsOverlongTitleToDatabaseLimit() {
     // assignment.title 是 varchar(300)，超长会直接报库错误；写长标题的提示词更容易撞上。
     String tooLong = "背诵".repeat(400);
