@@ -61,3 +61,4 @@ app:
     allow-unauthenticated: ${AI_ALLOW_UNAUTHENTICATED:false}
     structured-output: ${AI_STRUCTURED_OUTPUT:true}
     log-payloads: ${AI_LOG_PAYLOADS:false}
+    homework-shorthand: ${AI_HOMEWORK_SHORTHAND:}
