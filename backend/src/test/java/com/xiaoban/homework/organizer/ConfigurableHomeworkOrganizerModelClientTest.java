@@ -201,6 +201,84 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
+  void shorthandGlossaryExplainsTeacherAbbreviations() {
+    // 老师（官士棋）惯用极简短写，模型按字面读会丢任务或理解错，
+    // 例如「课外30分」被当成时长丢掉、「一起作业」被当成「一起做作业」。
+    String section = ConfigurableHomeworkOrganizerModelClient.shorthandSection("");
+
+    assertTrue(section.contains("一起作业"));
+    assertTrue(section.contains("阅读绘本"), section);
+    assertTrue(section.contains("听读U"));
+    assertTrue(section.contains("课外阅读 30 分钟"));
+    assertTrue(section.contains("国学"));
+    assertTrue(section.contains("久久积累"));
+    assertTrue(section.contains("订正《小白练》练习单"));
+    // 同义简写并成一行：「绘本」「绘」
+    assertTrue(section.contains("「绘本」「绘」＝阅读绘本"), section);
+    // 数字占位符要渲染成人能读懂的形式，不能留 *
+    assertFalse(section.contains("*"), section);
+    assertTrue(section.contains("听读U＋数字"), section);
+    // 必须要求把展开后的含义写进标题，而不是照抄简写
+    assertTrue(section.contains("写进 title 和 instruction"));
+  }
+
+  @Test
+  void shorthandGlossaryAppendsConfiguredEntriesWithoutDroppingBuiltins() {
+    // 家长后续要加简写只改环境变量，不该动代码，也不该覆盖内置词条。
+    String section = ConfigurableHomeworkOrganizerModelClient.shorthandSection(
+        "数学|口算|口算题卡;英语|周练|周末练习单");
+
+    assertTrue(section.contains("数学："));
+    assertTrue(section.contains("「口算」＝口算题卡"));
+    assertTrue(section.contains("「周练」＝周末练习单"));
+    assertTrue(section.contains("「绘本」"), "追加项不能覆盖内置词条");
+    assertTrue(section.contains("课外阅读 30 分钟"));
+  }
+
+  @Test
+  void splitsOneTaskCoveringTwoDifferentShorthands() {
+    // 黑板英语格写成「一起作业. 绘本」，模型常理解成"在平台上读绘本"并成一条，
+    // 而这是两项作业。简写是老师固定用法，这里确定性拆开。
+    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "英语", "一起作业平台作业及阅读绘本",
+                "在「一起作业」APP 上完成布置的作业，并阅读绘本", "英语课本", null, 30,
+                "一起作业. 绘本", 0.9))),
+        "");
+
+    assertEquals(2, result.candidates().size());
+    assertTrue(result.candidates().get(0).title().contains("一起作业"), "第一条应是平台作业");
+    assertTrue(result.candidates().get(1).title().contains("绘本"), "第二条应是阅读绘本");
+  }
+
+  @Test
+  void keepsOneTaskWhenOnlyASingleShorthandMatches() {
+    // 「预习8、10课 订小白」只有「订小白」一个简写，不能拆
+    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "语文", "预习8、10课 订小白",
+                "预习第8、10课，订正《小白练》练习单", "语文书", null, 30,
+                "2、预习8、10课 订小白", 0.9))),
+        "");
+
+    assertEquals(1, result.candidates().size());
+    assertEquals("预习8、10课 订小白", result.candidates().get(0).title());
+  }
+
+  @Test
+  void shorthandGlossaryIgnoresMalformedEntries() {
+    String section = ConfigurableHomeworkOrganizerModelClient.shorthandSection(
+        "只有一项;|缺科目|缺含义;;数学||空简写");
+
+    assertTrue(section.contains("课外阅读 30 分钟"), "非法条目不应影响内置词典");
+    assertFalse(section.contains("只有一项"));
+    assertFalse(section.contains("缺科目"));
+    assertFalse(section.contains("空简写"));
+  }
+
+  @Test
   void splitsMergedNumberedItemsIntoOneTaskEach() {
     // 线上真实黑板图：语文格子里写了「1、复习P28-38 周一练习」「2、预习8、10课 订正小白张」，
     // glm-4.6v-flashx 把它们并成一条，第 2 点只剩在 instruction 里，家长直接漏做。
