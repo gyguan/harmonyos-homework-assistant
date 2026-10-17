@@ -127,7 +127,8 @@ public class AssignmentService {
   }
 
   /**
-   * 生成「科目 · 月日 · 素材标题」形式的语音任务名，同日同名时追加序号。
+   * 生成「绘本-文件夹目录」形式的语音任务名（家长要求：自动与手动统一成这个格式），
+   * 同一个文件夹在同一天被布置第二次时追加序号，避免两条任务完全同名。
    *
    * @param excludeAssignmentId 顺延重命名时传任务自己的 id：这条任务本身就是「今天的任务」，
    *                            把它排除掉才不会因为同名计数而给自己追加序号。
@@ -139,11 +140,8 @@ public class AssignmentService {
     ZoneId zone = BUSINESS_ZONE;
     Instant from = businessDate.atStartOfDay(zone).toInstant();
     Instant to = businessDate.plusDays(1).atStartOfDay(zone).toInstant();
-    String dateLabel = businessDate.getMonthValue() + "月" + businessDate.getDayOfMonth() + "日";
     String normalizedMaterialTitle = text(materialTitle).trim();
-    String base = normalizedMaterialTitle.isBlank()
-        ? subjectDisplay(subjectCode) + " · " + dateLabel + "语音作业"
-        : subjectDisplay(subjectCode) + " · " + dateLabel + " · " + normalizedMaterialTitle;
+    String base = "绘本-" + (normalizedMaterialTitle.isBlank() ? "语音作业" : normalizedMaterialTitle);
     long count = excludeAssignmentId == null || excludeAssignmentId.isBlank()
         ? repository
             .countByFamilyIdAndStudentIdAndSubjectCodeAndContentTypeAndTitleStartingWithAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(

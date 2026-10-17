@@ -192,7 +192,7 @@ export class RemoteVoiceMaterialApi {
       `usage=${encodeURIComponent(usage)}`,
       `page=${Math.max(0, page)}`,
       `size=${Math.max(1, Math.min(100, size))}`,
-      'sort=importedAt,desc'
+      'sort=directoryName,asc'
     ];
     if (keyword.trim().length > 0) {
       params.push(`keyword=${encodeURIComponent(keyword.trim())}`);
