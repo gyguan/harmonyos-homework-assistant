@@ -31,6 +31,60 @@ export class HomeworkSubmissionService {
 
   configure(context: common.UIAbilityContext): void {
     this.context = context;
+    void this.cleanupStaleSandboxCopies();
+  }
+
+  /**
+   * 清理没有提交记录引用的孤儿沙盒副本。
+   * 每次提交都会往 filesDir 复制一份 `homework-submission-<组>-<序号>.jpg`，
+   * 中途放弃、上传失败重试、记录被清掉之后，这些副本就再也没人引用了，
+   * 而它们从来没被删过——用久了能堆到几百 MB。仍在回看的提交不受影响。
+   */
+  private async cleanupStaleSandboxCopies(): Promise<void> {
+    if (this.context === null) return;
+    try {
+      let referenced = this.referencedSandboxPaths();
+      await this.deleteOrphanFiles(this.context.filesDir, 'homework-submission-', referenced);
+      await this.deleteOrphanFiles(this.context.cacheDir, 'homework-submission-camera-', referenced);
+    } catch {
+      // 清理失败不影响提交主流程。
+    }
+  }
+
+  private referencedSandboxPaths(): Set<string> {
+    let result = new Set<string>();
+    let assignments = DefaultAssignmentRepository.instance.listCached();
+    for (let assignment of assignments) {
+      for (let submission of this.local.listSubmissions(assignment.id)) {
+        for (let uri of submission.photoUris) {
+          if (uri.length > 0) result.add(uri);
+        }
+        if (submission.audioUri !== undefined && submission.audioUri.length > 0) {
+          result.add(submission.audioUri);
+        }
+      }
+    }
+    return result;
+  }
+
+  private async deleteOrphanFiles(directory: string, prefix: string, referenced: Set<string>): Promise<void> {
+    let names: string[] = [];
+    try {
+      names = fileIo.listFileSync(directory);
+    } catch {
+      return;
+    }
+    for (let name of names) {
+      if (name.indexOf(prefix) !== 0) continue;
+      let path = `${directory}/${name}`;
+      let uri = fileUri.getUriFromPath(path);
+      if (referenced.has(path) || referenced.has(uri)) continue;
+      try {
+        fileIo.unlinkSync(path);
+      } catch {
+        // 单个文件删不掉就跳过，下一次启动再试。
+      }
+    }
   }
 
   listCached(assignmentId: string): Submission[] {

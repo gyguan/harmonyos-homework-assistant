@@ -87,11 +87,15 @@ export interface HomeworkImportPipelineResult {
   extracted: ExtractedHomeworkText;
   candidates: CandidateAssignment[];
   organizerMode: HomeworkOrganizerMode;
+  /** 已连接云端但 AI 整理失败（已回退本地规则），需要向用户提示。 */
+  aiFailed: boolean;
 }
 
 export interface HomeworkTextImportResult {
   candidateCount: number;
   organizerMode: HomeworkOrganizerMode;
+  /** 已连接云端但 AI 整理失败（已回退本地规则），需要向用户提示。 */
+  aiFailed: boolean;
 }
 
 export interface HomeworkImageImportResult {
@@ -99,6 +103,8 @@ export interface HomeworkImageImportResult {
   candidateCount: number;
   recognizedText: string;
   organizerMode: HomeworkOrganizerMode;
+  /** 已连接云端但 AI 整理失败（已回退本地规则），需要向用户提示。 */
+  aiFailed: boolean;
 }
 
 export interface HomeworkImageTextResult {

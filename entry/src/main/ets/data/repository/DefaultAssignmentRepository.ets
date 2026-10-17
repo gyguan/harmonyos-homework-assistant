@@ -15,6 +15,11 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
   private remoteSummaryStudentId: string = '';
   private queryCache: Assignment[] = [];
   private queryCacheStudentId: string = '';
+  // 每次发起查询/刷新自增。并发的慢响应回来时若序号已过期就不再写缓存，
+  // 否则先发的慢响应会盖掉后发的快响应结果，界面出现"闪回旧数据"。
+  private queryEpoch: number = 0;
+  // 离线改动与服务端版本冲突被覆盖的次数，供设置页提示用户核对。
+  private syncConflictCount: number = 0;
   private readonly local: AssignmentLocalDataSource = DefaultAssignmentLocalDataSource.instance;
   private syncRunning: boolean = false;
   private syncRequested: boolean = false;
@@ -52,6 +57,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
 
   async query(filter: AssignmentFilter): Promise<Assignment[]> {
     let studentId = this.local.getActiveStudentId();
+    let epoch = ++this.queryEpoch;
     if (!BackendSession.instance.isConnected()) {
       let cached = AssignmentQuery.filter(this.local.listAssignmentsForStudent(studentId), filter);
       this.replaceQueryCacheIfCurrent(studentId, cached);
@@ -68,11 +74,17 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       // (for example a single status). Always apply the complete V2 filter locally too so
       // multi-status views such as Parent "需关注" have exact semantics.
       let result = AssignmentQuery.filter(mapped, filter);
-      this.replaceQueryCacheIfCurrent(studentId, result);
+      // 只有本次查询仍是"最新发起的"才写缓存：否则先发的慢响应回来时会盖掉
+      // 后发的快响应结果，界面出现刷新后闪回旧数据。
+      if (epoch === this.queryEpoch) {
+        this.replaceQueryCacheIfCurrent(studentId, result);
+      }
       return result.slice();
     } catch {
       let cached = AssignmentQuery.filter(this.local.listAssignmentsForStudent(studentId), filter);
-      this.replaceQueryCacheIfCurrent(studentId, cached);
+      if (epoch === this.queryEpoch) {
+        this.replaceQueryCacheIfCurrent(studentId, cached);
+      }
       return cached.slice();
     }
   }
@@ -302,6 +314,8 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     // Capture identity before the first await. Async responses are always written back to the
     // student that started the request, never to whoever happens to be active when it returns.
     let studentId = this.local.getActiveStudentId();
+    // 让仍在飞行的 query() 结果失效：本次刷新拿到的是更新的服务端快照。
+    this.queryEpoch++;
     if (this.queryCacheStudentId === studentId) this.queryCache = [];
     this.queryCacheStudentId = studentId;
     this.remoteSummary = null;
@@ -338,6 +352,11 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
           // Seed assignments never cross the local/remote boundary. Candidate-backed remote
           // assignments may be restored from a local snapshot before their first refresh.
           if (assignment.backing === AssignmentBacking.LOCAL_SEED || assignment.candidateId.length === 0) continue;
+          // 服务端列表里已经没有这条，而本地曾经同步过（lastSyncedAtEpochMs 只在
+          // 服务端响应映射时写入）：说明是服务端或别的设备把它删了，绝不能再 create，
+          // 否则「家长在手机上删掉、平板一同步又冒出来」。
+          // 只有从未上传成功的本地作业（时间戳为 0）才需要补建。
+          if (assignment.lastSyncedAtEpochMs > 0) continue;
           let created = await HomeworkRemoteApi.instance.create(assignment);
           remoteById.set(created.id, created);
           remoteOrder.push(created.id);
@@ -348,6 +367,12 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
         // deliberately keeps the already fetched authoritative server snapshot.
         if (assignment.syncDirty && assignment.remoteVersion === existing.version) {
           dirtyEntries.push({ assignment: assignment, version: assignment.remoteVersion });
+        } else if (assignment.syncDirty) {
+          // 本地有离线改动，但服务端版本已经变过（别的设备改过/自己离线期间动过）：
+          // 服务端快照会覆盖掉这些改动，必须留痕让界面提示核对，不能无声吞掉。
+          this.syncConflictCount++;
+          console.warn(`[SYNC] assignment ${assignment.id} local changes dropped by remote version ` +
+            `${existing.version} (local ${assignment.remoteVersion})`);
         }
       }
 
@@ -422,11 +447,17 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
 
   private async flushSync(): Promise<void> {
     this.syncRunning = true;
-    while (this.syncRequested) {
-      this.syncRequested = false;
-      await this.refresh();
+    try {
+      while (this.syncRequested) {
+        this.syncRequested = false;
+        await this.refresh();
+      }
+    } finally {
+      // refresh() 内部会 emitChanged() 触发 UI 回调，UI 侧一旦抛错就会把异常带到这里。
+      // 没有 finally 时 syncRunning 永远卡在 true，requestSync() 从此全部直接 return，
+      // 跨设备改动再也拉不到，只能杀进程重启才恢复。
+      this.syncRunning = false;
     }
-    this.syncRunning = false;
   }
 
   private performLocalDemoAction(assignmentId: string, action: AssignmentAction): Assignment {
@@ -448,6 +479,13 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     if (this.local.getActiveStudentId() !== studentId) return;
     this.queryCacheStudentId = studentId;
     this.queryCache = items.slice();
+  }
+
+  /** 取出并清空"离线改动被服务端版本覆盖"的计数，用于提示用户核对。 */
+  takeSyncConflictCount(): number {
+    let count = this.syncConflictCount;
+    this.syncConflictCount = 0;
+    return count;
   }
 
   private replaceQueryCacheItem(updated: Assignment): void {

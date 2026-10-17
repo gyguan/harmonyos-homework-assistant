@@ -98,6 +98,15 @@ export struct HomeworkImportPage {
       }
       if (studentId !== this.viewModel.activeStudentId()) return;
       if (result.candidateCount > 0) {
+        if (result.aiFailed) {
+          // AI 整理失败后拿到的是降级结果，准确度有折扣：留在当前页把提示读清楚，
+          // 由用户自己点「继续核对」，别把降级结果直接推进发布流程。
+          this.parseMessage = `AI 整理失败，已用简化方式整理出 ${result.candidateCount} 项作业，请逐项核对后再发布`;
+          this.parseError = true;
+          this.localRevision++;
+          this.onStoreChanged();
+          return;
+        }
         this.parseMessage = `已整理出 ${result.candidateCount} 项作业，请继续核对`;
         this.afterOrganized(result.candidateCount);
       } else {

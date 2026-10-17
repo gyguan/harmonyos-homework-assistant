@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit';
 import { camera, cameraPicker } from '@kit.CameraKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { HomeworkOrganizerRemoteApi } from '../remote/HomeworkOrganizerRemoteApi';
+import { BackendSession } from '../remote/BackendSession';
 import { HomeworkImportInboxService } from './HomeworkImportInboxService';
 import { DefaultHomeworkImportDraftRepository } from '../../data/repository/DefaultHomeworkImportDraftRepository';
 import {
@@ -47,12 +48,20 @@ export class HomeworkImportService {
     let extracted: ExtractedHomeworkText = await this.pipeline.extract(input);
     let remoteCandidates = await HomeworkOrganizerRemoteApi.instance.organize(extracted);
     if (remoteCandidates !== null) {
-      return { extracted: extracted, candidates: this.normalizeCandidateDates(remoteCandidates), organizerMode: HomeworkOrganizerMode.AI };
+      return {
+        extracted: extracted,
+        candidates: this.normalizeCandidateDates(remoteCandidates),
+        organizerMode: HomeworkOrganizerMode.AI,
+        aiFailed: false
+      };
     }
+    // organize() 返回 null 有两种可能：离线（正常走本地）或在线但 AI 整理失败。
+    // 在线失败时必须让用户知道结果是本地规则出的，准确度有折扣。
     return {
       extracted: extracted,
       candidates: this.normalizeCandidateDates(await this.pipeline.parse(extracted)),
-      organizerMode: HomeworkOrganizerMode.LOCAL
+      organizerMode: HomeworkOrganizerMode.LOCAL,
+      aiFailed: BackendSession.instance.isConnected()
     };
   }
 
@@ -64,7 +73,7 @@ export class HomeworkImportService {
     imageSourceLabel: string = ''): Promise<HomeworkTextImportResult> {
     if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
     let normalized = text.trim();
-    if (normalized.length === 0) return { candidateCount: 0, organizerMode: HomeworkOrganizerMode.LOCAL };
+    if (normalized.length === 0) return { candidateCount: 0, organizerMode: HomeworkOrganizerMode.LOCAL, aiFailed: false };
 
     let studentId = this.drafts.getActiveStudentId();
     let fromScreenshot = imageRef.trim().length > 0;
@@ -90,7 +99,7 @@ export class HomeworkImportService {
       candidates,
       fromScreenshot ? imageRef : '');
     this.ensureCurrentStudent(studentId);
-    return { candidateCount: candidates.length, organizerMode: output.organizerMode };
+    return { candidateCount: candidates.length, organizerMode: output.organizerMode, aiFailed: output.aiFailed };
   }
 
   async parseImage(imageRef: string, subject: Subject | null = null,
@@ -115,7 +124,8 @@ export class HomeworkImportService {
     HomeworkImportInboxService.instance.commitParsedImport(
       rawImport, HomeworkImportSourceType.SCREENSHOT, sourceText, candidates, imageRef);
     this.ensureCurrentStudent(studentId);
-    return { candidateCount: candidates.length, organizerMode: HomeworkOrganizerMode.AI };
+    // 图片整理失败会直接抛错（由页面提示），这里返回即代表 AI 成功。
+    return { candidateCount: candidates.length, organizerMode: HomeworkOrganizerMode.AI, aiFailed: false };
   }
 
   private ensureCurrentStudent(studentId: string): void {
@@ -277,7 +287,7 @@ export class HomeworkImportService {
     }
 
     if (photoUris.length === 0) {
-      return { selected: false, candidateCount: 0, recognizedText: '', organizerMode: HomeworkOrganizerMode.LOCAL };
+      return { selected: false, candidateCount: 0, recognizedText: '', organizerMode: HomeworkOrganizerMode.LOCAL, aiFailed: false };
     }
 
     let studentId = this.drafts.getActiveStudentId();
@@ -299,7 +309,8 @@ export class HomeworkImportService {
       selected: true,
       candidateCount: output.candidates.length,
       recognizedText: output.extracted.text,
-      organizerMode: output.organizerMode
+      organizerMode: output.organizerMode,
+      aiFailed: output.aiFailed
     };
   }
 }

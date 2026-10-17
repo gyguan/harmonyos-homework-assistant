@@ -141,7 +141,8 @@ public class AssignmentResourceService {
         || mime.equals("audio/x-wav"))) {
       type = "AUDIO"; maxBytes = 30L * 1024 * 1024;
     } else if (name.endsWith(".mp4") && mime.equals("video/mp4")) {
-      type = "VIDEO"; maxBytes = 200L * 1024 * 1024;
+      // 家庭作业场景没有大视频，50MB 上限防止客户端把超大文件读进内存（OOM）。
+      type = "VIDEO"; maxBytes = 50L * 1024 * 1024;
     } else {
       throw new ApiExceptions.BadRequest("附件仅支持 JPG/PNG/WebP、MP3/M4A/WAV 或 MP4");
     }

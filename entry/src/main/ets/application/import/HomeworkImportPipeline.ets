@@ -26,7 +26,8 @@ export class HomeworkImportPipeline {
     return {
       extracted: extracted,
       candidates: candidates,
-      organizerMode: HomeworkOrganizerMode.LOCAL
+      organizerMode: HomeworkOrganizerMode.LOCAL,
+      aiFailed: false
     };
   }
 }

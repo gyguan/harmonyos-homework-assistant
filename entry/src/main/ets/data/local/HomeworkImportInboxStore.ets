@@ -71,11 +71,17 @@ export class HomeworkImportInboxStore {
     let persistence = this.persistence;
     if (persistence === null || this.persistRunning) return;
     this.persistRunning = true;
-    while (this.persistRequested) {
-      this.persistRequested = false;
-      await persistence.save(this.createSnapshot());
+    try {
+      while (this.persistRequested) {
+        this.persistRequested = false;
+        await persistence.save(this.createSnapshot());
+      }
+    } catch {
+      // 同 HomeworkStore：落盘失败不能让队列永久停摆，否则收件箱改动静默丢失。
+      this.persistRequested = true;
+    } finally {
+      this.persistRunning = false;
     }
-    this.persistRunning = false;
   }
 
   private cloneBatch(source: ImportBatch): ImportBatch {

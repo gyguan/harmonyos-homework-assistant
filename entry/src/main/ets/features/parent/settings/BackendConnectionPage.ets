@@ -23,6 +23,7 @@ export struct BackendConnectionPage {
   @State private password: string = '';
   @State private message: string = '';
   @State private connecting: boolean = false;
+  @State private syncing: boolean = false;
   @State private pageRevision: number = 0;
   @State private familyStudents: StudentProfile[] = [];
   @State private editingId: string = '';
@@ -217,9 +218,16 @@ export struct BackendConnectionPage {
       let familySynced = await FamilyCloudService.instance.syncStudents();
       let parentAccessSynced = await FamilyCloudService.instance.syncParentAccess();
       let homeworkSynced = await DefaultAssignmentRepository.instance.refresh();
+      let conflicts = DefaultAssignmentRepository.instance.takeSyncConflictCount();
       this.syncLocalStudents();
       this.pageRevision++;
-      this.message = familySynced && parentAccessSynced && homeworkSynced ? '' : '已登录，部分数据稍后再同步';
+      if (!familySynced || !parentAccessSynced || !homeworkSynced) {
+        this.message = '已登录，部分数据稍后再同步';
+      } else if (conflicts > 0) {
+        this.message = `已登录，但有 ${conflicts} 项离线改动被云端新版本覆盖，请核对作业内容`;
+      } else {
+        this.message = '';
+      }
       this.onStoreChanged();
     } catch {
       this.message = '连接失败，请检查电脑局域网地址、后端服务和账号密码';
@@ -237,13 +245,32 @@ export struct BackendConnectionPage {
   }
 
   private async syncCloudData(): Promise<void> {
-    let familySynced = await FamilyCloudService.instance.syncStudents();
-    let parentAccessSynced = await FamilyCloudService.instance.syncParentAccess();
-    let homeworkSynced = await DefaultAssignmentRepository.instance.refresh();
-    this.syncLocalStudents();
-    this.pageRevision++;
-    this.message = familySynced && parentAccessSynced && homeworkSynced ? '' : '部分数据同步失败，请稍后重试';
-    this.onStoreChanged();
+    // 没有忙锁时连点会并发发起 N 轮「学生列表 + 家长码 + 作业全量」请求；
+    // 没有 try/catch 时任一步 reject 都是静默失败，界面不报错、用户以为点了没反应。
+    if (this.syncing) return;
+    this.syncing = true;
+    this.message = '';
+    try {
+      let familySynced = await FamilyCloudService.instance.syncStudents();
+      let parentAccessSynced = await FamilyCloudService.instance.syncParentAccess();
+      let homeworkSynced = await DefaultAssignmentRepository.instance.refresh();
+      let conflicts = DefaultAssignmentRepository.instance.takeSyncConflictCount();
+      this.syncLocalStudents();
+      this.pageRevision++;
+      if (!familySynced || !parentAccessSynced || !homeworkSynced) {
+        this.message = '部分数据同步失败，请稍后重试';
+      } else if (conflicts > 0) {
+        // 离线期间的本地改动被服务端新版本覆盖，明确告诉用户去核对，而不是假装同步成功。
+        this.message = `已同步，但有 ${conflicts} 项离线改动被云端新版本覆盖，请核对作业内容`;
+      } else {
+        this.message = '';
+      }
+      this.onStoreChanged();
+    } catch {
+      this.message = '同步失败，请检查网络或后端地址后重试';
+    } finally {
+      this.syncing = false;
+    }
   }
 
   private openStudentEditorDialog(): void {
@@ -559,8 +586,10 @@ export struct BackendConnectionPage {
           .onClick(() => { void this.connect(); });
       } else {
         Row({ space: 8 }) {
-          Button('立即同步', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          Button(this.syncing ? '正在同步…' : '立即同步', { type: ButtonType.Normal }).layoutWeight(1)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
             .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
+            .enabled(!this.syncing)
             .onClick(() => { void this.syncCloudData(); });
           Button('断开连接', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
             .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.TEXT)
