@@ -8,9 +8,10 @@
 #
 # 用法（仓库根目录，Git Bash）：
 #   ./scripts/install_hap_to_device.sh                    # 用本地构建产物，USB 连接
-#   ./scripts/install_hap_to_device.sh -d                 # 改用服务器上的最新包
 #   ./scripts/install_hap_to_device.sh -w 192.168.1.23:5555   # 无线调试（同一 Wi-Fi）
 #   ./scripts/install_hap_to_device.sh -u                 # 卸载再装（默认是 -r 覆盖安装）
+#
+# 安装包只从本地构建产物取（服务器不再保存 .hap）；没有产物就先跑构建。
 #
 # 前置条件（手机端）：
 #   设置 → 关于本机 → 连点「版本号」进开发者模式
@@ -24,17 +25,14 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 HDC="${HDC:-E:/DevTools/DevEco Studio/sdk/default/openharmony/toolchains/hdc.exe}"
-PUBLIC_BASE="${PUBLIC_BASE:-http://192.144.143.141}"
 LOCAL_HAP="$REPO_ROOT/entry/build/default/outputs/default/entry-default-signed.hap"
 HAP_NAME="homework-assistant-0.1.0.hap"
 
-USE_DOWNLOAD=0
 WIRELESS=""
 REINSTALL=""
 
-while getopts "dw:uh" opt; do
+while getopts "w:uh" opt; do
   case "$opt" in
-    d) USE_DOWNLOAD=1 ;;
     w) WIRELESS="$OPTARG" ;;
     u) REINSTALL=1 ;;
     h) sed -n '2,22p' "$0"; exit 0 ;;
@@ -45,25 +43,20 @@ done
 [ -x "$HDC" ] || [ -f "$HDC" ] || { echo "找不到 hdc：$HDC（用 HDC=... 指定）" >&2; exit 1; }
 
 # ---------- 1. 准备安装包 ----------
-if [ "$USE_DOWNLOAD" -eq 1 ]; then
-  echo "[1/3] 从服务器下载 ${HAP_NAME} …"
-  TMP_DIR="$(mktemp -d)"
-  HAP="$TMP_DIR/$HAP_NAME"
-  CURL_OUT="$HAP"
-  if command -v cygpath >/dev/null 2>&1; then CURL_OUT="$(cygpath -w "$HAP")"; fi
-  curl -fsS -m 120 -o "$CURL_OUT" "${PUBLIC_BASE}/${HAP_NAME}"
-  trap 'rm -rf "$TMP_DIR"' EXIT
-elif [ -f "$LOCAL_HAP" ]; then
+# 服务器上不再保存安装包（下载站已下线），只认本地构建产物。
+if [ -f "$LOCAL_HAP" ]; then
   echo "[1/3] 使用本地构建产物"
   HAP="$LOCAL_HAP"
 else
-  echo "[1/3] 本地没有 $LOCAL_HAP，改为从服务器下载"
-  TMP_DIR="$(mktemp -d)"
-  HAP="$TMP_DIR/$HAP_NAME"
-  CURL_OUT="$HAP"
-  if command -v cygpath >/dev/null 2>&1; then CURL_OUT="$(cygpath -w "$HAP")"; fi
-  curl -fsS -m 120 -o "$CURL_OUT" "${PUBLIC_BASE}/${HAP_NAME}"
-  trap 'rm -rf "$TMP_DIR"' EXIT
+  cat >&2 <<'EOF'
+
+❌ 本地还没有签名安装包。请先构建 release 包：
+
+   hvigorw assembleHap --mode module -p product=default -p buildMode=release --no-daemon
+   # 或：bash scripts/deploy_pipeline.sh build
+
+EOF
+  exit 1
 fi
 echo "     $(ls -l "$HAP" | awk '{print $5}') 字节  $(sha256sum "$HAP" | cut -c1-16)…"
 

@@ -79,17 +79,19 @@ stage_backend() {
   info "步骤 3.2 本地打包并上传..."
   TARBALL="D:/code/homework-deploy.tar.gz"
   # --force-local 必需: 否则 GNU tar 会把 "D:/..." 里的冒号当成远程主机名，报 "Cannot connect to D:"
+  # signature/ 是本地签名材料（OpenHarmony.p12 私钥、发布 profile）：
+  # 只在 .gitignore 里排除还不够，tar 默认会把它一起打进部署包上传到云端。
   (cd "$REPO_DIR" && "$GIT_TOOLS/tar.exe" --force-local \
     --exclude='./.git' --exclude='node_modules' --exclude='oh_modules' \
     --exclude='./entry/build' --exclude='./backend/target' \
-    --exclude='.idea' --exclude='.workbuddy' -czf "$TARBALL" .) || fail "打包失败"
+    --exclude='.idea' --exclude='.workbuddy' --exclude='./signature' \
+    -czf "$TARBALL" .) || fail "打包失败"
   "$GIT_TOOLS/scp.exe" -i "$SSH_KEY" -o BatchMode=yes "$TARBALL" "$SERVER:$REMOTE_DIR/" || fail "上传失败"
 
-  info "步骤 3.3 服务器解压替换 src（保留 .env 与 releases/*.hap）..."
+  info "步骤 3.3 服务器解压替换 src（保留 .env）..."
   ssh_server "cd $REMOTE_DIR && rm -rf src.old && mv src src.old && mkdir src \
     && tar -xzf homework-deploy.tar.gz -C src \
-    && cp src.old/backend/.env src/backend/.env && chmod 600 src/backend/.env \
-    && cp src.old/releases/*.hap src/releases/ 2>/dev/null; \
+    && cp src.old/backend/.env src/backend/.env && chmod 600 src/backend/.env; \
     test -f src/backend/DEPLOY.md && echo EXTRACT_OK" || fail "解压/恢复失败"
   rm -f "$TARBALL"
 
