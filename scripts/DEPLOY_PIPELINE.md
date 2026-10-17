@@ -30,7 +30,7 @@
 - 脚本步骤：
   1. 部署前备份（`backend/scripts/prod_backup.sh`，每日 03:30 也有 crontab 自动备份）
   2. tar 打包（排除 .git/build/node_modules 等）→ scp 上传 → 替换 `src`
-  3. 恢复不入库文件：`src/backend/.env`（含数据库密码）和 `src/releases/*.hap`（下载站安装包）
+  3. 恢复不入库文件：`src/backend/.env`（含数据库密码）
   4. `docker compose -f backend/docker-compose.prod.yml up -d --build`（Flyway 迁移自动执行）
   5. 轮询 `http://localhost:8080/api/v1/health` 到 200
   6. `--force-recreate caddy`（⭐替换 src 目录后 bind mount 还挂旧 inode，必须重建）

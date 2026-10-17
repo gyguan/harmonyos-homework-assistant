@@ -419,106 +419,33 @@ AI_ORGANIZER_MODEL=glm-4-flashx
 
 ---
 
-## 十、客户端安装包分发（HTTP 下载站，2026-09-19 实测）
+## 十、客户端分发方式（下载站已下线，2026-10-17 调整）
 
-给家长/家人装 App 不需要数据线，走服务器上的下载站即可。
+服务器上**不再保存 .hap 安装包**：原先 80 端口的下载站（`releases/index.html` + Caddy 静态目录）
+连同发布脚本 `scripts/publish_hap_release.sh` 一起删除，服务器上已上传的旧包也已清理。
 
-### 10.1 下载地址
+现在装 App 只有两条路：
 
-| 用途 | 地址 |
-| --- | --- |
-| 安装说明页（**用电脑打开**） | `http://192.144.143.141/` |
-| 安装包直链 | `http://192.144.143.141/homework-assistant-0.1.0.hap` |
+| 途径 | 是否需要电脑/数据线 | 适用 |
+| --- | --- | --- |
+| `scripts/install_hap_to_device.sh`（底层 `hdc install`） | 需要（USB 或同一 Wi-Fi 无线调试） | 开发者模式 + USB 调试，自己装机 |
+| 华为 AGC 邀请测试 / 应用市场 | 不需要 | 家人点链接直接装，需发布证书 + 实名账号 |
 
-⚠️ 这个站**不是**"手机上点一下就能装"的方案——鸿蒙不支持点 `.hap` 安装，原因见 10.5。
-它的定位是「把包放到公网，电脑上取下来用 `hdc install` 装」。
+> ⚠️ HarmonyOS（尤其 NEXT）没有给 `.hap` 关联安装程序，手机上点 `.hap` 不会有任何安装动作，
+> 这是系统设计而非包坏了——所以那个下载站的链接本来也只是**给电脑用的**。
 
-### 10.2 为什么是 HTTP 而不是 HTTPS
+`hdc install` **只认调试签名的包**，Release 签名包必须走应用市场；本项目当前是调试证书，
+`buildMode=release` 只影响编译优化，不改变签名类型。换设备时需在 DevEco 里重新自动签名
+（把新设备 UDID 加进白名单，上限 100 台）后重新打包。
 
-本机在大陆节点、使用 `sslip.io` 免费域名（**未备案**）。实测：
-
-- 443 端口在云防火墙放行后，TLS 握手仍被 **SNI 级 RST**；
-- Let's Encrypt 的 `http-01` 校验拿到的是腾讯 DNSPod 的拦截页（`webblock.html`），证书根本签不下来；
-- 而 **80 端口完全正常**。
-
-所以下载站固定走 `http://<公网IP>/`，用 Caddy 的一个**纯 HTTP 站点块**承载（`http://` 前缀会让 Caddy 跳过自动 HTTPS）。这与原有的 HTTPS 反代站点块共存，互不影响。
-
-### 10.3 部署结构
-
-```
-/home/ubuntu/homework-app/src/            <- 部署根
-├── backend/                              <- 后端（docker compose 所在）
-│   ├── Caddyfile                         <- 末尾新增 http://192.144.143.141 站点块
-│   └── docker-compose.prod.yml           <- caddy 服务新增 ../releases 只读挂载
-└── releases/                             <- 安装包 + index.html 放这里
-    ├── index.html
-    └── homework-assistant-0.1.0.hap
-```
-
-⚠️ 挂载源写的是 `../releases` 而不是 `./releases`：compose 的相对路径是**相对 compose 文件所在目录**（`backend/`），
-写成 `./releases` 会落到 `backend/releases`，静默生成一个空目录，页面直接 404。
-
-生效命令（`--no-deps` 避免顺带重建后端容器）：
+裸命令等价写法：
 
 ```bash
-cd /home/ubuntu/homework-app/src/backend
-sudo docker compose -f docker-compose.prod.yml up -d --no-deps caddy
-sudo docker exec homework-backend-caddy-1 ls -la /srv/releases/   # 确认包可见
+hdc list targets              # 确认设备在线
+hdc tconn <手机IP:端口>        # 无线时才需要
+hdc install -r entry-default-signed.hap
+# -> install bundle successfully
 ```
-
-替换配置前先校验语法（Caddyfile 写错会导致开机启动失败）：
-
-```bash
-sudo docker run --rm -v $PWD/Caddyfile:/etc/caddy/Caddyfile:ro caddy:2-alpine \
-  caddy validate --config /etc/caddy/Caddyfile
-```
-
-### 10.4 发布新版本
-
-**方式一：一键脚本**（仓库根目录，Git Bash；已实测通过）
-
-```bash
-./scripts/publish_hap_release.sh          # 构建 + 签名校验 + 上传 + 回抓比对哈希
-./scripts/publish_hap_release.sh -s       # 跳过构建，只上传现有包
-./scripts/publish_hap_release.sh -v 0.2.0 # 指定版本号（默认读 AppScope/app.json5）
-```
-
-版本号变了记得同步改 `releases/index.html` 里的链接和哈希，脚本结尾会提醒。
-
-**方式二：手工四步**
-
-```bash
-# 1) 本机打 release 包（约 1 MB）
-hvigorw assembleHap --mode module -p product=default -p buildMode=release
-
-# 2) 上传（文件名带版本号）
-scp entry/build/default/outputs/default/entry-default-signed.hap \
-    ubuntu@192.144.143.141:/home/ubuntu/homework-app/src/releases/homework-assistant-0.1.0.hap
-
-# 3) 校验抓下来的哈希和本地一致
-curl -s -o dl.hap http://192.144.143.141/homework-assistant-0.1.0.hap && sha256sum dl.hap
-```
-
-> Git Bash 里 `curl` 是 Windows 原生程序，`-o /tmp/xxx` 会报 `client returned ERROR on write`，
-> 输出路径要用盘符路径（脚本里用 `cygpath -w` 转过）。
-
-⚠️ 注意 `buildMode`：`release` 出 **976 KB**，`debug` 出 **2.3 MB**，两者用的是同一个调试证书，
-都能装，但对外分发用 `release`。
-
-### 10.5 手机端安装流程
-
-> ⚠️ **重要（2026-09-19 实测踩坑）**：HarmonyOS（尤其 NEXT / 6.x）**没有给 `.hap` 关联安装程序**。
-> 在手机上点开下载好的 `.hap`，系统不会有任何安装动作，通常提示「暂无可用打开方式」或毫无反应。
-> **这不是包坏了，是系统设计**——和安卓「点 APK 就装」完全不同，App 的系统设置里也没有
-> 「允许外部来源安装」这类开关。所以下载页的链接实际是**给电脑用的**。
-
-真机安装只有三条路：
-
-| 途径 | 是否需要电脑/数据线 | 对普通家人可用 | 前置条件 |
-| --- | --- | --- | --- |
-| `hdc install` | 需要（USB 或同一 Wi-Fi 无线调试） | 否 | 开发者模式 + USB 调试 |
-| DevEco Studio Run | 需要 | 否 | 开发者模式 |
-| **AGC 邀请测试 / 应用市场** | 不需要 | ✅ 点链接直接装 | 发布证书 + 实名开发者账号 |
 
 **way ①：命令行安装（现在就能用）**
 
@@ -529,21 +456,8 @@ curl -s -o dl.hap http://192.144.143.141/homework-assistant-0.1.0.hap && sha256s
 # 无线方式：同页打开「无线调试」，记下 IP:端口
 
 ./scripts/install_hap_to_device.sh                        # 用本地构建产物（USB）
-./scripts/install_hap_to_device.sh -d                     # 用服务器上的最新包
 ./scripts/install_hap_to_device.sh -w 192.168.1.23:5555   # 无线调试
 ```
-
-等价的裸命令：
-
-```bash
-hdc list targets              # 确认设备在线
-hdc tconn <手机IP:端口>        # 无线时才需要
-hdc install -r homework-assistant-0.1.0.hap
-# -> install bundle successfully
-```
-
-⚠️ `hdc install` **只认调试签名的包**，Release 签名的包必须走应用市场。本项目用的是调试证书，
-所以 `hdc install` 可用（`buildMode` 是 release 只是编译优化，不影响签名类型）。
 
 **way ②：让家人"点链接就能装" → AGC 邀请测试（AppTest）**
 
@@ -560,14 +474,5 @@ hdc install -r homework-assistant-0.1.0.hap
 其它机器会报「签名校验失败 / signature verification failed」。要换设备：
 
 1. 目标设备开启「开发者选项 → USB 调试」，用数据线连电脑；
-2. DevEco Studio 里重新走一次自动签名（会把该设备的 UDID 加进白名单，上限 100 台）；
-3. 重新打包上传。
-
-**证书有效期到 2026-10-03**，过期后需重新签名再发包。
-
-查白名单/有效期（不需要设备在手）：
-
-```bash
-openssl smime -inform DER -in ~/.ohos/config/<项目名>.p7b -verify -noverify -out payload.json
-# payload.json 里的 debug-info.device-ids 与 validity.not-after
-```
+2. DevEco Studio 里重新走一次自动签名（会把该设备 UDID 加进白名单，上限 100 台）；
+3. 重新打包。
