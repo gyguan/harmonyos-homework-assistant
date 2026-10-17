@@ -88,6 +88,9 @@ require("AiProviderProperties" in organizer_model and "OpenAiCompatibleTransport
         "Organizer business must use the generic configurable AI transport")
 require("不得编造" in organizer_model and "不解答作业" in organizer_model and "JSON" in organizer_model,
         "AI organizer prompt must avoid hallucinating/solving homework and support JSON fallback")
+require("title 是孩子看到作业的第一句话" in organizer_model and "动作 + 具体内容 + 要求" in organizer_model
+        and "禁止只写" in organizer_model and "clampTitle" in organizer_model,
+        "AI organizer must ask for content-rich titles and clamp them to the varchar(300) column")
 require("normalizeSubject" in organizer_model and 'normalized.contains("语文")' in organizer_model and
         'normalized.contains("数学")' in organizer_model and 'normalized.contains("英语")' in organizer_model and
         'lower.contains("chinese")' in organizer_model and 'lower.contains("math")' in organizer_model and

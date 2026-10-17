@@ -188,6 +188,32 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
+  void instructionsDemandContentRichTitles() {
+    // 家长反馈：标题只写「语文作业」「完成练习」，孩子看标题不知道要做什么。
+    // 提示词必须把「动作 + 具体内容 + 要求」写进 title，并给出正例与禁止项。
+    String instructions = ConfigurableHomeworkOrganizerModelClient.instructions();
+
+    assertTrue(instructions.contains("title 是孩子看到作业的第一句话"));
+    assertTrue(instructions.contains("动作 + 具体内容 + 要求"));
+    assertTrue(instructions.contains("篇名、单元、页码、题号"));
+    assertTrue(instructions.contains("禁止只写"));
+    assertTrue(instructions.contains("60 个汉字"));
+  }
+
+  @Test
+  void conversionClampsOverlongTitleToDatabaseLimit() {
+    // assignment.title 是 varchar(300)，超长会直接报库错误；写长标题的提示词更容易撞上。
+    String tooLong = "背诵".repeat(400);
+    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "语文", tooLong, "背诵课文", "部编版", "2026-10-17", 20, "背诵", 0.9))));
+
+    assertEquals(1, result.candidates().size());
+    assertEquals(300, result.candidates().getFirst().title().length());
+  }
+
+  @Test
   void textOrganizerKeepsEveryAssignmentWhenModelOmitsFields() {
     // 2026-10-14 线上回归：AI_STRUCTURED_OUTPUT=false 时不发 response_format，
     // glm-4-flash 只输出 subject/title/instruction/taskDate/expectedMinutes/sourceExcerpt，
@@ -279,7 +305,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertFalse(schema.contains("duplicateConfidence"));
     assertFalse(schema.contains("duplicateReason"));
     assertFalse(ConfigurableHomeworkOrganizerModelClient.imageSchema().toString().contains("recognizedText"));
-    assertTrue(schema.contains("maxLength=80"));
+    assertTrue(schema.contains("maxLength=120"));
     assertTrue(schema.contains("maxLength=400"));
   }
 
@@ -299,7 +325,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
 
     assertEquals(1, result.size());
     verify(transport).complete(
-        anyString(), anyString(), anyString(), eq(1400), eq("homework_organization"), anyMap());
+        anyString(), anyString(), anyString(), eq(1800), eq("homework_organization"), anyMap());
   }
 
   @Test
