@@ -236,20 +236,157 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
+  void teacherFormatSectionHandlesThreePartNotification() {
+    // 官桐羽老师（语文）的通知固定分三段：学习进度 / 常规作业 / 今日作业。
+    // 不写进提示词的话，模型会把「学习进度」当成一项作业、把常规作业的两项并成一条。
+    String section = ConfigurableHomeworkOrganizerModelClient.teacherFormatSection();
+
+    assertTrue(section.contains("学习进度"));
+    assertTrue(section.contains("常规作业"));
+    assertTrue(section.contains("今日作业"));
+    assertTrue(section.contains("不要为它生成任务"), "学习进度不是作业，不能生成任务");
+    assertTrue(section.contains("课外阅读 30 分钟"));
+    assertTrue(section.contains("心情日记"));
+    assertTrue(section.contains("必须先归纳"), "长描述要先归纳再定标题");
+  }
+
+  @Test
+  void dropsLearningProgressEntryAndFillsLessonNameIntoTitles() {
+    // 模型把「学习进度」段当成了一条作业；且后面的项只写「课文」不写篇名。
+    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "语文", "今天我们学了《黄山奇石》。", "今天我们学了《黄山奇石》。", "语文书", null, 5,
+                "🔔学习进度：今天我们学了《黄山奇石》。", 0.9),
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "语文", "正确、流利、有感情地朗读课文三遍", "正确、流利、有感情地朗读课文三遍，家长签字",
+                "部编版", null, 15, "2️⃣正确、流利、有感情地朗读课文三遍。", 0.9))),
+        "");
+
+    assertEquals(1, result.candidates().size(), "学习进度不该生成任务");
+    assertTrue(result.candidates().get(0).title().contains("《黄山奇石》"),
+        "课文名要补进标题：" + result.candidates().get(0).title());
+    assertEquals(1, result.sourceCount(), "sourceCount 也不该把非作业条目算进去");
+  }
+
+  @Test
+  void readStructuredToleratesLineCommentsInsideJson() {
+    // 模型偶尔在字段后面加解释性注释（"expectedMinutes": 30, // 大约需要30分钟），
+    // 标准 JSON 不接受，会让整次整理解析失败并静默退回本地规则。
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), null, JsonMapper.builder().build());
+    String output = """
+        {"assignments":[
+          {"subject":"英语","title":"听读课本第4单元课文",  // 单元来自 U4
+           "instruction":"听读课本第4单元课文","textbookRef":"沪教版","taskDate":"今天",
+           "expectedMinutes":10,"sourceExcerpt":"英语：1、听读课文U4/绘本，10分钟",
+           "confidence":0.9}
+        ]}
+        """;
+
+    var parsed = client.readStructured(output);
+
+    assertEquals(1, parsed.assignments().size());
+    assertEquals("英语", parsed.assignments().getFirst().subject());
+    assertEquals("听读课本第4单元课文", parsed.assignments().getFirst().title());
+  }
+
+  @Test
+  void englishTeacherFormatSectionHandlesEnglishNotification() {
+    // 官桐羽 / 官士棋（同一位英语老师）的作业：条目少、简写重，
+    // 一个序号里用「/」并列多个听读对象——写两点实际是三个任务；
+    // 且绘本那一项由定时语音任务自动布置，整理结果里不能再出现。
+    String section = ConfigurableHomeworkOrganizerModelClient.englishTeacherFormatSection();
+
+    assertTrue(section.contains("U＋数字"), "要说明 U 是 Unit 的缩写");
+    assertTrue(section.contains("不要输出这一条任务"), "绘本由定时语音任务生成，不能重复产出");
+    assertTrue(section.contains("序号点数不等于作业任务数"), "老师写两点可能是三个任务");
+    assertTrue(section.contains("一起作业"));
+  }
+
+  @Test
+  void blackboardFormatSectionHandlesNoticeBoardTable() {
+    // 官士棋老师把作业写在黑板《作业公示栏》里：学科是行、内容在手写格子里、时长在独立列。
+    // 不写进提示词时，模型会把表头当作业、把「其他」行的课外阅读归到阅读/其他。
+    String section = ConfigurableHomeworkOrganizerModelClient.blackboardFormatSection();
+
+    assertTrue(section.contains("作业公示栏"));
+    assertTrue(section.contains("预计时长"), "要说明时长列不是作业");
+    assertTrue(section.contains("不是作业"), "表头与版式信息不能生成任务");
+    assertTrue(section.contains("「其他」行不是新科目"));
+    assertTrue(section.contains("跨行"), "日记跨行续写要合并，不能丢");
+    assertTrue(section.contains("一起作业"), "一起作业不能跟着绘本被删掉");
+    assertTrue(section.contains("不要拆成四条"), "按序号粒度，避免同一行时长被重复计算");
+  }
+
+  @Test
+  void refineDumpSubjectSendsChineseRegularHomeworkBackToChinese() {
+    // 模型把「其他」当垃圾桶：课外阅读、日记其实是语文常规作业。
+    assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.refineDumpSubject(
+        "其他", "课外阅读30分钟", "阅读课外书30分钟"));
+    assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.refineDumpSubject(
+        "实践", "日记一件事，120字以上", "写详细"));
+    assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.refineDumpSubject(
+        "阅读", "课外阅读30分钟", "课外书"));
+    // 家长自建的普通阅读任务、真的实践任务不能被吞掉。
+    assertEquals("阅读", ConfigurableHomeworkOrganizerModelClient.refineDumpSubject(
+        "阅读", "阅读《西游记》20分钟", "亲子阅读"));
+    assertEquals("其他", ConfigurableHomeworkOrganizerModelClient.refineDumpSubject(
+        "其他", "整理书包", "按课表整理"));
+    assertEquals("其他", ConfigurableHomeworkOrganizerModelClient.refineDumpSubject(
+        "其他", "复习数学错题", "复习数学错题"));
+  }
+
+  @Test
+  void dropsEnglishPictureBookTaskAlreadyGeneratedByVoiceScheduler() {
+    // 「听读课文U4/绘本」里的绘本由定时语音任务自动布置（标题「绘本-文件夹目录」），
+    // AI 整理如果再产出一条，孩子就会看到两条重复作业。
+    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "英语", "听读课文U4/绘本，10分钟", "听读课本第4单元课文并阅读绘本，每项各10分钟",
+                "沪教版", null, 10, "英语：1、听读课文U4/绘本，10分钟", 0.9),
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "英语", "一起作业", "在「一起作业」APP 上完成布置的作业",
+                "沪教版", null, 15, "2、一起作业。", 0.9))),
+        "");
+
+    assertEquals(2, result.candidates().size(), "绘本那条被剔除，其余两条保留");
+    assertTrue(result.candidates().get(0).title().contains("第4单元"),
+        "第一条应是听读课文第4单元：" + result.candidates().get(0).title());
+    assertTrue(result.candidates().get(1).title().contains("一起作业"), "第二条应是平台作业");
+    assertEquals(2, result.sourceCount(), "剔除绘本不该让图片链路误判成少作业");
+  }
+
+  @Test
+  void dropsTaskWhoseOnlyShorthandIsPictureBook() {
+    // 整条就只是「绘本」：定时语音任务已经布置过，整理结果里一条都不该出现。
+    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "英语", "绘本", "阅读绘本10分钟", "沪教版", null, 10, "绘本", 0.9))),
+        "");
+
+    assertTrue(result.candidates().isEmpty(), "绘本由定时语音任务生成，整理结果里不该再出现");
+    assertEquals(0, result.sourceCount(), "sourceCount 也不该把它算成应有的一条");
+  }
+
+  @Test
   void splitsOneTaskCoveringTwoDifferentShorthands() {
     // 黑板英语格写成「一起作业. 绘本」，模型常理解成"在平台上读绘本"并成一条，
     // 而这是两项作业。简写是老师固定用法，这里确定性拆开。
     var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
-                "英语", "一起作业平台作业及阅读绘本",
-                "在「一起作业」APP 上完成布置的作业，并阅读绘本", "英语课本", null, 30,
-                "一起作业. 绘本", 0.9))),
+                "英语", "一起作业平台作业及听读课文U4",
+                "在「一起作业」APP 上完成布置的作业，并听读课文U4", "英语课本", null, 30,
+                "一起作业. 听读U4", 0.9))),
         "");
 
     assertEquals(2, result.candidates().size());
     assertTrue(result.candidates().get(0).title().contains("一起作业"), "第一条应是平台作业");
-    assertTrue(result.candidates().get(1).title().contains("绘本"), "第二条应是阅读绘本");
+    assertTrue(result.candidates().get(1).title().contains("第4单元"),
+        "第二条应是听读课文第4单元：" + result.candidates().get(1).title());
   }
 
   @Test

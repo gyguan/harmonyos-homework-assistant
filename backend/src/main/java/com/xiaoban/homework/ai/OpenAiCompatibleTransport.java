@@ -274,6 +274,9 @@ public class OpenAiCompatibleTransport {
         Map.of("role", "system", "content", instructions),
         Map.of("role", "user", "content", chatInput(input, imageDataUrl))));
     body.put("max_tokens", maxTokens);
+    // 整理类请求（带 schema）要的是稳定抽取：厂商默认温度（智谱 0.8）会让同一张作业图
+    // 每次整理出的条数在 7~10 之间跳，同一个序号时而拆开时而合并。压到 0.2 后基本一致。
+    if (schema != null) body.put("temperature", 0.2);
     if (schema != null && properties.isStructuredOutput()) {
       Map<String, Object> responseFormat =
           chatStructuredResponseFormat(outputMode, schemaName, schema);
