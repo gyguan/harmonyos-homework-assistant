@@ -28,7 +28,9 @@ export class HomeworkImageEncoder {
       if (width <= 0 || height <= 0 || width * height > 40000000) {
         throw new Error('图片尺寸过大，请换一张截图重试');
       }
-      let ratio = Math.min(1, 2048 / Math.max(width, height));
+      // 长边收到 1536：视觉模型的等待时间几乎全花在图片预填充上（同一张黑板图实测
+      // 首 token 2048px≈22.6s、1536px≈5.3s），而作业照片在 1536px 下字迹依然清楚。
+      let ratio = Math.min(1, 1536 / Math.max(width, height));
       let options: image.DecodingOptions = {
         desiredSize: {
           width: Math.max(1, Math.round(width * ratio)),

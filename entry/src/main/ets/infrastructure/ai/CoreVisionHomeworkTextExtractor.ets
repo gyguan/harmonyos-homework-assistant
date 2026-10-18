@@ -62,10 +62,18 @@ export class CoreVisionHomeworkTextExtractor implements HomeworkTextExtractor {
       file = await fileIo.open(input.resourceUri, fileIo.OpenMode.READ_ONLY);
       stage = 'decode';
       imageSource = image.createImageSource(file.fd);
+      // 只按识别需要的尺寸解码：相册里的原图动辄三四千万像素，整幅解码成 RGBA_8888
+      // 要几百 MB 内存、且在平板要好几秒，而 OCR 在 2048px 长边下识别率没有差别。
+      let info = await imageSource.getImageInfo();
+      let decodeRatio = Math.min(1, 2048 / Math.max(info.size.width, info.size.height));
       // CoreVision only accepts RGBA_8888. Explicit SDR also normalizes HDR gallery photos.
       let options: image.DecodingOptions = {
         desiredPixelFormat: image.PixelMapFormat.RGBA_8888,
-        desiredDynamicRange: image.DecodingDynamicRange.SDR
+        desiredDynamicRange: image.DecodingDynamicRange.SDR,
+        desiredSize: {
+          width: Math.max(1, Math.round(info.size.width * decodeRatio)),
+          height: Math.max(1, Math.round(info.size.height * decodeRatio))
+        }
       };
       pixelMap = await imageSource.createPixelMap(options);
       stage = 'recognize';
