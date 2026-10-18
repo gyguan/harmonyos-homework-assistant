@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import tools.jackson.databind.json.JsonMapper;
 
 @Component
@@ -47,8 +48,15 @@ public class OpenAiCompatibleTransport {
     this.properties = properties;
     this.capabilityResolver = capabilityResolver;
     this.jsonMapper = jsonMapper;
+    // 不设超时时一次卡死的厂商请求会把业务线程一直挂住（家长侧表现为转圈到天荒地老）。
+    // 连接 10 秒足够判断网络不通；读超时给 120 秒 —— 整理一次作业时模型要生成上千个
+    // token，慢是正常的，但超过两分钟基本就是厂商侧卡住了，宁可报错让家长重试。
+    var requestFactory = new SimpleClientHttpRequestFactory();
+    requestFactory.setConnectTimeout(java.time.Duration.ofSeconds(10));
+    requestFactory.setReadTimeout(java.time.Duration.ofSeconds(120));
     this.client = RestClient.builder()
         .baseUrl(properties.getBaseUrl())
+        .requestFactory(requestFactory)
         .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
         .build();
 
@@ -277,6 +285,13 @@ public class OpenAiCompatibleTransport {
     // 整理类请求（带 schema）要的是稳定抽取：厂商默认温度（智谱 0.8）会让同一张作业图
     // 每次整理出的条数在 7~10 之间跳，同一个序号时而拆开时而合并。压到 0.2 后基本一致。
     if (schema != null) body.put("temperature", 0.2);
+    // 关闭思考：智谱的 flashx 系列默认会先写几百字的思考再出 JSON。实测同一张黑板图
+    // 思考 918 token / 37.5 秒，关掉后 656 token / 8.8 秒，整理出来的条数与科目完全一致
+    // —— 思考过程对"照原文拆条"这种抽取任务没有帮助，只是在烧时间和 token。
+    if (schema != null && properties.isDisableThinking()
+        && capabilities(model).provider() == AiProviderCapabilities.Provider.ZHIPU_GLM) {
+      body.put("thinking", Map.of("type", "disabled"));
+    }
     if (schema != null && properties.isStructuredOutput()) {
       Map<String, Object> responseFormat =
           chatStructuredResponseFormat(outputMode, schemaName, schema);

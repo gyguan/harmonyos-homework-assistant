@@ -80,6 +80,32 @@ class HomeworkImageInputTest {
   }
 
   @Test
+  void shrinksOversizedPhotoBeforeSendingItToTheVisionModel() throws Exception {
+    var oversized = new BufferedImage(3000, 2000, BufferedImage.TYPE_INT_RGB);
+    var original = new ByteArrayOutputStream();
+    ImageIO.write(oversized, "JPEG", original);
+    String base64 = Base64.getEncoder().encodeToString(original.toByteArray());
+
+    String dataUrl = HomeworkImageInput.dataUrl(
+        new HomeworkOrganizerDtos.ImageRequest(base64, "image/jpeg", "截图", null));
+
+    assertTrue(dataUrl.startsWith("data:image/jpeg;base64,"));
+    byte[] payload = Base64.getDecoder().decode(dataUrl.substring(dataUrl.indexOf(',') + 1));
+    assertTrue(payload.length < original.toByteArray().length,
+        "缩图后送给模型的字节数必须变小，否则等于没省到预填充时间");
+    var decoded = javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream(payload));
+    assertEquals(HomeworkImageInput.MAX_SIDE, Math.max(decoded.getWidth(), decoded.getHeight()));
+  }
+
+  @Test
+  void leavesImagesWithinTheSideBudgetAlone() {
+    assertNull(HomeworkImageInput.shrinkToMaxSide(
+        new BufferedImage(HomeworkImageInput.MAX_SIDE, 800, BufferedImage.TYPE_INT_RGB)));
+    assertNotNull(HomeworkImageInput.shrinkToMaxSide(
+        new BufferedImage(HomeworkImageInput.MAX_SIDE + 1, 800, BufferedImage.TYPE_INT_RGB)));
+  }
+
+  @Test
   void checksFamilyBeforeAnyModelCallAndKeepsParsedSubjects() throws Exception {
     var students = mock(StudentRepository.class);
     var model = mock(HomeworkOrganizerModelClient.class);

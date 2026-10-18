@@ -127,7 +127,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
               + "图片是表格时（如黑板上的作业公示栏），同一个学科格子里用序号或分行列出的多条作业必须逐条拆开，"
               + "不要因为同在一个格子、同一科目就合并成一条；格子里的预计时长可以直接用于 expectedMinutes。",
           imageInput(student, sourceLabel, text),
-          imageDataUrl, 3000, "homework_image_organization", imageSchema());
+          imageDataUrl, 1800, "homework_image_organization", imageSchema());
     } catch (ImageAiRequestException error) {
       throw new ApiExceptions.ServiceUnavailable(error.getMessage());
     }
@@ -250,19 +250,31 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     return organizeRaw(student, sourceLabel, text);
   }
 
+  private static long elapsedMs(long started) {
+    return java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started);
+  }
+
   private Optional<List<HomeworkOrganizerDtos.Candidate>> organizeRaw(
       StudentEntity student, String sourceLabel, String text) {
+    long started = System.nanoTime();
     Optional<String> outputText = transport.complete(
         properties.getOrganizerModel(),
         instructionsWithShorthand(),
         buildInput(student, sourceLabel, text),
-        1800,
+        // 关闭思考后每条任务约 90 个输出 token；一次 17 条的超长通知实测用到 1540，
+        // 留到 2000 防止长通知在结尾被截断（截断了等于整次整理失败）。
+        2000,
         "homework_organization",
         structuredSchema());
+    long modelMs = elapsedMs(started);
     if (outputText.isEmpty()) return Optional.empty();
     try {
       StructuredResult structured = readStructured(outputText.get());
       ConversionResult converted = toCandidates(structured, properties.getHomeworkShorthand());
+      log.info(
+          "[AI-PERF] homework_text model={} modelMs={} outputChars={} assignments={}",
+          properties.getOrganizerModel(), modelMs,
+          outputText.get() == null ? 0 : outputText.get().length(), converted.candidates().size());
       log.info(
           "[AI] organizer parsed model={} assignments={} accepted={} unsupportedSubject={} blankTitle={} missingField={} unsupportedValues={}",
           properties.getOrganizerModel(), converted.sourceCount(), converted.candidates().size(),
@@ -503,6 +515,9 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   }
 
   static String instructions() {
+        // 曾经在这里给 instruction / sourceExcerpt 加过字数上限（省 3~4 秒），实测条数会从 10 掉到 8、
+        // 还会漏掉心情日记：模型是靠「写开」来逐条对齐原文的，压字数它就用合并条目来省。
+        // 漏作业比多等 4 秒严重得多，所以这里只描述用途，不给字数上限。
     return "你是深圳小学家庭任务整理助手。只做结构化整理，不解答作业。"
         + "输入既可能是老师作业通知，也可能是家长直接布置的阅读、朗读、体育、实践或兴趣任务。"
         + "把输入拆成可以逐项完成的任务。subject 字段必须严格填写语文、数学、英语、阅读、朗读、体育、实践、兴趣、其他之一。"
@@ -784,8 +799,10 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     // 标题要能体现作业内容，80 不够写「动作+内容+要求」，放宽到 120；
     // 真实上限是数据库 title varchar(300)，toCandidates 里还有一道兜底截断。
     candidateProperties.put("title", Map.of("type", "string", "maxLength", 120));
+    // 字段上限同时是性能开关：模型输出多少 token，家长就要等多少秒（实测约 90 token/秒）。
+    // 一条任务 150 个汉字足够写清「做什么 + 要求」，再长只是把老师原文重抄一遍。
     candidateProperties.put("instruction", Map.of("type", "string", "maxLength", 800));
-    candidateProperties.put("textbookRef", Map.of("type", "string", "maxLength", 120));
+    candidateProperties.put("textbookRef", Map.of("type", "string", "maxLength", 40));
     candidateProperties.put("taskDate", Map.of("type", "string", "maxLength", 20));
     candidateProperties.put("expectedMinutes", Map.of("type", "integer", "minimum", 5, "maximum", 120));
     candidateProperties.put("sourceExcerpt", Map.of("type", "string", "maxLength", 400));
