@@ -95,6 +95,43 @@ class OpenAiCompatibleTransportTest {
   }
 
   @Test
+  void turnsOffModelThinkingForStructuredCallsOnly() throws Exception {
+    // 思考过程对「照原文拆条」这类抽取任务没有帮助，实测同一张作业图 37.5s → 8.8s。
+    assertEquals("disabled", bodyOf("glm-4.6v-flashx", Map.of("type", "object")).path("thinking").path("type").asText());
+    // 对话式调用（tutor）不带 schema，保持厂商默认行为。
+    assertNull(bodyOf("glm-4.6v-flashx", null).get("thinking"));
+    // 非智谱厂商不认识 thinking 字段，不能带。
+    assertNull(bodyOf("gpt-4o-mini", Map.of("type", "object")).get("thinking"));
+  }
+
+  private tools.jackson.databind.JsonNode bodyOf(String model, Map<String, Object> schema) throws Exception {
+    var received = new java.util.concurrent.atomic.AtomicReference<String>();
+    var server = com.sun.net.httpserver.HttpServer.create(new java.net.InetSocketAddress("127.0.0.1", 0), 0);
+    server.createContext("/v1/chat/completions", exchange -> {
+      received.set(new String(exchange.getRequestBody().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8));
+      byte[] bytes = "{\"choices\":[{\"message\":{\"role\":\"assistant\",\"content\":\"{}\"}}]}"
+          .getBytes(java.nio.charset.StandardCharsets.UTF_8);
+      exchange.getResponseHeaders().set("Content-Type", "application/json");
+      exchange.sendResponseHeaders(200, bytes.length);
+      exchange.getResponseBody().write(bytes);
+      exchange.close();
+    });
+    server.start();
+    try {
+      var props = new AiProviderProperties();
+      props.setBaseUrl("http://127.0.0.1:" + server.getAddress().getPort());
+      props.setProtocol("chat-completions");
+      props.setAllowUnauthenticated(true);
+      var transport = new OpenAiCompatibleTransport(
+          props, new AiProviderCapabilityResolver(props), JsonMapper.builder().build());
+      transport.complete(model, "规则", "原文", 800, "homework", schema);
+      return JsonMapper.builder().build().readTree(received.get());
+    } finally {
+      server.stop(0);
+    }
+  }
+
+  @Test
   void extractsChatCompletionText() {
     var response = new OpenAiCompatibleTransport.ChatResponse(List.of(
         new OpenAiCompatibleTransport.ChatChoice(

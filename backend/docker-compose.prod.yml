@@ -60,6 +60,7 @@ services:
       AI_ALLOW_UNAUTHENTICATED: ${AI_ALLOW_UNAUTHENTICATED:-false}
       AI_STRUCTURED_OUTPUT: ${AI_STRUCTURED_OUTPUT:-true}
       AI_LOG_PAYLOADS: ${AI_LOG_PAYLOADS:-false}
+      AI_DISABLE_THINKING: ${AI_DISABLE_THINKING:-true}
       # 老师布置作业的惯用简写（追加在代码内置词条之后，不会覆盖内置）。
       # 格式「科目|简写|含义」，多条用英文分号分隔，简写里的 * 表示后面跟数字。
       # 例：数学|口算|口算题卡;英语|周练|周末练习单

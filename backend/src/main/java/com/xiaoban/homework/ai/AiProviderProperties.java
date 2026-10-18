@@ -24,6 +24,7 @@ public class AiProviderProperties {
   private boolean allowUnauthenticated = false;
   private boolean structuredOutput = true;
   private boolean logPayloads = false;
+  private boolean disableThinking = true;
   /**
    * 老师布置作业的惯用简写，追加在内置词条之后（不会覆盖内置）。
    * 格式：{@code 科目|简写|含义}，多条用 {@code ;} 分隔；简写里的 {@code *} 表示「后面跟数字」。
@@ -90,6 +91,9 @@ public class AiProviderProperties {
   public void setStructuredOutput(boolean structuredOutput) { this.structuredOutput = structuredOutput; }
   public boolean isLogPayloads() { return logPayloads; }
   public void setLogPayloads(boolean logPayloads) { this.logPayloads = logPayloads; }
+  /** 结构化（整理 / 出题）请求关闭模型思考：思考对抽取类任务没有帮助，只会拖慢 3~4 倍。 */
+  public boolean isDisableThinking() { return disableThinking; }
+  public void setDisableThinking(boolean disableThinking) { this.disableThinking = disableThinking; }
   public String getHomeworkShorthand() {
     return homeworkShorthand == null ? "" : homeworkShorthand.trim();
   }

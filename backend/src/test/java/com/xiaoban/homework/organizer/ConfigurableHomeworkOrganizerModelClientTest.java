@@ -43,7 +43,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     var input = org.mockito.ArgumentCaptor.forClass(String.class);
     verify(transport).completeWithImage(
         anyString(), instructions.capture(), input.capture(),
-        eq("data:image/jpeg;base64,PRIVATE"), eq(3000), anyString(), anyMap());
+        eq("data:image/jpeg;base64,PRIVATE"), eq(1800), anyString(), anyMap());
 
     assertTrue(input.getValue().contains("补充文字（可能为空）：\n数学口算20题"));
     assertFalse(instructions.getValue().contains("sameTaskGroup"));
@@ -565,6 +565,8 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertFalse(schema.contains("duplicateReason"));
     assertFalse(ConfigurableHomeworkOrganizerModelClient.imageSchema().toString().contains("recognizedText"));
     assertTrue(schema.contains("maxLength=120"));
+    // 输出长度就是家长等待时间：instruction 300 字、sourceExcerpt 120 字是刻意收紧的预算，
+    // 放宽会让一次整理多花十几秒。
     assertTrue(schema.contains("maxLength=400"));
   }
 
@@ -584,7 +586,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
 
     assertEquals(1, result.size());
     verify(transport).complete(
-        anyString(), anyString(), anyString(), eq(1800), eq("homework_organization"), anyMap());
+        anyString(), anyString(), anyString(), eq(2000), eq("homework_organization"), anyMap());
   }
 
   @Test
