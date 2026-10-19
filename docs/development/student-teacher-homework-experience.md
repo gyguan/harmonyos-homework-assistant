@@ -47,3 +47,64 @@
 - 量化指标建议按学生及老师聚合：发布前改动率、漏项率、学科误判、缩写正确率、结构化解析失败率、平均请求耗时与 Token 数。发布前改动率并不等于模型准确率，不能当成唯一指标。
 
 运行检查：`cd backend && mvn test`；部署时 Flyway 自动执行 V33。没有真实生产 API 与老师原始案例样本时，不能据单元测试宣称准确率已达到某百分比。
+
+## 家长主动反馈（V34，2026-10-19）
+
+家长在 AI 整理出的任一待确认任务中点击 **“反馈 AI 整理问题”**。反馈选项动态加载自数据库表
+`homework_feedback_type`，客户端不内置问题类型列表，不需要修改 ArkTS 就能增加、禁用或调整排序/必填策略。
+
+### 两张表
+
+- `homework_feedback_type`：code / label / description / requires_comment / enabled / display_order。V34 初始化一组常见类型（遗漏、误拆、学科错误、缩写误读、内容不对、日期不对、重复、其他）；这些是**可修改的数据**而非 Java/ArkTS 枚举。
+- `homework_organizer_feedback`：家庭、学生、候选任务、导入批次、可选老师、学科、反馈分类、老师原文片段、AI 初稿标题、当前标题、家长说明、状态、提交时间与客户端幂等请求 ID。建立家庭+学生索引，接口校验家庭归属。
+
+### API
+
+- `GET /api/v1/students/{studentId}/homework/feedback/types`：只返回启用的类型，排序与说明来自表。
+- `POST /api/v1/students/{studentId}/homework/feedback`：保存反馈，幂等请求 ID 防重复提交，必填检查由类型配置驱动。
+- `GET /api/v1/students/{studentId}/homework/feedback`：当前家庭该孩子最近 50 条反馈。
+
+示例（老师可为空，无署名绝不强行归属）：
+
+```json
+{
+  "clientRequestId": "ai-import-1-1760840000000",
+  "candidateId": "ai-import-1",
+  "batchId": "batch-1",
+  "teacherName": "王老师",
+  "subject": "语文",
+  "feedbackTypeCode": "SHORTHAND",
+  "sourceLabel": "老师通知",
+  "sourceExcerpt": "朗读国13",
+  "originalTitle": "朗读国13",
+  "currentTitle": "朗读国13",
+  "details": "国13 是《国学》第13页，朗读该页"
+}
+```
+
+### 数据驱动管理示例
+
+```sql
+-- 修改某项描述、展示顺序、必填属性
+update homework_feedback_type
+set label = '缩写或教材解释错误', description = '请提供缩写的正确含义',
+    requires_comment = true, display_order = 35, updated_at = now()
+where code = 'SHORTHAND';
+
+-- 暂停不需要的反馈分类
+update homework_feedback_type
+set enabled = false, updated_at = now()
+where code = 'DUPLICATE';
+
+-- 新增分类：无需改前端
+insert into homework_feedback_type(code, label, description, requires_comment, enabled, display_order)
+values ('BOOK_EDITION', '教材版本不对', '说明老师所用的教材版本', true, true, 55);
+```
+
+### 学习边界
+
+反馈表是**可追溯的原始反馈证据**，默认 `processing_status=NEW`。它不会自动改写已有任务，也不被直接拼进 AI Prompt。下一阶段在 UI 增加反馈记录/纠错审核与规则转化：明确学生、老师、缩写及可靠更正后，方可转化为 `homework_teacher_experience` 的已确认经验。避免未经验证的个别意见污染全体学生。
+
+本版反馈入口在“编辑 AI 整理任务”页面，按需从服务器加载分类，可填写老师姓名、正确含义与补充说明；不影响家长正常保存或发布。尚无后台可视化类型管理 UI，分类可先通过 SQL 管理；未实现跨多项作业的批次级漏项差异比较。
+
+后端测试：`HomeworkOrganizerFeedbackServiceTest` 覆盖动态分类、必填、状态、幂等与家庭访问限制。
