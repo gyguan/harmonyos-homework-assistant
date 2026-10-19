@@ -84,7 +84,12 @@ class HomeworkFeedbackLearningTest {
     var applied = service.promote(family, "child1", record.id, input);
     assertEquals("FEEDBACK_APPROVED", applied.origin());
     assertEquals(record.id, applied.sourceFeedbackId());
-    assertEquals("child1", applied.id() == null ? "" : record.studentId);
+    var captured = org.mockito.ArgumentCaptor.forClass(HomeworkTeacherExperienceEntity.class);
+    verify(experiences).save(captured.capture());
+    assertEquals("child1", captured.getValue().studentId);
+    assertEquals(family, captured.getValue().familyId);
+    assertEquals("王老师", captured.getValue().teacherName);
+    assertEquals("国*", captured.getValue().cue);
     assertEquals("APPLIED", record.processingStatus);
     assertTrue(applied.active());
     var saved = new HomeworkTeacherExperienceEntity();
