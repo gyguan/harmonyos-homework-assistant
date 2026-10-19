@@ -7,6 +7,7 @@ import { HomeworkImageEncoder } from '../../infrastructure/ai/HomeworkImageEncod
 import { AssignmentTaskDate } from '../../domain/service/AssignmentTaskDate';
 
 interface OrganizePayload {
+  importId: string;
   text: string;
   sourceLabel: string;
   teacherName: string;
@@ -29,6 +30,7 @@ interface OrganizeResponse {
 }
 
 interface ImageOrganizePayload {
+  importId: string;
   imageBase64: string;
   contentType: string;
   sourceLabel: string;
@@ -237,6 +239,7 @@ export class HomeworkOrganizerRemoteApi {
     let encoded = await HomeworkImageEncoder.encode(imageRef);
     let encodeMs = Date.now() - encodeStarted;
     let payload: ImageOrganizePayload = {
+      importId: input.importId,
       imageBase64: encoded.imageBase64,
       contentType: encoded.contentType,
       sourceLabel: input.sourceLabel,
@@ -280,6 +283,7 @@ export class HomeworkOrganizerRemoteApi {
     }
     try {
       let payload: OrganizePayload = {
+        importId: input.importId,
         text: input.text,
         sourceLabel: input.sourceLabel,
         teacherName: input.teacherName === undefined ? '' : input.teacherName
