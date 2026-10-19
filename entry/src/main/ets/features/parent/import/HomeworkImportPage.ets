@@ -28,6 +28,7 @@ export struct HomeworkImportPage {
   @State private inputMode: HomeworkAssignmentInputMode = HomeworkAssignmentInputMode.TEXT;
   @State private boundTeacherName: string = '';
   @State private teacherDraft: string = '';
+  @State private teacherSubjectDraft: Subject = Subject.CHINESE;
   @State private teacherOptions: HomeworkTeacherOption[] = [];
   @State private teacherBusy: boolean = false;
   @State private teacherError: string = '';
@@ -84,7 +85,7 @@ export struct HomeworkImportPage {
     this.teacherBusy = true;
     try {
       let saved = await HomeworkStudentTeacherRemoteApi.instance.register(
-        studentId, name, this.selectedSubject === null ? Subject.OTHER : this.selectedSubject);
+        studentId, name, this.teacherSubjectDraft);
       if (studentId !== this.viewModel.activeStudentId()) return;
       let next = this.teacherOptions.filter((item: HomeworkTeacherOption) =>
         item.id !== saved.id);
@@ -623,6 +624,26 @@ export struct HomeworkImportPage {
         .layoutWeight(1);
       }
       .width('100%');
+      Text('新增老师的学科（仅用于老师资料，不改变作业识别的学科）')
+        .width('100%')
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .fontColor(AppTheme.SUBTEXT);
+      Scroll() {
+        Row({ space: 6 }) {
+          ForEach([Subject.CHINESE, Subject.MATH, Subject.ENGLISH, Subject.OTHER],
+            (subject: Subject) => {
+              ChoiceSelectionChip({
+                label: subject,
+                selected: this.teacherSubjectDraft === subject,
+                compact: true,
+                onSelect: () => this.teacherSubjectDraft = subject
+              });
+            }, (subject: Subject) => subject);
+        }
+      }
+      .width('100%')
+      .scrollable(ScrollDirection.Horizontal)
+      .scrollBar(BarState.Off);
       Row({ space: 8 }) {
         TextInput({ text: this.teacherDraft, placeholder: '新增老师，例如 王老师' })
           .layoutWeight(1)
