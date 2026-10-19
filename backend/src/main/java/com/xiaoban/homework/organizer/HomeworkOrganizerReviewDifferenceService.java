@@ -1,6 +1,9 @@
 package com.xiaoban.homework.organizer;
 
 import com.xiaoban.homework.common.ApiExceptions;
+import com.xiaoban.homework.assignment.AssignmentEntity;
+import com.xiaoban.homework.assignment.AssignmentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -18,10 +21,22 @@ public class HomeworkOrganizerReviewDifferenceService {
   private static final Set<String> TYPES = Set.of("CHANGED", "ADDED", "REMOVED");
   private final HomeworkOrganizerReviewDifferenceRepository repository;
   private final HomeworkStudentTeacherService teachers;
+  private final HomeworkOrganizerAiSnapshotRepository snapshots;
+  private final AssignmentRepository assignments;
+
   public HomeworkOrganizerReviewDifferenceService(
       HomeworkOrganizerReviewDifferenceRepository repository, HomeworkStudentTeacherService teachers) {
+    this(repository, teachers, null, null);
+  }
+
+  @Autowired
+  public HomeworkOrganizerReviewDifferenceService(
+      HomeworkOrganizerReviewDifferenceRepository repository, HomeworkStudentTeacherService teachers,
+      HomeworkOrganizerAiSnapshotRepository snapshots, AssignmentRepository assignments) {
     this.repository = repository;
     this.teachers = teachers;
+    this.snapshots = snapshots;
+    this.assignments = assignments;
   }
   public record Difference(@NotBlank @Size(max = 180) String candidateId,
       @NotBlank String changeType, @NotBlank String fieldName,
@@ -31,6 +46,8 @@ public class HomeworkOrganizerReviewDifferenceService {
       @Size(max = 80) String teacherName,
       @Size(min = 1, max = 150) List<@Valid Difference> differences) {}
   public record Result(int saved, int ignored) {}
+  public record Finalize(@NotBlank @Size(max = 140) String batchId,
+      @Size(min = 1, max = 50) List<@NotBlank @Size(max = 180) String> publishedCandidateIds) {}
   public record History(UUID id, String batchId, String teacherName, String candidateId,
       String changeType, String fieldName, String beforeValue, String afterValue, Instant createdAt) {
     static History from(HomeworkOrganizerReviewDifferenceEntity e) {
@@ -38,6 +55,86 @@ public class HomeworkOrganizerReviewDifferenceService {
           e.fieldName, e.beforeValue, e.afterValue, e.createdAt);
     }
   }
+
+  /**
+   * Server-owned original snapshots are compared with the actual published assignment
+   * records, never with client-submitted before/after values. The frontend only supplies
+   * the candidate IDs acknowledged by its successful atomic publish.
+   */
+  @Transactional
+  public Result finalizePublished(UUID familyId, String studentId, Finalize request) {
+    teachers.requireOwned(familyId, studentId);
+    if (snapshots == null || assignments == null) {
+      throw new ApiExceptions.ServiceUnavailable("作业对比服务不可用");
+    }
+    if (request.publishedCandidateIds() == null || request.publishedCandidateIds().isEmpty()) {
+      throw new ApiExceptions.BadRequest("缺少已发布的作业");
+    }
+    var originals = snapshots.findByFamilyIdAndStudentIdAndBatchIdOrderByCandidateIdAsc(
+        familyId, studentId, request.batchId());
+    if (originals.isEmpty()) {
+      // Legacy imports have no authoritative snapshot. Do not invent any corrections.
+      return new Result(0, 0);
+    }
+    String teacher = originals.getFirst().teacherName;
+    java.util.Map<String, HomeworkOrganizerAiSnapshotEntity> originalById = new java.util.HashMap<>();
+    for (var original : originals) {
+      if (!original.teacherName.equals(teacher)) {
+        throw new ApiExceptions.BadRequest("作业批次老师信息不一致");
+      }
+      originalById.put(original.candidateId, original);
+    }
+    java.util.Map<String, AssignmentEntity> published = new java.util.LinkedHashMap<>();
+    for (String rawId : request.publishedCandidateIds()) {
+      String id = rawId.trim();
+      if (published.containsKey(id)) throw new ApiExceptions.BadRequest("同一任务不能重复发布");
+      if (!originalById.containsKey(id) && !id.startsWith("manual-")) {
+        throw new ApiExceptions.BadRequest("包含不属于 AI 初稿的任务");
+      }
+      var record = assignments.findById("a-published-" + id)
+          .orElseThrow(() -> new ApiExceptions.BadRequest("未找到已发布的作业"));
+      if (!familyId.equals(record.familyId) || !studentId.equals(record.studentId)) {
+        throw new ApiExceptions.NotFound("孩子的作业不存在");
+      }
+      published.put(id, record);
+    }
+    List<Difference> changes = new java.util.ArrayList<>();
+    for (var old : originals) {
+      var result = published.get(old.candidateId);
+      if (result == null) {
+        changes.add(new Difference(old.candidateId, "REMOVED", "task",
+            old.title, "", old.sourceExcerpt));
+        continue;
+      }
+      append(changes, old.candidateId, "title", old.title, result.title, old.sourceExcerpt);
+      append(changes, old.candidateId, "subject", old.subject, result.subject, old.sourceExcerpt);
+      append(changes, old.candidateId, "instruction", old.instruction,
+          result.instruction, old.sourceExcerpt);
+      append(changes, old.candidateId, "textbookRef", old.textbookRef,
+          result.textbookRef, old.sourceExcerpt);
+      append(changes, old.candidateId, "taskDate", old.taskDate,
+          result.taskDate == null ? "" : result.taskDate.toString(), old.sourceExcerpt);
+      append(changes, old.candidateId, "expectedMinutes",
+          String.valueOf(old.expectedMinutes), String.valueOf(result.expectedMinutes),
+          old.sourceExcerpt);
+    }
+    for (var entry : published.entrySet()) {
+      if (!originalById.containsKey(entry.getKey())) {
+        changes.add(new Difference(entry.getKey(), "ADDED", "task",
+            "", safe(entry.getValue().title), safe(entry.getValue().sourceExcerpt)));
+      }
+    }
+    if (changes.isEmpty()) return new Result(0, 0);
+    return save(familyId, studentId, new Review(request.batchId(), teacher, changes));
+  }
+
+  private static void append(List<Difference> changes, String id, String field,
+      String before, String after, String source) {
+    if (!safe(before).equals(safe(after))) {
+      changes.add(new Difference(id, "CHANGED", field, safe(before), safe(after), safe(source)));
+    }
+  }
+  private static String safe(String value) { return value == null ? "" : value.trim(); }
 
   @Transactional
   public Result save(UUID familyId, String studentId, Review request) {
