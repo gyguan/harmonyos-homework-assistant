@@ -247,7 +247,7 @@ export struct ConfirmationCandidateEditor {
         .listExperiences(this.item.studentId);
     } catch {
       this.feedbackHasError = true;
-      this.feedbackMessage = '老师经验列表加载失败';
+      this.feedbackMessage = '作业经验列表加载失败';
     } finally {
       this.loadingExperiences = false;
     }
@@ -260,7 +260,7 @@ export struct ConfirmationCandidateEditor {
       this.savedExperiences = this.savedExperiences.map((old: HomeworkTeacherExperienceSummary) =>
         old.id === updated.id ? updated : old);
       this.feedbackHasError = false;
-      this.feedbackMessage = updated.active ? '已重新启用这条老师经验' : '已停用，后续整理不再引用这条经验';
+      this.feedbackMessage = updated.active ? '已重新启用这条作业经验' : '已停用，后续整理不再引用这条经验';
     } catch {
       this.feedbackHasError = true;
       this.feedbackMessage = '经验状态更新失败，请重试';
@@ -325,7 +325,7 @@ export struct ConfirmationCandidateEditor {
             });
         } catch {
           this.feedbackHasError = true;
-          this.feedbackMessage = '反馈已经保存，但老师经验暂未生效。请核对触发词是否出现在原文中，然后重试';
+          this.feedbackMessage = '反馈已经保存，但作业经验暂未生效。请核对触发词是否出现在原文中，然后重试';
           return;
         }
       }
@@ -621,7 +621,7 @@ export struct ConfirmationCandidateEditor {
         }
       }
 
-      Button(this.showSavedExperiences ? '收起已保存的老师经验' : '查看或停用老师经验',
+      Button(this.showSavedExperiences ? '收起已保存的作业经验' : '查看或停用作业经验',
         { type: ButtonType.Normal })
         .width('100%')
         .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
@@ -632,9 +632,9 @@ export struct ConfirmationCandidateEditor {
 
       if (this.showSavedExperiences) {
         if (this.loadingExperiences) {
-          Text('正在加载老师经验…').fontColor(AppTheme.SUBTEXT);
+          Text('正在加载作业经验…').fontColor(AppTheme.SUBTEXT);
         } else if (this.savedExperiences.length === 0) {
-          Text('当前学生尚未积累老师经验').fontColor(AppTheme.SUBTEXT);
+          Text('当前学生尚未积累作业经验').fontColor(AppTheme.SUBTEXT);
         } else {
           ForEach(this.savedExperiences, (experience: HomeworkTeacherExperienceSummary) => {
             Row({ space: 8 }) {
