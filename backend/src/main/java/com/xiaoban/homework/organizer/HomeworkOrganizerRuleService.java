@@ -35,7 +35,9 @@ public class HomeworkOrganizerRuleService {
   public Snapshot snapshot(StudentEntity student, String sourceLabel, String sourceText) {
     var shorthands = new LinkedHashMap<String, String>();
     var templates = new LinkedHashMap<String, String>();
-    for (var rule : repository.findByEnabledTrueOrderByPriorityDescCodeAsc()) {
+    for (var rule : repository.findApplicable(
+        student == null ? null : student.familyId,
+        student == null ? null : student.id)) {
       if (!applicable(rule, student, sourceLabel, sourceText)) continue;
       if ("SHORTHAND".equals(rule.ruleType)) {
         String term = safe(rule.triggerText);
