@@ -265,4 +265,11 @@ class HomeworkFeedbackAutoLearningServiceTest {
     assertEquals("", loader.context(student, "家长录入文字", "数学：口算20题", false));
   }
 
+  @Test void mixedChineseEnglishAbbreviationGeneralizesButPageReferencesDoNot() {
+    assertEquals("听读U*", HomeworkFeedbackAutoLearningService.autoCue(
+        "SHORTHAND", "英语：听读U4"));
+    assertEquals("第13页", HomeworkFeedbackAutoLearningService.autoCue(
+        "SHORTHAND", "第13页"));
+  }
+
 }
