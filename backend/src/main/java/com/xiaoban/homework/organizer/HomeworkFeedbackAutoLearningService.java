@@ -80,6 +80,7 @@ public class HomeworkFeedbackAutoLearningService {
     if (teacher.isBlank() || "未知".equals(teacher) || "未识别".equals(teacher)) {
       teacher = HomeworkTeacherAttribution.subjectScope(clean(source.subject));
     }
+    final String scopedTeacher = teacher;
     String subject = clean(source.subject);
     if (subject.isBlank()) return "PENDING_EVIDENCE";
     String interpretation = interpretation(record.feedbackTypeCode, details,
@@ -92,7 +93,7 @@ public class HomeworkFeedbackAutoLearningService {
       return "APPLIED";
     }
     boolean collision = existing.stream().anyMatch(item ->
-        item.active && teacher.equals(item.teacherName) && subject.equals(item.subject)
+        item.active && scopedTeacher.equals(item.teacherName) && subject.equals(item.subject)
         && cue.equals(item.cue) && !interpretation.equals(item.interpretation));
     if (collision || existing.size() >= MAX_RECORDS) return "REVIEW_REQUIRED";
 
