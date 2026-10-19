@@ -120,6 +120,16 @@ class JointMetricsTest(unittest.TestCase):
         pred = {'results':[{'caseId':'x','assignments':[{'subject':'语文','title':'完成摘抄（3+2）'}]}]}
         self.assertEqual(0, evaluate(case,pred)['total']['recallProxy'])
 
+    def test_http_failure_without_model_metadata_is_counted_not_mixed_variant(self):
+        fixture = HomeworkEvaluationTest().fixture()
+        fixture['cases'].append(dict(id='blank', reviewStatus='VERIFIED', expected=[]))
+        prediction = HomeworkEvaluationTest().prediction([])
+        prediction['results'].append(dict(caseId='blank',success=False,assignments=[],httpStatus=400))
+        result = evaluate(fixture,prediction)
+        self.assertEqual(.5,result['performance']['failureRate'])
+        self.assertEqual('fixture-model',result['model'])
+        self.assertEqual(0,result['total']['recallProxy'])
+
     def test_gold_edits_invalidate_comparison(self):
         from evaluate_homework_organizer import compare
         with self.assertRaisesRegex(ValueError, 'identical fixture'):

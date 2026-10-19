@@ -122,13 +122,20 @@ def evaluate(fixtures, predictions):
         if isinstance(prediction.get("tokens"), int):
             row["tokens"] = prediction["tokens"]
         rows.append(row)
-        model_names.add(prediction.get("model", "UNSPECIFIED"))
-        prompt_versions.add(prediction.get("promptVersion", "UNSPECIFIED"))
+        model_name = prediction.get("model", "UNSPECIFIED")
+        prompt_version = prediction.get("promptVersion", "UNSPECIFIED")
+        # HTTP input/auth failures may not enter the organizer/model scope. Keep them
+        # in failure/recall denominators without inventing another model variant.
+        unknown = {"UNSPECIFIED", "unavailable", "UNAVAILABLE"}
+        if prediction.get("success", True) or model_name not in unknown:
+            model_names.add(model_name)
+        if prediction.get("success", True) or prompt_version not in unknown:
+            prompt_versions.add(prompt_version)
         for key, value in (("matched", len(used)), ("expected", len(gold)),
                            ("predicted", len(outputs)), ("countExact", int(row["countExact"]))):
             totals[key] += value
             by_teacher[teacher][key] += value
-    if len(model_names) != 1 or len(prompt_versions) != 1:
+    if len(model_names) > 1 or len(prompt_versions) > 1:
         raise ValueError("Mixed model or prompt versions: report each variant separately")
 
     def score(counts):
@@ -144,7 +151,7 @@ def evaluate(fixtures, predictions):
         "status": "SCORED_KEYWORD_PROXY",
         "warning": "Keyword coverage is a deterministic proxy, not verified semantic accuracy.",
         "fixtureCount": len(cases), "verifiedCount": len(verified),
-        "model": next(iter(model_names)), "promptVersion": next(iter(prompt_versions)),
+        "model": next(iter(model_names), "UNAVAILABLE"), "promptVersion": next(iter(prompt_versions), "UNAVAILABLE"),
         "fixtureHash": fixture_hash, "performance": performance, "buckets": buckets,
         "total": dict(score(totals),
                       keyFieldAccuracy=round(totals["fieldCorrect"] / totals["fieldTotal"], 4) if totals["fieldTotal"] else None,
