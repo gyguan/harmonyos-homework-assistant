@@ -38,7 +38,15 @@ def main() -> int:
         restored = sql(container, f"""select enabled::text || ':' || version
             from homework_organizer_rule where code='{code}'""")
         require(restored == "true:3", "re-enabling global rule must persist safely")
-        print("HOMEWORK_ORGANIZER_RULES_E2E_PASS 10 shorthand 3 prompts dynamic toggling")
+        history = sql(container, f"""select old_version::text || '->' || new_version
+            from homework_organizer_rule_revision where rule_code='{code}'
+            order by id""").splitlines()
+        require(history == ["1->2", "2->3"],
+                f"rule changes must have append-only audited versions: {history}")
+        invalid = sql(container, f"""select count(*) from homework_organizer_rule
+            where rule_type='PROMPT' and (template_key='' or prompt_text='')""")
+        require(invalid == "0", "prompt templates must have explicit keys and bodies")
+        print("HOMEWORK_ORGANIZER_RULES_E2E_PASS 10 shorthand 3 prompts audited toggling")
         return 0
     except (SmokeFailure, OSError, ValueError) as exc:
         print("HOMEWORK_ORGANIZER_RULES_E2E_FAIL:", exc, file=sys.stderr)
