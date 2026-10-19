@@ -29,6 +29,13 @@ public class HomeworkTeacherExperienceController {
     return service.list(familyId, studentId);
   }
 
+  @GetMapping("/{id}")
+  public HomeworkTeacherExperienceDtos.DetailResponse detail(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String studentId, @PathVariable UUID id) {
+    return service.detail(familyId, studentId, id);
+  }
+
   @PostMapping
   public HomeworkTeacherExperienceDtos.Response upsert(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId, @PathVariable String studentId,
