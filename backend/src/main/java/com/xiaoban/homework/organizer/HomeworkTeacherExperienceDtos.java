@@ -41,11 +41,11 @@ public final class HomeworkTeacherExperienceDtos {
 
   public record Response(UUID id, String teacherName, String subject, String cue,
       String interpretation, String exampleSource, String exampleResult, String origin,
-      Instant updatedAt, boolean active, UUID sourceFeedbackId) {
+      Instant createdAt, Instant updatedAt, boolean active, UUID sourceFeedbackId) {
     static Response from(HomeworkTeacherExperienceEntity entity) {
       return new Response(entity.id, entity.teacherName, entity.subject,
           entity.cue, entity.interpretation, entity.exampleSource, entity.exampleResult,
-          entity.origin, entity.updatedAt, entity.active, entity.sourceFeedbackId);
+          entity.origin, entity.createdAt, entity.updatedAt, entity.active, entity.sourceFeedbackId);
     }
   }
 }
