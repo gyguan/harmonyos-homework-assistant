@@ -196,7 +196,7 @@ class HomeworkFeedbackAutoLearningServiceTest {
     student.familyId = family;
     var loader = new HomeworkTeacherExperienceService(experiences, students);
     var hint = loader.context(student, "拍照上传", "", true);
-    assertTrue(hint.contains("只有"), hint);
+    assertTrue(hint.contains("图片里必须识别出符合的老师和线索"), hint);
     assertTrue(hint.contains("课外阅读和心情日记"));
   }
 
