@@ -2,6 +2,7 @@ import { SelectionIds } from '../../../common/state/SelectionIds';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { RemoteAssignmentResourceApi } from '../../../application/remote/RemoteAssignmentResourceApi';
 import { HomeworkCoverageRemoteApi } from '../../../application/remote/HomeworkCoverageRemoteApi';
+import { HomeworkOrganizerRemoteApi } from '../../../application/remote/HomeworkOrganizerRemoteApi';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { PendingAssignmentAttachment } from '../../../components/assignment/PendingAssignmentAttachmentPicker';
 import {
@@ -44,6 +45,14 @@ export struct HomeworkConfirmationPage {
   aboutToAppear(): void {
     this.coverageSubjects = this.suggestCoverageSubjects();
     void this.mergeExistingCoverage();
+    let current = this.viewModel.candidates();
+    if (current.length > 0) {
+      let batchId = current[0].sourceEvidence.batchId;
+      if (batchId !== undefined && batchId.length > 0) {
+        void HomeworkOrganizerRemoteApi.instance.restoreOriginals(
+          current[0].studentId, batchId).catch(() => {});
+      }
+    }
   }
 
 
