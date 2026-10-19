@@ -600,4 +600,25 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertEquals(tomorrow,
         ConfigurableHomeworkOrganizerModelClient.candidateTaskDate(tomorrow.toString()));
   }
+  @Test
+  void sendsOnlyStudentTeacherScopedExperienceToTextModel() {
+    var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
+    var experiences = mock(HomeworkTeacherExperienceService.class);
+    var student = new TestStudent();
+    student.id = "student-a";
+    student.familyId = java.util.UUID.randomUUID();
+    when(experiences.context(eq(student), eq("王老师：通知"), eq("朗读国13"), eq(false)))
+        .thenReturn("\\n老师「王老师」：国13 指《国学》第13页。");
+    when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
+        .thenReturn(java.util.Optional.of("{\\"assignments\\":[]}"));
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), transport, JsonMapper.builder().build(), experiences);
+
+    client.organize(student, "王老师：通知", "朗读国13");
+
+    var instructions = org.mockito.ArgumentCaptor.forClass(String.class);
+    verify(transport).complete(anyString(), instructions.capture(), anyString(), anyInt(), anyString(), anyMap());
+    assertTrue(instructions.getValue().contains("国13 指《国学》第13页"));
+  }
+
 }
