@@ -64,15 +64,15 @@ class HomeworkOrganizerFinalizationTest {
             original(family, student, batch, "ai-text-100-2", "多生成了作业")));
     when(assignments.findById("a-published-ai-text-100-1")).thenReturn(Optional.of(
         published(family, student, "ai-text-100-1", "朗读国学13页")));
-    when(assignments.findById("a-published-manual-9")).thenReturn(Optional.of(
-        published(family, student, "manual-9", "补充听写")));
+    when(assignments.findById("a-published-manual-text-100-9")).thenReturn(Optional.of(
+        published(family, student, "manual-text-100-9", "补充听写")));
     when(differences.save(any(HomeworkOrganizerReviewDifferenceEntity.class)))
         .thenAnswer(i -> i.getArgument(0));
     var service = new HomeworkOrganizerReviewDifferenceService(
         differences, teachers, snapshots, assignments);
     var result = service.finalizePublished(family, student,
         new HomeworkOrganizerReviewDifferenceService.Finalize(batch,
-            List.of("ai-text-100-1", "manual-9")));
+            List.of("ai-text-100-1", "manual-text-100-9")));
     assertEquals(3, result.saved());
     var captor = ArgumentCaptor.forClass(HomeworkOrganizerReviewDifferenceEntity.class);
     verify(differences, times(3)).save(captor.capture());
@@ -81,7 +81,7 @@ class HomeworkOrganizerFinalizationTest {
     assertTrue(captor.getAllValues().stream().anyMatch(x ->
         x.changeType.equals("REMOVED") && x.candidateId.equals("ai-text-100-2")));
     assertTrue(captor.getAllValues().stream().anyMatch(x ->
-        x.changeType.equals("ADDED") && x.candidateId.equals("manual-9")));
+        x.changeType.equals("ADDED") && x.candidateId.equals("manual-text-100-9")));
   }
 
   @Test
