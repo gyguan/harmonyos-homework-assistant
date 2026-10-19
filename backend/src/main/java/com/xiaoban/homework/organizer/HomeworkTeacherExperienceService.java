@@ -166,7 +166,7 @@ public class HomeworkTeacherExperienceService {
         // Explicit teacher attribution must never be replaced by a generic subject rule.
         // For mixed-subject notices the cue's teacher is not provable before AI parsing.
         if (!cueFound || !boundTeacher.isBlank()
-            || !HomeworkTeacherAttribution.explicitSourceTeacher(source).isBlank()
+            || HomeworkTeacherAttribution.hasNamedTeachers(source)
             || !HomeworkTeacherAttribution.matchesUnambiguousSubject(source, entry.subject)) continue;
       } else {
         boolean teacherFound = boundTeacher.isBlank()
