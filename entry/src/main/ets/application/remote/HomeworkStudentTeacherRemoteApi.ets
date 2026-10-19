@@ -8,6 +8,11 @@ export interface HomeworkTeacherOption {
   enabled: boolean;
 }
 
+interface HomeworkTeacherRegistrationRequest {
+  teacherName: string;
+  subject: string;
+}
+
 export class HomeworkStudentTeacherRemoteApi {
   static readonly instance: HomeworkStudentTeacherRemoteApi = new HomeworkStudentTeacherRemoteApi();
   private constructor() {}
@@ -24,10 +29,14 @@ export class HomeworkStudentTeacherRemoteApi {
   }
 
   async register(studentId: string, teacherName: string, subject: string): Promise<HomeworkTeacherOption> {
+    let payload: HomeworkTeacherRegistrationRequest = {
+      teacherName: teacherName,
+      subject: subject
+    };
     let result = await BackendHttpClient.instance.requestFor(
       'homework.teachers.save',
       `/api/v1/students/${encodeURIComponent(studentId)}/homework/teachers`,
-      http.RequestMethod.POST, { teacherName: teacherName, subject: subject });
+      http.RequestMethod.POST, payload);
     if (result.statusCode < 200 || result.statusCode >= 300) {
       throw new Error('保存老师失败，请检查姓名或网络');
     }
