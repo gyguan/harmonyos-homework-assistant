@@ -69,8 +69,6 @@ class HomeworkEvaluationTest(unittest.TestCase):
             evaluate(fixture, self.prediction([]))
 
 
-if __name__ == "__main__":
-    unittest.main()
 
 class JointMetricsTest(unittest.TestCase):
     def test_latency_tokens_failures_and_missing_usage(self):
@@ -116,3 +114,26 @@ class JointMetricsTest(unittest.TestCase):
         with patch.dict('os.environ', {'ORGANIZER_EVAL_TOKEN': 'not-real'}):
             with self.assertRaisesRegex(ValueError, 'actual imagePath'):
                 replay({'cases': [{'id': 'img', 'sourceType': 'IMAGE'}]}, 'http://localhost', 's', Path('.'))
+
+class PerformanceGateTest(unittest.TestCase):
+    def test_speed_cannot_hide_field_regression_or_missing_usage(self):
+        from evaluate_homework_organizer import performance_gate, compare
+        baseline = dict(fixtureHash='same', status='SCORED_KEYWORD_PROXY',
+                        total={'recallProxy': 1, 'precisionProxy': 1, 'keyFieldAccuracy': 1},
+                        performance=dict(p50Ms=100, p95Ms=200, failureRate=0, averageTokensIn=100, averageTokensOut=50, usageUnavailableRequests=0))
+        candidate = dict(fixtureHash='same', status='SCORED_KEYWORD_PROXY',
+                         total={'recallProxy': .5, 'precisionProxy': 1, 'keyFieldAccuracy': .5},
+                         performance=dict(p50Ms=50, p95Ms=100, failureRate=0, averageTokensIn=80, averageTokensOut=40, usageUnavailableRequests=0))
+        self.assertEqual('PASS', performance_gate(baseline, candidate))
+        self.assertTrue(compare(baseline, candidate)['regressed'])
+        candidate['performance']['usageUnavailableRequests'] = 1
+        self.assertEqual('UNAVAILABLE', performance_gate(baseline, candidate))
+
+    def test_latency_or_cost_regression_is_not_pass(self):
+        from evaluate_homework_organizer import performance_gate
+        baseline = {'performance': dict(p50Ms=10, p95Ms=100, failureRate=0, averageTokensIn=100, averageTokensOut=50)}
+        candidate = {'performance': dict(p50Ms=10, p95Ms=101, failureRate=0, averageTokensIn=90, averageTokensOut=40)}
+        self.assertEqual('REGRESSED', performance_gate(baseline, candidate))
+
+if __name__ == "__main__":
+    unittest.main()

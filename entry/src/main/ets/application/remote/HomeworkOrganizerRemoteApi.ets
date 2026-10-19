@@ -13,7 +13,26 @@ interface OrganizePayload {
   teacherName: string;
 }
 
+interface OrganizerSourceBlock {
+  id: string;
+  text: string;
+}
+
+interface OrganizerSourceDocument {
+  schemaVersion: number;
+  inputKind: string;
+  originalText: string;
+  blocks: OrganizerSourceBlock[];
+}
+
+interface OrganizerQualityFlag {
+  code: string;
+  sourceBlockIds: string[];
+  assignmentIndexes: number[];
+}
+
 interface RemoteCandidate {
+  sourceBlockIds?: string[];
   subject: string;
   title: string;
   instruction: string;
@@ -25,6 +44,9 @@ interface RemoteCandidate {
 }
 
 interface OrganizeResponse {
+  sourceDocument?: OrganizerSourceDocument;
+  qualityFlags?: OrganizerQualityFlag[];
+  needsReview?: boolean;
   assignments: RemoteCandidate[];
   mode: string;
 }
@@ -39,6 +61,9 @@ interface ImageOrganizePayload {
 }
 
 interface ImageOrganizeResponse {
+  sourceDocument?: OrganizerSourceDocument;
+  qualityFlags?: OrganizerQualityFlag[];
+  needsReview?: boolean;
   assignments: RemoteCandidate[];
   mode: string;
   recognizedText: string;
@@ -245,10 +270,10 @@ export class HomeworkOrganizerRemoteApi {
     let parsed = JSON.parse(response.body) as ImageOrganizeResponse;
     if (parsed.mode !== 'AI_IMAGE' || typeof parsed.recognizedText !== 'string' ||
       !Array.isArray(parsed.assignments) ||
-      (parsed.assignments.length > 0 && parsed.recognizedText.trim().length === 0)) {
+      (parsed.assignments.length > 0 && parsed.recognizedText.trim().length === 0 && parsed.needsReview !== true)) {
       throw new Error('AI图片解析结果不完整，请换一张清晰图片后重试');
     }
-    let candidates = this.toCandidates(input, parsed.assignments, parsed.recognizedText.trim());
+    let candidates = this.toCandidates(input, parsed.assignments, parsed.recognizedText.trim(), parsed.qualityFlags, parsed.sourceDocument, parsed.needsReview);
     if (candidates.length !== parsed.assignments.length) {
       throw new Error('AI返回的作业科目或标题无效，请重试');
     }
@@ -276,14 +301,14 @@ export class HomeworkOrganizerRemoteApi {
         return null;
       }
       let parsed = JSON.parse(response.body) as OrganizeResponse;
-      return this.toCandidates(input, parsed.assignments);
+      return this.toCandidates(input, parsed.assignments, undefined, parsed.qualityFlags, parsed.sourceDocument, parsed.needsReview);
     } catch {
       return null;
     }
   }
 
   private toCandidates(input: ExtractedHomeworkText, assignments: RemoteCandidate[],
-    rawTextOverride?: string): CandidateAssignment[] {
+    rawTextOverride?: string, flags?: OrganizerQualityFlag[], document?: OrganizerSourceDocument, needsReview?: boolean): CandidateAssignment[] {
     let result: CandidateAssignment[] = [];
     for (let i = 0; i < assignments.length; i++) {
       let remote = assignments[i];
@@ -324,6 +349,8 @@ export class HomeworkOrganizerRemoteApi {
         taskDate: AssignmentTaskDate.resolve(this.value(remote.taskDate, AssignmentTaskDate.today())),
         expectedMinutes: this.expectedMinutes(remote.expectedMinutes),
         sourceEvidence: {
+          reviewNotice: this.reviewNotice(flags, document, i, needsReview),
+          sourceBlockIds: remote.sourceBlockIds === undefined ? undefined : remote.sourceBlockIds.slice(),
           sourceLabel: input.sourceLabel,
           excerpt: this.value(remote.sourceExcerpt, remote.title),
           teacherName: input.teacherName === undefined ? '' : input.teacherName,
@@ -333,6 +360,36 @@ export class HomeworkOrganizerRemoteApi {
       });
     }
     return result;
+  }
+
+  private reviewNotice(flags: OrganizerQualityFlag[] | undefined, document: OrganizerSourceDocument | undefined,
+    index: number, needsReview: boolean | undefined): string {
+    if (needsReview !== true) return '';
+    let notices: string[] = [];
+    if (flags !== undefined) {
+      for (let flag of flags) {
+        if (flag.assignmentIndexes.length > 0 && flag.assignmentIndexes.indexOf(index) < 0) continue;
+        let reason: string = '内容仍有不确定之处，请核对原文';
+        if (flag.code === 'POSSIBLE_OMISSION') reason = '可能遗漏作业';
+        if (flag.code === 'UNSUPPORTED_NUMBER' || flag.code === 'UNSUPPORTED_DATE') reason = '数量、页码或日期需要核对';
+        if (flag.code === 'UNREADABLE_SOURCE') reason = '有看不清的原文';
+        if (flag.code === 'TASK_WITHOUT_EVIDENCE' || flag.code === 'UNKNOWN_SOURCE_REFERENCE') reason = '这项作业缺少可核对的原文';
+        if (flag.code.indexOf('REVIEW_') === 0) reason = 'AI复核未能确认，请核对后发布';
+        let excerpt: string = '';
+        if (document !== undefined) {
+          for (let block of document.blocks) {
+            if (flag.sourceBlockIds.indexOf(block.id) >= 0 && block.text.length > 0) {
+              excerpt = block.text.substring(0, 80);
+              break;
+            }
+          }
+        }
+        let notice: string = excerpt.length > 0 ? `${reason}：${excerpt}` : reason;
+        if (notices.indexOf(notice) < 0) notices.push(notice);
+        if (notices.length >= 3) break;
+      }
+    }
+    return notices.length > 0 ? notices.join('；') : '请核对老师原文后再发布';
   }
 
   private subject(value: string): Subject | null {

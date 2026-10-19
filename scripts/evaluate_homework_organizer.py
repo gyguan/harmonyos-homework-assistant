@@ -38,7 +38,7 @@ def evaluate(fixtures, predictions):
         raise ValueError("Duplicate prediction case IDs")
     fixture_hash = hashlib.sha256(json.dumps(fixtures, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
     performance = summarize(results)
-    buckets = {kind: summarize([r for r in results if r.get("inputType") == kind])
+    buckets = {kind: summarize([r for r in results if r.get("inputType", "UNSPECIFIED") == kind])
                for kind in sorted({r.get("inputType", "UNSPECIFIED") for r in results})}
     cases = fixtures.get("cases", [])
     if len({case["id"] for case in cases}) != len(cases):
@@ -168,6 +168,21 @@ def compare(prior, candidate):
             "comparisonNote": "Confirm identical model, hardware/network, date and teacher/experience setup before attributing latency changes."}
 
 
+def performance_gate(prior, candidate):
+    old, new = prior.get("performance", {}), candidate.get("performance", {})
+    required = ("p50Ms", "p95Ms", "failureRate", "averageTokensIn", "averageTokensOut")
+    if any(old.get(k) is None or new.get(k) is None for k in required):
+        return "UNAVAILABLE"
+    # Partial usage cannot silently pass a cost gate.
+    if old.get("usageUnavailableRequests", 0) or new.get("usageUnavailableRequests", 0):
+        return "UNAVAILABLE"
+    if any(new[k] > old[k] for k in ("p50Ms", "p95Ms", "failureRate")):
+        return "REGRESSED"
+    if new["averageTokensIn"] + new["averageTokensOut"] > old["averageTokensIn"] + old["averageTokensOut"]:
+        return "REGRESSED"
+    return "PASS"
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--fixtures", required=True, type=Path)
@@ -175,10 +190,15 @@ def main():
     parser.add_argument("--report", type=Path)
     parser.add_argument("--baseline", type=Path,
                         help="Optional prior report, scored against the identical verified cases")
+    parser.add_argument("--enforce-performance", action="store_true",
+                        help="Fail if measured P50/P95, failure rate or total average tokens regress; unavailable data cannot pass")
     args = parser.parse_args()
     result = evaluate(read_json(args.fixtures), read_json(args.predictions))
     if args.baseline:
-        result.update(compare(read_json(args.baseline), result))
+        prior = read_json(args.baseline)
+        result.update(compare(prior, result))
+        if args.enforce_performance:
+            result["performanceGate"] = performance_gate(prior, result)
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n",
@@ -186,8 +206,10 @@ def main():
     print(json.dumps(result, ensure_ascii=False, indent=2))
     if result["status"] != "SCORED_KEYWORD_PROXY":
         raise SystemExit(2)
-    if result.get("regressed"):
+    if result.get("regressed") or result.get("performanceGate") == "REGRESSED":
         raise SystemExit(1)
+    if result.get("performanceGate") == "UNAVAILABLE":
+        raise SystemExit(2)
 
 
 if __name__ == "__main__":

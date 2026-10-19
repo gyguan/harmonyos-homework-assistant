@@ -57,6 +57,13 @@ final class HomeworkOrganizerTelemetry implements AutoCloseable {
     var t = CURRENT.get();
     if (t != null) t.stages.merge(name, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start), Long::sum);
   }
+  static void quality(String risk, java.util.List<HomeworkOrganizerDtos.QualityFlag> flags, String reviewOutcome) {
+    var t = CURRENT.get();
+    if (t == null) return;
+    t.data.put("riskLevel", risk);
+    t.data.put("finalQualityFlags", flags.stream().map(HomeworkOrganizerDtos.QualityFlag::code).distinct().toList());
+    t.data.put("reviewOutcome", reviewOutcome);
+  }
   static void experiences(HomeworkOrganizerDtos.ExperienceUsage usage) {
     var t = CURRENT.get();
     if (t == null) return;

@@ -167,6 +167,9 @@ export struct HomeworkConfirmationPage {
       taskDate: item.taskDate,
       expectedMinutes: minutes,
       sourceEvidence: {
+        reviewNotice: item.sourceEvidence.reviewNotice,
+        sourceBlockIds: item.sourceEvidence.sourceBlockIds === undefined ?
+          undefined : item.sourceEvidence.sourceBlockIds.slice(),
         sourceLabel: item.sourceEvidence.sourceLabel,
         excerpt: item.sourceEvidence.excerpt,
         teacherName: item.sourceEvidence.teacherName,
