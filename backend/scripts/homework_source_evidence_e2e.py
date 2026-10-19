@@ -12,7 +12,7 @@ import time
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from batch_publish_e2e import create_student
-from e2e_smoke import expect, http, require, PNG_1X1
+from e2e_smoke import expect, http, require, PNG_1X1, SmokeFailure
 from homework_review_outbox_e2e import pg_container, sql
 
 REPLY = {}
@@ -59,10 +59,11 @@ def start_backend(log):
         try:
             if http('http://localhost:8081', 'GET', '/api/v1/health').status == 200:
                 return proc
-        except OSError:
+        except (OSError, SmokeFailure):
             pass
         time.sleep(1)
     proc.terminate()
+    proc.wait(timeout=30)
     raise RuntimeError('isolated backend startup timed out')
 
 
