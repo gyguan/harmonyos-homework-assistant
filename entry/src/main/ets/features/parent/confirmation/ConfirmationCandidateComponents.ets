@@ -312,7 +312,16 @@ export struct ConfirmationCandidateEditor {
       this.showFeedbackPanel = false;
       this.feedbackSelectedCode = '';
       this.feedbackDetails = '';
-            this.feedbackRequestId = '';
+      this.feedbackRequestId = '';
+      if (receipt.processingStatus === 'APPLIED' && this.showSavedExperiences) {
+        try {
+          this.savedExperiences = await HomeworkOrganizerFeedbackRemoteApi.instance
+            .listExperiences(this.item.studentId);
+        } catch {
+          // The feedback and the rule were already committed. A list refresh
+          // failure must not present the saved feedback as failed.
+        }
+      }
     } catch {
       this.feedbackHasError = true;
       this.feedbackMessage = '反馈保存失败，内容已保留，请重试';
