@@ -201,7 +201,8 @@ struct SavedHomeworkExperienceCard {
   }
 
   private originLabel(origin: string): string {
-    if (origin === 'FEEDBACK_AUTO') return '反馈自动学习';
+    if (origin === 'FEEDBACK_AI') return 'AI 提炼的反馈经验';
+    if (origin === 'FEEDBACK_AUTO') return '历史反馈经验';
     if (origin === 'FEEDBACK_APPROVED') return '家长确认的反馈';
     if (origin === 'CONFIRMED_EDIT') return '家长修改作业后确认';
     if (origin === 'MANUAL') return '手工保存';
@@ -502,10 +503,12 @@ export struct ConfirmationCandidateEditor {
       let receipt = await HomeworkOrganizerFeedbackRemoteApi.instance.submit(this.item.studentId, input);
       this.feedbackHasError = false;
       this.feedbackMessage = receipt.processingStatus === 'APPLIED'
-        ? '反馈已保存，已自动形成当前学生的作业经验，下次匹配时生效'
+        ? '反馈已保存，AI 已提炼并启用可复用经验；下次整理将按上下文参考'
         : (receipt.processingStatus === 'REVIEW_REQUIRED'
-          ? '反馈已保存；同类经验存在冲突，暂不自动启用'
-          : '反馈已保存；缺少足够原始证据，暂未生成新经验');
+          ? '反馈已保存；AI 经验存在冲突或校验未通过，暂未启用'
+          : (receipt.processingStatus === 'PENDING_AI'
+            ? '反馈已保存；AI 经验提炼暂不可用，尚未生效'
+            : '反馈已保存；缺少充分证据或无法安全归纳，尚未生效'));
       this.showFeedbackPanel = false;
       this.feedbackSelectedCode = '';
       this.feedbackDetails = '';
@@ -754,7 +757,7 @@ export struct ConfirmationCandidateEditor {
               this.feedbackRequestId = '';
             });
 
-          Text('提交后将自动尝试生成本学生的专属经验；证据不足或与已有规则冲突时不会误生效。')
+          Text('提交后 AI 会根据原文和纠正说明提炼可复用经验，并在下次整理时按作业上下文动态使用。')
             .fontSize(AppTheme.META_SIZE)
             .fontColor(AppTheme.SUBTEXT)
             .width('100%');
