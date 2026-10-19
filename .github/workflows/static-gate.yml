@@ -453,6 +453,9 @@ jobs:
       - name: Run batch publish E2E
         run: python backend/scripts/batch_publish_e2e.py
 
+      - name: Run organizer review Outbox PostgreSQL E2E
+        run: python backend/scripts/homework_review_outbox_e2e.py
+
       - name: Run voice material daily automation E2E
         run: python backend/scripts/voice_material_e2e.py
 
