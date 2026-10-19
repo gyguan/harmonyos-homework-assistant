@@ -40,6 +40,7 @@ export interface HomeworkTeacherExperienceSummary {
   exampleSource: string;
   exampleResult: string;
   origin: string;
+  createdAt: string;
   updatedAt: string;
   active: boolean;
   sourceFeedbackId: string | null;
