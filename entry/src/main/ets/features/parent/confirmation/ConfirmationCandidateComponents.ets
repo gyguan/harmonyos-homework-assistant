@@ -411,6 +411,7 @@ export struct ConfirmationCandidateEditor {
       sourceEvidence: {
         sourceLabel: this.item.sourceEvidence.sourceLabel,
         excerpt: this.item.sourceEvidence.excerpt,
+        teacherName: this.item.sourceEvidence.teacherName,
         batchId: this.item.sourceEvidence.batchId,
         sourceType: this.item.sourceEvidence.sourceType,
         sourceMessageIds: this.item.sourceEvidence.sourceMessageIds === undefined ?
