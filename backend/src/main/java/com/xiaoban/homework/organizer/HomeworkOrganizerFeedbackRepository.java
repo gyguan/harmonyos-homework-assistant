@@ -9,6 +9,8 @@ public interface HomeworkOrganizerFeedbackRepository
     extends JpaRepository<HomeworkOrganizerFeedbackEntity, UUID> {
   Optional<HomeworkOrganizerFeedbackEntity> findByFamilyIdAndStudentIdAndClientRequestId(
       UUID familyId, String studentId, String clientRequestId);
+  Optional<HomeworkOrganizerFeedbackEntity> findByIdAndFamilyIdAndStudentId(
+      UUID id, UUID familyId, String studentId);
   List<HomeworkOrganizerFeedbackEntity> findTop50ByFamilyIdAndStudentIdOrderByCreatedAtDesc(
       UUID familyId, String studentId);
 }
