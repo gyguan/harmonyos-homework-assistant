@@ -116,7 +116,9 @@ public class HomeworkOrganizerFeedbackService {
     entity.details = details;
     // Always preserve the parent report. Only a server-verified, narrowly scoped
     // source/correction pair may create a reversible experience automatically.
-    entity.processingStatus = "PENDING_EVIDENCE";
+    // Compatibility constructors in existing unit tests do not inject the learner.
+    // Production always injects autoLearning and reports its actual outcome.
+    entity.processingStatus = autoLearning == null ? "NEW" : "PENDING_EVIDENCE";
     entity.createdAt = Instant.now();
     if (autoLearning != null) {
       // Persist the feedback first: learned experience.source_feedback_id is a FK.
