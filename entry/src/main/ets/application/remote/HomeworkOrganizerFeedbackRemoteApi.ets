@@ -37,9 +37,29 @@ export interface HomeworkTeacherExperienceSummary {
   subject: string;
   cue: string;
   interpretation: string;
+  exampleSource: string;
+  exampleResult: string;
   origin: string;
+  updatedAt: string;
   active: boolean;
   sourceFeedbackId: string | null;
+}
+
+/** Full original feedback, available only when the experience has a linked record. */
+export interface HomeworkExperienceFeedbackEvidence {
+  typeCode: string;
+  details: string;
+  originalTitle: string;
+  currentTitle: string;
+  sourceLabel: string;
+  sourceExcerpt: string;
+  processingStatus: string;
+  createdAt: string;
+}
+
+export interface HomeworkExperienceDetail {
+  experience: HomeworkTeacherExperienceSummary;
+  feedback: HomeworkExperienceFeedbackEvidence | null;
 }
 
 export interface HomeworkExperiencePromotion {
@@ -77,6 +97,22 @@ export class HomeworkOrganizerFeedbackRemoteApi {
       throw new Error('老师经验列表加载失败');
     }
     return JSON.parse(response.body) as HomeworkTeacherExperienceSummary[];
+  }
+
+  async experienceDetail(studentId: string, experienceId: string): Promise<HomeworkExperienceDetail> {
+    let response = await BackendHttpClient.instance.requestFor(
+      'homework.organize.experiences.detail',
+      `/api/v1/students/${encodeURIComponent(studentId)}/homework/teacher-experiences/${encodeURIComponent(experienceId)}`,
+      http.RequestMethod.GET);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw new Error('加载作业经验详情失败');
+    }
+    let result = JSON.parse(response.body) as HomeworkExperienceDetail;
+    if (result === null || result.experience === undefined ||
+      result.experience.id !== experienceId) {
+      throw new Error('作业经验详情格式不正确');
+    }
+    return result;
   }
 
   async setExperienceActive(studentId: string, experienceId: string,
