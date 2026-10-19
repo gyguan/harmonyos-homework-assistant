@@ -35,6 +35,14 @@ final class HomeworkTeacherAttribution {
     return inferred.isEmpty() ? subjectScope(subject) : inferred;
   }
 
+  static boolean hasNamedTeachers(String text) {
+    var matcher = NAMED_TEACHER.matcher(safe(text));
+    while (matcher.find()) {
+      if (!GENERIC.contains(matcher.group(1))) return true;
+    }
+    return false;
+  }
+
   static String explicitSourceTeacher(String text) {
     var found = new LinkedHashSet<String>();
     var matcher = NAMED_TEACHER.matcher(safe(text));
