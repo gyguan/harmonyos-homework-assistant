@@ -170,4 +170,43 @@ class HomeworkFeedbackLearningTest {
     service.setActive(family, "child1", record.id, true);
     assertFalse(service.context(student, "李老师", "朗读国14", false).contains("国*"));
   }
+
+  @Test
+  void explicitlyBoundTeacherDoesNotReuseForwardedTeacherExperience() {
+    var students = mock(StudentRepository.class);
+    var family = UUID.randomUUID();
+    var student = owned(family, "child1", students);
+    var repository = mock(HomeworkTeacherExperienceRepository.class);
+    var wang = new HomeworkTeacherExperienceEntity();
+    wang.id = UUID.randomUUID();
+    wang.familyId = family;
+    wang.studentId = "child1";
+    wang.teacherName = "王老师";
+    wang.subject = "语文";
+    wang.cue = "国*";
+    wang.interpretation = "王老师的国学页码规则";
+    wang.exampleSource = "";
+    wang.exampleResult = "";
+    wang.active = true;
+    var li = new HomeworkTeacherExperienceEntity();
+    li.id = UUID.randomUUID();
+    li.familyId = family;
+    li.studentId = "child1";
+    li.teacherName = "李老师";
+    li.subject = "语文";
+    li.cue = "国*";
+    li.interpretation = "李老师另一套不同教材规则";
+    li.exampleSource = "";
+    li.exampleResult = "";
+    li.active = true;
+    when(repository.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "child1"))
+        .thenReturn(List.of(wang, li));
+    var service = new HomeworkTeacherExperienceService(repository, students);
+    String result = service.context(student,
+        "家长录入文字\\n[家长已确认老师：王老师]",
+        "转发李老师消息：朗读国13", false);
+    assertTrue(result.contains("王老师的国学页码规则"));
+    assertFalse(result.contains("李老师另一套不同教材规则"));
+  }
+
 }
