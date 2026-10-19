@@ -288,6 +288,14 @@ public class HomeworkTeacherExperienceService {
         continue;
       }
       var pair = HomeworkExcerptCountConvention.extract(candidate.sourceExcerpt());
+      // The LLM sometimes shortens sourceExcerpt to just "摘抄". Recover the
+      // count only when BOTH the AI title and the full original agree on one
+      // unique pair; otherwise never guess from another item in the notice.
+      if (pair == null && safe(candidate.sourceExcerpt()).contains("摘抄")) {
+        var titlePair = HomeworkExcerptCountConvention.extract(candidate.title());
+        var originalPair = HomeworkExcerptCountConvention.extract(text);
+        if (titlePair != null && titlePair.equals(originalPair)) pair = originalPair;
+      }
       // The LLM excerpt alone is insufficient when a supplied original text
       // contradicts it. For image sources, use the OCR/recognizedText field.
       if (pair == null || !HomeworkExcerptCountConvention.mentionsPair(text, pair)) {
