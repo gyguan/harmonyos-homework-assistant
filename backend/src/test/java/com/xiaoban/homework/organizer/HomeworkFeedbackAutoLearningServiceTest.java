@@ -200,4 +200,17 @@ class HomeworkFeedbackAutoLearningServiceTest {
     assertTrue(hint.contains("课外阅读和心情日记"));
   }
 
+  @Test void clientProvidedTeacherMustNotOverrideServerSnapshotAttribution() {
+    UUID family = UUID.randomUUID();
+    var exp = mock(HomeworkTeacherExperienceRepository.class);
+    var snap = mock(HomeworkOrganizerAiSnapshotRepository.class);
+    var learning = service(family, "child-1", exp, snap);
+    var f = feedback(family, "child-1");
+    f.teacherName = "未经核实的李老师";
+    assertEquals("APPLIED", learning.evaluate(f));
+    var saved = ArgumentCaptor.forClass(HomeworkTeacherExperienceEntity.class);
+    verify(exp).save(saved.capture());
+    assertEquals("学科归属:语文", saved.getValue().teacherName);
+  }
+
 }
