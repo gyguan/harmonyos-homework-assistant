@@ -55,4 +55,23 @@ class HomeworkOrganizerTeacherBindingTest {
     service.organize(family, "s1", new HomeworkOrganizerDtos.Request("读国13", "原始来源"));
     verify(model).organize(eq(student), eq("原始来源"), eq("读国13"));
   }
+  @Test
+  void originalSourceUniquelyNamedTeacherIsStoredWithoutRegisteringTeacher() {
+    UUID family = UUID.randomUUID();
+    var student = new Student();
+    student.id = "s1";
+    student.familyId = family;
+    var students = mock(StudentRepository.class);
+    when(students.findById("s1")).thenReturn(Optional.of(student));
+    var model = mock(HomeworkOrganizerModelClient.class);
+    when(model.available()).thenReturn(true);
+    when(model.organize(eq(student), eq("家长录入文字"), eq("王老师：朗读国13")))
+        .thenReturn(Optional.of(List.of()));
+    var snapshots = mock(HomeworkOrganizerAiSnapshotService.class);
+    var service = new HomeworkOrganizerService(students, model, null, snapshots);
+    service.organize(family, "s1",
+        new HomeworkOrganizerDtos.Request("王老师：朗读国13", "家长录入文字", "", "text-100"));
+    verify(snapshots).capture(eq(family), eq("s1"), eq("text-100"), eq("王老师"), anyList());
+  }
+
 }
