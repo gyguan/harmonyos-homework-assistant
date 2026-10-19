@@ -74,7 +74,9 @@ public class HomeworkFeedbackAutoLearningService {
     if (!HomeworkExperienceCueMatcher.valid(cue) ||
         !HomeworkExperienceCueMatcher.matches(cue, excerpt)) return "PENDING_EVIDENCE";
 
-    String teacher = clean(record.teacherName);
+    // Attribution must come from the immutable server snapshot, not a
+    // client-supplied teacher name on the feedback payload.
+    String teacher = clean(source.teacherName);
     // Historical snapshots might store an empty teacher field. A subject marker
     // is a scope, not a fabricated teacher's identity.
     if (teacher.isBlank() || "未知".equals(teacher) || "未识别".equals(teacher)) {
