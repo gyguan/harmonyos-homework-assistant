@@ -198,8 +198,10 @@ public class HomeworkTeacherExperienceService {
           || !student.id.equals(entry.studentId)) continue;
       boolean subjectOnly = HomeworkTeacherAttribution.isSubjectScope(entry.teacherName);
       boolean subjectPresent = HomeworkTeacherAttribution.matchesUnambiguousSubject(source, entry.subject);
-      boolean anySubject = List.of("语文", "数学", "英语", "阅读", "朗读", "体育", "实践", "兴趣", "其他")
-          .stream().anyMatch(source::contains);
+      // Words such as 朗读 can be verbs in a Chinese teacher's notice, not an explicit subject scope.
+      boolean anySubject = List.of("语文", "数学", "英语").stream().anyMatch(source::contains)
+          || List.of("阅读", "朗读", "体育", "实践", "兴趣", "其他").stream()
+              .anyMatch(subject -> source.matches("(?s).*(?:^|[\\s；;。])" + java.util.regex.Pattern.quote(subject) + "\\s*[:：].*"));
       if (subjectOnly) {
         if (!explicit.isEmpty() || HomeworkTeacherAttribution.hasNamedTeachers(source)
             || !subjectPresent) continue;

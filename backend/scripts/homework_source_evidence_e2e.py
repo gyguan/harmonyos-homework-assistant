@@ -26,7 +26,19 @@ class Provider(BaseHTTPRequestHandler):
     def do_POST(self):
         global CALLS
         CALLS += 1
-        body = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+        if self.headers.get('Transfer-Encoding', '').lower() == 'chunked':
+            raw = bytearray()
+            while True:
+                size = int(self.rfile.readline().split(b';', 1)[0].strip(), 16)
+                if size == 0:
+                    while self.rfile.readline() not in (b'\r\n', b'\n', b''):
+                        pass
+                    break
+                raw.extend(self.rfile.read(size))
+                self.rfile.read(2)
+        else:
+            raw = self.rfile.read(int(self.headers.get('Content-Length', '0')))
+        body = json.loads(raw)
         require('messages' in body, 'expected chat protocol')
         data = json.dumps({'choices': [{'message': {'role': 'assistant', 'content': json.dumps(REPLY, ensure_ascii=False)}}],
                            'usage': {'prompt_tokens': 120, 'completion_tokens': 80}}).encode()
