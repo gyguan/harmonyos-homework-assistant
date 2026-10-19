@@ -74,6 +74,8 @@ class HomeworkOrganizerFinalizationTest {
         new HomeworkOrganizerReviewDifferenceService.Finalize(batch,
             List.of("ai-text-100-1", "manual-text-100-9")));
     assertEquals(3, result.saved());
+    // Parent may unbind/change teacher after publish. The trusted snapshot remains authoritative.
+    verify(teachers, never()).verifiedTeacher(any(), any(), any());
     var captor = ArgumentCaptor.forClass(HomeworkOrganizerReviewDifferenceEntity.class);
     verify(differences, times(3)).save(captor.capture());
     assertTrue(captor.getAllValues().stream().anyMatch(x ->
