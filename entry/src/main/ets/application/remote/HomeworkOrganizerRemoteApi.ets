@@ -67,6 +67,12 @@ export class HomeworkOrganizerRemoteApi {
   private readonly originalById: Map<string, OrganizerOriginalCandidate> = new Map<string, OrganizerOriginalCandidate>();
   private constructor() {}
 
+  /** AI 原始标题仅在本次确认会话内保存，反馈时作为纠错前的证据。 */
+  originalTitle(candidateId: string, fallback: string): string {
+    let item = this.originalById.get(candidateId);
+    return item === undefined ? fallback : item.title;
+  }
+
   /** 家长成功发布后静默记录真正发生的标题纠错；上报失败不影响已发布作业。 */
   async reportConfirmedEdits(candidates: CandidateAssignment[]): Promise<void> {
     if (candidates.length === 0) return;
