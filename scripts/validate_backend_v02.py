@@ -91,11 +91,10 @@ require("不得编造" in organizer_model and "不解答作业" in organizer_mod
 require("title 是孩子看到作业的第一句话" in organizer_model and "动作 + 具体内容 + 要求" in organizer_model
         and "禁止只写" in organizer_model and "clampTitle" in organizer_model,
         "AI organizer must ask for content-rich titles and clamp them to the varchar(300) column")
-require("normalizeSubject" in organizer_model and 'normalized.contains("语文")' in organizer_model and
-        'normalized.contains("数学")' in organizer_model and 'normalized.contains("英语")' in organizer_model and
-        'lower.contains("chinese")' in organizer_model and 'lower.contains("math")' in organizer_model and
-        'lower.contains("english")' in organizer_model,
-        "AI organizer must normalize common provider subject labels before filtering")
+require("normalizeSubject" in organizer_model and
+        'contains(value) ? value : null' in organizer_model and
+        'refineDumpSubject(' not in organizer_model,
+        "AI organizer must validate canonical subjects without applying Java keyword-based semantic changes")
 require("unsupportedValues" in organizer_model and "safeSubjectForLog" in organizer_model,
         "AI organizer must expose bounded unsupported subject values for diagnosis")
 require("subject 字段必须严格填写语文、数学、英语、阅读、朗读、体育、实践、兴趣、其他之一" in organizer_model and
@@ -104,9 +103,11 @@ require("subject 字段必须严格填写语文、数学、英语、阅读、朗
 require("[AI] organizer parsed" in organizer_model and "unsupportedSubject" in organizer_model and
         "blankTitle" in organizer_model,
         "AI organizer must log privacy-safe conversion counts when model output is filtered")
-require("converted.sourceCount() > 0 && converted.candidates().isEmpty()" in organizer_model and
+require("converted.sourceCount() > 0 &&" in organizer_model and
+        "converted.unsupportedSubjectCount() > 0" in organizer_model and
+        "converted.blankTitleCount() > 0" in organizer_model and
         "return Optional.empty();" in organizer_model,
-        "AI organizer must fall back instead of returning a misleading empty AI result when all model assignments are rejected")
+        "AI organizer must reject any invalid subject/title rows rather than return partial AI output")
 for phrase in ["不要直接给出", "个人信息", "可信成年人"]:
     require(phrase in tutor_prompt, f"Tutor safety/guidance prompt missing: {phrase}")
 require('@PostMapping("/messages")' in tutor_controller,

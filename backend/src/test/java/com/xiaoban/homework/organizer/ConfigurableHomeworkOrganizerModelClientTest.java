@@ -298,22 +298,19 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
-  void dropsLearningProgressEntryAndFillsLessonNameIntoTitles() {
-    // 模型把「学习进度」段当成了一条作业；且后面的项只写「课文」不写篇名。
+  void conversionNeverSilentlyDropsOrRewritesModelTasksByTeacherKeywords() {
     var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
-                "语文", "今天我们学了《黄山奇石》。", "今天我们学了《黄山奇石》。", "语文书", null, 5,
-                "🔔学习进度：今天我们学了《黄山奇石》。", 0.9),
+                "语文", "今天我们学了《黄山奇石》。", "今天我们学了《黄山奇石》。",
+                "语文书", null, 5, "学习进度：今天我们学了《黄山奇石》。", 0.9),
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
-                "语文", "正确、流利、有感情地朗读课文三遍", "正确、流利、有感情地朗读课文三遍，家长签字",
-                "部编版", null, 15, "2️⃣正确、流利、有感情地朗读课文三遍。", 0.9))),
-        "");
-
-    assertEquals(1, result.candidates().size(), "学习进度不该生成任务");
-    assertTrue(result.candidates().get(0).title().contains("《黄山奇石》"),
-        "课文名要补进标题：" + result.candidates().get(0).title());
-    assertEquals(1, result.sourceCount(), "sourceCount 也不该把非作业条目算进去");
+                "语文", "朗读课文三遍", "朗读课文三遍，家长签字",
+                "部编版", null, 15, "朗读课文三遍。", 0.9))), "");
+    assertEquals(2, result.sourceCount());
+    assertEquals(2, result.candidates().size());
+    assertEquals("今天我们学了《黄山奇石》。", result.candidates().getFirst().title());
+    assertEquals("朗读课文三遍", result.candidates().get(1).title());
   }
 
   @Test
@@ -367,73 +364,55 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
-  void refineDumpSubjectSendsChineseRegularHomeworkBackToChinese() {
-    // 模型把「其他」当垃圾桶：课外阅读、日记其实是语文常规作业。
-    assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.refineDumpSubject(
-        "其他", "课外阅读30分钟", "阅读课外书30分钟"));
-    assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.refineDumpSubject(
-        "实践", "日记一件事，120字以上", "写详细"));
-    assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.refineDumpSubject(
-        "阅读", "课外阅读30分钟", "课外书"));
-    // 家长自建的普通阅读任务、真的实践任务不能被吞掉。
-    assertEquals("阅读", ConfigurableHomeworkOrganizerModelClient.refineDumpSubject(
-        "阅读", "阅读《西游记》20分钟", "亲子阅读"));
-    assertEquals("其他", ConfigurableHomeworkOrganizerModelClient.refineDumpSubject(
-        "其他", "整理书包", "按课表整理"));
-    assertEquals("其他", ConfigurableHomeworkOrganizerModelClient.refineDumpSubject(
-        "其他", "复习数学错题", "复习数学错题"));
-  }
-
-  @Test
-  void dropsEnglishPictureBookTaskAlreadyGeneratedByVoiceScheduler() {
-    // 「听读课文U4/绘本」里的绘本由定时语音任务自动布置（标题「绘本-文件夹目录」），
-    // AI 整理如果再产出一条，孩子就会看到两条重复作业。
+  void aiOutputSubjectsAreNotReclassifiedUsingTaskKeywords() {
     var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
-                "英语", "听读课文U4/绘本，10分钟", "听读课本第4单元课文并阅读绘本，每项各10分钟",
+                "其他", "课外阅读30分钟", "阅读课外书30分钟", "", null, 20,
+                "课外阅读30分钟", 0.8))));
+    assertEquals("其他", result.candidates().getFirst().subject());
+    assertNull(ConfigurableHomeworkOrganizerModelClient.normalizeSubject("写作"));
+    assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("语文"));
+  }
+
+  @Test
+  void aiOutputIsKeptIntactWhilePromptDefinesVoiceAndShorthandPolicy() {
+    String policy = seededTemplate("ENGLISH");
+    assertTrue(policy.contains("绘本"));
+    assertTrue(policy.contains("不要输出这一条任务"));
+
+    var result = seededCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "英语", "听读课文U4/绘本，10分钟", "听读课本第4单元课文并阅读绘本",
                 "沪教版", null, 10, "英语：1、听读课文U4/绘本，10分钟", 0.9),
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "英语", "一起作业", "在「一起作业」APP 上完成布置的作业",
-                "沪教版", null, 15, "2、一起作业。", 0.9))),
-        "");
+                "沪教版", null, 15, "2、一起作业。", 0.9))), "");
+    assertEquals(2, result.candidates().size());
+    assertEquals("听读课文U4/绘本，10分钟", result.candidates().get(0).title());
+    assertEquals("一起作业", result.candidates().get(1).title());
+    assertEquals(2, result.sourceCount());
 
-    assertEquals(2, result.candidates().size(), "绘本那条被剔除，其余两条保留");
-    assertTrue(result.candidates().get(0).title().contains("第4单元"),
-        "第一条应是听读课文第4单元：" + result.candidates().get(0).title());
-    assertTrue(result.candidates().get(1).title().contains("一起作业"), "第二条应是平台作业");
-    assertEquals(2, result.sourceCount(), "剔除绘本不该让图片链路误判成少作业");
-  }
-
-  @Test
-  void dropsTaskWhoseOnlyShorthandIsPictureBook() {
-    // 整条就只是「绘本」：定时语音任务已经布置过，整理结果里一条都不该出现。
-    var result = seededCandidates(
+    var onlyBook = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
-                "英语", "绘本", "阅读绘本10分钟", "沪教版", null, 10, "绘本", 0.9))),
-        "");
-
-    assertTrue(result.candidates().isEmpty(), "绘本由定时语音任务生成，整理结果里不该再出现");
-    assertEquals(0, result.sourceCount(), "sourceCount 也不该把它算成应有的一条");
+                "英语", "绘本", "阅读绘本10分钟", "沪教版", null, 10,
+                "绘本", 0.9))), "");
+    assertEquals(1, onlyBook.candidates().size());
+    assertEquals("绘本", onlyBook.candidates().getFirst().title());
   }
 
   @Test
-  void splitsOneTaskCoveringTwoDifferentShorthands() {
-    // 黑板英语格写成「一起作业. 绘本」，模型常理解成"在平台上读绘本"并成一条，
-    // 而这是两项作业。简写是老师固定用法，这里确定性拆开。
+  void mergedShorthandOutputIsNotFabricatedIntoNewTitlesInJava() {
     var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "英语", "一起作业平台作业及听读课文U4",
-                "在「一起作业」APP 上完成布置的作业，并听读课文U4", "英语课本", null, 30,
-                "一起作业. 听读U4", 0.9))),
-        "");
-
-    assertEquals(2, result.candidates().size());
-    assertTrue(result.candidates().get(0).title().contains("一起作业"), "第一条应是平台作业");
-    assertTrue(result.candidates().get(1).title().contains("第4单元"),
-        "第二条应是听读课文第4单元：" + result.candidates().get(1).title());
+                "在「一起作业」APP 上完成布置的作业，并听读课文U4", "英语课本",
+                null, 30, "一起作业. 听读U4", 0.9))), "");
+    assertEquals(1, result.candidates().size());
+    assertEquals("一起作业平台作业及听读课文U4", result.candidates().getFirst().title());
   }
 
   @Test
@@ -569,14 +548,16 @@ class ConfigurableHomeworkOrganizerModelClientTest {
 
   @Test
   void normalizesSchoolAndExtracurricularSubjectLabels() {
-    assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("语文作业"));
-    assertEquals("数学", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Math"));
-    assertEquals("英语", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("English Reading"));
-    assertEquals("阅读", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("阅读任务"));
-    assertEquals("朗读", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("朗诵练习"));
-    assertEquals("体育", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("体育运动"));
-    assertEquals("实践", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("劳动实践"));
-    assertEquals("兴趣", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("兴趣拓展"));
+    assertNull(ConfigurableHomeworkOrganizerModelClient.normalizeSubject("语文作业"));
+    assertNull(ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Math"));
+    assertNull(ConfigurableHomeworkOrganizerModelClient.normalizeSubject("English Reading"));
+    assertNull(ConfigurableHomeworkOrganizerModelClient.normalizeSubject("阅读任务"));
+    assertNull(ConfigurableHomeworkOrganizerModelClient.normalizeSubject("朗诵练习"));
+    assertNull(ConfigurableHomeworkOrganizerModelClient.normalizeSubject("体育运动"));
+    assertNull(ConfigurableHomeworkOrganizerModelClient.normalizeSubject("劳动实践"));
+    assertNull(ConfigurableHomeworkOrganizerModelClient.normalizeSubject("兴趣拓展"));
+    assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("语文"));
+    assertEquals("阅读", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("阅读"));
     assertEquals("其他", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("其他"));
     assertNull(ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Science"));
   }
@@ -588,7 +569,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "科学", "观察植物", "观察并记录", "", "今天", 20, "观察植物", 0.9),
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
-                "语文作业", "背诵第12课", "背诵课文", "", "明天", 15, "背诵第12课", 0.95))));
+                "语文", "背诵第12课", "背诵课文", "", "明天", 15, "背诵第12课", 0.95))));
 
     assertEquals(2, result.sourceCount());
     assertEquals(1, result.candidates().size());
@@ -684,5 +665,70 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertEquals(List.of(20, 120, 20),
         result.candidates().stream().map(HomeworkOrganizerDtos.Candidate::expectedMinutes).toList());
   }
+
+  @Test
+  void confirmedExperienceTriggersAiReviewRatherThanJavaKeywordRewrite() {
+    var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
+    var experiences = mock(HomeworkTeacherExperienceService.class);
+    var student = new TestStudent();
+    student.id = "student-review";
+    student.familyId = java.util.UUID.randomUUID();
+    String original = "语文：摘抄：（3+2）";
+    String experience = "家长经验：摘抄中两个数字分别表示本次好词、好句数量。";
+    when(experiences.context(eq(student), eq("家长文字"), eq(original), eq(false)))
+        .thenReturn(experience);
+    when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
+        .thenAnswer(inv -> {
+          String scene = inv.getArgument(4);
+          if ("homework_experience_review".equals(scene)) {
+            return java.util.Optional.of("""
+                {"assignments":[{"subject":"语文","title":"摘抄3个好词、2个好句",
+                "instruction":"摘抄3个好词、2个好句","textbookRef":"待家长确认",
+                "taskDate":"2026-10-19","expectedMinutes":15,
+                "sourceExcerpt":"摘抄：（3+2）","confidence":0.95}]}
+                """);
+          }
+          return java.util.Optional.of("""
+              {"assignments":[{"subject":"语文","title":"完成摘抄（3+2）",
+              "instruction":"完成摘抄（3+2）","textbookRef":"待家长确认",
+              "taskDate":"2026-10-19","expectedMinutes":15,
+              "sourceExcerpt":"摘抄：（3+2）","confidence":0.95}]}
+              """);
+        });
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), transport, JsonMapper.builder().build(), experiences);
+    var result = client.organize(student, "家长文字", original).orElseThrow();
+    assertEquals("摘抄3个好词、2个好句", result.getFirst().title());
+    var prompts = org.mockito.ArgumentCaptor.forClass(String.class);
+    verify(transport, org.mockito.Mockito.times(2)).complete(anyString(), prompts.capture(),
+        anyString(), anyInt(), anyString(), anyMap());
+    assertTrue(prompts.getAllValues().get(1).contains("质量复核"));
+    assertTrue(prompts.getAllValues().get(1).contains(experience));
+  }
+
+  @Test
+  void aiReviewFailureDoesNotInventUnconfirmedCorrection() {
+    var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
+    var experiences = mock(HomeworkTeacherExperienceService.class);
+    var student = new TestStudent();
+    student.id = "student-review-fail";
+    student.familyId = java.util.UUID.randomUUID();
+    when(experiences.context(eq(student), anyString(), anyString(), eq(false)))
+        .thenReturn("家长经验：需按原文解释");
+    when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
+        .thenAnswer(inv -> "homework_experience_review".equals(inv.getArgument(4))
+            ? java.util.Optional.empty()
+            : java.util.Optional.of("""
+                {"assignments":[{"subject":"语文","title":"完成摘抄（3+2）",
+                "instruction":"完成摘抄（3+2）","textbookRef":"待家长确认",
+                "taskDate":"2026-10-19","expectedMinutes":15,
+                "sourceExcerpt":"摘抄：（3+2）","confidence":0.95}]}
+                """));
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), transport, JsonMapper.builder().build(), experiences);
+    var result = client.organize(student, "家长文字", "语文：摘抄：（3+2）").orElseThrow();
+    assertEquals("完成摘抄（3+2）", result.getFirst().title());
+  }
+
 
 }
