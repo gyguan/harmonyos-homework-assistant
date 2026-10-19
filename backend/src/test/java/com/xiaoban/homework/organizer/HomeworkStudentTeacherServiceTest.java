@@ -58,4 +58,25 @@ class HomeworkStudentTeacherServiceTest {
     assertThrows(ApiExceptions.NotFound.class,
         () -> service.verifiedTeacher(family, "s2", "王老师"));
   }
+  @Test
+  void rejectsSameNameWithDifferentSubjectInsteadOfGuessingTeacherIdentity() {
+    var family = UUID.randomUUID();
+    var students = mock(StudentRepository.class);
+    var student = new Student();
+    student.id = "s1";
+    student.familyId = family;
+    when(students.findById("s1")).thenReturn(Optional.of(student));
+    var existing = new HomeworkStudentTeacherEntity();
+    existing.teacherName = "王老师";
+    existing.subject = "数学";
+    var repository = mock(HomeworkStudentTeacherRepository.class);
+    when(repository.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "s1"))
+        .thenReturn(List.of(existing));
+    var service = new HomeworkStudentTeacherService(repository, students);
+    assertThrows(ApiExceptions.BadRequest.class,
+        () -> service.register(family, "s1",
+            new HomeworkStudentTeacherService.TeacherInput("王老师", "语文")));
+    verify(repository, never()).save(any());
+  }
+
 }
