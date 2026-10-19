@@ -47,3 +47,39 @@ INSERT INTO homework_organizer_rule(code,rule_type,subject,prompt_text,priority,
 INSERT INTO homework_organizer_rule(code,rule_type,subject,prompt_text,priority,template_key) VALUES ('PROMPT_ENGLISH','PROMPT',$seed$英语$seed$,$seed$当英语作业出现下列简写或分点写法时，按规则解析；不要根据姓名猜测两位老师是否同一人：①「U＋数字」＝Unit（单元），U 后面的数字就是单元号；「听读U4」「听读课文U4」都是「听读课本第 4 单元课文」，单元号必须写进 title。②老师常在一个序号里用「/」「、」「和」并列多个听读对象，并列的每个对象都是一项独立的作业，必须逐条拆开，例如「听读课文U4/绘本，10分钟」是「听读课文第4单元」与「听读绘本」两项，句尾的时长是每一项各自的时长，不是两项合计。③⚠️「绘本」「绘」「听读绘本」指的是阅读绘本，这一项由系统的定时语音任务自动布置，标题格式是「绘本-文件夹目录」，**整理结果里不要输出这一条任务**，否则孩子会看到重复作业；同一条里除了绘本还有别的作业时，只去掉绘本那一条，其余各项照常保留。④「一起作业」是 APP 名称，指在该 APP 上布置的作业，不是「一起做作业」；它即使和「绘本」挤在同一行、即使只有四个字，也永远要单独保留一条，不能跟着绘本一起被删掉。⑤⚠️老师写的序号点数不等于作业任务数：可能只写了两点却是三个任务，必须按原文里出现的可执行动作数量来定条数，不要照抄序号个数。⑥英语作业的文字通常很简短，title 不能因为原文短就照抄，要把简写展开成完整说法（如「听读课文U4」→「听读课本第4单元课文」）。拆解范例：原文「英语：1、听读课文U4/绘本，10分钟  2、一起作业。」应整理成 2 条：①听读课本第4单元课文（约10分钟）；②完成一起作业 APP 上布置的作业。其中「听读绘本」不生成任务，因为定时语音任务已经生成过「绘本-…」了，再生成一次就是重复作业。$seed$,200,'ENGLISH');
 
 INSERT INTO homework_organizer_rule(code,rule_type,subject,prompt_text,priority,template_key) VALUES ('PROMPT_BLACKBOARD','PROMPT',$seed$$seed$,$seed$当图片中有黑板/白板《作业公示栏》时，按照表格版式解析（表头「学科」「内容」「预计时长」，右侧可能还有「上午」「下午」）。⚠️下面这几条只适用于这种黑板表格；微信群里的三段式文字通知仍按前面「三段式模板」那一条逐动作拆，不要拿这里的「一个序号一条」去合并那边的动作。①标题「作业公示栏」、表头「学科/内容/预计时长」「上午/下午」和顶部的「26年10月16日 星期五」都是版式信息，不是作业；顶部那个日期就是这份作业的日期，用它填 taskDate。②学科是行标题，只作用到本行；「内容」格里的字才是作业。行内用序号「1. 2.」分的，一个序号就是一条任务：序号里写了两个动作（如「1.复习P28-38。周一练习」）时并成这一条，但两个动作都必须写进 title，完整内容进 instruction，不能只留前半个、也不能丢后半个。同一格里没有序号、只用逗号/换行并列的独立项目（如「一起作业，绘本」「听读U3」）要各自成条。③「其他」行不是新科目：这一行写的是课外阅读、日记、摘抄、练字这类语文常规作业，subject 一律填「语文」，填成「阅读」「实践」「其他」都算错。④格子里跨行的内容（「日记一件事，120字以上」下一行接着写「写详细」）是同一件事的续写，并进上一条，既不拆成两条也不能丢。⑤「预计时长」列的分钟数只作用在同一行的作业上，直接用作 expectedMinutes；内容格里手写的「(25分)」同理。一行拆成多条时，每条都用这一行的时长。⑥同一格里「一起作业」这四个字永远是一项必须保留的作业，不能因为和「绘本」写在同一行、或者只有四个字就省掉。⑦黑板上字少，title 不能照抄成「数学写口算单」这种半截话：去掉「语文/数学/英语」这类前缀（subject 已经单独给出），写成完整动作，如「复习课本第28-38页」「完成口算单」「订正《小白练》练习单」；简写必须展开，不能把「订小白」「U3」原样留在标题里。整理范例：黑板原文「语文｜1.复习P28-38。周一练习 2.预习8、10课 订小白｜15分钟；数学｜写口算单｜5分钟；英语｜一起作业，绘本 听读U3｜10分钟；其他｜课外30分；日记一件事，120字以上(25分) 写详细」应整理成 7 条：①复习课本第28-38页并完成周一练习（15分钟）；②预习第8、10课并订正《小白练》练习单（15分钟）；③完成口算单（5分钟）；④完成一起作业 APP 上布置的作业（10分钟）；⑤听读课本第3单元课文（10分钟）；⑥课外阅读30分钟（30分钟）；⑦日记一件事：120字以上，写详细（25分钟）。其中「绘本」不生成任务；「其他」行的两项都归语文；「写详细」并进日记那一条，不单独成条；语文两个序号各自只有一条任务，不要拆成四条，否则同一行的 15 分钟会被重复计算。$seed$,100,'BLACKBOARD');
+
+-- Append-only audit: prior and new rule versions are preserved for rollback/inspection.
+-- Database operators must increment version for every update (optimistic version contract).
+CREATE TABLE homework_organizer_rule_revision (
+  id bigserial PRIMARY KEY,
+  rule_code varchar(80) NOT NULL,
+  old_version integer NOT NULL,
+  new_version integer NOT NULL,
+  before_json jsonb NOT NULL,
+  after_json jsonb NOT NULL,
+  changed_by varchar(100) NOT NULL DEFAULT current_user,
+  changed_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_homework_organizer_rule_revision_code
+  ON homework_organizer_rule_revision(rule_code, changed_at DESC);
+
+CREATE OR REPLACE FUNCTION audit_homework_organizer_rule_change()
+RETURNS trigger LANGUAGE plpgsql AS $audit$
+BEGIN
+  IF NEW.version <= OLD.version THEN
+    RAISE EXCEPTION 'homework rule version must increase: % old % new %',
+      OLD.code, OLD.version, NEW.version;
+  END IF;
+  IF NEW.code <> OLD.code THEN
+    RAISE EXCEPTION 'homework rule code cannot change';
+  END IF;
+  INSERT INTO homework_organizer_rule_revision(
+      rule_code, old_version, new_version, before_json, after_json)
+  VALUES (OLD.code, OLD.version, NEW.version, to_jsonb(OLD), to_jsonb(NEW));
+  RETURN NEW;
+END;
+$audit$;
+
+CREATE TRIGGER trg_audit_homework_organizer_rule_change
+BEFORE UPDATE ON homework_organizer_rule
+FOR EACH ROW EXECUTE FUNCTION audit_homework_organizer_rule_change();
