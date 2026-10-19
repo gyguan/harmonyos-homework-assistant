@@ -206,3 +206,43 @@ values ('BOOK_EDITION', '教材版本不对', '说明老师所用的教材版本
 - 老师身份隔离及授权仍由 V36 测试覆盖。
 
 只有确认家长选择的“反馈 → 启用经验”才会影响下一次 AI 提示词；V37/V38 只形成证据与统计。未完成：严格事务 outbox、语义层面的跨段落拆分归因、多老师单批次、真机 ArkTS 完整编译及基于人工标准答案的模型准确率回归。
+
+
+## V39：作业批量发布与纠错差异可靠投递（Transactional Outbox）
+
+旧链路为「服务端原子发布完成 → 手机后台另发 `/review-differences/finalize`」，若客户端断网或关闭则漏记纠错。新链路不依赖客户端后续请求：
+
+1. `BatchPublishRequest` 增加**可选** `batchId`（旧版 App 不传时继续兼容发布）。新客户端从待发布候选项中取原始导入批次，并同 `items` 在**同一个 POST /students/{studentId}/assignments/batch** 中传给后端。
+2. `AssignmentBatchPublishService.publish` 的 Spring `@Transactional` 包含所有 `AssignmentService.create` 和 `HomeworkReviewOutboxEnqueuer.enqueue`。其中入队器强制 `Propagation.MANDATORY`，不能在无发布事务时独立记录「已成功发布」事件。写队列出错会让整个发布事务回滚，避免作业已完成、事件却永远丢失。
+3. `V39__homework_review_outbox.sql` 新增 `homework_review_outbox`，保存家庭/学生/批次、合法候选 ID 集合、状态、尝试次数、下次尝试时间及失败类别，不存图片和老师原文；存在对应的 V37 AI 原始快照时才入队。唯一约束 `(family_id, student_id, batch_id)` 保证同一批次只能登记一次，重复 ID 必须一致。
+4. `HomeworkReviewOutboxWorker` 默认每 30 秒检查最多 20 条到期任务（`HOMEWORK_REVIEW_WORKER_DELAY_MS` 可配置）；`HomeworkReviewOutboxProcessor` 使用 `PESSIMISTIC_WRITE` 行锁，保证多个实例不会同时处理同一记录。
+5. 事务内对照**不可覆盖的 AI 快照 + 实际落库的作业**，完成原字段、增删和疑似拆合并的结构化差异。复核成功：`COMPLETED`。失败时，执行事务回滚，交由另一 `REQUIRES_NEW` 事务登记失败原因及指数退避：30 秒、60 秒、120 秒……上限 3600 秒；最多 8 次，之后标记 `FAILED`，不会无限打模型或反复误处理。
+6. App 已移除发布后非可靠的二次 `reportConfirmedReview` 调用；即使手机发布成功立即关闭，待处理事件仍位于 PostgreSQL 中。旧客户端无 `batchId` 和无 AI 快照的本地/手工作业，不创建差异作业，正常发布。
+7. 老师资料可能在发布后改变。队列后端通过发布时保存的原始快照确认老师归属，不因后来解绑/停用老师而阻断差异归档。队列里的差异是**证据**，绝不自动修改 AI 规则。
+
+**运维检查示例**（PostgreSQL）：
+
+```sql
+select status, count(*) from homework_review_outbox group by status;
+select student_id, batch_id, attempts, next_attempt_at, last_error
+from homework_review_outbox where status in ('PENDING','FAILED')
+order by updated_at desc limit 30;
+```
+
+对确定已修复且可以重试的失败记录，运维可在确认归属后把特定 UUID 的 `status` 改回 `PENDING`、`attempts=0`、`next_attempt_at=now()`；不要批量无差别重放。差异唯一约束使重试后的再次计算可幂等跳过旧字段记录。对于长期 FAIL 应升级为运行告警。本实现是**有限次至少一次重试**，不是无穷次保证，也没有承诺客户端可见的最终同步提示。
+
+### 离线固定样本评测：无真实标准答案时不得编造准确率
+
+新增 `scripts/evaluate_homework_organizer.py` 和 `scripts/fixtures/homework_organizer_cases.json`，按老师、来源类型建立结构化金标样本；目前附带的四份文本/黑板案例均标记 `reviewStatus: "DRAFT"`，只是匿名演示，**尚未获家长逐项确认**。
+
+每条要在确认准确科目、条目数、原文、关键词、老师归属后才改为 `VERIFIED`。配合实际模型或 Prompt 版本的预测 JSON：
+
+```powershell
+python scripts/evaluate_homework_organizer.py --fixtures scripts/fixtures/homework_organizer_cases.json --predictions predictions.json --report organizer-report.json
+```
+
+评分严格过滤 DRAFT，只对 VERIFIED 返回“关键词覆盖代理指标”（按学科+标题/要求中的关键词进行一对一匹配）、条目数量相等的案例数，以及按老师分组的匹配率。它**不等价于语义准确率**，亦不自动检测 OCR 漏行、日期、Token、真实模型推理成本；可选 `--baseline previous-report.json` 要求同一组案例并在指标下降时报错。当前没有任何 VERIFIED 样本，脚本会明确输出 `NO_VERIFIED_GOLD` 并返回退出码 2，拒绝生成虚假分数。
+
+`python -m unittest discover -s scripts/tests -p test_evaluate_homework_organizer.py -v` 测试该评测器并被纳入 `.github/workflows/static-gate.yml` 的独立 job；后端 outbox 与发布事务也分别有对应 JUnit 用例。
+
+**仍未完成的验收**：真实老师通知经家长确认的金标、同输入/同模型跨版本跑分、HarmonyOS HAP 完整编译和手机交互、全量 PostgreSQL 功能 E2E（部分其他模块门禁仍未通过）。保持 PR Draft。
