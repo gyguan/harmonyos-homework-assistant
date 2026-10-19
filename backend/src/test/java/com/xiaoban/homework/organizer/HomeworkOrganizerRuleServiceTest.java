@@ -34,7 +34,7 @@ class HomeworkOrganizerRuleServiceTest {
     assertEquals(2, snapshot.shorthand().size());
     assertTrue(snapshot.encodedShorthand().contains("优先解释"));
     assertFalse(snapshot.encodedShorthand().contains("过时解释"));
-    verify(repository).findByEnabledTrueOrderByPriorityDescCodeAsc();
+    verify(repository).findApplicable(null, null);
   }
 
   @Test void databaseTemplatingSupportsDirectEnableDisableWithoutJavaFallback() {
