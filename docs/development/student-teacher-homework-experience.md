@@ -128,3 +128,50 @@ values ('BOOK_EDITION', '教材版本不对', '说明老师所用的教材版本
 测试：`HomeworkFeedbackLearningTest` 验证数字占位符、来源精确匹配、学生/老师隔离、重复晋升幂等、非可学习类别拒绝、停用与恢复。后端 CI 完整测试 218 项通过；HarmonyOS HAP 构建未运行（需要已启用的自托管 Runner），部分既有 UI/E2E 门禁仍失败，PR 保持 Draft。
 
 **尚待建设**：导入前可选绑定具体老师（图片可能没有署名，当前不会从姓名相似度推测）；可解释的跨多任务“漏拆/误拆/遗漏”反馈自动提炼；基于真实老师样本和模型版本的在线/离线效果回归。这些必须与本版“可撤销的家长明确规则”区分。
+
+
+## V36：来源老师绑定与发布差异审计（2026-10-19）
+
+### 一、来源老师显式绑定
+
+新增数据库表 `homework_student_teacher`，以家庭和学生作为强隔离键，保存家长确认过的老师姓名、学科、启用状态和时间。家长可在“布置作业 → AI 整理”中给**当前学生**添加老师并直接选择；默认允许“不指定老师”，禁止自动把同姓老师归为一人。
+
+- `GET /api/v1/students/{studentId}/homework/teachers`：返回这个学生已启用的老师。
+- `POST /api/v1/students/{studentId}/homework/teachers`：新增/复用老师资料；请求 `{"teacherName":"王老师","subject":"语文"}`。
+- 文字 `POST /homework/organize` 和图片 `POST /homework/organize-image` 增加可选 `teacherName` 字段，服务端必须再次检查老师是否已绑定当前学生；旧客户端可以不提供。
+- 明确绑定的老师身份优先于转发通知内提到的其他老师；经验只有同学生、同老师、同触发词时才复用，图片内容仍必须符合线索。
+- 选定的老师信息随候选任务 `sourceEvidence.teacherName` 保存到本地导入批次，不与老师原文混淆；进入反馈界面时自动预填，避免家长重复输入。
+
+### 二、全字段纠错审计
+
+新增 `homework_organizer_review_difference`，跟踪以下情形：
+
+| 差异类型 | 字段 | 说明 |
+| --- | --- | --- |
+| CHANGED | title | 标题调整 |
+| CHANGED | subject | 学科纠正 |
+| CHANGED | instruction | 具体要求调整 |
+| CHANGED | taskDate | 日期调整 |
+| CHANGED | expectedMinutes | 预计耗时调整 |
+| CHANGED | textbookRef | 教材/页码调整 |
+| REMOVED | task | 删除 AI 多生成的任务 |
+| ADDED | task | 家长在 AI 批次里补充任务 |
+
+每条记录保留 `family_id,student_id,batch_id,candidate_id,teacher_name,field_name,change_type,before_value,after_value,source_excerpt,created_at`。组合唯一键保证同批次、同候选任务、同字段、同变更类型重复上报不会插两条。服务器做家庭权限校验、字段白名单和老师绑定验证。
+
+- `POST /api/v1/students/{studentId}/homework/review-differences`：批量提交 1–150 条结构化差异（最多 150 条），只保存证据，不自动更新规则。
+- `GET /api/v1/students/{studentId}/homework/review-differences`：查看最近 100 条历史。
+- `GET /api/v1/students/{studentId}/homework/review-differences/summary`：按老师/字段/变更类型对最近 100 条差异分组计数。**这只是最近 100 条修改分布，不是 AI 准确率。**
+
+客户端仅在服务端**整个批次发布成功后**比较 AI 初稿和已发布结果，后台上传差异不阻塞成功发布。之前“发布后见标题变化就自动纳入 CONFIRMED_EDIT 老师经验”的调用已停用，学习转化只走家长明确确认的 V35 机制。
+
+### 三、验证与限制
+
+新增 `HomeworkStudentTeacherServiceTest`（家庭隔离、学生隔离、老师绑定与拒绝未注册姓名）和 `HomeworkOrganizerReviewDifferenceServiceTest`（变更、删除、增加、幂等、老师隔离、无效字段），与既有验证一起运行。
+
+- V36 解决本地导入页面来源老师选择和**本次会话**的 AI 初稿快照对比；跨重启的未发布 AI 初稿未服务端持久化，故重开 App 的历史草稿**不会被误标为完整差异**，相关差异可能缺失。
+- 系统对第三方已存在导入记录也不会假装持有原始 AI 快照，无快照的批次跳过对比。
+- 已移除发布流程中“默认从标题纠错直接学习”的调用；差异只作为分析材料。当前没有全样本标准答案，因此不宣称漏项率/准确率已提升。
+- 同批次只支持一个来源老师作为明确绑定；需要多老师拆分来源时，应采用多批次或继续建设“候选任务级来源绑定”。
+- GUI 尚无差异报表页，当前可通过 API 查看；后续再建设带老师筛选和问题趋势的管理页。
+- 部分仓库 UI 静态门禁和语音 E2E 仍失败，HarmonyOS 自建 Runner 尚未启用；必须在真机/模拟器上验证新增 ArkTS 页面交互后再发布。
