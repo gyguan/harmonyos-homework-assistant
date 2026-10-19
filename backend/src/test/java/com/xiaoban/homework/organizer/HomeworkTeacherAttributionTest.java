@@ -18,6 +18,9 @@ class HomeworkTeacherAttributionTest {
         "", "数学", "数学老师", "口算20题"));
     assertEquals("", HomeworkTeacherAttribution.explicitSourceTeacher(
         "王老师：朗读国13；李老师：抄写生字"));
+    assertTrue(HomeworkTeacherAttribution.hasNamedTeachers(
+        "王老师：朗读国13；李老师：抄写生字"));
+    assertFalse(HomeworkTeacherAttribution.hasNamedTeachers("语文老师：朗读国13"));
   }
 
   @Test void subjectExperienceNeverAppliesToMixedSubjects() {
