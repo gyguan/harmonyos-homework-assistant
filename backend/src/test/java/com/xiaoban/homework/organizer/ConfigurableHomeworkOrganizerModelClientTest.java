@@ -608,9 +608,9 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     student.id = "student-a";
     student.familyId = java.util.UUID.randomUUID();
     when(experiences.context(eq(student), eq("王老师：通知"), eq("朗读国13"), eq(false)))
-        .thenReturn("\\n老师「王老师」：国13 指《国学》第13页。");
+        .thenReturn("老师「王老师」：国13 指《国学》第13页。");
     when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
-        .thenReturn(java.util.Optional.of("{\\"assignments\\":[]}"));
+        .thenReturn(java.util.Optional.of("{}"));
     var client = new ConfigurableHomeworkOrganizerModelClient(
         new AiProviderProperties(), transport, JsonMapper.builder().build(), experiences);
 
