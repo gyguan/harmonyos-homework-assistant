@@ -621,4 +621,21 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertTrue(instructions.getValue().contains("国13 指《国学》第13页"));
   }
 
+  @Test
+  void missingAndOutOfRangeDurationsUseDeterministicSafeValues() {
+    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "语文", "书写汉字", "书写汉字一行", "", null, null,
+                "语文书写汉字", 0.9),
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "数学", "练习口算", "完成口算题", "", null, 1000,
+                "数学口算练习", 0.9),
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "英语", "复习单词", "默读单词清单", "", null, -5,
+                "英语单词清单", 0.9))));
+    assertEquals(List.of(20, 120, 20),
+        result.candidates().stream().map(HomeworkOrganizerDtos.Candidate::expectedMinutes).toList());
+  }
+
 }
