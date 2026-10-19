@@ -8,7 +8,7 @@ create table homework_student_teacher (
   enabled boolean not null default true,
   created_at timestamptz not null,
   updated_at timestamptz not null,
-  constraint uq_homework_student_teacher unique (family_id, student_id, teacher_name, subject)
+  constraint uq_homework_student_teacher unique (family_id, student_id, teacher_name)
 );
 create index idx_homework_student_teacher_family_student
   on homework_student_teacher (family_id, student_id, enabled, updated_at desc);
