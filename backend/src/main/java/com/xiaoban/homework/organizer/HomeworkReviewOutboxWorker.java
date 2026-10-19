@@ -30,6 +30,12 @@ public class HomeworkReviewOutboxWorker {
         // A transaction/connection failure should be retried on the next scheduler pass.
         log.warn("homework_review_outbox worker_exception={} id={}",
             error.getClass().getSimpleName(), pending.id);
+        try {
+          processor.markFailedAttempt(pending.id, error);
+        } catch (RuntimeException retryError) {
+          log.warn("homework_review_outbox unable_to_mark_retry id={} exception={}",
+              pending.id, retryError.getClass().getSimpleName());
+        }
       }
     }
   }
