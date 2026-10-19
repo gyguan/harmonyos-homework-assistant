@@ -469,11 +469,11 @@ def main() -> int:
                 f"carried task must be dated today (taskDate={carry_after.get('taskDate')})")
         require(carry_after.get("status") == "NOT_STARTED",
                 f"carry over must not change task status (status={carry_after.get('status')})")
-        # 名称必须按新业务日重算：自定义的旧名字要消失、今天要出现在名字里，
-        # 而且不能因为把任务自己数进「同日同名」计数而多出一个序号。
+        # 当前业务约定为“绘本-文件夹目录”，而不是旧版将业务日期拼入标题。
+        # 顺延必须抛弃手工修改的旧标题，并继续使用原素材目录的标准名称。
         carried_title = carry_after.get("title") or ""
-        require(today_label in carried_title and "旧的语音作业名字" not in carried_title,
-                "carry over must regenerate the task name from the new business date "
+        require(carried_title == "绘本-语文朗读",
+                "carry over must regenerate the canonical folder-based title "
                 f"(title={carried_title})")
         require("②" not in carried_title,
                 "carry over must not suffix the renamed task with a sequence number "
