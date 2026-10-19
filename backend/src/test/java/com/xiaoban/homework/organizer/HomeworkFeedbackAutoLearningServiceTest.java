@@ -240,4 +240,29 @@ class HomeworkFeedbackAutoLearningServiceTest {
     assertEquals("学科归属:英语", saved.getValue().teacherName);
   }
 
+  @Test void confirmedShorthandIsAvailableToImageAiOnlyAsConditionalGuidance() {
+    UUID family = UUID.randomUUID();
+    var experiences = mock(HomeworkTeacherExperienceRepository.class);
+    var students = mock(com.xiaoban.homework.student.StudentRepository.class);
+    var row = new HomeworkTeacherExperienceEntity();
+    row.teacherName = "学科归属:英语";
+    row.subject = "英语";
+    row.cue = "听读U*";
+    row.interpretation = "家长确认U后面数字是英语课文单元号";
+    row.origin = "FEEDBACK_AUTO";
+    row.exampleSource = "英语：听读U4";
+    row.exampleResult = "";
+    row.active = true;
+    when(experiences.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "child-1"))
+        .thenReturn(List.of(row));
+    var student = new com.xiaoban.homework.student.StudentEntity() {};
+    student.id = "child-1";
+    student.familyId = family;
+    var loader = new HomeworkTeacherExperienceService(experiences, students);
+    String hint = loader.context(student, "拍照上传", "", true);
+    assertTrue(hint.contains("听读U*"));
+    assertTrue(hint.contains("图片里必须识别出符合的老师和线索"));
+    assertEquals("", loader.context(student, "家长录入文字", "数学：口算20题", false));
+  }
+
 }
