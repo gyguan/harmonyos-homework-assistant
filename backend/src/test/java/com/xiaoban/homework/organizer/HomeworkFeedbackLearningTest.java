@@ -241,6 +241,8 @@ class HomeworkFeedbackLearningTest {
         "语文：朗读国14；数学：口算20题", false));
     assertEquals("", service.context(owner, "家长录入文字",
         "王老师：语文朗读国14", false));
+    assertEquals("", service.context(owner, "家长录入文字",
+        "王老师：语文朗读国14；李老师：语文抄写生字", false));
     assertEquals("", service.context(other, "家长录入文字", "语文：朗读国14", false));
   }
 
