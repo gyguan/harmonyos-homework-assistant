@@ -10,10 +10,19 @@ import subprocess
 import threading
 import time
 import uuid
+import struct
+import zlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from batch_publish_e2e import create_student
-from e2e_smoke import expect, http, require, PNG_1X1, SmokeFailure
+from e2e_smoke import expect, http, require, SmokeFailure
 from homework_review_outbox_e2e import pg_container, sql
+
+def valid_test_png():
+    def chunk(kind, data):
+        return struct.pack('>I', len(data)) + kind + data + struct.pack('>I', zlib.crc32(kind + data) & 0xffffffff)
+    return (b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', 8, 8, 8, 2, 0, 0, 0))
+            + chunk(b'IDAT', zlib.compress((b'\x00' + b'\xff\xff\xff' * 8) * 8)) + chunk(b'IEND', b''))
+
 
 REPLY = {}
 CALLS = 0
@@ -115,7 +124,7 @@ def main():
             expect(http(base, 'GET', f'/api/v1/students/{foreign_student}/homework/source-evidence/{batch}', token=token), (404,), 'cross-family isolation')
             REPLY = dict(schemaVersion=2, sourceBlocks=[block('i1', '数学口算20题', image=True), block('i2', '语文朗读13页', image=True)], assignments=[candidate('i1')])
             image = expect(http(base, 'POST', route + '/organize-image', token=token,
-                               payload=dict(imageBase64=base64.b64encode(PNG_1X1).decode(), contentType='image/png', importId='img-' + run)), (200,), 'vision evidence').json()
+                               payload=dict(imageBase64=base64.b64encode(valid_test_png()).decode(), contentType='image/png', importId='img-' + run)), (200,), 'vision evidence').json()
             require('语文朗读13页' in image['recognizedText'], 'vision source incorrectly rebuilt from generated tasks')
             REPLY = dict(assignments=[candidate('fake')])
             legacy = expect(http(base, 'POST', route + '/organize', token=token, payload={'text': '数学口算20题'}), (200,), 'legacy request/response compatibility').json()
