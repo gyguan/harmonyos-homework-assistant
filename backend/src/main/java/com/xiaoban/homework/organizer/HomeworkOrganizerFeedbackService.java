@@ -15,20 +15,29 @@ public class HomeworkOrganizerFeedbackService {
   private final HomeworkFeedbackTypeRepository types;
   private final HomeworkOrganizerFeedbackRepository feedback;
   private final HomeworkTeacherExperienceRepository experiences;
+  private final HomeworkOrganizerAiSnapshotRepository snapshots;
 
   public HomeworkOrganizerFeedbackService(StudentRepository students,
       HomeworkFeedbackTypeRepository types, HomeworkOrganizerFeedbackRepository feedback) {
-    this(students, types, feedback, null);
+    this(students, types, feedback, null, null);
+  }
+
+  public HomeworkOrganizerFeedbackService(StudentRepository students,
+      HomeworkFeedbackTypeRepository types, HomeworkOrganizerFeedbackRepository feedback,
+      HomeworkTeacherExperienceRepository experiences) {
+    this(students, types, feedback, experiences, null);
   }
 
   @Autowired
   public HomeworkOrganizerFeedbackService(StudentRepository students,
       HomeworkFeedbackTypeRepository types, HomeworkOrganizerFeedbackRepository feedback,
-      HomeworkTeacherExperienceRepository experiences) {
+      HomeworkTeacherExperienceRepository experiences,
+      HomeworkOrganizerAiSnapshotRepository snapshots) {
     this.students = students;
     this.types = types;
     this.feedback = feedback;
     this.experiences = experiences;
+    this.snapshots = snapshots;
   }
 
   private void requireOwned(UUID familyId, String studentId) {
@@ -74,8 +83,20 @@ public class HomeworkOrganizerFeedbackService {
     entity.clientRequestId = clientRequestId;
     entity.candidateId = request.candidateId().trim();
     entity.batchId = clean(request.batchId());
-    entity.teacherName = HomeworkTeacherAttribution.resolve(
-        request.teacherName(), request.subject(), request.sourceLabel(), request.sourceExcerpt());
+    // Prefer immutable server-captured source attribution over client/AI-composed excerpts.
+    String attributedTeacher = "";
+    if (snapshots != null && request.batchId() != null && !request.batchId().isBlank()) {
+      attributedTeacher = snapshots.findByFamilyIdAndStudentIdAndBatchIdOrderByCandidateIdAsc(
+          familyId, studentId, request.batchId()).stream()
+          .filter(item -> item.candidateId.equals(request.candidateId()))
+          .map(item -> item.teacherName).findFirst().orElse("");
+    }
+    if (attributedTeacher.isBlank()) {
+      // Existing clients may still send a selected teacher. New imports do not.
+      attributedTeacher = HomeworkTeacherAttribution.resolve(
+          request.teacherName(), request.subject(), request.sourceLabel(), "");
+    }
+    entity.teacherName = attributedTeacher;
     entity.subject = request.subject().trim();
     entity.feedbackTypeCode = type.code;
     entity.sourceLabel = clean(request.sourceLabel());
