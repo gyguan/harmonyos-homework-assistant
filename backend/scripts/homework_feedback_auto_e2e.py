@@ -110,6 +110,42 @@ def main() -> int:
             where family_id='{family}' and student_id='{student_id}' and origin='FEEDBACK_AUTO'""")
         require(count == "1", "unverified feedback became a learning rule")
 
+        # Parent's actual reported case: the AI title stays unchanged, but a
+        # clearly described 4+2 convention must still become an active,
+        # reusable, student-specific experience.
+        copy_candidate = "ai-" + batch + "-2"
+        original_copy = "摘抄：（4+2）"
+        sql(container, f"""
+          insert into homework_organizer_ai_snapshot(
+            id,family_id,student_id,batch_id,candidate_id,teacher_name,subject,
+            title,instruction,textbook_ref,task_date,expected_minutes,source_excerpt,created_at)
+          values ('{uuid.uuid4()}','{family}','{student_id}','{batch}','{copy_candidate}',
+            '','语文','完成摘抄（4+2）','完成摘抄（4+2）','',current_date,15,
+            '{original_copy}',now())""")
+        copy_feedback = dict(payload)
+        copy_feedback.update({
+            "clientRequestId": "feedback-excerpt-count-" + run,
+            "candidateId": copy_candidate,
+            "subject": "语文",
+            "feedbackTypeCode": "WRONG_CONTENT",
+            "sourceExcerpt": original_copy,
+            "originalTitle": "完成摘抄（4+2）",
+            "currentTitle": "完成摘抄（4+2）",
+            "details": "对于摘抄这类作业，里面的数字代表多少个好词好句，比如4+2标识4个好词，2个好句",
+        })
+        copy_receipt = expect(http(DEFAULT_BASE_URL, "POST", path,
+                                   token=token, payload=copy_feedback),
+                              (200,), "excerpt count feedback immediately applied").json()
+        require(copy_receipt["processingStatus"] == "APPLIED",
+                "parent's explicit 4+2 convention did not apply")
+        learned = sql(container, f"""select cue || ':' || active::text ||
+            ':' || (interpretation like '%摘抄双数字约定%')::text
+            from homework_teacher_experience
+            where family_id='{family}' and student_id='{student_id}'
+            and source_feedback_id='{copy_receipt["id"]}'""")
+        require(learned == "摘抄:true:true",
+                "feedback should store reusable convention, not literal (4+2): " + learned)
+
         print("HOMEWORK_FEEDBACK_AUTO_E2E_PASS effective scoped rule, idempotency, evidence gate")
         return 0
     except (SmokeFailure, subprocess.SubprocessError, KeyError, ValueError, TypeError) as err:
