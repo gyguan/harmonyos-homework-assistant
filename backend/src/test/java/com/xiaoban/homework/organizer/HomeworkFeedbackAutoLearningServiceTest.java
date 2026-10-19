@@ -147,4 +147,57 @@ class HomeworkFeedbackAutoLearningServiceTest {
     assertEquals("PENDING_EVIDENCE", learning.evaluate(f));
     verify(exp, never()).save(any());
   }
+  @Test void nextTextPromptReusesAutoCorrectionOnlyForMatchingStudentAndSubject() {
+    UUID family = UUID.randomUUID();
+    var experiences = mock(HomeworkTeacherExperienceRepository.class);
+    var snapshots = mock(HomeworkOrganizerAiSnapshotRepository.class);
+    var feedback = feedback(family, "child-1");
+    var learning = service(family, "child-1", experiences, snapshots);
+    assertEquals("APPLIED", learning.evaluate(feedback));
+    var cap = ArgumentCaptor.forClass(HomeworkTeacherExperienceEntity.class);
+    verify(experiences).save(cap.capture());
+    var rule = cap.getValue();
+    var students = mock(com.xiaoban.homework.student.StudentRepository.class);
+    var student = new com.xiaoban.homework.student.StudentEntity() {};
+    student.id = "child-1";
+    student.familyId = family;
+    var other = new com.xiaoban.homework.student.StudentEntity() {};
+    other.id = "child-2";
+    other.familyId = family;
+    when(experiences.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "child-1"))
+        .thenReturn(List.of(rule));
+    var loader = new HomeworkTeacherExperienceService(experiences, students);
+    assertTrue(loader.context(student, "家长录入文字", "语文：朗读国14", false)
+        .contains("国后面的数字表示"));
+    assertEquals("", loader.context(student, "家长录入文字",
+        "数学：口算国14", false));
+    assertEquals("", loader.context(student, "家长录入文字",
+        "王老师：语文朗读国14", false));
+    assertEquals("", loader.context(other, "家长录入文字", "语文：朗读国14", false));
+  }
+
+  @Test void imageRuleOnlyOffersConditionalGuidanceForLongExactCue() {
+    UUID family = UUID.randomUUID();
+    var experiences = mock(HomeworkTeacherExperienceRepository.class);
+    var students = mock(com.xiaoban.homework.student.StudentRepository.class);
+    var row = new HomeworkTeacherExperienceEntity();
+    row.teacherName = "学科归属:语文";
+    row.subject = "语文";
+    row.cue = "语文：课外阅读30分钟，完成心情日记";
+    row.interpretation = "课外阅读和心情日记是两个不同任务";
+    row.origin = "FEEDBACK_AUTO";
+    row.active = true;
+    row.exampleSource = "语文：课外阅读30分钟，完成心情日记";
+    row.exampleResult = "";
+    when(experiences.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "child-1"))
+        .thenReturn(List.of(row));
+    var student = new com.xiaoban.homework.student.StudentEntity() {};
+    student.id = "child-1";
+    student.familyId = family;
+    var loader = new HomeworkTeacherExperienceService(experiences, students);
+    var hint = loader.context(student, "拍照上传", "", true);
+    assertTrue(hint.contains("只有"), hint);
+    assertTrue(hint.contains("课外阅读和心情日记"));
+  }
+
 }
