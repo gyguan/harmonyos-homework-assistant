@@ -36,8 +36,9 @@ require("TextArea" in page and "作业内容" in page,
         "parent assignment create page must expose one editable assignment-content input")
 require("整理并继续" in page and "private async organize()" in page,
         "parent assignment create page must expose one organize action")
-require("this.viewModel.parseText(text, this.selectedSubject, '', '', this.boundTeacherName)" in page,
-        "all typed homework must flow through the import ViewModel with subject and selected teacher")
+require("this.viewModel.parseText(text, this.selectedSubject)" in page and
+        "private TeacherSelector()" not in page and "saveTeacher()" not in page,
+        "text homework follows current student's assignment without teacher registration")
 require("private SubjectSelector()" in page and "@State private selectedSubject: Subject | null = null" in page and
         "label: '自动识别'" in page and "this.selectSubject(null)" in page and
         "请先选择作业科目" not in page and ".enabled(this.canOrganize())" in page,
@@ -46,10 +47,10 @@ require("HomeworkImageRecognitionMode.OCR" not in page and
         "this.viewModel.parseImage(" in page and
         "void this.recognizePhoto();" in page and "void this.recognizeGallery();" in page,
         "parent-facing image parsing must use direct AI image flow without retired OCR fallback buttons")
-require("this.sourceImageRef, this.selectedSubject, this.sourceImageLabel, '', this.boundTeacherName" in page and
+require("this.sourceImageRef, this.selectedSubject, this.sourceImageLabel" in page and
         "text: text.trim()" in service and "补充文字：" in service and
         "HomeworkImportService.instance.parseImage(imageRef, subject, sourceLabel, text, teacherName)" in view_model,
-        "parent's exclusive image mode must use verified teacher and the service must preserve explicit supplemental text from supported callers")
+        "parent's exclusive image mode must use current student and optional subject without teacher selection")
 selected_image = page.split("private applySelectedImage(", 1)[-1].split("private selectInputMode(", 1)[0]
 require("this.textDraft = '';" in selected_image and
         "this.inputMode = HomeworkAssignmentInputMode.IMAGE;" in selected_image and
