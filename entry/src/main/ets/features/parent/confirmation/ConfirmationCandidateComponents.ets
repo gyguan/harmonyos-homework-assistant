@@ -3,7 +3,6 @@ import {
   HomeworkFeedbackType,
   HomeworkFeedbackInput,
   HomeworkExperienceDetail,
-  HomeworkExperienceFeedbackEvidence,
   HomeworkTeacherExperienceSummary
 } from '../../../application/remote/HomeworkOrganizerFeedbackRemoteApi';
 import { HomeworkOrganizerRemoteApi } from '../../../application/remote/HomeworkOrganizerRemoteApi';
@@ -729,7 +728,7 @@ export struct ConfirmationCandidateEditor {
                   compact: true,
                   onSelect: () => {
                     this.feedbackSelectedCode = option.code;
-                                    this.feedbackMessage = '';
+                    this.feedbackMessage = '';
                     this.feedbackRequestId = '';
                   }
                 });
