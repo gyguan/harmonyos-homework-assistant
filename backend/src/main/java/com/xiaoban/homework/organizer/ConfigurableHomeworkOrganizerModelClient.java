@@ -368,7 +368,9 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       List<HomeworkOrganizerDtos.Candidate> initial, HomeworkTeacherExperienceService.Retrieval selected, List<String> declared) {
     var usage = usage(selected, declared, doc, initial);
     var validator = new HomeworkQualityValidator();
+    long qualityStarted = System.nanoTime();
     var before = validator.validate(doc, initial, usage);
+    HomeworkOrganizerTelemetry.stage("qualityValidation", qualityStarted);
     HomeworkOrganizerTelemetry.quality(before.risk().name(), before.flags(), "NOT_NEEDED");
     if (!before.reviewable()) return new HomeworkOrganizerDtos.Response(initial, mode, doc,
         before.flags(), !before.flags().isEmpty(), usage);
@@ -425,7 +427,9 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
           decisions.containsKey(b.id()) ? new HomeworkSourceDocument.Block(b.id(), b.text(), b.inputKind(), b.page(), b.imageIndex(),
               b.region(), b.legibility(), decisions.get(b.id())) : b).toList());
       var applied = usage(selected, patch.appliedExperienceIds(), reviewedDoc, updated);
+      long revalidationStarted = System.nanoTime();
       var after = validator.validate(reviewedDoc, updated, applied);
+      HomeworkOrganizerTelemetry.stage("qualityValidation", revalidationStarted);
       Set<String> originalCodes = before.flags().stream().map(HomeworkOrganizerDtos.QualityFlag::code).collect(java.util.stream.Collectors.toSet());
       // A review must measurably remove a risk and introduce no new risk class. It cannot hide
       // missing tasks by shrinking the draft or changing the authoritative source text.

@@ -95,7 +95,7 @@ def evaluate(fixtures, predictions):
                 field_checks.append(normalize(out.get(field)) == normalize(value))
             required = set(exp.get("sourceBlockIds", []))
             if required:
-                evidence_checks.append(required <= set(out.get("sourceBlockIds", [])))
+                evidence_checks.append(required <= set(out.get("sourceBlockIds", [])) and required <= blocks)
         totals["fieldCorrect"] += sum(field_checks)
         totals["fieldTotal"] += len(field_checks) + sum(len(gold[g].get("fields", {})) for g in range(len(gold)) if g not in matched_gold)
         totals["evidenceCorrect"] += sum(evidence_checks)

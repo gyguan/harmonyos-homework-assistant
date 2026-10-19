@@ -97,6 +97,15 @@ class JointMetricsTest(unittest.TestCase):
         self.assertEqual(0, result['total']['evidenceAccuracy'])
         self.assertEqual(0, result['total']['evidenceCoverage'])
 
+    def test_matching_reference_without_real_source_block_is_not_evidence_accuracy(self):
+        case = HomeworkEvaluationTest().fixture()
+        case['cases'][0]['expected'][0]['sourceBlockIds'] = ['b1']
+        pred = HomeworkEvaluationTest().prediction([
+            dict(subject='语文', title='国学13页', sourceBlockIds=['b1']),
+            dict(subject='数学', title='口算20题')])
+        result = evaluate(case, pred)
+        self.assertEqual(0, result['total']['evidenceAccuracy'])
+
     def test_gold_edits_invalidate_comparison(self):
         from evaluate_homework_organizer import compare
         with self.assertRaisesRegex(ValueError, 'identical fixture'):

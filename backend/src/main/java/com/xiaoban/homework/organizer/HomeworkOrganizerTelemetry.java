@@ -78,6 +78,8 @@ final class HomeworkOrganizerTelemetry implements AutoCloseable {
   void success(int count) { data.put("success", true); data.put("taskCount", count); }
   Map<String, Object> measurement() {
     var calls = ai.calls();
+    if (!calls.isEmpty() && !"unavailable".equals(calls.getFirst().provider()))
+      data.put("provider", calls.getFirst().provider());
     data.put("elapsedMs", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started));
     data.put("stage", "TOTAL");
     stages.put("model", calls.stream().filter(c -> "PRIMARY".equals(c.stage())).mapToLong(AiCallMetrics.Call::elapsedMs).sum());

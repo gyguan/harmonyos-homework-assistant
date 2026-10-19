@@ -345,7 +345,8 @@ public class OpenAiCompatibleTransport {
     } finally {
       // Actual HTTP attempts, including failed/empty responses; no estimated token counts.
       AiCallMetrics.record(new AiCallMetrics.Call(schemaName != null && schemaName.endsWith("review") ? "REVIEW" : "PRIMARY",
-          String.valueOf(body.get("model")), elapsedMs(started), success, usage));
+          String.valueOf(body.get("model")), elapsedMs(started), success, usage,
+          capabilities(String.valueOf(body.get("model"))).provider().name()));
     }
   }
 
