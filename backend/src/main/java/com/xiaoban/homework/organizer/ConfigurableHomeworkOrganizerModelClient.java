@@ -61,8 +61,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     }
   }
   record StructuredResult(List<StructuredCandidate> assignments, Integer schemaVersion,
-      List<HomeworkSourceDocument.Block> sourceBlocks) {
-    StructuredResult(List<StructuredCandidate> assignments) { this(assignments, 1, List.of()); }
+      List<HomeworkSourceDocument.Block> sourceBlocks, List<String> appliedExperienceIds) {
+    StructuredResult(List<StructuredCandidate> assignments) { this(assignments, 1, List.of(), List.of()); }
   }
   record ConversionResult(List<HomeworkOrganizerDtos.Candidate> candidates, int sourceCount,
       int unsupportedSubjectCount, int blankTitleCount, int missingFieldCount,
@@ -101,7 +101,31 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   }
 
   private String studentTeacherContext(StudentEntity student, String sourceLabel, String text, boolean image) {
-    return teacherExperiences == null ? "" : teacherExperiences.context(student, sourceLabel, text, image);
+    return selection(student, sourceLabel, text, image).context();
+  }
+
+  private HomeworkTeacherExperienceService.Retrieval selection(StudentEntity student, String sourceLabel, String text, boolean image) {
+    var result = teacherExperiences == null ? null : teacherExperiences.retrieve(student, sourceLabel, text, image);
+    return result == null ? HomeworkTeacherExperienceService.Retrieval.empty() : result;
+  }
+
+  static HomeworkOrganizerDtos.ExperienceUsage usage(HomeworkTeacherExperienceService.Retrieval selected,
+      List<String> declared, HomeworkSourceDocument doc, List<HomeworkOrganizerDtos.Candidate> items) {
+    var applied = new ArrayList<String>();
+    var unsupported = new ArrayList<String>();
+    for (String id : declared == null ? List.<String>of() : new LinkedHashSet<>(declared)) {
+      var entry = selected.selected().stream().filter(e -> e.id().equals(id)).findFirst().orElse(null);
+      boolean supported = entry != null && doc != null && items.stream().anyMatch(item ->
+          item.subject().equals(entry.subject()) && doc.blocks().stream().anyMatch(block ->
+              item.sourceBlockIds().contains(block.id()) && (HomeworkExperienceCueMatcher.matches(entry.cue(), block.text())
+                  || HomeworkExperienceRetrieval.lexical(entry.cue()).length() >= 2
+                  && HomeworkExperienceRetrieval.lexical(block.text()).contains(HomeworkExperienceRetrieval.lexical(entry.cue())))));
+      if (supported) applied.add(id); else unsupported.add(id);
+    }
+    var usage = new HomeworkOrganizerDtos.ExperienceUsage(selected.selected().stream()
+        .map(HomeworkTeacherExperienceService.Selected::id).toList(), List.copyOf(applied), List.copyOf(unsupported));
+    HomeworkOrganizerTelemetry.experiences(usage);
+    return usage;
   }
 
   @Override
@@ -120,7 +144,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       String sourceLabel, String imageDataUrl, String text) {
     long retrievalStarted = System.nanoTime();
     HomeworkOrganizerRuleService.Snapshot activeRules = ruleSnapshot(student, sourceLabel, text);
-    String experienceContext = studentTeacherContext(student, sourceLabel, text, true);
+    var retrieved = selection(student, sourceLabel, text, true);
+    String experienceContext = retrieved.context();
     HomeworkOrganizerTelemetry.stage("experienceRetrieval", retrievalStarted);
     HomeworkOrganizerTelemetry.versions(properties.getImageOrganizerModel(), properties.getProvider().toString(),
         instructionsWithShorthand(activeRules) + evidenceInstructions(true) + activeRules.template("BLACKBOARD"),
@@ -152,6 +177,15 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     long validationStarted = System.nanoTime();
     try {
       var first = parseImageOutput(output.get(), activeRules.encodedShorthand(), text);
+      if (first.isPresent()) {
+        var initial = first.get();
+        var applied = usage(retrieved, readStructured(output.get()).appliedExperienceIds(), initial.sourceDocument(), initial.assignments());
+        var initialFlags = new ArrayList<>(initial.qualityFlags());
+        if (!applied.unsupportedAppliedExperienceIds().isEmpty()) HomeworkSourceEvidence.add(initialFlags,
+            "EXPERIENCE_APPLICATION_UNSUPPORTED", List.of(), List.of());
+        first = Optional.of(new HomeworkOrganizerDtos.ImageResponse(initial.assignments(), initial.mode(), initial.recognizedText(),
+            initial.sourceDocument(), List.copyOf(initialFlags), !initialFlags.isEmpty(), applied));
+      }
       HomeworkOrganizerTelemetry.stage("localValidation", validationStarted);
       if (first.isEmpty()) { HomeworkOrganizerTelemetry.flag("SCHEMA_REJECTED"); return first; }
       if (experienceContext.isBlank() || first.get().assignments().isEmpty()) return first;
@@ -169,7 +203,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
           matchingContext, output.get(), first.get().assignments());
       var flags = HomeworkSourceEvidence.flags(first.get().sourceDocument(), checked);
       return Optional.of(new HomeworkOrganizerDtos.ImageResponse(
-          checked, "AI_IMAGE", first.get().recognizedText(), first.get().sourceDocument(), flags, !flags.isEmpty()));
+          checked, "AI_IMAGE", first.get().recognizedText(), first.get().sourceDocument(), flags, !flags.isEmpty(), first.get().experiences()));
     } catch (Exception error) {
       log.warn("homework_import image_parse_failed model={} outputChars={} exception={}",
           properties.getImageOrganizerModel(), output.get().length(), error.getClass().getSimpleName());
@@ -309,7 +343,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       StudentEntity student, String sourceLabel, String text) {
     long retrievalStarted = System.nanoTime();
     HomeworkOrganizerRuleService.Snapshot activeRules = ruleSnapshot(student, sourceLabel, text);
-    String experienceContext = studentTeacherContext(student, sourceLabel, text, false);
+    var retrieved = selection(student, sourceLabel, text, false);
+    String experienceContext = retrieved.context();
     HomeworkOrganizerTelemetry.stage("experienceRetrieval", retrievalStarted);
     HomeworkOrganizerTelemetry.versions(properties.getOrganizerModel(), properties.getProvider().toString(),
         instructionsWithShorthand(activeRules) + evidenceInstructions(false),
@@ -319,7 +354,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         properties.getOrganizerModel(),
         instructionsWithShorthand(activeRules) + evidenceInstructions(false)
             + experienceContext,
-        buildInput(student, sourceLabel, text) + "\n【独立原文块，不得修改文字】\n"
+        buildInput(student, sourceLabel, "请按以下独立原文块整理。") + "\n【独立原文块，不得修改文字】\n"
             + jsonMapper.writeValueAsString(HomeworkSourceDocument.text(text).blocks()),
         // 关闭思考后每条任务约 90 个输出 token；一次 17 条的超长通知实测用到 1540，
         // 留到 2000 防止长通知在结尾被截断（截断了等于整次整理失败）。
@@ -354,7 +389,11 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       var items = reviewWithExperience(
           properties.getOrganizerModel(), text, experienceContext, outputText.get(), converted.candidates());
       var document = HomeworkSourceEvidence.reconcileText(HomeworkSourceDocument.text(text), structured.sourceBlocks());
-      return Optional.of(HomeworkSourceEvidence.response(items, "AI", document));
+      var applied = usage(retrieved, structured.appliedExperienceIds(), document, items);
+      var flags = new ArrayList<>(HomeworkSourceEvidence.flags(document, items));
+      if (!applied.unsupportedAppliedExperienceIds().isEmpty()) HomeworkSourceEvidence.add(flags,
+          "EXPERIENCE_APPLICATION_UNSUPPORTED", List.of(), List.of());
+      return Optional.of(new HomeworkOrganizerDtos.Response(items, "AI", document, List.copyOf(flags), !flags.isEmpty(), applied));
     } catch (Exception error) {
       HomeworkOrganizerTelemetry.flag("SCHEMA_REJECTED");
       log.warn("[AI] organizer parse failed model={} outputChars={} exception={}",
@@ -732,8 +771,9 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     schema.put("additionalProperties", false);
     schema.put("properties", Map.of("assignments", Map.of("type", "array", "maxItems", 30, "items", candidate),
         "schemaVersion", Map.of("type", "integer", "enum", List.of(2)),
-        "sourceBlocks", Map.of("type", "array", "maxItems", 120, "items", sourceBlockSchema())));
-    schema.put("required", List.of("schemaVersion", "sourceBlocks", "assignments"));
+        "sourceBlocks", Map.of("type", "array", "maxItems", 120, "items", sourceBlockSchema()),
+        "appliedExperienceIds", Map.of("type", "array", "maxItems", 8, "items", Map.of("type", "string", "maxLength", 80))));
+    schema.put("required", List.of("schemaVersion", "sourceBlocks", "assignments", "appliedExperienceIds"));
     return schema;
   }
 

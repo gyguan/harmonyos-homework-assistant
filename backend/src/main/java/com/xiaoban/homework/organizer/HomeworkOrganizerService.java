@@ -72,12 +72,12 @@ public class HomeworkOrganizerService {
           ? HomeworkTeacherAttribution.explicitSourceTeacher(request.text())
           : request.teacherName();
       if (evidence != null) evidence.capture(familyId, studentId, request.importId(), sourcedTeacher, normalized,
-          organized.sourceDocument(), organized.qualityFlags(), organized.needsReview());
+          organized.sourceDocument(), organized.qualityFlags(), organized.needsReview(), organized.experiences());
       else snapshots.capture(familyId, studentId, request.importId(), sourcedTeacher, normalized);
     }
     log.info("homework_import organized studentId={} assignments={}", studentId, normalized.size());
     trace.success(normalized.size());
-    return new HomeworkOrganizerDtos.Response(normalized, "AI", organized.sourceDocument(), organized.qualityFlags(), organized.needsReview());
+    return new HomeworkOrganizerDtos.Response(normalized, "AI", organized.sourceDocument(), organized.qualityFlags(), organized.needsReview(), organized.experiences());
     }
   }
 
@@ -105,7 +105,7 @@ public class HomeworkOrganizerService {
         normalizeDefaultTaskDates(result.assignments(), result.recognizedText());
     if (snapshots != null) {
       if (evidence != null) evidence.capture(familyId, studentId, request.importId(), request.teacherName(), normalized,
-          result.sourceDocument(), result.qualityFlags(), result.needsReview());
+          result.sourceDocument(), result.qualityFlags(), result.needsReview(), result.experiences());
       else snapshots.capture(familyId, studentId, request.importId(), request.teacherName(), normalized);
     }
     log.info(
@@ -119,7 +119,7 @@ public class HomeworkOrganizerService {
         result.recognizedText() == null ? 0 : result.recognizedText().length());
     trace.success(normalized.size());
     return new HomeworkOrganizerDtos.ImageResponse(
-        normalized, result.mode(), result.recognizedText(), result.sourceDocument(), result.qualityFlags(), result.needsReview());
+        normalized, result.mode(), result.recognizedText(), result.sourceDocument(), result.qualityFlags(), result.needsReview(), result.experiences());
     }
   }
 

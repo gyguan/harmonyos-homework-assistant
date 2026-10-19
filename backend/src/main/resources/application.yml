@@ -45,6 +45,10 @@ app:
     worker-delay-ms: ${HOMEWORK_REVIEW_WORKER_DELAY_MS:30000}
   media-sync:
     worker-delay-ms: ${MEDIA_SYNC_WORKER_DELAY_MS:5000}
+  organizer:
+    experience:
+      top-k: ${ORGANIZER_EXPERIENCE_TOP_K:4}
+      max-chars: ${ORGANIZER_EXPERIENCE_MAX_CHARS:2400}
   ai:
     provider: ${AI_PROVIDER:AUTO}
     protocol: ${AI_PROTOCOL:responses}
