@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 
 @Service
 public class HomeworkReviewOutboxProcessor {
@@ -25,29 +26,35 @@ public class HomeworkReviewOutboxProcessor {
     var row = outbox.lockById(id).orElse(null);
     if (row == null || !"PENDING".equals(row.status)
         || row.nextAttemptAt.isAfter(Instant.now())) return;
-    try {
-      var ids = Arrays.asList(row.candidateIds.split("\n"));
-      reviews.finalizePublished(row.familyId, row.studentId,
-          new HomeworkOrganizerReviewDifferenceService.Finalize(row.batchId, ids));
-      row.status = "COMPLETED";
-      row.lastError = "";
-      row.updatedAt = Instant.now();
-      outbox.save(row);
-      log.info("homework_review_outbox completed batchId={} attempts={}", row.batchId, row.attempts + 1);
-    } catch (RuntimeException error) {
-      row.attempts++;
-      // Bounded retry and exponential backoff: 30, 60, 120, ... 3600 seconds.
-      if (row.attempts >= 8) {
-        row.status = "FAILED";
-      } else {
-        long delay = Math.min(3600L, 30L << Math.min(7, row.attempts - 1));
-        row.nextAttemptAt = Instant.now().plusSeconds(delay);
-      }
-      row.lastError = error.getClass().getSimpleName();
-      row.updatedAt = Instant.now();
-      outbox.save(row);
-      log.warn("homework_review_outbox retry batchId={} status={} attempts={} exception={}",
-          row.batchId, row.status, row.attempts, row.lastError);
+    var ids = Arrays.asList(row.candidateIds.split("\n"));
+    reviews.finalizePublished(row.familyId, row.studentId,
+        new HomeworkOrganizerReviewDifferenceService.Finalize(row.batchId, ids));
+    row.status = "COMPLETED";
+    row.lastError = "";
+    row.updatedAt = Instant.now();
+    outbox.save(row);
+    log.info("homework_review_outbox completed batchId={} attempts={}", row.batchId, row.attempts + 1);
+  }
+
+  /**
+   * Separate transaction: a failed review may mark its transaction rollback-only.
+   * The retry state must survive that rollback.
+   */
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void markFailedAttempt(UUID id, RuntimeException error) {
+    var row = outbox.lockById(id).orElse(null);
+    if (row == null || !"PENDING".equals(row.status)) return;
+    row.attempts++;
+    if (row.attempts >= 8) {
+      row.status = "FAILED";
+    } else {
+      long delay = Math.min(3600L, 30L << Math.min(7, row.attempts - 1));
+      row.nextAttemptAt = Instant.now().plusSeconds(delay);
     }
+    row.lastError = error.getClass().getSimpleName();
+    row.updatedAt = Instant.now();
+    outbox.save(row);
+    log.warn("homework_review_outbox retry batchId={} status={} attempts={} exception={}",
+        row.batchId, row.status, row.attempts, row.lastError);
   }
 }
