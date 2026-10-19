@@ -163,6 +163,11 @@ public class HomeworkTeacherExperienceService {
       boolean subjectOnly = HomeworkTeacherAttribution.isSubjectScope(entry.teacherName);
       boolean auto = "FEEDBACK_AUTO".equals(entry.origin);
       boolean cueFound = HomeworkExperienceCueMatcher.matches(entry.cue, source);
+      // Long notices must also match their captured example, not merely a
+      // repeated 120-character prefix of another day's notice.
+      if (auto && !image && !entry.cue.contains("*")
+          && entry.exampleSource != null && entry.exampleSource.length() > 120
+          && !source.contains(entry.exampleSource)) continue;
       if (subjectOnly) {
         // A broad wildcard must not cross school subjects. An exact, long
         // parent-confirmed excerpt can be reused when the source names no
