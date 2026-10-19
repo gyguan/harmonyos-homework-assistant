@@ -68,11 +68,13 @@ public class HomeworkOrganizerService {
     if (!familyId.equals(student.familyId)) throw new ApiExceptions.NotFound("孩子不存在");
     if (!model.available()) throw new ApiExceptions.ServiceUnavailable("AI整理暂未配置");
 
+    String attributedSource = teacherLabel(familyId, studentId,
+        request.sourceLabel(), request.teacherName());
     List<HomeworkOrganizerDtos.Candidate> organized = model
-        .organize(student, teacherLabel(familyId, studentId, request.sourceLabel(), request.teacherName()), request.text())
+        .organize(student, attributedSource, request.text())
         .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI整理暂时不可用"));
     List<HomeworkOrganizerDtos.Candidate> normalized = applyLearnedConventions(
-        student, request.sourceLabel(), request.text(),
+        student, attributedSource, request.text(),
         normalizeDefaultTaskDates(organized, request.text()));
     if (snapshots != null) {
       String sourcedTeacher = request.teacherName() == null || request.teacherName().isBlank()
@@ -97,13 +99,15 @@ public class HomeworkOrganizerService {
 
     if (!model.imageAvailable()) throw new ApiExceptions.ServiceUnavailable("AI图片解析暂未配置");
     long modelStarted = System.nanoTime();
+    String attributedSource = teacherLabel(familyId, studentId,
+        request.sourceLabel(), request.teacherName());
     var result = model.organizeImage(
-        student, teacherLabel(familyId, studentId, request.sourceLabel(), request.teacherName()), imageDataUrl, request.text())
+        student, attributedSource, imageDataUrl, request.text())
         .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI图片解析失败，请确认模型支持图片"));
     long modelMs = elapsedMs(modelStarted);
 
     List<HomeworkOrganizerDtos.Candidate> normalized = applyLearnedConventions(
-        student, request.sourceLabel(), result.recognizedText(),
+        student, attributedSource, result.recognizedText(),
         normalizeDefaultTaskDates(result.assignments(), result.recognizedText()));
     if (snapshots != null) {
       snapshots.capture(familyId, studentId, request.importId(), request.teacherName(), normalized);
