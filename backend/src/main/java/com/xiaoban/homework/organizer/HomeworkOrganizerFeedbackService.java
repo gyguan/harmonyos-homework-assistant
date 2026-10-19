@@ -16,28 +16,38 @@ public class HomeworkOrganizerFeedbackService {
   private final HomeworkOrganizerFeedbackRepository feedback;
   private final HomeworkTeacherExperienceRepository experiences;
   private final HomeworkOrganizerAiSnapshotRepository snapshots;
+  private final HomeworkFeedbackAutoLearningService autoLearning;
 
   public HomeworkOrganizerFeedbackService(StudentRepository students,
       HomeworkFeedbackTypeRepository types, HomeworkOrganizerFeedbackRepository feedback) {
-    this(students, types, feedback, null, null);
+    this(students, types, feedback, null, null, null);
   }
 
   public HomeworkOrganizerFeedbackService(StudentRepository students,
       HomeworkFeedbackTypeRepository types, HomeworkOrganizerFeedbackRepository feedback,
       HomeworkTeacherExperienceRepository experiences) {
-    this(students, types, feedback, experiences, null);
+    this(students, types, feedback, experiences, null, null);
+  }
+
+  public HomeworkOrganizerFeedbackService(StudentRepository students,
+      HomeworkFeedbackTypeRepository types, HomeworkOrganizerFeedbackRepository feedback,
+      HomeworkTeacherExperienceRepository experiences,
+      HomeworkOrganizerAiSnapshotRepository snapshots) {
+    this(students, types, feedback, experiences, snapshots, null);
   }
 
   @Autowired
   public HomeworkOrganizerFeedbackService(StudentRepository students,
       HomeworkFeedbackTypeRepository types, HomeworkOrganizerFeedbackRepository feedback,
       HomeworkTeacherExperienceRepository experiences,
-      HomeworkOrganizerAiSnapshotRepository snapshots) {
+      HomeworkOrganizerAiSnapshotRepository snapshots,
+      HomeworkFeedbackAutoLearningService autoLearning) {
     this.students = students;
     this.types = types;
     this.feedback = feedback;
     this.experiences = experiences;
     this.snapshots = snapshots;
+    this.autoLearning = autoLearning;
   }
 
   private void requireOwned(UUID familyId, String studentId) {
@@ -104,9 +114,18 @@ public class HomeworkOrganizerFeedbackService {
     entity.originalTitle = clean(request.originalTitle());
     entity.currentTitle = clean(request.currentTitle());
     entity.details = details;
-    // 原始反馈只作为证据，不能未经验证就写入 AI 的通用或老师经验。
-    entity.processingStatus = "NEW";
+    // Always preserve the parent report. Only a server-verified, narrowly scoped
+    // source/correction pair may create a reversible experience automatically.
+    // Compatibility constructors in existing unit tests do not inject the learner.
+    // Production always injects autoLearning and reports its actual outcome.
+    entity.processingStatus = autoLearning == null ? "NEW" : "PENDING_EVIDENCE";
     entity.createdAt = Instant.now();
+    if (autoLearning != null) {
+      // Persist the feedback first: learned experience.source_feedback_id is a FK.
+      // JPA rolls both writes back together if either one fails.
+      feedback.save(entity);
+      entity.processingStatus = autoLearning.evaluate(entity);
+    }
     return HomeworkOrganizerFeedbackDtos.Response.from(feedback.save(entity));
   }
 
@@ -153,7 +172,9 @@ public class HomeworkOrganizerFeedbackService {
       feedback.save(record);
       return HomeworkTeacherExperienceDtos.Response.from(experiences.save(existing));
     }
-    if (!"NEW".equals(record.processingStatus)) {
+    if (!"NEW".equals(record.processingStatus)
+        && !"PENDING_EVIDENCE".equals(record.processingStatus)
+        && !"REVIEW_REQUIRED".equals(record.processingStatus)) {
       throw new ApiExceptions.Conflict("反馈状态不允许生成规则");
     }
     long count = experiences.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(familyId, studentId).size();
