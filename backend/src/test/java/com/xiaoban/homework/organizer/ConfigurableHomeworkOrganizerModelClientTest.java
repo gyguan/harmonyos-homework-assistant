@@ -700,7 +700,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     var result = client.organize(student, "家长文字", original).orElseThrow();
     assertEquals("摘抄3个好词、2个好句", result.getFirst().title());
     var prompts = org.mockito.ArgumentCaptor.forClass(String.class);
-    verify(transport, times(2)).complete(anyString(), prompts.capture(),
+    verify(transport, org.mockito.Mockito.times(2)).complete(anyString(), prompts.capture(),
         anyString(), anyInt(), anyString(), anyMap());
     assertTrue(prompts.getAllValues().get(1).contains("质量复核"));
     assertTrue(prompts.getAllValues().get(1).contains(experience));
