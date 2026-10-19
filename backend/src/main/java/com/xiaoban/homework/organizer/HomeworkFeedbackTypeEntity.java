@@ -10,6 +10,7 @@ public class HomeworkFeedbackTypeEntity {
   public String label;
   public String description;
   public boolean requiresComment;
+  public boolean canBecomeExperience;
   public boolean enabled;
   public int displayOrder;
   public Instant createdAt;
