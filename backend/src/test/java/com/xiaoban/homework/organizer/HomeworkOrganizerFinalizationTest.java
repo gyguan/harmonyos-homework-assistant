@@ -35,7 +35,7 @@ class HomeworkOrganizerFinalizationTest {
   }
 
   private static AssignmentEntity published(UUID family, String student, String id, String title) {
-    var e = new AssignmentEntity();
+    var e = mock(AssignmentEntity.class);
     e.id = "a-published-" + id;
     e.familyId = family;
     e.studentId = student;
