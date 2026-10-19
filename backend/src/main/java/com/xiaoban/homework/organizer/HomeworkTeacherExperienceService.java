@@ -177,11 +177,13 @@ public class HomeworkTeacherExperienceService {
         boolean exactAuto = auto && !entry.cue.contains("*") && entry.cue.length() >= 8;
         // Image pixels have not yet been transcribed at prompt-build time:
         // provide only exact long cues as conditional examples, never assert a hit.
-        boolean conditionalImage = image && exactAuto && safe(sourceText).isBlank();
+        boolean conditionalImage = image && auto && safe(sourceText).isBlank()
+            && (exactAuto || (entry.cue.contains("*") && entry.cue.length() >= 2));
         if (!boundTeacher.isBlank() || HomeworkTeacherAttribution.hasNamedTeachers(source) ||
             (image && !cueFound && !conditionalImage) ||
             (!image && !cueFound) ||
-            (!clearSubject && !(exactAuto && noSchoolSubject))) continue;
+            (!clearSubject && !(exactAuto && noSchoolSubject)
+                && !(conditionalImage && noSchoolSubject))) continue;
       } else {
         boolean teacherFound = boundTeacher.isBlank()
             ? source.contains(entry.teacherName) : boundTeacher.equals(entry.teacherName);
