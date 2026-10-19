@@ -75,4 +75,13 @@ class HomeworkOrganizerRuleServiceTest {
     assertTrue(service.snapshot(student, "", "王老师：语文朗读国13").shorthand().isEmpty());
     assertTrue(service.snapshot(other, "", "语文：朗读国13").shorthand().isEmpty());
   }
+  @Test void databaseRuleDescriptionsMayContainNaturalLanguageSemicolons() {
+    var snapshot = new HomeworkOrganizerRuleService.Snapshot(
+        List.of("语文|国*|国学课本；后面的数字是页码|国学第*页"), java.util.Map.of());
+    var decoded = ConfigurableHomeworkOrganizerModelClient.shorthandEntries(
+        snapshot.encodedShorthand());
+    assertEquals(1, decoded.size());
+    assertEquals("国学课本；后面的数字是页码", decoded.getFirst().meaning());
+  }
+
 }
