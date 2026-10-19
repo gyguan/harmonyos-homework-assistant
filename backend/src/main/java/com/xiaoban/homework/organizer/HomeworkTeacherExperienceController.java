@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -40,6 +41,13 @@ public class HomeworkTeacherExperienceController {
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId, @PathVariable String studentId,
       @Valid @RequestBody HomeworkTeacherExperienceDtos.ConfirmedEdit request) {
     service.confirmedEdit(familyId, studentId, request);
+  }
+
+  @PatchMapping("/{id}/active")
+  public HomeworkTeacherExperienceDtos.Response setActive(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId, @PathVariable String studentId,
+      @PathVariable UUID id, @Valid @RequestBody HomeworkTeacherExperienceDtos.ActiveUpdate request) {
+    return service.setActive(familyId, studentId, id, request.active());
   }
 
   @DeleteMapping("/{id}")
