@@ -99,9 +99,12 @@ require("if (this.inputMode === HomeworkAssignmentInputMode.IMAGE)" in input_sec
         "this.textDraft = '';" in import_page.split("private applySelectedImage(", 1)[-1].split("private selectInputMode(", 1)[0],
         "manual image/text selection must clear the inactive source and never combine content implicitly")
 require("this.viewModel.parseImage(" in import_page and
-        "this.sourceImageRef, this.selectedSubject, this.sourceImageLabel, '', this.boundTeacherName" in import_page and
-        "this.viewModel.parseText(text, this.selectedSubject, '', '', this.boundTeacherName)" in import_page,
-        "both image and text modes must carry the selected subject and bound teacher to organization")
+        "this.sourceImageRef, this.selectedSubject, this.sourceImageLabel" in import_page and
+        "this.viewModel.parseText(text, this.selectedSubject)" in import_page and
+        "private TeacherSelector()" not in import_page and
+        "saveTeacher()" not in import_page and
+        "boundTeacherName" not in import_page,
+        "parent assigns a student and optional subject; must not maintain/select teachers to organize")
 require("captureImageText()" in import_vm and
         "HomeworkImportService.instance.captureImageText()" in import_vm,
         "manual homework ViewModel must expose camera OCR through the import service")
