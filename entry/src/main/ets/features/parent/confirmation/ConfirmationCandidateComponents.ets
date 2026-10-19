@@ -300,6 +300,7 @@ struct SavedHomeworkExperienceCard {
           this.DetailField('家长确认的结果', this.experience.exampleResult);
           this.DetailField('经验来源', this.originLabel(this.experience.origin));
           this.DetailField('当前状态', this.experience.active ? '启用中' : '已停用');
+          this.DetailField('创建时间', this.experience.createdAt);
           this.DetailField('最后更新时间', this.experience.updatedAt);
           this.DetailField('经验编号', this.experience.id);
 
