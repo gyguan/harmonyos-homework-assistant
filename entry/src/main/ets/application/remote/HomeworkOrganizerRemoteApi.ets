@@ -42,6 +42,21 @@ interface ImageOrganizeResponse {
 
 interface OrganizerErrorResponse { message: string; }
 
+/** 仅保存本次 AI 原始标题供家长确认后比较，不包含孩子姓名或图片原件。 */
+interface OrganizerOriginalCandidate {
+  title: string;
+  subject: string;
+  sourceExcerpt: string;
+}
+
+interface OrganizerConfirmedEdit {
+  teacherName: string;
+  subject: string;
+  sourceExcerpt: string;
+  beforeTitle: string;
+  afterTitle: string;
+}
+
 export interface OrganizedHomeworkImage {
   candidates: CandidateAssignment[];
   recognizedText: string;
@@ -49,7 +64,49 @@ export interface OrganizedHomeworkImage {
 
 export class HomeworkOrganizerRemoteApi {
   static readonly instance: HomeworkOrganizerRemoteApi = new HomeworkOrganizerRemoteApi();
+  private readonly originalById: Map<string, OrganizerOriginalCandidate> = new Map<string, OrganizerOriginalCandidate>();
   private constructor() {}
+
+  /** 家长成功发布后静默记录真正发生的标题纠错；上报失败不影响已发布作业。 */
+  async reportConfirmedEdits(candidates: CandidateAssignment[]): Promise<void> {
+    if (candidates.length === 0) return;
+    let studentId = candidates[0].studentId;
+    let teacherNames: string[] = [];
+    let first = candidates[0];
+    let raw = first.sourceEvidence.rawText === undefined ? '' : first.sourceEvidence.rawText;
+    let combined = first.sourceEvidence.sourceLabel + '\n' + raw;
+    let matches = combined.match(/[\u4e00-\u9fa5]{2,4}老师/g);
+    if (matches !== null) {
+      for (let name of matches) {
+        if (teacherNames.indexOf(name) < 0) teacherNames.push(name);
+      }
+    }
+    // 一个批次出现多位老师，或者根本没写老师姓名时，不推测归属。
+    let teacherName = teacherNames.length === 1 ? teacherNames[0] : '';
+    for (let candidate of candidates) {
+      let previous = this.originalById.get(candidate.id);
+      this.originalById.delete(candidate.id);
+      if (previous === undefined || candidate.studentId !== studentId ||
+        previous.title === candidate.title || teacherName.length === 0) continue;
+      let excerpt = previous.sourceExcerpt.trim();
+      if (excerpt.length === 0) continue;
+      let payload: OrganizerConfirmedEdit = {
+        teacherName: teacherName,
+        subject: candidate.subject,
+        sourceExcerpt: excerpt.substring(0, 120),
+        beforeTitle: previous.title.substring(0, 400),
+        afterTitle: candidate.title.substring(0, 400)
+      };
+      try {
+        await BackendHttpClient.instance.requestFor(
+          'homework.organize.feedback',
+          `/api/v1/students/${encodeURIComponent(studentId)}/homework/teacher-experiences/confirmed-edit`,
+          http.RequestMethod.POST, payload);
+      } catch {
+        // 学习是可选增强，不能把已成功发布的作业判为失败。
+      }
+    }
+  }
 
   async organizeImage(input: ExtractedHomeworkText, imageRef: string): Promise<OrganizedHomeworkImage> {
     if (!BackendSession.instance.isConnected()) throw new Error('请先连接后端后再解析作业图片');
@@ -130,8 +187,18 @@ export class HomeworkOrganizerRemoteApi {
       let confidence = remote.confidence;
       if (confidence < 0) confidence = 0;
       if (confidence > 1) confidence = 1;
+      let candidateId = `ai-${input.importId}-${i + 1}`;
+      this.originalById.set(candidateId, {
+        title: remote.title.trim(),
+        subject: subject,
+        sourceExcerpt: this.value(remote.sourceExcerpt, remote.title)
+      });
+      if (this.originalById.size > 100) {
+        let oldest = this.originalById.keys().next().value;
+        if (oldest !== undefined) this.originalById.delete(oldest);
+      }
       result.push({
-        id: `ai-${input.importId}-${i + 1}`,
+        id: candidateId,
         studentId: input.studentId,
         subject: subject,
         title: remote.title.trim(),
