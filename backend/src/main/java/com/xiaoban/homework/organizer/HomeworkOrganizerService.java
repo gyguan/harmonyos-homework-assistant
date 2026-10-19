@@ -20,23 +20,38 @@ public class HomeworkOrganizerService {
   private final HomeworkOrganizerModelClient model;
   private final HomeworkStudentTeacherService teachers;
   private final HomeworkOrganizerAiSnapshotService snapshots;
+  private final HomeworkTeacherExperienceService learnedExperiences;
 
   public HomeworkOrganizerService(StudentRepository students, HomeworkOrganizerModelClient model) {
-    this(students, model, null, null);
+    this(students, model, null, null, null);
   }
 
   public HomeworkOrganizerService(StudentRepository students, HomeworkOrganizerModelClient model,
       HomeworkStudentTeacherService teachers) {
-    this(students, model, teachers, null);
+    this(students, model, teachers, null, null);
+  }
+
+  public HomeworkOrganizerService(StudentRepository students, HomeworkOrganizerModelClient model,
+      HomeworkStudentTeacherService teachers, HomeworkOrganizerAiSnapshotService snapshots) {
+    this(students, model, teachers, snapshots, null);
   }
 
   @org.springframework.beans.factory.annotation.Autowired
   public HomeworkOrganizerService(StudentRepository students, HomeworkOrganizerModelClient model,
-      HomeworkStudentTeacherService teachers, HomeworkOrganizerAiSnapshotService snapshots) {
+      HomeworkStudentTeacherService teachers, HomeworkOrganizerAiSnapshotService snapshots,
+      HomeworkTeacherExperienceService learnedExperiences) {
     this.students = students;
     this.model = model;
     this.teachers = teachers;
     this.snapshots = snapshots;
+    this.learnedExperiences = learnedExperiences;
+  }
+
+  private List<HomeworkOrganizerDtos.Candidate> applyLearnedConventions(
+      StudentEntity student, String sourceLabel, String sourceText,
+      List<HomeworkOrganizerDtos.Candidate> candidates) {
+    return learnedExperiences == null ? candidates
+        : learnedExperiences.applyConfirmedExcerptCounts(student, sourceLabel, sourceText, candidates);
   }
 
   private String teacherLabel(UUID familyId, String studentId, String label, String selectedTeacher) {
@@ -56,8 +71,9 @@ public class HomeworkOrganizerService {
     List<HomeworkOrganizerDtos.Candidate> organized = model
         .organize(student, teacherLabel(familyId, studentId, request.sourceLabel(), request.teacherName()), request.text())
         .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI整理暂时不可用"));
-    List<HomeworkOrganizerDtos.Candidate> normalized =
-        normalizeDefaultTaskDates(organized, request.text());
+    List<HomeworkOrganizerDtos.Candidate> normalized = applyLearnedConventions(
+        student, request.sourceLabel(), request.text(),
+        normalizeDefaultTaskDates(organized, request.text()));
     if (snapshots != null) {
       String sourcedTeacher = request.teacherName() == null || request.teacherName().isBlank()
           ? HomeworkTeacherAttribution.explicitSourceTeacher(request.text())
@@ -86,8 +102,9 @@ public class HomeworkOrganizerService {
         .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI图片解析失败，请确认模型支持图片"));
     long modelMs = elapsedMs(modelStarted);
 
-    List<HomeworkOrganizerDtos.Candidate> normalized =
-        normalizeDefaultTaskDates(result.assignments(), result.recognizedText());
+    List<HomeworkOrganizerDtos.Candidate> normalized = applyLearnedConventions(
+        student, request.sourceLabel(), result.recognizedText(),
+        normalizeDefaultTaskDates(result.assignments(), result.recognizedText()));
     if (snapshots != null) {
       snapshots.capture(familyId, studentId, request.importId(), request.teacherName(), normalized);
     }
