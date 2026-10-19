@@ -31,7 +31,8 @@ public class HomeworkOrganizerRuleService {
     public String encodedShorthand() {
       // Runtime DB entries use the record separator, not the legacy env's semicolon:
       // descriptions often contain natural-language Chinese semicolons.
-      return shorthand.isEmpty() ? "" : "\u001e" + String.join("\u001e", shorthand);
+      String delimiter = Character.toString((char) 0x1e);
+      return shorthand.isEmpty() ? "" : delimiter + String.join(delimiter, shorthand);
     }
   }
 
