@@ -19,17 +19,24 @@ public class HomeworkOrganizerService {
   private final StudentRepository students;
   private final HomeworkOrganizerModelClient model;
   private final HomeworkStudentTeacherService teachers;
+  private final HomeworkOrganizerAiSnapshotService snapshots;
 
   public HomeworkOrganizerService(StudentRepository students, HomeworkOrganizerModelClient model) {
-    this(students, model, null);
+    this(students, model, null, null);
+  }
+
+  public HomeworkOrganizerService(StudentRepository students, HomeworkOrganizerModelClient model,
+      HomeworkStudentTeacherService teachers) {
+    this(students, model, teachers, null);
   }
 
   @org.springframework.beans.factory.annotation.Autowired
   public HomeworkOrganizerService(StudentRepository students, HomeworkOrganizerModelClient model,
-      HomeworkStudentTeacherService teachers) {
+      HomeworkStudentTeacherService teachers, HomeworkOrganizerAiSnapshotService snapshots) {
     this.students = students;
     this.model = model;
     this.teachers = teachers;
+    this.snapshots = snapshots;
   }
 
   private String teacherLabel(UUID familyId, String studentId, String label, String selectedTeacher) {
@@ -51,6 +58,9 @@ public class HomeworkOrganizerService {
         .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI整理暂时不可用"));
     List<HomeworkOrganizerDtos.Candidate> normalized =
         normalizeDefaultTaskDates(organized, request.text());
+    if (snapshots != null) {
+      snapshots.capture(familyId, studentId, request.importId(), request.teacherName(), normalized);
+    }
     log.info("homework_import organized studentId={} assignments={}", studentId, normalized.size());
     return new HomeworkOrganizerDtos.Response(normalized, "AI");
   }
@@ -75,6 +85,9 @@ public class HomeworkOrganizerService {
 
     List<HomeworkOrganizerDtos.Candidate> normalized =
         normalizeDefaultTaskDates(result.assignments(), result.recognizedText());
+    if (snapshots != null) {
+      snapshots.capture(familyId, studentId, request.importId(), request.teacherName(), normalized);
+    }
     log.info(
         "[AI-PERF] homework_image studentId={} base64Chars={} imageValidateMs={} modelMs={} totalMs={} assignments={} recognizedChars={}",
         studentId,
