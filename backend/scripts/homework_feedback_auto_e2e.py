@@ -120,7 +120,7 @@ def main() -> int:
         require(pending["processingStatus"] == "PENDING_EVIDENCE",
                 "unverified candidate falsely reported effective")
         count = sql(container, f"""select count(*) from homework_teacher_experience
-            where family_id='{family}' and student_id='{student_id}' and origin='FEEDBACK_AUTO'""")
+            where family_id='{family}' and student_id='{student_id}' and origin='FEEDBACK_AI'""")
         require(count == "1", "unverified feedback became a learning rule")
 
         print("HOMEWORK_FEEDBACK_AUTO_E2E_PASS unavailable AI status, saved feedback, detail isolation")
