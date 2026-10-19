@@ -24,13 +24,15 @@ public final class HomeworkTeacherExperienceDtos {
       @NotBlank @Size(max = 400) String beforeTitle,
       @NotBlank @Size(max = 400) String afterTitle) {}
 
+  public record ActiveUpdate(boolean active) {}
+
   public record Response(UUID id, String teacherName, String subject, String cue,
       String interpretation, String exampleSource, String exampleResult, String origin,
-      Instant updatedAt) {
+      Instant updatedAt, boolean active, UUID sourceFeedbackId) {
     static Response from(HomeworkTeacherExperienceEntity entity) {
       return new Response(entity.id, entity.teacherName, entity.subject,
           entity.cue, entity.interpretation, entity.exampleSource, entity.exampleResult,
-          entity.origin, entity.updatedAt);
+          entity.origin, entity.updatedAt, entity.active, entity.sourceFeedbackId);
     }
   }
 }
