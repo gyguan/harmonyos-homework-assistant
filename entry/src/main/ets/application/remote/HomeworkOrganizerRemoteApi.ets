@@ -81,7 +81,7 @@ export class HomeworkOrganizerRemoteApi {
     let first = candidates[0];
     let raw = first.sourceEvidence.rawText === undefined ? '' : first.sourceEvidence.rawText;
     let combined = first.sourceEvidence.sourceLabel + '\n' + raw;
-    let matches = combined.match(/[\\u4e00-\\u9fa5]{1,4}老师/g);
+    let matches = combined.match(/[\u4e00-\u9fa5]{1,4}老师/g);
     if (matches !== null) {
       for (let name of matches) {
         if (teacherNames.indexOf(name) < 0) teacherNames.push(name);
