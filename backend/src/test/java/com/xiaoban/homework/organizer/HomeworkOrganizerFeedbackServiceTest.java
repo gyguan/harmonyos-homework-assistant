@@ -3,6 +3,7 @@ package com.xiaoban.homework.organizer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -70,6 +71,8 @@ class HomeworkOrganizerFeedbackServiceTest {
     var feedback = mock(HomeworkOrganizerFeedbackRepository.class);
     var family = UUID.randomUUID();
     when(types.findById("SHORTHAND")).thenReturn(Optional.of(option("SHORTHAND", true)));
+    when(feedback.save(any(HomeworkOrganizerFeedbackEntity.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
     var handler = service(family, "student-a", students, types, feedback);
     handler.submit(family, "student-a", request("SHORTHAND", "国13 指国学第13页"));
     var captor = ArgumentCaptor.forClass(HomeworkOrganizerFeedbackEntity.class);
