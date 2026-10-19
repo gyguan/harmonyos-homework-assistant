@@ -61,6 +61,36 @@ def main() -> int:
         require(rule_rows == "听读U*:FEEDBACK_AUTO:true",
                 "feedback did not create a scoped active shorthand: " + rule_rows)
 
+        # Complete experience detail must include the original untruncated
+        # parent feedback, before/after titles, source and timestamps.
+        experience_id = sql(container, f"""select id from homework_teacher_experience
+            where family_id='{family}' and student_id='{student_id}'
+            and source_feedback_id='{receipt["id"]}'""")
+        require(bool(experience_id), "auto-learned experience id missing")
+        detail_path = (f"/api/v1/students/{student_id}/homework/"
+                       f"teacher-experiences/{experience_id}")
+        details = expect(http(DEFAULT_BASE_URL, "GET", detail_path, token=token),
+                         (200,), "full saved experience details").json()
+        require(details["experience"]["id"] == experience_id,
+                "detail endpoint returned another experience")
+        require(details["experience"]["cue"] == "听读U*" and
+                details["experience"]["exampleSource"] == source,
+                "detail endpoint lost complete stored experience fields")
+        require(bool(details["experience"].get("createdAt")) and
+                bool(details["experience"].get("updatedAt")),
+                "experience detail omitted timestamps")
+        require(details["feedback"]["details"] == payload["details"] and
+                details["feedback"]["originalTitle"] == payload["originalTitle"] and
+                details["feedback"]["currentTitle"] == payload["currentTitle"],
+                "linked parent feedback contents were truncated or missing")
+
+        unrelated_student = "s-unrelated-" + run
+        create_student(DEFAULT_BASE_URL, token, unrelated_student, "详情隔离测试学生")
+        denied_path = (f"/api/v1/students/{unrelated_student}/homework/"
+                       f"teacher-experiences/{experience_id}")
+        expect(http(DEFAULT_BASE_URL, "GET", denied_path, token=token),
+               (404,), "other student cannot read saved experience detail")
+
         replay = expect(http(DEFAULT_BASE_URL, "POST", path, token=token, payload=payload),
                         (200,), "idempotent feedback replay").json()
         require(replay["id"] == receipt["id"], "retry created another feedback")
