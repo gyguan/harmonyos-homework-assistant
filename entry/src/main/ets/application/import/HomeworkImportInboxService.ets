@@ -88,7 +88,8 @@ export class HomeworkImportInboxService {
       sourceKind: rawImport.sourceKind,
       sourceLabel: rawImport.sourceLabel,
       resourceUri: rawImport.resourceUri,
-      rawText: extractedText
+      rawText: extractedText,
+      teacherName: rawImport.teacherName
     });
     this.drafts.replaceCandidates(enriched);
   }
@@ -117,6 +118,7 @@ export class HomeworkImportInboxService {
         sourceEvidence: {
           sourceLabel: candidate.sourceEvidence.sourceLabel,
           excerpt: candidate.sourceEvidence.excerpt,
+          teacherName: candidate.sourceEvidence.teacherName,
           batchId: batch.id,
           sourceType: batch.sourceType,
           sourceMessageIds: messageIds,
@@ -232,6 +234,7 @@ export class HomeworkImportInboxService {
       sourceEvidence: {
         sourceLabel: candidate.sourceEvidence.sourceLabel,
         excerpt: candidate.sourceEvidence.excerpt,
+        teacherName: candidate.sourceEvidence.teacherName,
         batchId: batchId,
         sourceType: sourceType,
         sourceMessageIds: [message.id],
