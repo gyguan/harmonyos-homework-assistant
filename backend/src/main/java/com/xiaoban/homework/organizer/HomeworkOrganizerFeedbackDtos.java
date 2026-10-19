@@ -8,9 +8,11 @@ import java.util.UUID;
 public final class HomeworkOrganizerFeedbackDtos {
   private HomeworkOrganizerFeedbackDtos() {}
 
-  public record TypeResponse(String code, String label, String description, boolean requiresComment) {
+  public record TypeResponse(String code, String label, String description, boolean requiresComment,
+      boolean canBecomeExperience) {
     static TypeResponse from(HomeworkFeedbackTypeEntity entity) {
-      return new TypeResponse(entity.code, entity.label, entity.description, entity.requiresComment);
+      return new TypeResponse(entity.code, entity.label, entity.description,
+          entity.requiresComment, entity.canBecomeExperience);
     }
   }
 
@@ -26,6 +28,9 @@ public final class HomeworkOrganizerFeedbackDtos {
       @Size(max = 400) String originalTitle,
       @Size(max = 400) String currentTitle,
       @Size(max = 1200) String details) {}
+
+  public record Promote(@NotBlank @Size(max = 120) String cue,
+      @NotBlank @Size(max = 600) String interpretation) {}
 
   public record Response(UUID id, String candidateId, String teacherName,
       String subject, String feedbackTypeCode, String details, String processingStatus,
