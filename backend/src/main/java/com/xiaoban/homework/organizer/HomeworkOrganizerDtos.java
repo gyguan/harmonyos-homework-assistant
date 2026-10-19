@@ -10,8 +10,12 @@ public final class HomeworkOrganizerDtos {
   public record Request(
       @NotBlank @Size(max = 12000) String text,
       @Size(max = 200) String sourceLabel,
-      @Size(max = 80) String teacherName) {
-    public Request(String text, String sourceLabel) { this(text, sourceLabel, ""); }
+      @Size(max = 80) String teacherName,
+      @Size(max = 140) String importId) {
+    public Request(String text, String sourceLabel) { this(text, sourceLabel, "", ""); }
+    public Request(String text, String sourceLabel, String teacherName) {
+      this(text, sourceLabel, teacherName, "");
+    }
   }
 
   public record Candidate(
@@ -36,9 +40,14 @@ public final class HomeworkOrganizerDtos {
       @NotBlank @Size(max = 30) String contentType,
       @Size(max = 200) String sourceLabel,
       @Size(max = 12000) String text,
-      @Size(max = 80) String teacherName) {
+      @Size(max = 80) String teacherName,
+      @Size(max = 140) String importId) {
     public ImageRequest(String imageBase64, String contentType, String sourceLabel, String text) {
-      this(imageBase64, contentType, sourceLabel, text, "");
+      this(imageBase64, contentType, sourceLabel, text, "", "");
+    }
+    public ImageRequest(String imageBase64, String contentType, String sourceLabel, String text,
+        String teacherName) {
+      this(imageBase64, contentType, sourceLabel, text, teacherName, "");
     }
   }
 
