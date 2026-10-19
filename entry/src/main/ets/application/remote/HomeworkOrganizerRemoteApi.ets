@@ -7,8 +7,10 @@ import { HomeworkImageEncoder } from '../../infrastructure/ai/HomeworkImageEncod
 import { AssignmentTaskDate } from '../../domain/service/AssignmentTaskDate';
 
 interface OrganizePayload {
+  importId: string;
   text: string;
   sourceLabel: string;
+  teacherName: string;
 }
 
 interface RemoteCandidate {
@@ -28,10 +30,12 @@ interface OrganizeResponse {
 }
 
 interface ImageOrganizePayload {
+  importId: string;
   imageBase64: string;
   contentType: string;
   sourceLabel: string;
   text: string;
+  teacherName: string;
 }
 
 interface ImageOrganizeResponse {
@@ -42,6 +46,54 @@ interface ImageOrganizeResponse {
 
 interface OrganizerErrorResponse { message: string; }
 
+/** 仅保存本次 AI 原始标题供家长确认后比较，不包含孩子姓名或图片原件。 */
+interface OrganizerOriginalCandidate {
+  title: string;
+  subject: string;
+  instruction: string;
+  textbookRef: string;
+  taskDate: string;
+  expectedMinutes: number;
+  sourceExcerpt: string;
+  studentId: string;
+  batchId: string;
+  teacherName: string;
+}
+
+interface OrganizerReviewDifference {
+  candidateId: string;
+  changeType: string;
+  fieldName: string;
+  beforeValue: string;
+  afterValue: string;
+  sourceExcerpt: string;
+}
+
+interface OrganizerOriginalCandidateResponse {
+  candidateId: string;
+  teacherName: string;
+  title: string;
+  subject: string;
+  instruction: string;
+  textbookRef: string;
+  taskDate: string;
+  expectedMinutes: number;
+  sourceExcerpt: string;
+}
+
+interface OrganizerFinalizePayload {
+  batchId: string;
+  publishedCandidateIds: string[];
+}
+
+interface OrganizerConfirmedEdit {
+  teacherName: string;
+  subject: string;
+  sourceExcerpt: string;
+  beforeTitle: string;
+  afterTitle: string;
+}
+
 export interface OrganizedHomeworkImage {
   candidates: CandidateAssignment[];
   recognizedText: string;
@@ -49,7 +101,114 @@ export interface OrganizedHomeworkImage {
 
 export class HomeworkOrganizerRemoteApi {
   static readonly instance: HomeworkOrganizerRemoteApi = new HomeworkOrganizerRemoteApi();
+  private readonly originalById: Map<string, OrganizerOriginalCandidate> = new Map<string, OrganizerOriginalCandidate>();
   private constructor() {}
+
+  /** AI 原始标题仅在本次确认会话内保存，反馈时作为纠错前的证据。 */
+  originalTitle(candidateId: string, fallback: string): string {
+    let item = this.originalById.get(candidateId);
+    return item === undefined ? fallback : item.title;
+  }
+
+  /** Retrieve server originals after an app restart; never fabricate missing AI evidence. */
+  async restoreOriginals(studentId: string, batchId: string): Promise<void> {
+    if (studentId.length === 0 || batchId.length === 0) return;
+    let response = await BackendHttpClient.instance.requestFor(
+      'homework.organize.snapshots',
+      `/api/v1/students/${encodeURIComponent(studentId)}/homework/ai-snapshots/${encodeURIComponent(batchId)}`,
+      http.RequestMethod.GET);
+    if (response.statusCode < 200 || response.statusCode >= 300) return;
+    let rows = JSON.parse(response.body) as OrganizerOriginalCandidateResponse[];
+    if (!Array.isArray(rows)) return;
+    for (let row of rows) {
+      if (typeof row.candidateId !== 'string' || row.candidateId.length === 0) continue;
+      this.originalById.set(row.candidateId, {
+        title: row.title,
+        subject: row.subject,
+        instruction: row.instruction,
+        textbookRef: row.textbookRef,
+        taskDate: row.taskDate,
+        expectedMinutes: row.expectedMinutes,
+        sourceExcerpt: row.sourceExcerpt,
+        studentId: studentId,
+        batchId: batchId,
+        teacherName: row.teacherName
+      });
+    }
+  }
+
+  /** The server compares original snapshot with actual persisted published assignments. */
+  async reportConfirmedReview(candidates: CandidateAssignment[]): Promise<void> {
+    if (candidates.length === 0) return;
+    let studentId = candidates[0].studentId;
+    let batchId = candidates[0].sourceEvidence.batchId;
+    if (batchId === undefined || batchId.length === 0) return;
+    let ids: string[] = [];
+    for (let item of candidates) {
+      if (item.studentId !== studentId || item.sourceEvidence.batchId !== batchId) return;
+      ids.push(item.id);
+    }
+    let payload: OrganizerFinalizePayload = {
+      batchId: batchId,
+      publishedCandidateIds: ids
+    };
+    let response = await BackendHttpClient.instance.requestFor(
+      'homework.organize.review-differences.finalize',
+      `/api/v1/students/${encodeURIComponent(studentId)}/homework/review-differences/finalize`,
+      http.RequestMethod.POST, payload);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw new Error('作业已发布，差异分析上传失败');
+    }
+    for (let entry of this.originalById.entries()) {
+      if (entry[1].studentId === studentId && entry[1].batchId === batchId) {
+        this.originalById.delete(entry[0]);
+      }
+    }
+  }
+
+  /** 家长成功发布后静默记录真正发生的标题纠错；上报失败不影响已发布作业。 */
+  async reportConfirmedEdits(candidates: CandidateAssignment[]): Promise<void> {
+    if (candidates.length === 0) return;
+    let studentId = candidates[0].studentId;
+    let teacherNames: string[] = [];
+    let first = candidates[0];
+    let raw = first.sourceEvidence.rawText === undefined ? '' : first.sourceEvidence.rawText;
+    let combined = first.sourceEvidence.sourceLabel + '\n' + raw;
+    let matches = combined.match(/[\u4e00-\u9fa5]{1,4}老师/g);
+    if (matches !== null) {
+      for (let name of matches) {
+        if (teacherNames.indexOf(name) < 0) teacherNames.push(name);
+      }
+    }
+    // 一个批次出现多位老师，或者根本没写老师姓名时，不推测归属。
+    let teacherName = teacherNames.length === 1 ? teacherNames[0] : '';
+    let explicitlyBound = first.sourceEvidence.teacherName === undefined ? '' :
+      first.sourceEvidence.teacherName.trim();
+    if (explicitlyBound.length > 0) teacherName = explicitlyBound;
+    for (let candidate of candidates) {
+      let previous = this.originalById.get(candidate.id);
+      this.originalById.delete(candidate.id);
+      if (previous === undefined || candidate.studentId !== studentId ||
+        previous.title === candidate.title || teacherName.length === 0) continue;
+      let excerpt = previous.sourceExcerpt.trim();
+      if (excerpt.length === 0) continue;
+      let payload: OrganizerConfirmedEdit = {
+        teacherName: teacherName,
+        subject: candidate.subject,
+        sourceExcerpt: excerpt.substring(0, 120),
+        beforeTitle: previous.title.substring(0, 400),
+        afterTitle: candidate.title.substring(0, 400)
+      };
+      try {
+        await BackendHttpClient.instance.requestFor(
+          'homework.organize.feedback',
+          `/api/v1/students/${encodeURIComponent(studentId)}/homework/teacher-experiences/confirmed-edit`,
+          http.RequestMethod.POST, payload);
+      } catch {
+        // 学习是可选增强，不能把已成功发布的作业判为失败。
+      }
+    }
+  }
 
   async organizeImage(input: ExtractedHomeworkText, imageRef: string): Promise<OrganizedHomeworkImage> {
     if (!BackendSession.instance.isConnected()) throw new Error('请先连接后端后再解析作业图片');
@@ -58,10 +217,12 @@ export class HomeworkOrganizerRemoteApi {
     let encoded = await HomeworkImageEncoder.encode(imageRef);
     let encodeMs = Date.now() - encodeStarted;
     let payload: ImageOrganizePayload = {
+      importId: input.importId,
       imageBase64: encoded.imageBase64,
       contentType: encoded.contentType,
       sourceLabel: input.sourceLabel,
-      text: input.text
+      text: input.text,
+      teacherName: input.teacherName === undefined ? '' : input.teacherName
     };
     let requestStarted = Date.now();
     let response = await BackendHttpClient.instance.requestFor(
@@ -83,7 +244,8 @@ export class HomeworkOrganizerRemoteApi {
     }
     let parsed = JSON.parse(response.body) as ImageOrganizeResponse;
     if (parsed.mode !== 'AI_IMAGE' || typeof parsed.recognizedText !== 'string' ||
-      parsed.recognizedText.trim().length === 0 || !Array.isArray(parsed.assignments)) {
+      !Array.isArray(parsed.assignments) ||
+      (parsed.assignments.length > 0 && parsed.recognizedText.trim().length === 0)) {
       throw new Error('AI图片解析结果不完整，请换一张清晰图片后重试');
     }
     let candidates = this.toCandidates(input, parsed.assignments, parsed.recognizedText.trim());
@@ -99,8 +261,10 @@ export class HomeworkOrganizerRemoteApi {
     }
     try {
       let payload: OrganizePayload = {
+        importId: input.importId,
         text: input.text,
-        sourceLabel: input.sourceLabel
+        sourceLabel: input.sourceLabel,
+        teacherName: input.teacherName === undefined ? '' : input.teacherName
       };
       let response = await BackendHttpClient.instance.requestFor(
         'homework.organize',
@@ -130,8 +294,25 @@ export class HomeworkOrganizerRemoteApi {
       let confidence = remote.confidence;
       if (confidence < 0) confidence = 0;
       if (confidence > 1) confidence = 1;
+      let candidateId = `ai-${input.importId}-${i + 1}`;
+      this.originalById.set(candidateId, {
+        title: remote.title.trim(),
+        subject: subject,
+        instruction: this.value(remote.instruction, remote.title),
+        textbookRef: this.value(remote.textbookRef, '待家长确认'),
+        taskDate: AssignmentTaskDate.resolve(this.value(remote.taskDate, AssignmentTaskDate.today())),
+        expectedMinutes: this.expectedMinutes(remote.expectedMinutes),
+        sourceExcerpt: this.value(remote.sourceExcerpt, remote.title),
+        studentId: input.studentId,
+        batchId: input.importId,
+        teacherName: input.teacherName === undefined ? '' : input.teacherName
+      });
+      if (this.originalById.size > 100) {
+        let oldest = this.originalById.keys().next().value;
+        if (oldest !== undefined) this.originalById.delete(oldest);
+      }
       result.push({
-        id: `ai-${input.importId}-${i + 1}`,
+        id: candidateId,
         studentId: input.studentId,
         subject: subject,
         title: remote.title.trim(),
@@ -142,6 +323,7 @@ export class HomeworkOrganizerRemoteApi {
         sourceEvidence: {
           sourceLabel: input.sourceLabel,
           excerpt: this.value(remote.sourceExcerpt, remote.title),
+          teacherName: input.teacherName === undefined ? '' : input.teacherName,
           rawText: rawTextOverride === undefined ? input.text : rawTextOverride
         },
         confidence: confidence

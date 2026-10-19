@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -69,6 +70,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   private final AiProviderProperties properties;
   private final OpenAiCompatibleTransport transport;
   private final JsonMapper jsonMapper;
+  private final HomeworkTeacherExperienceService teacherExperiences;
 
   /**
    * 注意：expectedMinutes / confidence 必须用装箱类型。
@@ -89,11 +91,24 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   /** 一次简写命中：词条本身，以及原文里实际匹配到的文本（用于取数字）。 */
   record ShorthandMatch(ShorthandEntry entry, String text) {}
 
+  /** 测试和旧调用方可继续用原有构造；生产环境自动装配经验仓库。 */
   public ConfigurableHomeworkOrganizerModelClient(AiProviderProperties properties,
       OpenAiCompatibleTransport transport, JsonMapper jsonMapper) {
+    this(properties, transport, jsonMapper, null);
+  }
+
+  @Autowired
+  public ConfigurableHomeworkOrganizerModelClient(AiProviderProperties properties,
+      OpenAiCompatibleTransport transport, JsonMapper jsonMapper,
+      HomeworkTeacherExperienceService teacherExperiences) {
     this.properties = properties;
     this.transport = transport;
     this.jsonMapper = jsonMapper;
+    this.teacherExperiences = teacherExperiences;
+  }
+
+  private String studentTeacherContext(StudentEntity student, String sourceLabel, String text, boolean image) {
+    return teacherExperiences == null ? "" : teacherExperiences.context(student, sourceLabel, text, image);
   }
 
   @Override
@@ -115,6 +130,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       output = transport.completeWithImage(
           properties.getImageOrganizerModel(),
           instructionsWithShorthand()
+              + studentTeacherContext(student, sourceLabel, text, true)
               + blackboardFormatSection()
               + "输入图片可能包含多个科目，逐项识别科目，不把整张图片归为单一科目。"
               + "sourceExcerpt 只摘取对应作业的可辨认原文，删除群聊闲聊、通知性废话和重复内容。"
@@ -259,7 +275,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     long started = System.nanoTime();
     Optional<String> outputText = transport.complete(
         properties.getOrganizerModel(),
-        instructionsWithShorthand(),
+        instructionsWithShorthand()
+            + studentTeacherContext(student, sourceLabel, text, false),
         buildInput(student, sourceLabel, text),
         // 关闭思考后每条任务约 90 个输出 token；一次 17 条的超长通知实测用到 1540，
         // 留到 2000 防止长通知在结尾被截断（截断了等于整次整理失败）。
@@ -368,7 +385,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
    * </pre>
    */
   static String teacherFormatSection() {
-    return "老师布置作业常用「学习进度 / 常规作业 / 今日作业」三段式模板，识别到时按下面处理："
+    return "当老师通知出现「学习进度 / 常规作业 / 今日作业」三段式模板时按下面处理，其他格式不得套用："
         + "「学习进度」段（常带🔔，写「今天我们学了《…》」）只是告知当天学了哪篇课文，"
         + "孩子没有对应的动作可做，**不要为它生成任务**；但要把这里的课文篇名用到后面各项作业的 title 里，"
         + "例如学习进度是《黄山奇石》时，「正确、流利、有感情地朗读课文三遍」的标题要写成"
@@ -425,7 +442,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   }
 
   /**
-   * 官桐羽老师与官士棋老师是同一位英语老师，其作业写法与语文老师不同：
+   * 一类英语老师通知条目少、简写重。尚未核实具体教师身份，严禁将不同老师自动合并：
    * 条目少、简写重，一个序号里常用「/」并列好几个听读对象——老师写两点，实际是三个任务。
    * 不写进提示词的话，模型会照序号个数出两条，并把「听读课文U4」和「听读绘本」并成一条。
    *
@@ -435,7 +452,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
    * </pre>
    */
   static String englishTeacherFormatSection() {
-    return "英语作业（官桐羽老师与官士棋老师是同一位老师）另有固定写法，识别到时按下面处理："
+    return "当英语作业出现下列简写或分点写法时，按规则解析；不要根据姓名猜测两位老师是否同一人："
         + "①「U＋数字」＝Unit（单元），U 后面的数字就是单元号；"
         + "「听读U4」「听读课文U4」都是「听读课本第 4 单元课文」，单元号必须写进 title。"
         + "②老师常在一个序号里用「/」「、」「和」并列多个听读对象，"
@@ -470,7 +487,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
    * <p>典型形态见 {@link #blackboardExample()}。
    */
   static String blackboardFormatSection() {
-    return "官士棋老师把作业写在黑板/白板的《作业公示栏》里，是表格版式"
+    return "当图片中有黑板/白板《作业公示栏》时，按照表格版式解析"
         + "（表头「学科」「内容」「预计时长」，右侧可能还有「上午」「下午」）。"
         + "⚠️下面这几条只适用于这种黑板表格；微信群里的三段式文字通知仍按前面「三段式模板」"
         + "那一条逐动作拆，不要拿这里的「一个序号一条」去合并那边的动作。"

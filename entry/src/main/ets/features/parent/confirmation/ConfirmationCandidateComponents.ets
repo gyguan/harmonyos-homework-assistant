@@ -1,3 +1,10 @@
+import {
+  HomeworkOrganizerFeedbackRemoteApi,
+  HomeworkFeedbackType,
+  HomeworkFeedbackInput,
+  HomeworkTeacherExperienceSummary
+} from '../../../application/remote/HomeworkOrganizerFeedbackRemoteApi';
+import { HomeworkOrganizerRemoteApi } from '../../../application/remote/HomeworkOrganizerRemoteApi';
 import { AssignmentEditChangeDetector, AssignmentEditValues } from '../../../common/state/AssignmentEditChangeDetector';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
@@ -166,6 +173,22 @@ export struct ConfirmationCandidateEditor {
   @State private attachmentDraft: PendingAssignmentAttachment[] = [];
   @State private confirmDiscard: boolean = false;
   @State private confirmDelete: boolean = false;
+  @State private showFeedbackPanel: boolean = false;
+  @State private feedbackTypes: HomeworkFeedbackType[] = [];
+  @State private feedbackLoading: boolean = false;
+  @State private feedbackSubmitting: boolean = false;
+  @State private feedbackSelectedCode: string = '';
+  @State private feedbackTeacherName: string = '';
+  @State private feedbackDetails: string = '';
+  @State private feedbackMessage: string = '';
+  @State private feedbackHasError: boolean = false;
+  @State private feedbackSaveAsRule: boolean = false;
+  @State private feedbackCue: string = '';
+  @State private feedbackInterpretation: string = '';
+  @State private showSavedExperiences: boolean = false;
+  @State private loadingExperiences: boolean = false;
+  @State private savedExperiences: HomeworkTeacherExperienceSummary[] = [];
+  private feedbackRequestId: string = '';
 
   onClose: () => void = () => {};
   onSave: (candidate: CandidateAssignment, attachments: PendingAssignmentAttachment[]) => boolean =
@@ -182,6 +205,155 @@ export struct ConfirmationCandidateEditor {
     this.attachmentDraft = this.attachments.slice();
     this.confirmDiscard = false;
     this.confirmDelete = false;
+    this.showFeedbackPanel = false;
+    this.feedbackSelectedCode = '';
+    this.feedbackTeacherName = this.item.sourceEvidence.teacherName === undefined ? '' :
+      this.item.sourceEvidence.teacherName;
+    this.feedbackDetails = '';
+    this.feedbackMessage = '';
+    this.feedbackHasError = false;
+    this.feedbackSaveAsRule = false;
+    this.feedbackCue = '';
+    this.feedbackInterpretation = '';
+    this.showSavedExperiences = false;
+    this.savedExperiences = [];
+    this.feedbackRequestId = '';
+  }
+
+  private toggleFeedbackPanel(): void {
+    this.showFeedbackPanel = !this.showFeedbackPanel;
+    if (this.showFeedbackPanel && this.feedbackTypes.length === 0) {
+      void this.loadFeedbackTypes();
+    }
+  }
+
+  private async loadFeedbackTypes(): Promise<void> {
+    if (this.feedbackLoading) return;
+    this.feedbackLoading = true;
+    this.feedbackMessage = '';
+    try {
+      this.feedbackTypes = await HomeworkOrganizerFeedbackRemoteApi.instance.listTypes(this.item.studentId);
+    } catch {
+      this.feedbackHasError = true;
+      this.feedbackMessage = '反馈选项加载失败，请检查网络后重试';
+    } finally {
+      this.feedbackLoading = false;
+    }
+  }
+
+  private async toggleSavedExperiences(): Promise<void> {
+    this.showSavedExperiences = !this.showSavedExperiences;
+    if (!this.showSavedExperiences) return;
+    this.loadingExperiences = true;
+    try {
+      this.savedExperiences = await HomeworkOrganizerFeedbackRemoteApi.instance
+        .listExperiences(this.item.studentId);
+    } catch {
+      this.feedbackHasError = true;
+      this.feedbackMessage = '老师经验列表加载失败';
+    } finally {
+      this.loadingExperiences = false;
+    }
+  }
+
+  private async setSavedExperienceActive(item: HomeworkTeacherExperienceSummary): Promise<void> {
+    try {
+      let updated = await HomeworkOrganizerFeedbackRemoteApi.instance
+        .setExperienceActive(this.item.studentId, item.id, !item.active);
+      this.savedExperiences = this.savedExperiences.map((old: HomeworkTeacherExperienceSummary) =>
+        old.id === updated.id ? updated : old);
+      this.feedbackHasError = false;
+      this.feedbackMessage = updated.active ? '已重新启用这条老师经验' : '已停用，后续整理不再引用这条经验';
+    } catch {
+      this.feedbackHasError = true;
+      this.feedbackMessage = '经验状态更新失败，请重试';
+    }
+  }
+
+  private selectedFeedbackType(): HomeworkFeedbackType | null {
+    for (let option of this.feedbackTypes) {
+      if (option.code === this.feedbackSelectedCode) return option;
+    }
+    return null;
+  }
+
+  private async submitFeedback(): Promise<void> {
+    if (this.feedbackSubmitting) return;
+    let type = this.selectedFeedbackType();
+    if (type === null) {
+      this.feedbackHasError = true;
+      this.feedbackMessage = '请选择要反馈的问题';
+      return;
+    }
+    if (type.requiresComment && this.feedbackDetails.trim().length === 0) {
+      this.feedbackHasError = true;
+      this.feedbackMessage = '请简要说明具体问题或正确写法';
+      return;
+    }
+    if (this.feedbackSaveAsRule && type.canBecomeExperience) {
+      if (this.feedbackTeacherName.trim().length < 2) {
+        this.feedbackHasError = true;
+        this.feedbackMessage = '要形成老师经验，请填写确定的老师姓名';
+        return;
+      }
+      if (this.feedbackCue.trim().length < 2 || this.feedbackInterpretation.trim().length < 6) {
+        this.feedbackHasError = true;
+        this.feedbackMessage = '请填写原文中出现的触发词（如国*）及完整正确解释';
+        return;
+      }
+    }
+    if (this.feedbackRequestId.length === 0) {
+      this.feedbackRequestId = `${this.item.id}-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+    }
+    let evidence = this.item.sourceEvidence;
+    let input: HomeworkFeedbackInput = {
+      clientRequestId: this.feedbackRequestId.substring(0, 160),
+      candidateId: this.item.id.substring(0, 180),
+      batchId: evidence.batchId === undefined ? '' : evidence.batchId.substring(0, 180),
+      teacherName: this.feedbackTeacherName.trim().substring(0, 80),
+      subject: this.item.subject,
+      feedbackTypeCode: type.code,
+      sourceLabel: evidence.sourceLabel.substring(0, 200),
+      sourceExcerpt: evidence.excerpt.substring(0, 500),
+      originalTitle: HomeworkOrganizerRemoteApi.instance.originalTitle(
+        this.item.id, this.item.title).substring(0, 400),
+      currentTitle: this.item.title.substring(0, 400),
+      details: this.feedbackDetails.trim().substring(0, 1200)
+    };
+    this.feedbackSubmitting = true;
+    this.feedbackMessage = '';
+    try {
+      let receipt = await HomeworkOrganizerFeedbackRemoteApi.instance.submit(this.item.studentId, input);
+      if (this.feedbackSaveAsRule && type.canBecomeExperience) {
+        try {
+          await HomeworkOrganizerFeedbackRemoteApi.instance.promote(
+            this.item.studentId, receipt.id, {
+              cue: this.feedbackCue.trim(),
+              interpretation: this.feedbackInterpretation.trim()
+            });
+        } catch {
+          this.feedbackHasError = true;
+          this.feedbackMessage = '反馈已经保存，但老师经验暂未生效。请核对触发词是否出现在原文中，然后重试';
+          return;
+        }
+      }
+      this.feedbackHasError = false;
+      this.feedbackMessage = this.feedbackSaveAsRule
+        ? '已保存反馈并启用该学生、该老师的专属经验'
+        : '反馈已保存，暂不会自动改变 AI 解析规则';
+      this.showFeedbackPanel = false;
+      this.feedbackSelectedCode = '';
+      this.feedbackDetails = '';
+      this.feedbackSaveAsRule = false;
+      this.feedbackCue = '';
+      this.feedbackInterpretation = '';
+      this.feedbackRequestId = '';
+    } catch {
+      this.feedbackHasError = true;
+      this.feedbackMessage = '反馈保存失败，内容已保留，请重试';
+    } finally {
+      this.feedbackSubmitting = false;
+    }
   }
 
   private originalEditValues(): AssignmentEditValues {
@@ -240,6 +412,7 @@ export struct ConfirmationCandidateEditor {
       sourceEvidence: {
         sourceLabel: this.item.sourceEvidence.sourceLabel,
         excerpt: this.item.sourceEvidence.excerpt,
+        teacherName: this.item.sourceEvidence.teacherName,
         batchId: this.item.sourceEvidence.batchId,
         sourceType: this.item.sourceEvidence.sourceType,
         sourceMessageIds: this.item.sourceEvidence.sourceMessageIds === undefined ?
@@ -342,6 +515,175 @@ export struct ConfirmationCandidateEditor {
     .border({ width: { top: 1 }, color: AppTheme.DIVIDER });
   }
 
+
+  @Builder
+  private FeedbackPanel() {
+    Column({ space: 9 }) {
+      Button(this.showFeedbackPanel ? '收起 AI 整理反馈' : '反馈 AI 整理问题',
+        { type: ButtonType.Normal })
+        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+        .width('100%')
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+        .fontColor(AppTheme.PRIMARY)
+        .onClick(() => this.toggleFeedbackPanel());
+
+      if (this.feedbackMessage.length > 0) {
+        Text(this.feedbackMessage)
+          .fontSize(AppTheme.META_SIZE)
+          .fontColor(this.feedbackHasError ? AppTheme.DANGER : AppTheme.PRIMARY)
+          .width('100%');
+      }
+
+      if (this.showFeedbackPanel) {
+        if (this.feedbackLoading) {
+          Text('正在加载可选反馈类型…')
+            .fontSize(AppTheme.META_SIZE)
+            .fontColor(AppTheme.SUBTEXT);
+        } else if (this.feedbackTypes.length === 0) {
+          Button('重新加载反馈选项', { type: ButtonType.Normal })
+            .onClick(() => { void this.loadFeedbackTypes(); });
+        } else {
+          Text('问题类型')
+            .fontSize(AppTheme.LABEL_TITLE_SIZE)
+            .fontColor(AppTheme.TEXT)
+            .width('100%');
+
+          Column({ space: 6 }) {
+            ForEach(this.feedbackTypes, (option: HomeworkFeedbackType) => {
+              Column({ space: 3 }) {
+                ChoiceSelectionChip({
+                  label: option.label,
+                  selected: this.feedbackSelectedCode === option.code,
+                  compact: true,
+                  onSelect: () => {
+                    this.feedbackSelectedCode = option.code;
+                    this.feedbackSaveAsRule = false;
+                    this.feedbackMessage = '';
+                    this.feedbackRequestId = '';
+                  }
+                });
+                if (this.feedbackSelectedCode === option.code && option.description.length > 0) {
+                  Text(option.description)
+                    .width('100%')
+                    .fontSize(AppTheme.META_SIZE)
+                    .fontColor(AppTheme.SUBTEXT);
+                }
+              }
+              .width('100%')
+              .alignItems(HorizontalAlign.Start);
+            }, (option: HomeworkFeedbackType) => option.code);
+          }
+          .width('100%');
+
+          TextInput({ text: this.feedbackTeacherName, placeholder: '老师姓名（选填，用于归纳老师习惯）' })
+            .width('100%')
+            .height(AppTheme.INPUT_HEIGHT)
+            .onChange((value: string) => {
+              this.feedbackTeacherName = value;
+              this.feedbackRequestId = '';
+            });
+
+          TextArea({ text: this.feedbackDetails, placeholder: '具体问题、正确内容或老师缩写的含义' })
+            .width('100%')
+            .height(100)
+            .onChange((value: string) => {
+              this.feedbackDetails = value;
+              this.feedbackRequestId = '';
+            });
+
+          if (this.selectedFeedbackType() !== null &&
+            this.selectedFeedbackType()!.canBecomeExperience) {
+            ChoiceSelectionChip({
+              label: '同时保存为该老师的专属经验',
+              selected: this.feedbackSaveAsRule,
+              compact: false,
+              onSelect: () => {
+                this.feedbackSaveAsRule = !this.feedbackSaveAsRule;
+              }
+            });
+            if (this.feedbackSaveAsRule) {
+              Text('只有当前学生、老师及触发词匹配，后续才会使用这条经验；可随时停用。')
+                .fontSize(AppTheme.META_SIZE)
+                .fontColor(AppTheme.SUBTEXT)
+                .width('100%');
+              TextInput({ text: this.feedbackCue, placeholder: '老师原文中的触发词，如 国* 或 听读U*' })
+                .width('100%')
+                .height(AppTheme.INPUT_HEIGHT)
+                .onChange((value: string) => {
+                  this.feedbackCue = value;
+                  this.feedbackRequestId = '';
+                });
+              TextArea({ text: this.feedbackInterpretation,
+                placeholder: '准确含义，如 国* 指《国学》第*页，只替换实际出现的数字' })
+                .width('100%')
+                .height(90)
+                .onChange((value: string) => {
+                  this.feedbackInterpretation = value;
+                  this.feedbackRequestId = '';
+                });
+            }
+          }
+
+          Button(this.feedbackSubmitting ? '正在保存反馈…' : '提交反馈',
+            { type: ButtonType.Normal })
+            .width('100%')
+            .height(AppTheme.BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.PRIMARY)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .enabled(!this.feedbackSubmitting)
+            .onClick(() => { void this.submitFeedback(); });
+        }
+      }
+
+      Button(this.showSavedExperiences ? '收起已保存的老师经验' : '查看或停用老师经验',
+        { type: ButtonType.Normal })
+        .width('100%')
+        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+        .fontColor(AppTheme.TEXT)
+        .onClick(() => { void this.toggleSavedExperiences(); });
+
+      if (this.showSavedExperiences) {
+        if (this.loadingExperiences) {
+          Text('正在加载老师经验…').fontColor(AppTheme.SUBTEXT);
+        } else if (this.savedExperiences.length === 0) {
+          Text('当前学生尚未积累老师经验').fontColor(AppTheme.SUBTEXT);
+        } else {
+          ForEach(this.savedExperiences, (experience: HomeworkTeacherExperienceSummary) => {
+            Row({ space: 8 }) {
+              Column({ space: 4 }) {
+                Text(`${experience.teacherName} · ${experience.subject} · ${experience.cue}`)
+                  .fontSize(AppTheme.META_SIZE)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.TEXT);
+                Text(experience.interpretation)
+                  .fontSize(AppTheme.META_SIZE)
+                  .maxLines(2)
+                  .fontColor(AppTheme.SUBTEXT);
+              }
+              .layoutWeight(1);
+              Button(experience.active ? '停用' : '启用', { type: ButtonType.Normal })
+                .fontSize(AppTheme.META_SIZE)
+                .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+                .fontColor(AppTheme.PRIMARY)
+                .onClick(() => { void this.setSavedExperienceActive(experience); });
+            }
+            .width('100%');
+          }, (experience: HomeworkTeacherExperienceSummary) =>
+            `${experience.id}-${experience.active}`);
+        }
+      }
+    }
+    .width('100%')
+    .padding(AppTheme.CARD_PADDING_COMPACT)
+    .backgroundColor(AppTheme.SURFACE_SUBTLE)
+    .borderRadius(AppTheme.CONTROL_RADIUS);
+  }
+
   build() {
     Column() {
       EditSheetHeader({
@@ -410,6 +752,10 @@ export struct ConfirmationCandidateEditor {
           .padding(AppTheme.CARD_PADDING_COMPACT)
           .backgroundColor(this.item.confidence < 0.8 ? AppTheme.WARNING_SOFT : AppTheme.SURFACE_SUBTLE)
           .borderRadius(AppTheme.CONTROL_RADIUS);
+
+          if (this.item.id.startsWith('ai-')) {
+            this.FeedbackPanel();
+          }
         }
         .width('100%')
         .padding({ left: 16, right: 16, top: 12, bottom: 16 });

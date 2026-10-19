@@ -11,6 +11,18 @@ on:
       - 'fix/**'
 
 jobs:
+  validate-homework-organizer-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test gold-only homework organizer evaluator
+        run: python -m unittest discover -s scripts/tests -p test_evaluate_homework_organizer.py -v
+
   validate-backend-logging:
     runs-on: ubuntu-latest
     steps:
@@ -440,6 +452,9 @@ jobs:
 
       - name: Run batch publish E2E
         run: python backend/scripts/batch_publish_e2e.py
+
+      - name: Run organizer review Outbox PostgreSQL E2E
+        run: python backend/scripts/homework_review_outbox_e2e.py
 
       - name: Run voice material daily automation E2E
         run: python backend/scripts/voice_material_e2e.py

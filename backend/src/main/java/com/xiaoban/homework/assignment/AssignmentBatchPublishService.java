@@ -1,6 +1,8 @@
 package com.xiaoban.homework.assignment;
 
 import com.xiaoban.homework.common.ApiExceptions;
+import com.xiaoban.homework.organizer.HomeworkReviewOutboxEnqueuer;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,9 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AssignmentBatchPublishService {
   private final AssignmentService assignmentService;
+  private final HomeworkReviewOutboxEnqueuer outbox;
 
   public AssignmentBatchPublishService(AssignmentService assignmentService) {
+    this(assignmentService, null);
+  }
+
+  @Autowired
+  public AssignmentBatchPublishService(AssignmentService assignmentService,
+      HomeworkReviewOutboxEnqueuer outbox) {
     this.assignmentService = assignmentService;
+    this.outbox = outbox;
   }
 
   @Transactional
@@ -47,6 +57,10 @@ public class AssignmentBatchPublishService {
     for (AssignmentDtos.BatchPublishItem item : input.items()) {
       AssignmentDtos.Response assignment = assignmentService.create(familyId, studentId, item.assignment());
       published.add(new AssignmentDtos.BatchPublishResult(item.candidateId(), assignment));
+    }
+    if (outbox != null && input.batchId() != null && !input.batchId().isBlank()) {
+      outbox.enqueue(familyId, studentId, input.batchId(),
+          input.items().stream().map(AssignmentDtos.BatchPublishItem::candidateId).toList());
     }
     return new AssignmentDtos.BatchPublishResponse(true, published.size(), published);
   }

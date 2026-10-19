@@ -79,18 +79,29 @@ require("@State private selectedSubject: Subject | null = null" in import_page a
         "label: '自动识别'" in import_page and
         ".enabled(this.canOrganize())" in import_page and "请先选择作业科目" not in import_page,
         "manual homework must allow automatic subject inference before organization")
-require("HomeworkImageRecognitionMode.AI_IMAGE" in import_page and
-        "HomeworkImageRecognitionMode.OCR" in import_page and
-        "识别图片文字" in import_page and "重新用图片解析" in import_page and
-        "this.viewModel.parseImage(" in import_page and "this.viewModel.recognizeSelectedImageText(" in import_page,
-        "manual homework must default to image AI parsing and retain explicit same-image OCR rollback")
+# Current product decision: the parent picks either image AI parsing or text input.
+# Do not reintroduce retired on-device OCR buttons, or silently combine both inputs.
+require("enum HomeworkAssignmentInputMode" in import_page and
+        "TEXT = 'TEXT'" in import_page and "IMAGE = 'IMAGE'" in import_page and
+        "@State private inputMode: HomeworkAssignmentInputMode = HomeworkAssignmentInputMode.TEXT" in import_page and
+        "private usesImageAiParse(): boolean" in import_page and
+        "HomeworkImageRecognitionMode.OCR" not in import_page and
+        "识别图片文字" not in import_page,
+        "manual import must have explicit mutually exclusive text/image AI modes without retired OCR fallback")
 input_section = import_page.split("private AssignmentInput()", 1)[-1].split("private ActionFooter()", 1)[0]
-require("this.ImageInput();" in input_section and "TextArea({" in input_section and
-        "} else {" not in input_section and
-        "this.viewModel.parseImage(this.sourceImageRef, this.selectedSubject, this.sourceImageLabel, text)" in import_page,
-        "image and text must coexist and supplemental text must reach image organization")
-require("this.viewModel.parseText(text, this.selectedSubject, this.sourceImageRef, this.sourceImageLabel)" in import_page,
-        "manual homework must pass the parent-selected subject into organization")
+mode_change = import_page.split("private selectInputMode(", 1)[-1].split("private selectSubject(", 1)[0]
+require("if (this.inputMode === HomeworkAssignmentInputMode.IMAGE)" in input_section and
+        "this.RecognitionActions();" in input_section and "this.ImageInput();" in input_section and
+        "} else {" in input_section and "TextArea({" in input_section and
+        "this.sourceImageRef = '';" in mode_change and
+        "this.textDraft = '';" in mode_change and
+        "this.inputMode = HomeworkAssignmentInputMode.IMAGE;" in import_page and
+        "this.textDraft = '';" in import_page.split("private applySelectedImage(", 1)[-1].split("private selectInputMode(", 1)[0],
+        "manual image/text selection must clear the inactive source and never combine content implicitly")
+require("this.viewModel.parseImage(" in import_page and
+        "this.sourceImageRef, this.selectedSubject, this.sourceImageLabel, '', this.boundTeacherName" in import_page and
+        "this.viewModel.parseText(text, this.selectedSubject, '', '', this.boundTeacherName)" in import_page,
+        "both image and text modes must carry the selected subject and bound teacher to organization")
 require("captureImageText()" in import_vm and
         "HomeworkImportService.instance.captureImageText()" in import_vm,
         "manual homework ViewModel must expose camera OCR through the import service")

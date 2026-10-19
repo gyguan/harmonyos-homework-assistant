@@ -1,4 +1,5 @@
 import { BackendSession } from '../remote/BackendSession';
+import { HomeworkOrganizerRemoteApi } from '../remote/HomeworkOrganizerRemoteApi';
 import { HomeworkImportInboxService } from './HomeworkImportInboxService';
 import {
   BatchPublishEntry,
@@ -55,7 +56,7 @@ export class HomeworkBatchPublishService {
       localByCandidateId.set(candidate.id, assignment);
     }
 
-    let response: RemoteBatchPublishResponse = await HomeworkRemoteApi.instance.batchPublish(studentId, entries);
+    let response: RemoteBatchPublishResponse = await HomeworkRemoteApi.instance.batchPublish(studentId, entries, batchId);
     if (!response.atomic || response.publishedCount !== candidates.length || response.results.length !== candidates.length) {
       throw new Error('云端未确认整批发布完成，请刷新后重试');
     }
@@ -81,6 +82,8 @@ export class HomeworkBatchPublishService {
     }
     DefaultAssignmentRepository.instance.applyAuthoritativeBatch(mapped);
     inbox.markBatchPublished(batchId);
+    // 纠错差异已在本次批量发布事务内持久排队，服务端自动重试。
+    // 不再依赖客户端发布后的第二次请求。
     if (clearCurrentDraft) this.drafts.clearCandidates();
     return { publishedCount: mapped.length, assignments: mapped.slice() };
   }

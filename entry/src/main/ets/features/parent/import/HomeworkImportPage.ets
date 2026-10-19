@@ -1,3 +1,4 @@
+import { HomeworkStudentTeacherRemoteApi, HomeworkTeacherOption } from '../../../application/remote/HomeworkStudentTeacherRemoteApi';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { HomeworkTextImportResult } from '../../../domain/model/ImportModels';
 import { Subject } from '../../../domain/model/HomeworkModels';
@@ -25,6 +26,13 @@ export struct HomeworkImportPage {
   @State private selectedSubject: Subject | null = null;
   @State private subjectOptionsOpen: boolean = false;
   @State private inputMode: HomeworkAssignmentInputMode = HomeworkAssignmentInputMode.TEXT;
+  @State private boundTeacherName: string = '';
+  @State private teacherDraft: string = '';
+  @State private teacherSubjectDraft: Subject = Subject.CHINESE;
+  @State private teacherOptions: HomeworkTeacherOption[] = [];
+  @State private teacherBusy: boolean = false;
+  @State private teacherError: string = '';
+  private teacherStudentId: string = '';
   @State private previewImageUri: string = '';
   private previewController: CustomDialogController = new CustomDialogController({
     builder: PhotoPreviewDialog({ uri: $previewImageUri }),
@@ -40,6 +48,57 @@ export struct HomeworkImportPage {
 
   aboutToAppear(): void {
     this.resetInputDraft();
+    void this.loadTeachers();
+  }
+
+  private async loadTeachers(): Promise<void> {
+    let studentId = this.viewModel.activeStudentId();
+    if (studentId.length === 0) return;
+    if (this.teacherStudentId !== studentId) {
+      this.teacherStudentId = studentId;
+      this.boundTeacherName = '';
+      this.teacherDraft = '';
+      this.teacherOptions = [];
+    }
+    this.teacherBusy = true;
+    try {
+      let loaded = await HomeworkStudentTeacherRemoteApi.instance.list(studentId);
+      if (studentId !== this.viewModel.activeStudentId()) return;
+      this.teacherOptions = loaded;
+      this.teacherError = '';
+    } catch {
+      if (studentId === this.viewModel.activeStudentId()) {
+        this.teacherError = '老师列表加载失败，仍可不指定老师进行整理';
+      }
+    } finally {
+      this.teacherBusy = false;
+    }
+  }
+
+  private async saveTeacher(): Promise<void> {
+    let studentId = this.viewModel.activeStudentId();
+    let name = this.teacherDraft.trim();
+    if (name.length < 2) {
+      this.teacherError = '请输入完整老师姓名或称呼';
+      return;
+    }
+    this.teacherBusy = true;
+    try {
+      let saved = await HomeworkStudentTeacherRemoteApi.instance.register(
+        studentId, name, this.teacherSubjectDraft);
+      if (studentId !== this.viewModel.activeStudentId()) return;
+      let next = this.teacherOptions.filter((item: HomeworkTeacherOption) =>
+        item.id !== saved.id);
+      next.unshift(saved);
+      this.teacherOptions = next;
+      this.boundTeacherName = saved.teacherName;
+      this.teacherDraft = '';
+      this.teacherError = '';
+    } catch {
+      if (studentId === this.viewModel.activeStudentId()) this.teacherError = '保存失败；若存在同名老师，请补充学科或完整姓名以区分';
+    } finally {
+      this.teacherBusy = false;
+    }
   }
 
   private touchRevision(): number {
@@ -74,6 +133,12 @@ export struct HomeworkImportPage {
   private async organize(): Promise<void> {
     if (this.parseBusy) return;
     let studentId = this.viewModel.activeStudentId();
+    if (studentId !== this.teacherStudentId) {
+      this.teacherStudentId = studentId;
+      this.boundTeacherName = '';
+      this.teacherOptions = [];
+      void this.loadTeachers();
+    }
     let text = this.textDraft.trim();
     if (this.inputMode === HomeworkAssignmentInputMode.TEXT && text.length === 0) {
       this.showParseError('请输入作业文字');
@@ -92,9 +157,9 @@ export struct HomeworkImportPage {
       let result: HomeworkTextImportResult;
       if (this.inputMode === HomeworkAssignmentInputMode.IMAGE) {
         result = await this.viewModel.parseImage(
-          this.sourceImageRef, this.selectedSubject, this.sourceImageLabel, '');
+          this.sourceImageRef, this.selectedSubject, this.sourceImageLabel, '', this.boundTeacherName);
       } else {
-        result = await this.viewModel.parseText(text, this.selectedSubject);
+        result = await this.viewModel.parseText(text, this.selectedSubject, '', '', this.boundTeacherName);
       }
       if (studentId !== this.viewModel.activeStudentId()) return;
       if (result.candidateCount > 0) {
@@ -525,6 +590,85 @@ export struct HomeworkImportPage {
   }
 
   @Builder
+  private TeacherSelector() {
+    Column({ space: 8 }) {
+      Text('来源老师（选填）')
+        .width('100%')
+        .fontSize(AppTheme.LABEL_TITLE_SIZE)
+        .fontColor(AppTheme.TEXT);
+      Text('指定老师后，仅参考当前孩子这位老师的经验；无法确定时可以不选。')
+        .width('100%')
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .fontColor(AppTheme.SUBTEXT);
+      Row({ space: 6 }) {
+        ChoiceSelectionChip({
+          label: '不指定',
+          selected: this.boundTeacherName.length === 0,
+          compact: true,
+          onSelect: () => this.boundTeacherName = ''
+        });
+        Scroll() {
+          Row({ space: 6 }) {
+            ForEach(this.teacherOptions, (teacher: HomeworkTeacherOption) => {
+              ChoiceSelectionChip({
+                label: `${teacher.teacherName} · ${teacher.subject}`,
+                selected: this.boundTeacherName === teacher.teacherName,
+                compact: true,
+                onSelect: () => this.boundTeacherName = teacher.teacherName
+              });
+            }, (teacher: HomeworkTeacherOption) => teacher.id);
+          }
+        }
+        .scrollable(ScrollDirection.Horizontal)
+        .scrollBar(BarState.Off)
+        .layoutWeight(1);
+      }
+      .width('100%');
+      Text('新增老师的学科（仅用于老师资料，不改变作业识别的学科）')
+        .width('100%')
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .fontColor(AppTheme.SUBTEXT);
+      Scroll() {
+        Row({ space: 6 }) {
+          ForEach([Subject.CHINESE, Subject.MATH, Subject.ENGLISH, Subject.OTHER],
+            (subject: Subject) => {
+              ChoiceSelectionChip({
+                label: subject,
+                selected: this.teacherSubjectDraft === subject,
+                compact: true,
+                onSelect: () => this.teacherSubjectDraft = subject
+              });
+            }, (subject: Subject) => subject);
+        }
+      }
+      .width('100%')
+      .scrollable(ScrollDirection.Horizontal)
+      .scrollBar(BarState.Off);
+      Row({ space: 8 }) {
+        TextInput({ text: this.teacherDraft, placeholder: '新增老师，例如 王老师' })
+          .layoutWeight(1)
+          .height(AppTheme.INPUT_HEIGHT)
+          .onChange((value: string) => this.teacherDraft = value);
+        Button(this.teacherBusy ? '保存中' : '保存老师', { type: ButtonType.Normal })
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .fontColor(AppTheme.PRIMARY)
+          .enabled(!this.teacherBusy && !this.parseBusy)
+          .onClick(() => { void this.saveTeacher(); });
+      }
+      .width('100%');
+      if (this.teacherError.length > 0) {
+        Text(this.teacherError)
+          .width('100%')
+          .fontSize(AppTheme.META_SIZE)
+          .fontColor(AppTheme.WARNING);
+      }
+    }
+    .width('100%');
+  }
+
+  @Builder
   private AssignmentInput() {
     Column({ space: 12 }) {
       Text('作业内容')
@@ -534,6 +678,7 @@ export struct HomeworkImportPage {
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
       this.InputModeSelector();
+      this.TeacherSelector();
       if (this.inputMode === HomeworkAssignmentInputMode.IMAGE) {
         this.RecognitionActions();
         this.ImageInput();

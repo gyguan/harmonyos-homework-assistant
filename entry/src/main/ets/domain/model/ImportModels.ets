@@ -81,6 +81,7 @@ export interface ExtractedHomeworkText {
   studentId: string;
   sourceLabel: string;
   text: string;
+  teacherName?: string;
 }
 
 export interface HomeworkImportPipelineResult {

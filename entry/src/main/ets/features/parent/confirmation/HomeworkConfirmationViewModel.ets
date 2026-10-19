@@ -43,7 +43,9 @@ export class HomeworkConfirmationViewModel {
     let excerpt = evidenceText.length > 0 ?
       evidenceText.substring(0, Math.min(120, evidenceText.length)) : '家长手工新增';
     return {
-      id: `manual-${Date.now()}`,
+      id: activeBatchId.length > 0 ?
+        `manual-${activeBatchId}-${Date.now()}-${Math.floor(Math.random() * 100000)}` :
+        `manual-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
       studentId: this.drafts.getActiveStudentId(),
       subject: Subject.CHINESE,
       title: '新作业',
@@ -54,6 +56,7 @@ export class HomeworkConfirmationViewModel {
       sourceEvidence: {
         sourceLabel: raw.sourceLabel.length > 0 ? raw.sourceLabel : '家长手工新增',
         excerpt: excerpt,
+        teacherName: raw.teacherName,
         batchId: activeBatchId.length > 0 ? activeBatchId : undefined,
         sourceType: activeBatchId.length > 0 ? 'MANUAL_REVIEW' : undefined,
         sourceMessageIds: sourceMessageIds,

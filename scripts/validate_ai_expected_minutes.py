@@ -35,8 +35,10 @@ require('"minimum", 5' in client and '"maximum", 120' in client,
         "AI suggested duration must be schema-bounded to 5..120 minutes")
 require("学生年级" in client and "不包含休息" in client,
         "AI prompt must estimate focused child work time using grade context")
-require("expectedMinutes(item.expectedMinutes())" in client,
-        "backend must normalize model-suggested duration before returning it")
+require("expectedMinutes(item.expectedMinutes() == null ? 0 : item.expectedMinutes())" in client and
+        "if (value <= 0) return 20;" in client and
+        "Math.max(5, Math.min(120, value))" in client,
+        "backend must normalize null/zero AI durations to default 20 and clamp valid suggestions to 5–120")
 require("expectedMinutes: number" in remote,
         "HarmonyOS remote candidate must parse expectedMinutes")
 require("expectedMinutes: this.expectedMinutes(remote.expectedMinutes)" in remote,
