@@ -33,7 +33,9 @@ UPDATE homework_organizer_rule SET enabled = true, version = version + 1, update
 WHERE code = 'GLOBAL_SHORTHAND_08' AND version = 2;
 ```
 
-改变优先级时同样递增 `version`，新增规则建议使用稳定唯一 `code`，`origin='MANUAL'`。不要编辑已经在环境中执行过的 Flyway V40 文件；以后基线种子修改使用后续新版本迁移。外部部署的 `AI_HOMEWORK_SHORTHAND` 仅为旧配置迁移保留：**应用首次启动时**通过 `HomeworkOrganizerLegacyShorthandImport` 将有效词条按稳定 ID、较低优先级幂等写入数据库。再次启动不会覆盖或重新启用已停用的词条；生产解析始终只读数据库，完成迁移后建议清除该环境变量。
+改变优先级时同样递增 `version`，新增规则建议使用稳定唯一 `code`，`origin='MANUAL'`。
+
+数据库触发器强制每次 UPDATE 增加版本，并将修改前后的完整 JSON 快照、数据库操作者与时间追加到 `homework_organizer_rule_revision`，便于审计及按版本恢复。规则标识 `code` 不允许修改；历史表只追加不覆盖。不要编辑已经在环境中执行过的 Flyway V40 文件；以后基线种子修改使用后续新版本迁移。外部部署的 `AI_HOMEWORK_SHORTHAND` 仅为旧配置迁移保留：**应用首次启动时**通过 `HomeworkOrganizerLegacyShorthandImport` 将有效词条按稳定 ID、较低优先级幂等写入数据库。再次启动不会覆盖或重新启用已停用的词条；生产解析始终只读数据库，完成迁移后建议清除该环境变量。
 
 ## 验收
 
