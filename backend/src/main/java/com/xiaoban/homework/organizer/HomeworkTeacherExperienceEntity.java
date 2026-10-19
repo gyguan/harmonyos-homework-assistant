@@ -18,6 +18,8 @@ public class HomeworkTeacherExperienceEntity {
   @Column(length = 400) public String exampleSource;
   @Column(length = 400) public String exampleResult;
   public String origin;
+  public boolean active = true;
+  public UUID sourceFeedbackId;
   public Instant createdAt;
   public Instant updatedAt;
 
