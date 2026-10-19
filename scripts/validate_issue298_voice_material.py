@@ -268,7 +268,7 @@ for token in [
     "carry over must keep the same Assignment instance",
     "carried task must be dated today",
     "carry over must not create a second voice task",
-    "carry over must regenerate the task name from the new business date",
+    "carry over must regenerate the canonical folder-based title",
     "carry over must not suffix the renamed task with a sequence number",
     "a carried over task must already consume the current business day quota",
     # 孩子已经交出去的（待提交/已提交）不再顺延。
