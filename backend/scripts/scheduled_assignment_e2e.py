@@ -56,7 +56,10 @@ def main() -> int:
         require(plan.get("nextFireAtEpochMs", 0) > 0, "new scheduled plan missing next fire time")
 
         expected_title = "E2E 定时阅读任务 · " + target.strftime("%m-%d")
-        deadline = time.time() + 95
+        # A plan created after :45 is scheduled two minute boundaries ahead. With the
+        # production scheduler's 30s polling, a fixed 95s wait can expire before its
+        # first eligible tick. Wait through that tick, retaining all SUCCESS/idempotency checks.
+        deadline = max(time.time() + 95, target.timestamp() + 45)
         created = None
         while time.time() < deadline:
             assignments = expect(http(base_url, "GET",
