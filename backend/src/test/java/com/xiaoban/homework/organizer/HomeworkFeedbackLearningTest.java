@@ -213,4 +213,35 @@ class HomeworkFeedbackLearningTest {
     assertFalse(result.contains("李老师另一套不同教材规则"));
   }
 
+  @Test
+  void subjectScopedApprovedExperienceOnlyReachesSameStudentAndUnambiguousSubject() {
+    var students = mock(StudentRepository.class);
+    var family = UUID.randomUUID();
+    var owner = owned(family, "child1", students);
+    var other = owned(family, "child2", students);
+    var experiences = mock(HomeworkTeacherExperienceRepository.class);
+    var record = new HomeworkTeacherExperienceEntity();
+    record.id = UUID.randomUUID();
+    record.familyId = family;
+    record.studentId = "child1";
+    record.teacherName = "学科归属:语文";
+    record.subject = "语文";
+    record.cue = "国*";
+    record.interpretation = "国加数字指国学课本页码";
+    record.exampleSource = "";
+    record.exampleResult = "";
+    record.active = true;
+    when(experiences.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "child1"))
+        .thenReturn(List.of(record));
+    var service = new HomeworkTeacherExperienceService(experiences, students);
+    assertTrue(service.context(owner, "家长录入文字", "语文：朗读国14", false)
+        .contains("本学生学科经验"));
+    assertEquals("", service.context(owner, "家长录入文字", "数学：口算国14", false));
+    assertEquals("", service.context(owner, "家长录入文字",
+        "语文：朗读国14；数学：口算20题", false));
+    assertEquals("", service.context(owner, "家长录入文字",
+        "王老师：语文朗读国14", false));
+    assertEquals("", service.context(other, "家长录入文字", "语文：朗读国14", false));
+  }
+
 }
