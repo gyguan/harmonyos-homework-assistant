@@ -55,13 +55,16 @@ public class HomeworkFeedbackAutoLearningService {
     // evidence when the parent gave a concrete explanation and it contains
     // exactly one safe numeric abbreviation. Generic short text remains unsafe.
     String proposedCue = autoCue(record.feedbackTypeCode, excerpt);
+    String compoundCue = HomeworkExcerptCountConvention.learnedCue(excerpt, clean(record.details));
     boolean confirmedShorthand = "SHORTHAND".equals(record.feedbackTypeCode)
         && clean(record.details).length() >= 6
         && proposedCue.contains("*")
         && HomeworkExperienceCueMatcher.matches(proposedCue, excerpt);
     if (!excerpt.equals(clean(record.sourceExcerpt)) ||
-        (!confirmedShorthand && (excerpt.length() < 6 ||
-            excerpt.equals(clean(source.title))))) return "PENDING_EVIDENCE";
+        (!confirmedShorthand && compoundCue.isEmpty() &&
+            (excerpt.length() < 6 || excerpt.equals(clean(source.title))))) {
+      return "PENDING_EVIDENCE";
+    }
 
     String details = clean(record.details);
     String after = clean(record.currentTitle);
@@ -79,7 +82,7 @@ public class HomeworkFeedbackAutoLearningService {
     if ("WRONG_SUBJECT".equals(record.feedbackTypeCode) &&
         !correctedSubject && details.length() < 6) return "PENDING_EVIDENCE";
 
-    String cue = autoCue(record.feedbackTypeCode, excerpt);
+    String cue = compoundCue.isEmpty() ? proposedCue : compoundCue;
     if (!HomeworkExperienceCueMatcher.valid(cue) ||
         !HomeworkExperienceCueMatcher.matches(cue, excerpt)) return "PENDING_EVIDENCE";
 
@@ -94,8 +97,10 @@ public class HomeworkFeedbackAutoLearningService {
     final String scopedTeacher = teacher;
     String subject = clean(source.subject);
     if (subject.isBlank()) return "PENDING_EVIDENCE";
-    String interpretation = interpretation(record.feedbackTypeCode, details,
-        before, correctedTitle ? after : "", correctedSubject ? requestedSubject : "");
+    String interpretation = (compoundCue.isEmpty() ? ""
+        : HomeworkExcerptCountConvention.CONFIRMED_MEANING)
+        + interpretation(record.feedbackTypeCode, details,
+            before, correctedTitle ? after : "", correctedSubject ? requestedSubject : "");
     if (interpretation.length() < 6) return "PENDING_EVIDENCE";
     List<HomeworkTeacherExperienceEntity> existing = experiences
         .findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(record.familyId, record.studentId);
