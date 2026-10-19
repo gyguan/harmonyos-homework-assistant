@@ -28,7 +28,7 @@ class HomeworkOrganizerRuleServiceTest {
     var high = shorthand("high", "听读U*", "优先解释", 100);
     var low = shorthand("low", "听读U*", "过时解释", 50);
     var another = shorthand("another", "一起作业", "平台任务", 80);
-    when(repository.findByEnabledTrueOrderByPriorityDescCodeAsc())
+    when(repository.findApplicable(org.mockito.ArgumentMatchers.nullable(UUID.class), org.mockito.ArgumentMatchers.nullable(String.class)))
         .thenReturn(List.of(high, another, low));
     var snapshot = new HomeworkOrganizerRuleService(repository).snapshot(null, "", "");
     assertEquals(2, snapshot.shorthand().size());
@@ -45,10 +45,10 @@ class HomeworkOrganizerRuleServiceTest {
     template.scope = "GLOBAL";
     template.templateKey = "BLACKBOARD";
     template.promptText = "从数据库加载的黑板模板";
-    when(repository.findByEnabledTrueOrderByPriorityDescCodeAsc()).thenReturn(List.of(template));
+    when(repository.findApplicable(org.mockito.ArgumentMatchers.nullable(UUID.class), org.mockito.ArgumentMatchers.nullable(String.class))).thenReturn(List.of(template));
     var service = new HomeworkOrganizerRuleService(repository);
     assertEquals("从数据库加载的黑板模板", service.snapshot(null, "", "").template("BLACKBOARD"));
-    when(repository.findByEnabledTrueOrderByPriorityDescCodeAsc()).thenReturn(List.of());
+    when(repository.findApplicable(org.mockito.ArgumentMatchers.nullable(UUID.class), org.mockito.ArgumentMatchers.nullable(String.class))).thenReturn(List.of());
     assertEquals("", service.snapshot(null, "", "").template("BLACKBOARD"),
         "Disabling a row must not silently re-enable a Java fallback");
     assertEquals("", service.snapshot(null, "", "").encodedShorthand());
@@ -62,7 +62,7 @@ class HomeworkOrganizerRuleServiceTest {
     rule.familyId = family;
     rule.studentId = "child-1";
     rule.subject = "语文";
-    when(repository.findByEnabledTrueOrderByPriorityDescCodeAsc()).thenReturn(List.of(rule));
+    when(repository.findApplicable(org.mockito.ArgumentMatchers.nullable(UUID.class), org.mockito.ArgumentMatchers.nullable(String.class))).thenReturn(List.of(rule));
     var student = new StudentEntity() {};
     student.id = "child-1";
     student.familyId = family;
