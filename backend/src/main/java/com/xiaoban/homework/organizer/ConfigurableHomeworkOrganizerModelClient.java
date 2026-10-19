@@ -38,14 +38,6 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       Pattern.compile("(?:^|(?<=[\\n\\s；;。：:，,]))\\s*([0-9]{1,2})\\s*[.、)）]", Pattern.MULTILINE);
   /** 圈码序号 ①…⑩，本身就带序号语义，不会误判。 */
   private static final String CIRCLED = "①②③④⑤⑥⑦⑧⑨⑩";
-  /**
-   * 三段式模板里的「学习进度」段：只是告知当天学了哪篇课文，孩子没有对应的动作可做，
-   * 不是作业；但里面的课文篇名要拿去补全「朗读课文三遍」这类没写篇名的作业。
-   */
-  private static final Pattern LEARNING_PROGRESS =
-      Pattern.compile("(?:^|\\n)\\s*[^\\p{L}\\p{N}]*\\s*(?:学习进度|今日学习|学习内容)?\\s*[:：]?\\s*"
-          + "(?:我们)?(?:今天|今日)?(?:我们)?(?:学习了|学了|学习)\\s*《?\\s*"
-          + "([^\\n。；;《》]{2,40}?)\\s*》?\\s*[。.]?\\s*(?=$|\\n)");
   private final AiProviderProperties properties;
   private final OpenAiCompatibleTransport transport;
   private final JsonMapper jsonMapper;
@@ -67,9 +59,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       int unsupportedSubjectCount, int blankTitleCount, int missingFieldCount,
       List<String> unsupportedSubjects) {}
   /** 一条老师简写：所属科目、简写原文、给模型的解释、可当标题用的短说法、匹配用的正则。 */
-  record ShorthandEntry(String subject, String term, String meaning, String shortTitle, Pattern pattern) {}
-  /** 一次简写命中：词条本身，以及原文里实际匹配到的文本（用于取数字）。 */
-  record ShorthandMatch(ShorthandEntry entry, String text) {}
+  record ShorthandEntry(String subject, String term, String meaning, String shortTitle) {}
 
   /** 测试和旧调用方可继续用原有构造；生产环境自动装配经验仓库。 */
   public ConfigurableHomeworkOrganizerModelClient(AiProviderProperties properties,
@@ -166,15 +156,12 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     StructuredResult parsed = readStructured(output);
     if (parsed == null || parsed.assignments() == null || parsed.assignments().size() > 30) return Optional.empty();
     ConversionResult converted = toCandidates(parsed, glossary);
-    // 模型给出了条目，但全是「学习进度」「绘本」这类不该生成任务的段落：
-    // "整理出 0 条作业"是正确的结果，不是输出不完整，不该让家长重拍。
-    if (converted.sourceCount() == 0 && !parsed.assignments().isEmpty()) {
-      return Optional.of(new HomeworkOrganizerDtos.ImageResponse(List.of(), "AI_IMAGE", ""));
-    }
-    // 条数变多来自 splitNumbered 的兜底拆分（模型把 1、2 两点并成一条时），不算失败；
-    // 只有变少才说明有科目或标题被丢弃，那时宁可让家长重拍也不能少作业。
-    // 用 sourceCount 而不是模型原始条数：绘本这类"有意剔除"的条目不该算作被丢弃。
-    if (converted.candidates().isEmpty() || converted.candidates().size() < converted.sourceCount()) {
+    // Do not turn uncertain rows into published tasks, nor drop rows silently.
+    // An explicitly empty AI result is valid; loss of any non-null returned row is not.
+    if (converted.sourceCount() > 0 &&
+        (converted.candidates().size() < converted.sourceCount()
+            || converted.unsupportedSubjectCount() > 0
+            || converted.blankTitleCount() > 0)) {
       return Optional.empty();
     }
     return Optional.of(new HomeworkOrganizerDtos.ImageResponse(
@@ -297,7 +284,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
           properties.getOrganizerModel(), converted.sourceCount(), converted.candidates().size(),
           converted.unsupportedSubjectCount(), converted.blankTitleCount(), converted.missingFieldCount(),
           converted.unsupportedSubjects());
-      if (converted.sourceCount() > 0 && converted.candidates().isEmpty()) {
+      if (converted.sourceCount() > 0 && (converted.candidates().size() < converted.sourceCount()
+          || converted.unsupportedSubjectCount() > 0 || converted.blankTitleCount() > 0)) {
         log.warn(
             "[AI] organizer rejected all model assignments model={} assignments={} unsupportedSubject={} blankTitle={} unsupportedValues={}",
             properties.getOrganizerModel(), converted.sourceCount(), converted.unsupportedSubjectCount(),
@@ -362,17 +350,9 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       String meaning = parts[2].trim();
       if (subject.isEmpty() || term.isEmpty() || meaning.isEmpty()) continue;
       String shortTitle = parts.length > 3 && !parts[3].trim().isEmpty() ? parts[3].trim() : term;
-      entries.add(new ShorthandEntry(subject, term, meaning, shortTitle, shorthandPattern(term)));
+      entries.add(new ShorthandEntry(subject, term, meaning, shortTitle));
     }
     return entries;
-  }
-
-  private static Pattern shorthandPattern(String term) {
-    StringBuilder regex = new StringBuilder();
-    for (char character : term.toCharArray()) {
-      regex.append(character == '*' ? "\\d+" : Pattern.quote(String.valueOf(character)));
-    }
-    return Pattern.compile(regex.toString());
   }
 
   /**
@@ -468,38 +448,29 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     return toCandidates(result, "");
   }
 
-  /** 第二参数是 {@code AI_HOMEWORK_SHORTHAND} 里追加的简写，用于确定性拆分兜底。 */
+  /**
+   * Only schema/range normalization and generic numbered-list splitting happen in Java.
+   * The model, with database prompts + confirmed experiences, owns subject attribution,
+   * abbreviation meaning, task relevance and title wording. Do not post-process those
+   * from keyword lists, which can silently override newly learned feedback.
+   */
   static ConversionResult toCandidates(StructuredResult result, String configuredShorthand) {
     List<HomeworkOrganizerDtos.Candidate> output = new ArrayList<>();
     if (result == null || result.assignments() == null) {
       return new ConversionResult(output, 0, 0, 0, 0, List.of());
     }
-    List<ShorthandEntry> shorthand = shorthandEntries(configuredShorthand);
-
-    // 三段式模板的第一段「学习进度」不是作业（孩子没有可执行的动作），即使模型把它
-    // 整理成了一条也剔除；但里面的课文篇名要留着，用来补全「朗读课文三遍」这类标题。
-    String lesson = null;
-    List<StructuredCandidate> items = new ArrayList<>();
-    for (StructuredCandidate item : result.assignments()) {
-      if (item == null) continue;
-      String progressLesson = learningProgressLesson(item);
-      if (progressLesson != null) {
-        if (lesson == null) lesson = progressLesson;
-        continue;
-      }
-      items.add(item);
-    }
-
     int unsupportedSubjectCount = 0;
     int blankTitleCount = 0;
     int missingFieldCount = 0;
-    int voiceMaterialDropped = 0;
+    int sourceCount = 0;
     Set<String> unsupportedSubjects = new LinkedHashSet<>();
-    for (StructuredCandidate item : items) {
+    for (StructuredCandidate item : result.assignments()) {
+      if (item == null) continue;
+      sourceCount++;
       if (item.expectedMinutes() == null || item.confidence() == null || blank(item.textbookRef())) {
         missingFieldCount++;
       }
-      String subject = refineDumpSubject(normalizeSubject(item.subject()), item.title(), item.instruction());
+      String subject = normalizeSubject(item.subject());
       if (subject == null) {
         unsupportedSubjectCount++;
         if (unsupportedSubjects.size() < 8) unsupportedSubjects.add(safeSubjectForLog(item.subject()));
@@ -511,129 +482,22 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       }
       LocalDate parsedTaskDate = candidateTaskDate(item.taskDate());
       String taskDate = parsedTaskDate == null ? LocalDate.now(BUSINESS_ZONE).toString() : parsedTaskDate.toString();
-      String title = clampTitle(applyLesson(item.title(), lesson));
-      String instruction = applyLesson(value(item.instruction(), title), lesson);
-      String excerpt = applyLesson(value(item.sourceExcerpt(), title), lesson);
-      // 英语的绘本阅读由定时语音任务自动布置（标题「绘本-文件夹目录」），
-      // 整条只剩绘本时直接不生成任务，否则孩子会看到两条重复作业。
-      if (onlyVoiceMaterial(String.join("\n", title, instruction, excerpt), shorthand)) {
-        voiceMaterialDropped++;
-        continue;
-      }
+      String title = clampTitle(item.title());
+      String instruction = value(item.instruction(), title);
+      String excerpt = value(item.sourceExcerpt(), title);
       var candidate = new HomeworkOrganizerDtos.Candidate(
-          subject, title, instruction,
-          value(item.textbookRef(), "待家长确认"), taskDate,
-          expectedMinutes(item.expectedMinutes() == null ? 0 : item.expectedMinutes()),
-          excerpt,
-          clamp(item.confidence() == null ? DEFAULT_CONFIDENCE : item.confidence()),
+          subject, title, instruction, value(item.textbookRef(), "待家长确认"),
+          taskDate, expectedMinutes(item.expectedMinutes() == null ? 0 : item.expectedMinutes()),
+          excerpt, clamp(item.confidence() == null ? DEFAULT_CONFIDENCE : item.confidence()),
           "", "", "", 0.0, "");
-      for (HomeworkOrganizerDtos.Candidate part : splitNumbered(candidate)) {
-        for (HomeworkOrganizerDtos.Candidate split : splitShorthand(part, shorthand)) {
-          output.add(split);
-          if (output.size() >= 30) break;
-        }
+      for (var part : splitNumbered(candidate)) {
+        output.add(part);
         if (output.size() >= 30) break;
       }
       if (output.size() >= 30) break;
     }
-    // sourceCount 是"应该整理出多少条作业"：既剔除「学习进度」这类非作业条目，
-    // 也剔除绘本这类由定时语音任务代劳的条目——否则图片链路会误判成"少作业"而拒绝整次整理。
-    int sourceCount = items.size() - voiceMaterialDropped;
     return new ConversionResult(output, sourceCount, unsupportedSubjectCount, blankTitleCount,
         missingFieldCount, List.copyOf(unsupportedSubjects));
-  }
-
-  /** 识别「学习进度」段：命中返回课文篇名，否则返回 null。 */
-  static String learningProgressLesson(StructuredCandidate item) {
-    String raw = String.join("\n", nz(item.title()), nz(item.instruction()), nz(item.sourceExcerpt()));
-    Matcher matcher = LEARNING_PROGRESS.matcher(raw);
-    return matcher.find() ? matcher.group(1).trim() : null;
-  }
-
-  /**
-   * 把「学习进度」里的课文篇名补进标题：老师常把当天的篇名只写在第一段，
-   * 后面各项一律简称「课文」，家长和孩子不知道是哪篇。
-   */
-  private static String applyLesson(String value, String lesson) {
-    if (blank(value) || blank(lesson)) return value;
-    String book = lesson.startsWith("《") ? lesson : "《" + lesson + "》";
-    if (value.contains(book) || value.contains(lesson)) return value;
-    return value.replace("课文", book);
-  }
-
-  private static String nz(String value) { return value == null ? "" : value; }
-
-  /**
-   * 模型有时把「一起作业. 听读U3」这类同行并列的两个简写并成一条，孩子就少做一项。
-   * 简写是老师固定用法，这里确定性按词典拆开：
-   * 一条任务里同时命中两个以上不同简写时，拆成各简写对应的一条。
-   *
-   * <p>命中按「科目 + 含义」去重，所以「绘本」「绘」算同一个，不会因为同义简写重复拆。
-   * 只命中一个时不动，避免误伤「预习8、10课 订小白」这种本来就一条的作业。
-   *
-   * <p>⚠️唯一的例外是绘本：英语的绘本阅读由定时语音任务自动布置，
-   * 拆分后绘本那一条直接从结果里去掉，其余各项保留。
-   */
-  private static List<HomeworkOrganizerDtos.Candidate> splitShorthand(
-      HomeworkOrganizerDtos.Candidate candidate, List<ShorthandEntry> entries) {
-    if (entries == null || entries.isEmpty()) return List.of(candidate);
-    String haystack = String.join("\n", candidate.title(), candidate.instruction(), candidate.sourceExcerpt());
-    Map<String, ShorthandMatch> matched = matchedEntries(haystack, entries);
-    if (matched.isEmpty()) return List.of(candidate);
-    // 只命中绘本一项：定时语音任务已经自动布置过，这里不再重复产出任务。
-    if (matched.size() == 1) {
-      return isVoiceMaterialEntry(matched.values().iterator().next().entry()) ? List.of() : List.of(candidate);
-    }
-
-    List<ShorthandMatch> kept = new ArrayList<>();
-    for (ShorthandMatch hit : matched.values()) {
-      // 「绘本」这项由定时语音任务代劳，去掉它；其余各项照常保留。
-      if (!isVoiceMaterialEntry(hit.entry())) kept.add(hit);
-    }
-    if (kept.isEmpty()) return List.of();
-    // 原文给的时长是单项时长，拆开后按保留条数平分，避免每项都顶着总时长。
-    int minutes = Math.max(5, candidate.expectedMinutes() / kept.size());
-    List<HomeworkOrganizerDtos.Candidate> parts = new ArrayList<>();
-    for (ShorthandMatch hit : kept) {
-      ShorthandEntry entry = hit.entry();
-      String digits = hit.text().replaceAll("\\D", "");
-      String title = clampTitle(entry.shortTitle().replace("*", digits));
-      parts.add(new HomeworkOrganizerDtos.Candidate(entry.subject(), title, candidate.instruction(),
-          candidate.textbookRef(), candidate.taskDate(), minutes, candidate.sourceExcerpt(),
-          candidate.confidence(), "", "", "", 0.0, ""));
-    }
-    return parts;
-  }
-
-  /** 一条任务里命中了哪些简写（按「科目 + 含义」去重），供拆分与剔除共用。 */
-  private static Map<String, ShorthandMatch> matchedEntries(String haystack, List<ShorthandEntry> entries) {
-    Map<String, ShorthandMatch> matched = new LinkedHashMap<>();
-    if (entries == null || entries.isEmpty()) return matched;
-    for (ShorthandEntry entry : entries) {
-      Matcher matcher = entry.pattern().matcher(haystack);
-      if (!matcher.find()) continue;
-      matched.computeIfAbsent(entry.subject() + "|" + entry.meaning(),
-          ignored -> new ShorthandMatch(entry, matcher.group()));
-    }
-    return matched;
-  }
-
-  /**
-   * 英语的绘本阅读由定时语音任务自动布置，标题形如「绘本-文件夹目录」。
-   * AI 整理再产出一条就是重复作业，孩子会看到两条一样的。
-   */
-  private static boolean isVoiceMaterialEntry(ShorthandEntry entry) {
-    return "英语".equals(entry.subject()) && entry.meaning().contains("绘本");
-  }
-
-  /** 一条任务里命中的简写是否全是绘本：整条都不生成任务。 */
-  private static boolean onlyVoiceMaterial(String haystack, List<ShorthandEntry> entries) {
-    Map<String, ShorthandMatch> matched = matchedEntries(haystack, entries);
-    if (matched.isEmpty()) return false;
-    for (ShorthandMatch hit : matched.values()) {
-      if (!isVoiceMaterialEntry(hit.entry())) return false;
-    }
-    return true;
   }
 
   /**
@@ -747,51 +611,14 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   }
 
   /**
-   * 「其他」「实践」是模型装不下时的垃圾桶：老师的课外阅读、日记、摘抄、练字其实都是语文常规作业，
-   * 被塞进这两个科目后家长就得在「其他」里找语文作业。这里按内容把它们捞回语文。
-   * 只处理这两个科目，不碰家长自己建的「阅读」「朗读」任务。
+   * Schema subjects are canonical domain enums, not natural-language content.
+   * Ambiguous model labels are rejected rather than semantically rewritten.
    */
-  static String refineDumpSubject(String subject, String title, String instruction) {
-    String joined = value(title, "") + " " + value(instruction, "");
-    // 老师写的「课外阅读」是语文常规作业；家长自建的普通「阅读」任务不动。
-    if ("阅读".equals(subject) && (joined.contains("课外阅读") || joined.contains("课外书"))) return "语文";
-    if (!"其他".equals(subject) && !"实践".equals(subject)) return subject;
-    if (joined.contains("英语") || joined.contains("数学")) return subject;
-    for (String keyword : CHINESE_REGULAR_KEYWORDS) {
-      if (joined.contains(keyword)) return "语文";
-    }
-    return subject;
-  }
-
-  /** 语文常规作业的关键词：出现这些说明是语文，不是家长自定义的实践任务。 */
-  private static final List<String> CHINESE_REGULAR_KEYWORDS = List.of(
-      "课外阅读", "课外书", "日记", "周记", "摘抄", "练字", "写字", "国学",
-      "生字", "词语", "课文", "古诗", "背诵", "默写", "预习", "复习", "习作", "作文");
-
   static String normalizeSubject(String subject) {
     if (blank(subject)) return null;
-    String normalized = subject.trim().replace(" ", "").replace("　", "");
-    if (normalized.contains("语文")) return "语文";
-    if (normalized.contains("数学")) return "数学";
-    if (normalized.contains("英语")) return "英语";
-    if (normalized.contains("阅读")) return "阅读";
-    if (normalized.contains("朗读") || normalized.contains("朗诵")) return "朗读";
-    if (normalized.contains("体育") || normalized.contains("运动")) return "体育";
-    if (normalized.contains("实践") || normalized.contains("劳动")) return "实践";
-    if (normalized.contains("兴趣")) return "兴趣";
-    if (normalized.contains("其他")) return "其他";
-    // 模型偶尔自造「写作」「国学」这类科目，不在白名单里会让整条作业被当成非法科目丢弃，
-    // 这里按语义归并到白名单，避免家长少看到一条作业。
-    if (normalized.contains("写作") || normalized.contains("作文")
-        || normalized.contains("日记") || normalized.contains("练笔")
-        || normalized.contains("国学") || normalized.contains("写字")) return "语文";
-    if (normalized.contains("听读") || normalized.contains("绘本")) return "英语";
-
-    String lower = normalized.toLowerCase();
-    if (lower.contains("chinese")) return "语文";
-    if (lower.contains("math")) return "数学";
-    if (lower.contains("english")) return "英语";
-    return null;
+    String value = subject.trim();
+    return List.of("语文", "数学", "英语", "阅读", "朗读", "体育", "实践", "兴趣", "其他")
+        .contains(value) ? value : null;
   }
 
   private static String safeSubjectForLog(String subject) {
