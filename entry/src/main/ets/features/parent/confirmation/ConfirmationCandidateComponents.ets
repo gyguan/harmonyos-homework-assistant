@@ -181,9 +181,6 @@ export struct ConfirmationCandidateEditor {
   @State private feedbackDetails: string = '';
   @State private feedbackMessage: string = '';
   @State private feedbackHasError: boolean = false;
-  @State private feedbackSaveAsRule: boolean = false;
-  @State private feedbackCue: string = '';
-  @State private feedbackInterpretation: string = '';
   @State private showSavedExperiences: boolean = false;
   @State private loadingExperiences: boolean = false;
   @State private savedExperiences: HomeworkTeacherExperienceSummary[] = [];
@@ -209,9 +206,6 @@ export struct ConfirmationCandidateEditor {
     this.feedbackDetails = '';
     this.feedbackMessage = '';
     this.feedbackHasError = false;
-    this.feedbackSaveAsRule = false;
-    this.feedbackCue = '';
-    this.feedbackInterpretation = '';
     this.showSavedExperiences = false;
     this.savedExperiences = [];
     this.feedbackRequestId = '';
@@ -287,13 +281,6 @@ export struct ConfirmationCandidateEditor {
       this.feedbackMessage = '请简要说明具体问题或正确写法';
       return;
     }
-    if (this.feedbackSaveAsRule && type.canBecomeExperience) {
-      if (this.feedbackCue.trim().length < 2 || this.feedbackInterpretation.trim().length < 6) {
-        this.feedbackHasError = true;
-        this.feedbackMessage = '请填写原文中出现的触发词（如国*）及完整正确解释';
-        return;
-      }
-    }
     if (this.feedbackRequestId.length === 0) {
       this.feedbackRequestId = `${this.item.id}-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
     }
@@ -316,30 +303,16 @@ export struct ConfirmationCandidateEditor {
     this.feedbackMessage = '';
     try {
       let receipt = await HomeworkOrganizerFeedbackRemoteApi.instance.submit(this.item.studentId, input);
-      if (this.feedbackSaveAsRule && type.canBecomeExperience) {
-        try {
-          await HomeworkOrganizerFeedbackRemoteApi.instance.promote(
-            this.item.studentId, receipt.id, {
-              cue: this.feedbackCue.trim(),
-              interpretation: this.feedbackInterpretation.trim()
-            });
-        } catch {
-          this.feedbackHasError = true;
-          this.feedbackMessage = '反馈已经保存，但作业经验暂未生效。请核对触发词是否出现在原文中，然后重试';
-          return;
-        }
-      }
       this.feedbackHasError = false;
-      this.feedbackMessage = this.feedbackSaveAsRule
-        ? '已保存反馈，并按当前学生与作业来源启用经验'
-        : '反馈已保存，暂不会自动改变 AI 解析规则';
+      this.feedbackMessage = receipt.processingStatus === 'APPLIED'
+        ? '反馈已保存，已自动形成当前学生的作业经验，下次匹配时生效'
+        : (receipt.processingStatus === 'REVIEW_REQUIRED'
+          ? '反馈已保存；同类经验存在冲突，暂不自动启用'
+          : '反馈已保存；缺少足够原始证据，暂未生成新经验');
       this.showFeedbackPanel = false;
       this.feedbackSelectedCode = '';
       this.feedbackDetails = '';
-      this.feedbackSaveAsRule = false;
-      this.feedbackCue = '';
-      this.feedbackInterpretation = '';
-      this.feedbackRequestId = '';
+            this.feedbackRequestId = '';
     } catch {
       this.feedbackHasError = true;
       this.feedbackMessage = '反馈保存失败，内容已保留，请重试';
@@ -550,8 +523,7 @@ export struct ConfirmationCandidateEditor {
                   compact: true,
                   onSelect: () => {
                     this.feedbackSelectedCode = option.code;
-                    this.feedbackSaveAsRule = false;
-                    this.feedbackMessage = '';
+                                    this.feedbackMessage = '';
                     this.feedbackRequestId = '';
                   }
                 });
@@ -568,7 +540,7 @@ export struct ConfirmationCandidateEditor {
           }
           .width('100%');
 
-          TextArea({ text: this.feedbackDetails, placeholder: '具体问题、正确内容或老师缩写的含义' })
+          TextArea({ text: this.feedbackDetails, placeholder: '请描述问题及正确做法，便于系统自动学习' })
             .width('100%')
             .height(100)
             .onChange((value: string) => {
@@ -576,38 +548,10 @@ export struct ConfirmationCandidateEditor {
               this.feedbackRequestId = '';
             });
 
-          if (this.selectedFeedbackType() !== null &&
-            this.selectedFeedbackType()!.canBecomeExperience) {
-            ChoiceSelectionChip({
-              label: '同时保存为本学生的作业经验',
-              selected: this.feedbackSaveAsRule,
-              compact: false,
-              onSelect: () => {
-                this.feedbackSaveAsRule = !this.feedbackSaveAsRule;
-              }
-            });
-            if (this.feedbackSaveAsRule) {
-              Text('按当前学生、科目及原文线索归属；原文明确老师时可进一步区分老师。可随时停用。')
-                .fontSize(AppTheme.META_SIZE)
-                .fontColor(AppTheme.SUBTEXT)
-                .width('100%');
-              TextInput({ text: this.feedbackCue, placeholder: '老师原文中的触发词，如 国* 或 听读U*' })
-                .width('100%')
-                .height(AppTheme.INPUT_HEIGHT)
-                .onChange((value: string) => {
-                  this.feedbackCue = value;
-                  this.feedbackRequestId = '';
-                });
-              TextArea({ text: this.feedbackInterpretation,
-                placeholder: '准确含义，如 国* 指《国学》第*页，只替换实际出现的数字' })
-                .width('100%')
-                .height(90)
-                .onChange((value: string) => {
-                  this.feedbackInterpretation = value;
-                  this.feedbackRequestId = '';
-                });
-            }
-          }
+          Text('提交后将自动尝试生成本学生的专属经验；证据不足或与已有规则冲突时不会误生效。')
+            .fontSize(AppTheme.META_SIZE)
+            .fontColor(AppTheme.SUBTEXT)
+            .width('100%');
 
           Button(this.feedbackSubmitting ? '正在保存反馈…' : '提交反馈',
             { type: ButtonType.Normal })
