@@ -170,7 +170,9 @@ public class HomeworkTeacherExperienceService {
         boolean clearSubject = HomeworkTeacherAttribution.matchesUnambiguousSubject(source, entry.subject);
         boolean noSchoolSubject = !source.contains("语文") && !source.contains("数学") && !source.contains("英语");
         boolean exactAuto = auto && !entry.cue.contains("*") && entry.cue.length() >= 8;
-        boolean conditionalImage = image && exactAuto && source.isBlank();
+        // Image pixels have not yet been transcribed at prompt-build time:
+        // provide only exact long cues as conditional examples, never assert a hit.
+        boolean conditionalImage = image && exactAuto && safe(sourceText).isBlank();
         if (!boundTeacher.isBlank() || HomeworkTeacherAttribution.hasNamedTeachers(source) ||
             (image && !cueFound && !conditionalImage) ||
             (!image && !cueFound) ||
