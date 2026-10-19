@@ -213,4 +213,31 @@ class HomeworkFeedbackAutoLearningServiceTest {
     assertEquals("学科归属:语文", saved.getValue().teacherName);
   }
 
+  @Test void parentExplainedVeryShortSchoolAbbreviationIsStillLearnable() {
+    UUID family = UUID.randomUUID();
+    var exp = mock(HomeworkTeacherExperienceRepository.class);
+    var snap = mock(HomeworkOrganizerAiSnapshotRepository.class);
+    var source = original();
+    source.subject = "英语";
+    source.title = "U4";
+    source.sourceExcerpt = "U4";
+    when(snap.findByFamilyIdAndStudentIdAndBatchIdOrderByCandidateIdAsc(
+        family, "child-1", "text-100")).thenReturn(List.of(source));
+    when(exp.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "child-1"))
+        .thenReturn(List.of());
+    when(exp.findBySourceFeedbackId(any(UUID.class))).thenReturn(Optional.empty());
+    var record = feedback(family, "child-1");
+    record.teacherName = "";
+    record.subject = "英语";
+    record.sourceExcerpt = "U4";
+    record.originalTitle = "U4";
+    record.currentTitle = "听读课本第4单元课文";
+    record.details = "U表示Unit单元，数字是课文单元号";
+    assertEquals("APPLIED", new HomeworkFeedbackAutoLearningService(exp, snap).evaluate(record));
+    var saved = ArgumentCaptor.forClass(HomeworkTeacherExperienceEntity.class);
+    verify(exp).save(saved.capture());
+    assertEquals("U*", saved.getValue().cue);
+    assertEquals("学科归属:英语", saved.getValue().teacherName);
+  }
+
 }
