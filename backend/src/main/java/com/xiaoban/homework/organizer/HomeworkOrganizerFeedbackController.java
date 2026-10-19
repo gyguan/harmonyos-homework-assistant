@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,14 @@ public class HomeworkOrganizerFeedbackController {
   public List<HomeworkOrganizerFeedbackDtos.Response> history(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId, @PathVariable String studentId) {
     return service.history(familyId, studentId);
+  }
+
+  @PostMapping("/{feedbackId}/promote")
+  public HomeworkTeacherExperienceDtos.Response promote(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String studentId, @PathVariable UUID feedbackId,
+      @Valid @RequestBody HomeworkOrganizerFeedbackDtos.Promote request) {
+    return service.promote(familyId, studentId, feedbackId, request);
   }
 
   @PostMapping
