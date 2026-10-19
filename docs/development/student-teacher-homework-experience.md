@@ -175,3 +175,34 @@ values ('BOOK_EDITION', '教材版本不对', '说明老师所用的教材版本
 - 同批次只支持一个来源老师作为明确绑定；需要多老师拆分来源时，应采用多批次或继续建设“候选任务级来源绑定”。
 - GUI 尚无差异报表页，当前可通过 API 查看；后续再建设带老师筛选和问题趋势的管理页。
 - 部分仓库 UI 静态门禁和语音 E2E 仍失败，HarmonyOS 自建 Runner 尚未启用；必须在真机/模拟器上验证新增 ArkTS 页面交互后再发布。
+
+
+## V37/V38：服务端原始快照、可信发布复核与拆分合并候选
+
+### 为什么不再依赖客户端 Map
+
+早期 `HomeworkOrganizerRemoteApi.originalById` 在手机重启后丢失，发布后在客户端比较前后内容可能遗漏纠错，且客户端上传的 beforeValue 可被意外覆盖。V37 后，新版客户端的文字/图片请求增加 `importId`；后端成功整理后、返回候选任务前调用 `HomeworkOrganizerAiSnapshotService.capture`。数据库 `homework_organizer_ai_snapshot` 按家庭/学生/批次/候选 ID 永久保存**最初的 AI 标题、学科、要求、教材、日期、时长和少量来源片段**，不保存上传的图片及全部聊天内容。重复 importId 请求仅允许与首次快照一致，否则拒绝覆盖，要求客户端重新整理为新批次。
+
+- `GET /api/v1/students/{studentId}/homework/ai-snapshots/{batchId}`：当前家庭当前学生的原始快照；确认页面重新进入后尽力恢复，用于解释初稿及家长纠错反馈。
+- `POST /api/v1/students/{studentId}/homework/review-differences/finalize`：新版客户端在确认**整批发布成功**后调用，仅传 `{"batchId":"text-...","publishedCandidateIds":["ai-text-...-1","manual-text-...-..."]}`。服务端从原始快照和实际持久化的 `assignment` 读取前后记录，检查家庭、学生、AI 批次和手工任务 ID 前缀一致，计算全字段 CHANGED 及 ADDED/REMOVED；历史导入不存在快照时跳过，绝不伪造差异。
+- App 手工补充任务使用 `manual-{batchId}-{timestamp}-{随机值}`，将新任务和当前批次绑定。后台比较失败不会回滚已发布作业，结果留给运维观察，不主动修改解析规则。
+- 旧的客户端直传差异 API 暂保留兼容；新代码不再使用它作为主要路径。
+- 这解决**AI 原始内容跨 App 重启可恢复**，但发布后对比目前仍是异步最佳努力。如果发布完成后立即断电且没有重试，差异分析仍可能暂缺；下一阶段可用服务端持久化 outbox / 重试任务消除此窗口，不能宣称绝对不漏记。
+
+### V38 的误拆/误合并检测边界
+
+新增 `SPLIT_SUSPECTED`、`MERGE_SUSPECTED`，`fieldName=structure`。后端只在 **同一批次 + 同一非短原文片段（至少8字符）** 中，观察原始和已发布任务数量的明确变化时产生候选：
+- 原始 1 条 → 终稿至少 2 条：疑似误合并，需要拆开；
+- 原始至少 2 条 → 终稿 1 条：疑似误拆分，需要合并。
+
+候选记录会携带前后标题和来源证据，**不自动写入任何老师经验**。短语、不同来源片段及不能明确映射的拆合操作宁愿漏提示，也不推定错误；同一来源片段下的变动也可能出于家长偏好，需要再确认。这不是通用语义拆分检测或模型准确率指标。
+
+### 验收与限制
+
+相关回归用例：
+- `HomeworkOrganizerAiSnapshotServiceTest`：快照保存、家庭隔离、非法批次 ID、同批次覆盖拒绝。
+- `HomeworkOrganizerFinalizationTest`：对照服务器真实发布记录，增、删、标题字段修正、跨家庭与无来源快照处理。
+- `HomeworkOrganizerStructureSuggestionTest`：确证同来源的拆合候选和不同/过短来源不误标。
+- 老师身份隔离及授权仍由 V36 测试覆盖。
+
+只有确认家长选择的“反馈 → 启用经验”才会影响下一次 AI 提示词；V37/V38 只形成证据与统计。未完成：严格事务 outbox、语义层面的跨段落拆分归因、多老师单批次、真机 ArkTS 完整编译及基于人工标准答案的模型准确率回归。
