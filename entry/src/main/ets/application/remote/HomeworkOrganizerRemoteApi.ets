@@ -140,7 +140,8 @@ export class HomeworkOrganizerRemoteApi {
     }
     let parsed = JSON.parse(response.body) as ImageOrganizeResponse;
     if (parsed.mode !== 'AI_IMAGE' || typeof parsed.recognizedText !== 'string' ||
-      parsed.recognizedText.trim().length === 0 || !Array.isArray(parsed.assignments)) {
+      !Array.isArray(parsed.assignments) ||
+      (parsed.assignments.length > 0 && parsed.recognizedText.trim().length === 0)) {
       throw new Error('AI图片解析结果不完整，请换一张清晰图片后重试');
     }
     let candidates = this.toCandidates(input, parsed.assignments, parsed.recognizedText.trim());
