@@ -36,23 +36,25 @@ require("TextArea" in page and "作业内容" in page,
         "parent assignment create page must expose one editable assignment-content input")
 require("整理并继续" in page and "private async organize()" in page,
         "parent assignment create page must expose one organize action")
-require("this.viewModel.parseText(text, this.selectedSubject, this.sourceImageRef, this.sourceImageLabel)" in page,
-        "all editable assignment text must flow through the import ViewModel with explicit subject and source evidence")
+require("this.viewModel.parseText(text, this.selectedSubject, '', '', this.boundTeacherName)" in page,
+        "all typed homework must flow through the import ViewModel with subject and selected teacher")
 require("private SubjectSelector()" in page and "@State private selectedSubject: Subject | null = null" in page and
         "label: '自动识别'" in page and "this.selectSubject(null)" in page and
         "请先选择作业科目" not in page and ".enabled(this.canOrganize())" in page,
         "assignment creation must default to automatic subject inference without a required subject gate")
-require("this.viewModel.recognizeSelectedImageText(this.sourceImageRef, this.sourceImageLabel)" in page and
-        "this.imageMode = HomeworkImageRecognitionMode.OCR" in page and
-        "已识别文字，可修改后继续" in page,
-        "explicit OCR fallback must fill editable text before organization, preserving source image")
-require("this.viewModel.parseImage(this.sourceImageRef, this.selectedSubject, this.sourceImageLabel, text)" in page and
-        "sourceLabel, text)" in view_model and "text: text.trim()" in service and
-        "补充文字：" in service,
-        "image organization must submit and preserve parent supplementary text in source evidence")
-selected_image = page.split("private applySelectedImage(", 1)[-1].split("private async recognizeImageAsText", 1)[0]
-require("this.textDraft = ''" not in selected_image,
-        "selecting an image must not erase the parent's existing text")
+require("HomeworkImageRecognitionMode.OCR" not in page and
+        "this.viewModel.parseImage(" in page and
+        "void this.recognizePhoto();" in page and "void this.recognizeGallery();" in page,
+        "parent-facing image parsing must use direct AI image flow without retired OCR fallback buttons")
+require("this.sourceImageRef, this.selectedSubject, this.sourceImageLabel, '', this.boundTeacherName" in page and
+        "text: text.trim()" in service and "补充文字：" in service and
+        "HomeworkImportService.instance.parseImage(imageRef, subject, sourceLabel, text, teacherName)" in view_model,
+        "parent's exclusive image mode must use verified teacher and the service must preserve explicit supplemental text from supported callers")
+selected_image = page.split("private applySelectedImage(", 1)[-1].split("private selectInputMode(", 1)[0]
+require("this.textDraft = '';" in selected_image and
+        "this.inputMode = HomeworkAssignmentInputMode.IMAGE;" in selected_image and
+        "this.sourceImageRef = imageRef;" in selected_image,
+        "selecting an image must activate the image-only mode and clear stale typed text")
 require("selectImageAndParse()" not in page and "parseTypedText" not in page and
         "textEntryOpen" not in page,
         "unified create page must not retain separate screenshot/text sub-flows")
@@ -71,10 +73,11 @@ require("this.FeedbackBanner();" in page and "if (this.parseMessage.length > 0)"
 require("HomeworkConfirmationPage" not in page,
         "assignment create page must navigate to confirmation rather than duplicate confirmation UI")
 
-require("HomeworkImportService.instance.parseText(text, subject, imageRef, imageSourceLabel)" in view_model and
-        "HomeworkImportService.instance.selectImageText()" in view_model and
-        "HomeworkImportService.instance.captureImageText()" in view_model,
-        "import ViewModel must delegate explicit subject, unified text, gallery OCR and camera OCR actions")
+require("HomeworkImportService.instance.parseText(text, subject, imageRef, imageSourceLabel, teacherName)" in view_model and
+        "HomeworkImportService.instance.selectImage()" in view_model and
+        "HomeworkImportService.instance.captureImage()" in view_model and
+        "HomeworkImportService.instance.parseImage(imageRef, subject, sourceLabel, text, teacherName)" in view_model,
+        "import ViewModel must delegate text/image parsing with teacher source binding and device image selection")
 require("HomeworkImportDraftRepository" in service and "DefaultHomeworkImportDraftRepository" in service,
         "HomeworkImportService must persist drafts through the draft repository boundary")
 require("HomeworkStore" not in service,
@@ -117,10 +120,10 @@ for field in ["sameTaskGroup", "duplicateAssignmentId", "duplicateAssignmentTitl
     require(inbox_service.count(f"{field}: candidate.{field}") >= 2,
             f"import inbox enrichment and normalization must preserve AI duplicate metadata: {field}")
 
-require("【本地兜底】" in confirmation_candidate and
-        "本地兜底" in confirmation_candidate and
-        "AI 判重暂不可用，本次由本地规则辅助判断，请重点确认。" in confirmation_candidate,
-        "confirmation must clearly identify local duplicate-review fallback to parents")
+require("ConfirmationCandidateEditor" in confirmation_candidate and
+        "反馈 AI 整理问题" in confirmation_candidate and
+        "HomeworkOrganizerFeedbackRemoteApi.instance" in confirmation_candidate,
+        "confirmation must allow parents to provide persisted AI organizer corrections")
 
 require("getRawImport" in draft_port and "getCandidates" in draft_port and
         "replaceRawImport" in draft_port and "replaceCandidates" in draft_port,
