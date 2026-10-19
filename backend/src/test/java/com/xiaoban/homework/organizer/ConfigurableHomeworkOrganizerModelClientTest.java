@@ -666,4 +666,69 @@ class ConfigurableHomeworkOrganizerModelClientTest {
         result.candidates().stream().map(HomeworkOrganizerDtos.Candidate::expectedMinutes).toList());
   }
 
+  @Test
+  void confirmedExperienceTriggersAiReviewRatherThanJavaKeywordRewrite() {
+    var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
+    var experiences = mock(HomeworkTeacherExperienceService.class);
+    var student = new TestStudent();
+    student.id = "student-review";
+    student.familyId = java.util.UUID.randomUUID();
+    String original = "语文：摘抄：（3+2）";
+    String experience = "家长经验：摘抄中两个数字分别表示本次好词、好句数量。";
+    when(experiences.context(eq(student), eq("家长文字"), eq(original), eq(false)))
+        .thenReturn(experience);
+    when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
+        .thenAnswer(inv -> {
+          String scene = inv.getArgument(4);
+          if ("homework_experience_review".equals(scene)) {
+            return java.util.Optional.of("""
+                {"assignments":[{"subject":"语文","title":"摘抄3个好词、2个好句",
+                "instruction":"摘抄3个好词、2个好句","textbookRef":"待家长确认",
+                "taskDate":"2026-10-19","expectedMinutes":15,
+                "sourceExcerpt":"摘抄：（3+2）","confidence":0.95}]}
+                """);
+          }
+          return java.util.Optional.of("""
+              {"assignments":[{"subject":"语文","title":"完成摘抄（3+2）",
+              "instruction":"完成摘抄（3+2）","textbookRef":"待家长确认",
+              "taskDate":"2026-10-19","expectedMinutes":15,
+              "sourceExcerpt":"摘抄：（3+2）","confidence":0.95}]}
+              """);
+        });
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), transport, JsonMapper.builder().build(), experiences);
+    var result = client.organize(student, "家长文字", original).orElseThrow();
+    assertEquals("摘抄3个好词、2个好句", result.getFirst().title());
+    var prompts = org.mockito.ArgumentCaptor.forClass(String.class);
+    verify(transport, times(2)).complete(anyString(), prompts.capture(),
+        anyString(), anyInt(), anyString(), anyMap());
+    assertTrue(prompts.getAllValues().get(1).contains("质量复核"));
+    assertTrue(prompts.getAllValues().get(1).contains(experience));
+  }
+
+  @Test
+  void aiReviewFailureDoesNotInventUnconfirmedCorrection() {
+    var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
+    var experiences = mock(HomeworkTeacherExperienceService.class);
+    var student = new TestStudent();
+    student.id = "student-review-fail";
+    student.familyId = java.util.UUID.randomUUID();
+    when(experiences.context(eq(student), anyString(), anyString(), eq(false)))
+        .thenReturn("家长经验：需按原文解释");
+    when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
+        .thenAnswer(inv -> "homework_experience_review".equals(inv.getArgument(4))
+            ? java.util.Optional.empty()
+            : java.util.Optional.of("""
+                {"assignments":[{"subject":"语文","title":"完成摘抄（3+2）",
+                "instruction":"完成摘抄（3+2）","textbookRef":"待家长确认",
+                "taskDate":"2026-10-19","expectedMinutes":15,
+                "sourceExcerpt":"摘抄：（3+2）","confidence":0.95}]}
+                """));
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), transport, JsonMapper.builder().build(), experiences);
+    var result = client.organize(student, "家长文字", "语文：摘抄：（3+2）").orElseThrow();
+    assertEquals("完成摘抄（3+2）", result.getFirst().title());
+  }
+
+
 }
