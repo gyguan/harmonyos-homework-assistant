@@ -193,10 +193,17 @@ public class HomeworkTeacherExperienceService {
       if (!entry.active) continue;
       boolean subjectOnly = HomeworkTeacherAttribution.isSubjectScope(entry.teacherName);
       boolean auto = "FEEDBACK_AUTO".equals(entry.origin);
-      boolean cueFound = HomeworkExperienceCueMatcher.matches(entry.cue, source);
+      // An older saved feedback may have the literal cue "摘抄：（4+2）".
+      // Reuse its confirmed mathematical meaning with this task's numbers,
+      // rather than requiring the historical 4+2 to appear again.
+      boolean confirmedCounts = HomeworkExcerptCountConvention.isConfirmed(entry);
+      boolean compoundFound = confirmedCounts
+          && HomeworkExcerptCountConvention.extract(source) != null;
+      boolean cueFound = HomeworkExperienceCueMatcher.matches(entry.cue, source)
+          || compoundFound;
       // Long notices must also match their captured example, not merely a
       // repeated 120-character prefix of another day's notice.
-      if (auto && !image && !entry.cue.contains("*")
+      if (auto && !image && !entry.cue.contains("*") && !compoundFound
           && entry.exampleSource != null && entry.exampleSource.length() > 120
           && !source.contains(entry.exampleSource)) continue;
       if (subjectOnly) {
@@ -205,11 +212,13 @@ public class HomeworkTeacherExperienceService {
         // subject, but never for a mixed-subject notice or a named teacher.
         boolean clearSubject = HomeworkTeacherAttribution.matchesUnambiguousSubject(source, entry.subject);
         boolean noSchoolSubject = !source.contains("语文") && !source.contains("数学") && !source.contains("英语");
-        boolean exactAuto = auto && !entry.cue.contains("*") && entry.cue.length() >= 8;
+        boolean exactAuto = (auto && !entry.cue.contains("*") && entry.cue.length() >= 8)
+            || compoundFound;
         // Image pixels have not yet been transcribed at prompt-build time:
         // provide only exact long cues as conditional examples, never assert a hit.
-        boolean conditionalImage = image && auto && safe(sourceText).isBlank()
-            && (exactAuto || (entry.cue.contains("*") && entry.cue.length() >= 2));
+        boolean conditionalImage = image && safe(sourceText).isBlank()
+            && ((auto && (exactAuto || (entry.cue.contains("*") && entry.cue.length() >= 2)))
+                || confirmedCounts);
         if (!boundTeacher.isBlank() || HomeworkTeacherAttribution.hasNamedTeachers(source) ||
             (image && !cueFound && !conditionalImage) ||
             (!image && !cueFound) ||
@@ -228,6 +237,9 @@ public class HomeworkTeacherExperienceService {
           + "」，原文线索「" + entry.cue + "」："
           + (auto ? "这是家长提交的问题反馈，仅作为同源作业的纠错提示。"
               + "绝不照搬本例数字或补造未出现的内容。" : "")
+          + (confirmedCounts ? "家长已明确确认：对于当前学生的摘抄（N+M），"
+              + "前一数是好词数量，后一数是好句数量；按本次的数字展开标题及要求，"
+              + "不能只保留（N+M）作为任务标题。" : "")
           + entry.interpretation
           + (entry.exampleSource.isBlank() ? "" :
               "；历史原文「" + entry.exampleSource + "」，已确认结果「" + entry.exampleResult + "」")
@@ -239,6 +251,65 @@ public class HomeworkTeacherExperienceService {
     if (matches == 0) return "";
     if (image) section.append("图片里必须识别出符合的老师和线索才可以引用；不确定则忽略以上经验。\n");
     return section.toString();
+  }
+
+  /**
+   * AI prompts are advisory. Enforce a confirmed, reversible student-specific
+   * two-count shorthand AFTER model generation, so the output cannot silently
+   * degrade back to "完成摘抄（4+2）". Legacy experiences work without migration.
+   */
+  @Transactional(readOnly = true)
+  public List<HomeworkOrganizerDtos.Candidate> applyConfirmedExcerptCounts(
+      StudentEntity student, String sourceLabel, String sourceText,
+      List<HomeworkOrganizerDtos.Candidate> candidates) {
+    if (student == null || student.id == null || student.familyId == null
+        || candidates == null || candidates.isEmpty()) return candidates;
+    var rows = repository.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(
+        student.familyId, student.id);
+    if (rows.isEmpty()) return candidates;
+    var approved = rows.stream()
+        .filter(HomeworkExcerptCountConvention::isConfirmed).toList();
+    if (approved.isEmpty()) return candidates;
+
+    String label = safe(sourceLabel);
+    String text = safe(sourceText);
+    String identity = HomeworkTeacherAttribution.explicitSourceTeacher(label + "\n" + text);
+    String marker = "[家长已确认老师：";
+    int start = label.indexOf(marker);
+    if (start >= 0) {
+      int end = label.indexOf(']', start + marker.length());
+      if (end > start) identity = label.substring(start + marker.length(), end).trim();
+    }
+
+    var output = new ArrayList<HomeworkOrganizerDtos.Candidate>(candidates.size());
+    for (var candidate : candidates) {
+      if (candidate == null || candidate.title() == null) {
+        output.add(candidate);
+        continue;
+      }
+      var pair = HomeworkExcerptCountConvention.extract(candidate.sourceExcerpt());
+      // The LLM excerpt alone is insufficient when a supplied original text
+      // contradicts it. For image sources, use the OCR/recognizedText field.
+      if (pair == null || !HomeworkExcerptCountConvention.mentionsPair(text, pair)) {
+        output.add(candidate);
+        continue;
+      }
+      boolean matched = false;
+      for (var row : approved) {
+        if (!row.subject.equals(candidate.subject())) continue;
+        if (HomeworkTeacherAttribution.isSubjectScope(row.teacherName)) {
+          // Do not reuse generic subject feedback in a named-teacher notice.
+          if (HomeworkTeacherAttribution.hasNamedTeachers(label + "\n" + text)
+              || !identity.isBlank()) continue;
+        } else if (!row.teacherName.equals(identity)) {
+          continue;
+        }
+        matched = true;
+        break;
+      }
+      output.add(matched ? HomeworkExcerptCountConvention.rewrite(candidate, pair) : candidate);
+    }
+    return output;
   }
 
   private static String validSubject(String subject) {
