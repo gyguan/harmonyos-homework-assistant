@@ -346,7 +346,9 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
    */
   static List<ShorthandEntry> shorthandEntries(String configured) {
     List<String> raw = new ArrayList<>();
-    for (String item : (configured == null ? "" : configured).split("[;；\n]")) {
+    String glossary = configured == null ? "" : configured;
+    String delimiter = glossary.startsWith("\\u001e") ? "\\u001e" : "[;；\\n]";
+    for (String item : glossary.split(delimiter)) {
       String entry = item.trim();
       if (!entry.isEmpty() && !raw.contains(entry)) raw.add(entry);
     }
