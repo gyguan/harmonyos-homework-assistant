@@ -51,6 +51,12 @@ public class HomeworkStudentTeacherService {
       throw new ApiExceptions.BadRequest("请填写老师姓名或称呼");
     }
     if (subject.isEmpty()) throw new ApiExceptions.BadRequest("请选择老师的学科");
+    var existingTeachers = repository.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(
+        familyId, studentId);
+    if (existingTeachers.stream().anyMatch(t -> t.teacherName.equals(name)
+        && !t.subject.equals(subject))) {
+      throw new ApiExceptions.BadRequest("存在同名老师，请在老师称呼中加入学科或完整姓名以区分");
+    }
     var row = repository.findByFamilyIdAndStudentIdAndTeacherNameAndSubject(
         familyId, studentId, name, subject).orElse(null);
     if (row == null) {
