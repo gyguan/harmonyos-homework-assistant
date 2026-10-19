@@ -27,11 +27,19 @@ public class HomeworkReviewOutboxEnqueuer {
       throw new ApiExceptions.BadRequest("导入批次不合法");
     }
     // Non-AI manual work needs no reconciliation job.
-    if (snapshots.findByFamilyIdAndStudentIdAndBatchIdOrderByCandidateIdAsc(
-        familyId, studentId, batchId).isEmpty()) return;
+    var originals = snapshots.findByFamilyIdAndStudentIdAndBatchIdOrderByCandidateIdAsc(
+        familyId, studentId, batchId);
+    if (originals.isEmpty()) return;
     if (ids.isEmpty() || ids.size() > 50 || ids.stream().anyMatch(
-        id -> id == null || !id.matches("[A-Za-z0-9_-]{1,180}"))) {
+        id -> id == null || !id.matches("[A-Za-z0-9_-]{1,180}"))
+        || new java.util.HashSet<>(ids).size() != ids.size()) {
       throw new ApiExceptions.BadRequest("已发布作业标识不合法");
+    }
+    var originalIds = originals.stream().map(e -> e.candidateId).collect(java.util.stream.Collectors.toSet());
+    for (String id : ids) {
+      if (!originalIds.contains(id) && !id.startsWith("manual-" + batchId + "-")) {
+        throw new ApiExceptions.BadRequest("已发布作业不属于本次导入批次");
+      }
     }
     String encoded = String.join("\n", ids);
     var existing = outbox.findByFamilyIdAndStudentIdAndBatchId(familyId, studentId, batchId);
