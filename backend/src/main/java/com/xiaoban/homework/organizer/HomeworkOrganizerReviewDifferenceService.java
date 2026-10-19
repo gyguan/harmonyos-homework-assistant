@@ -77,6 +77,24 @@ public class HomeworkOrganizerReviewDifferenceService {
     return new Result(saved, ignored);
   }
 
+  /** Recent correction distribution; not an accuracy percentage without verified ground truth. */
+  public record Summary(String teacherName, String fieldName, String changeType, long count) {}
+
+  @Transactional(readOnly = true)
+  public List<Summary> summary(UUID familyId, String studentId) {
+    teachers.requireOwned(familyId, studentId);
+    var rows = repository.findTop100ByFamilyIdAndStudentIdOrderByCreatedAtDesc(familyId, studentId);
+    java.util.Map<String, Long> counts = new java.util.LinkedHashMap<>();
+    for (var item : rows) {
+      String key = item.teacherName + "\u001F" + item.fieldName + "\u001F" + item.changeType;
+      counts.merge(key, 1L, Long::sum);
+    }
+    return counts.entrySet().stream().map(entry -> {
+      String[] pieces = entry.getKey().split("\u001F", -1);
+      return new Summary(pieces[0], pieces[1], pieces[2], entry.getValue());
+    }).sorted(java.util.Comparator.comparingLong(Summary::count).reversed()).toList();
+  }
+
   @Transactional(readOnly = true)
   public List<History> history(UUID familyId, String studentId) {
     teachers.requireOwned(familyId, studentId);
