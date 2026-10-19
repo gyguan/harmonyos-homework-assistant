@@ -18,10 +18,26 @@ public class HomeworkOrganizerService {
   private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai");
   private final StudentRepository students;
   private final HomeworkOrganizerModelClient model;
+  private final HomeworkStudentTeacherService teachers;
 
   public HomeworkOrganizerService(StudentRepository students, HomeworkOrganizerModelClient model) {
+    this(students, model, null);
+  }
+
+  @org.springframework.beans.factory.annotation.Autowired
+  public HomeworkOrganizerService(StudentRepository students, HomeworkOrganizerModelClient model,
+      HomeworkStudentTeacherService teachers) {
     this.students = students;
     this.model = model;
+    this.teachers = teachers;
+  }
+
+  private String teacherLabel(UUID familyId, String studentId, String label, String selectedTeacher) {
+    if (selectedTeacher == null || selectedTeacher.isBlank()) return label;
+    if (teachers == null) throw new ApiExceptions.BadRequest("老师资料尚未配置");
+    String verified = teachers.verifiedTeacher(familyId, studentId, selectedTeacher);
+    // Explicit verified identity is conveyed to AI separately from the untrusted original message.
+    return (label == null ? "" : label) + "\n[家长已确认老师：" + verified + "]";
   }
 
   public HomeworkOrganizerDtos.Response organize(UUID familyId, String studentId, HomeworkOrganizerDtos.Request request) {
@@ -31,7 +47,7 @@ public class HomeworkOrganizerService {
     if (!model.available()) throw new ApiExceptions.ServiceUnavailable("AI整理暂未配置");
 
     List<HomeworkOrganizerDtos.Candidate> organized = model
-        .organize(student, request.sourceLabel(), request.text())
+        .organize(student, teacherLabel(familyId, studentId, request.sourceLabel(), request.teacherName()), request.text())
         .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI整理暂时不可用"));
     List<HomeworkOrganizerDtos.Candidate> normalized =
         normalizeDefaultTaskDates(organized, request.text());
@@ -53,7 +69,7 @@ public class HomeworkOrganizerService {
     if (!model.imageAvailable()) throw new ApiExceptions.ServiceUnavailable("AI图片解析暂未配置");
     long modelStarted = System.nanoTime();
     var result = model.organizeImage(
-        student, request.sourceLabel(), imageDataUrl, request.text())
+        student, teacherLabel(familyId, studentId, request.sourceLabel(), request.teacherName()), imageDataUrl, request.text())
         .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI图片解析失败，请确认模型支持图片"));
     long modelMs = elapsedMs(modelStarted);
 
