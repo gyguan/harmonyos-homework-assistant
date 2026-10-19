@@ -108,3 +108,23 @@ values ('BOOK_EDITION', '教材版本不对', '说明老师所用的教材版本
 本版反馈入口在“编辑 AI 整理任务”页面，按需从服务器加载分类，可填写老师姓名、正确含义与补充说明；不影响家长正常保存或发布。尚无后台可视化类型管理 UI，分类可先通过 SQL 管理；未实现跨多项作业的批次级漏项差异比较。
 
 后端测试：`HomeworkOrganizerFeedbackServiceTest` 覆盖动态分类、必填、状态、幂等与家庭访问限制。
+
+
+## 家长确认后转化为生效经验（V35）
+
+本版本为反馈闭环增加显式启用与可撤销能力。不是“反馈即自动学习”：
+
+1. `homework_feedback_type.can_become_experience` 从表中读取。V35 只为 `SHORTHAND` 初始化为 true；其他问题仍以 `NEW` 保存，等待更丰富的差异分析/验证。
+2. 家长在 **反馈 AI 整理问题** 中选择可学习的类型，勾选 **同时保存为该老师的专属经验**，填入已确认的老师姓名、触发词及正确含义。例：`国*` 代表 `国13`、`国14` 等 1–3 位数字的写法。
+3. 客户端先保存反馈，获取服务端反馈 ID，再通过 `POST /api/v1/students/{studentId}/homework/feedback/{feedbackId}/promote` 提交 `{"cue":"国*","interpretation":"国后的数字代表《国学》课本对应页码，不增加不存在的题目"}`。在后端事务内验证：家庭/学生访问权限、反馈归属、当前类别可学习、老师姓名明确、触发词确实与原文匹配、释义不为空。
+4. 成功后生成 `homework_teacher_experience` 记录，`origin=FEEDBACK_APPROVED`、`active=true`、`source_feedback_id` 保留证据，反馈状态设为 `APPLIED`；同反馈重复调用不会生成重复经验，也不能借第二次提交悄悄覆盖历史规则。
+5. 新的文字整理会验证 **当前学生 + 老师名称 + 触发词**；图片整理只传受控条数的条件性经验，要求图片同时能识别出对应老师和原文线索；无法确定老师不猜测。规则被停用后不再放入 AI Prompt。
+6. 家长在同一页面 **查看或停用老师经验**；`PUT /api/v1/students/{studentId}/homework/teacher-experiences/{id}/active` 用 `{"active":false}` 可停用，`{"active":true}` 可重新启用。旧版 DELETE 经验变成**软停用**而非物理删除，以保留来源和审计信息。
+
+数据库：`V35__homework_feedback_learning.sql` 新增 `can_become_experience`、`active`、`source_feedback_id`，保留有效反馈与规则的单一映射。家长前端从接口读取 `canBecomeExperience`，允许转经验的类型不在 ArkTS 写死。
+
+可选 SQL 配置：允许别的反馈分类进入“明确由家长确认才生效”的流程时，可设置 `update homework_feedback_type set can_become_experience=true where code='...';`。**注意**：建议先为新增类别编写差异验证规则，避免把“漏项”“重复作业”等需要跨任务比对的结论当成单条缩写知识。
+
+测试：`HomeworkFeedbackLearningTest` 验证数字占位符、来源精确匹配、学生/老师隔离、重复晋升幂等、非可学习类别拒绝、停用与恢复。后端 CI 完整测试 218 项通过；HarmonyOS HAP 构建未运行（需要已启用的自托管 Runner），部分既有 UI/E2E 门禁仍失败，PR 保持 Draft。
+
+**尚待建设**：导入前可选绑定具体老师（图片可能没有署名，当前不会从姓名相似度推测）；可解释的跨多任务“漏拆/误拆/遗漏”反馈自动提炼；基于真实老师样本和模型版本的在线/离线效果回归。这些必须与本版“可撤销的家长明确规则”区分。
