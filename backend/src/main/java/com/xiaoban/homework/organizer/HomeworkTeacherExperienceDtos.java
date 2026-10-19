@@ -26,6 +26,19 @@ public final class HomeworkTeacherExperienceDtos {
 
   public record ActiveUpdate(boolean active) {}
 
+  /** Complete information for one experience and its linked parent feedback. */
+  public record FeedbackEvidence(String typeCode, String details, String originalTitle,
+      String currentTitle, String sourceLabel, String sourceExcerpt,
+      String processingStatus, Instant createdAt) {
+    static FeedbackEvidence from(HomeworkOrganizerFeedbackEntity entity) {
+      return new FeedbackEvidence(entity.feedbackTypeCode, entity.details,
+          entity.originalTitle, entity.currentTitle, entity.sourceLabel,
+          entity.sourceExcerpt, entity.processingStatus, entity.createdAt);
+    }
+  }
+
+  public record DetailResponse(Response experience, FeedbackEvidence feedback) {}
+
   public record Response(UUID id, String teacherName, String subject, String cue,
       String interpretation, String exampleSource, String exampleResult, String origin,
       Instant updatedAt, boolean active, UUID sourceFeedbackId) {
