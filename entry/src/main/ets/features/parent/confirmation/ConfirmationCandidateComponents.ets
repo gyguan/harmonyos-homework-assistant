@@ -1,7 +1,8 @@
 import {
   HomeworkOrganizerFeedbackRemoteApi,
   HomeworkFeedbackType,
-  HomeworkFeedbackInput
+  HomeworkFeedbackInput,
+  HomeworkTeacherExperienceSummary
 } from '../../../application/remote/HomeworkOrganizerFeedbackRemoteApi';
 import { HomeworkOrganizerRemoteApi } from '../../../application/remote/HomeworkOrganizerRemoteApi';
 import { AssignmentEditChangeDetector, AssignmentEditValues } from '../../../common/state/AssignmentEditChangeDetector';
@@ -181,6 +182,12 @@ export struct ConfirmationCandidateEditor {
   @State private feedbackDetails: string = '';
   @State private feedbackMessage: string = '';
   @State private feedbackHasError: boolean = false;
+  @State private feedbackSaveAsRule: boolean = false;
+  @State private feedbackCue: string = '';
+  @State private feedbackInterpretation: string = '';
+  @State private showSavedExperiences: boolean = false;
+  @State private loadingExperiences: boolean = false;
+  @State private savedExperiences: HomeworkTeacherExperienceSummary[] = [];
   private feedbackRequestId: string = '';
 
   onClose: () => void = () => {};
@@ -204,6 +211,11 @@ export struct ConfirmationCandidateEditor {
     this.feedbackDetails = '';
     this.feedbackMessage = '';
     this.feedbackHasError = false;
+    this.feedbackSaveAsRule = false;
+    this.feedbackCue = '';
+    this.feedbackInterpretation = '';
+    this.showSavedExperiences = false;
+    this.savedExperiences = [];
     this.feedbackRequestId = '';
   }
 
@@ -228,6 +240,35 @@ export struct ConfirmationCandidateEditor {
     }
   }
 
+  private async toggleSavedExperiences(): Promise<void> {
+    this.showSavedExperiences = !this.showSavedExperiences;
+    if (!this.showSavedExperiences) return;
+    this.loadingExperiences = true;
+    try {
+      this.savedExperiences = await HomeworkOrganizerFeedbackRemoteApi.instance
+        .listExperiences(this.item.studentId);
+    } catch {
+      this.feedbackHasError = true;
+      this.feedbackMessage = '老师经验列表加载失败';
+    } finally {
+      this.loadingExperiences = false;
+    }
+  }
+
+  private async setSavedExperienceActive(item: HomeworkTeacherExperienceSummary): Promise<void> {
+    try {
+      let updated = await HomeworkOrganizerFeedbackRemoteApi.instance
+        .setExperienceActive(this.item.studentId, item.id, !item.active);
+      this.savedExperiences = this.savedExperiences.map((old: HomeworkTeacherExperienceSummary) =>
+        old.id === updated.id ? updated : old);
+      this.feedbackHasError = false;
+      this.feedbackMessage = updated.active ? '已重新启用这条老师经验' : '已停用，后续整理不再引用这条经验';
+    } catch {
+      this.feedbackHasError = true;
+      this.feedbackMessage = '经验状态更新失败，请重试';
+    }
+  }
+
   private selectedFeedbackType(): HomeworkFeedbackType | null {
     for (let option of this.feedbackTypes) {
       if (option.code === this.feedbackSelectedCode) return option;
@@ -247,6 +288,18 @@ export struct ConfirmationCandidateEditor {
       this.feedbackHasError = true;
       this.feedbackMessage = '请简要说明具体问题或正确写法';
       return;
+    }
+    if (this.feedbackSaveAsRule && type.canBecomeExperience) {
+      if (this.feedbackTeacherName.trim().length < 2) {
+        this.feedbackHasError = true;
+        this.feedbackMessage = '要形成老师经验，请填写确定的老师姓名';
+        return;
+      }
+      if (this.feedbackCue.trim().length < 2 || this.feedbackInterpretation.trim().length < 6) {
+        this.feedbackHasError = true;
+        this.feedbackMessage = '请填写原文中出现的触发词（如国*）及完整正确解释';
+        return;
+      }
     }
     if (this.feedbackRequestId.length === 0) {
       this.feedbackRequestId = `${this.item.id}-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
@@ -269,12 +322,30 @@ export struct ConfirmationCandidateEditor {
     this.feedbackSubmitting = true;
     this.feedbackMessage = '';
     try {
-      await HomeworkOrganizerFeedbackRemoteApi.instance.submit(this.item.studentId, input);
+      let receipt = await HomeworkOrganizerFeedbackRemoteApi.instance.submit(this.item.studentId, input);
+      if (this.feedbackSaveAsRule && type.canBecomeExperience) {
+        try {
+          await HomeworkOrganizerFeedbackRemoteApi.instance.promote(
+            this.item.studentId, receipt.id, {
+              cue: this.feedbackCue.trim(),
+              interpretation: this.feedbackInterpretation.trim()
+            });
+        } catch {
+          this.feedbackHasError = true;
+          this.feedbackMessage = '反馈已经保存，但老师经验暂未生效。请核对触发词是否出现在原文中，然后重试';
+          return;
+        }
+      }
       this.feedbackHasError = false;
-      this.feedbackMessage = '已保存反馈，后续会用于改进这类作业的整理';
+      this.feedbackMessage = this.feedbackSaveAsRule
+        ? '已保存反馈并启用该学生、该老师的专属经验'
+        : '反馈已保存，暂不会自动改变 AI 解析规则';
       this.showFeedbackPanel = false;
       this.feedbackSelectedCode = '';
       this.feedbackDetails = '';
+      this.feedbackSaveAsRule = false;
+      this.feedbackCue = '';
+      this.feedbackInterpretation = '';
       this.feedbackRequestId = '';
     } catch {
       this.feedbackHasError = true;
@@ -485,6 +556,7 @@ export struct ConfirmationCandidateEditor {
                   compact: true,
                   onSelect: () => {
                     this.feedbackSelectedCode = option.code;
+                    this.feedbackSaveAsRule = false;
                     this.feedbackMessage = '';
                     this.feedbackRequestId = '';
                   }
@@ -518,6 +590,39 @@ export struct ConfirmationCandidateEditor {
               this.feedbackRequestId = '';
             });
 
+          if (this.selectedFeedbackType() !== null &&
+            this.selectedFeedbackType()!.canBecomeExperience) {
+            ChoiceSelectionChip({
+              label: '同时保存为该老师的专属经验',
+              selected: this.feedbackSaveAsRule,
+              compact: false,
+              onSelect: () => {
+                this.feedbackSaveAsRule = !this.feedbackSaveAsRule;
+              }
+            });
+            if (this.feedbackSaveAsRule) {
+              Text('只有当前学生、老师及触发词匹配，后续才会使用这条经验；可随时停用。')
+                .fontSize(AppTheme.META_SIZE)
+                .fontColor(AppTheme.SUBTEXT)
+                .width('100%');
+              TextInput({ text: this.feedbackCue, placeholder: '老师原文中的触发词，如 国* 或 听读U*' })
+                .width('100%')
+                .height(AppTheme.INPUT_HEIGHT)
+                .onChange((value: string) => {
+                  this.feedbackCue = value;
+                  this.feedbackRequestId = '';
+                });
+              TextArea({ text: this.feedbackInterpretation,
+                placeholder: '准确含义，如 国* 指《国学》第*页，只替换实际出现的数字' })
+                .width('100%')
+                .height(90)
+                .onChange((value: string) => {
+                  this.feedbackInterpretation = value;
+                  this.feedbackRequestId = '';
+                });
+            }
+          }
+
           Button(this.feedbackSubmitting ? '正在保存反馈…' : '提交反馈',
             { type: ButtonType.Normal })
             .width('100%')
@@ -527,6 +632,47 @@ export struct ConfirmationCandidateEditor {
             .fontColor(AppTheme.TEXT_ON_PRIMARY)
             .enabled(!this.feedbackSubmitting)
             .onClick(() => { void this.submitFeedback(); });
+        }
+      }
+
+      Button(this.showSavedExperiences ? '收起已保存的老师经验' : '查看或停用老师经验',
+        { type: ButtonType.Normal })
+        .width('100%')
+        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+        .fontColor(AppTheme.TEXT)
+        .onClick(() => { void this.toggleSavedExperiences(); });
+
+      if (this.showSavedExperiences) {
+        if (this.loadingExperiences) {
+          Text('正在加载老师经验…').fontColor(AppTheme.SUBTEXT);
+        } else if (this.savedExperiences.length === 0) {
+          Text('当前学生尚未积累老师经验').fontColor(AppTheme.SUBTEXT);
+        } else {
+          ForEach(this.savedExperiences, (experience: HomeworkTeacherExperienceSummary) => {
+            Row({ space: 8 }) {
+              Column({ space: 4 }) {
+                Text(`${experience.teacherName} · ${experience.subject} · ${experience.cue}`)
+                  .fontSize(AppTheme.META_SIZE)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.TEXT);
+                Text(experience.interpretation)
+                  .fontSize(AppTheme.META_SIZE)
+                  .maxLines(2)
+                  .fontColor(AppTheme.SUBTEXT);
+              }
+              .layoutWeight(1);
+              Button(experience.active ? '停用' : '启用', { type: ButtonType.Normal })
+                .fontSize(AppTheme.META_SIZE)
+                .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+                .fontColor(AppTheme.PRIMARY)
+                .onClick(() => { void this.setSavedExperienceActive(experience); });
+            }
+            .width('100%');
+          }, (experience: HomeworkTeacherExperienceSummary) =>
+            `${experience.id}-${experience.active}`);
         }
       }
     }
