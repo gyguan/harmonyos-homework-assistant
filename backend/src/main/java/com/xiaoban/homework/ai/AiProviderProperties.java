@@ -26,9 +26,11 @@ public class AiProviderProperties {
   private boolean logPayloads = false;
   private boolean disableThinking = true;
   /**
-   * 老师布置作业的惯用简写，追加在内置词条之后（不会覆盖内置）。
-   * 格式：{@code 科目|简写|含义}，多条用 {@code ;} 分隔；简写里的 {@code *} 表示「后面跟数字」。
-   * 例：{@code 数学|口算|口算题卡;英语|周练|周末练习单}
+   * Compatibility-only: previous deployments may still supply AI_HOMEWORK_SHORTHAND.
+   * Startup imports these entries into homework_organizer_rule once (idempotently);
+   * production organizer execution reads only the database. A disabled row will never
+   * be silently restored by this old environment setting.
+   * Format: 科目|简写|含义|短标题 (optional), separated by semicolons.
    */
   private String homeworkShorthand = "";
 

@@ -456,6 +456,9 @@ jobs:
       - name: Run batch publish E2E
         run: python backend/scripts/batch_publish_e2e.py
 
+      - name: Verify migrated organizer rules in real PostgreSQL
+        run: python backend/scripts/homework_organizer_rules_e2e.py
+
       - name: Run organizer review Outbox PostgreSQL E2E
         run: python backend/scripts/homework_review_outbox_e2e.py
 
