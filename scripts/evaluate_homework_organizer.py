@@ -94,12 +94,17 @@ def evaluate(fixtures, predictions):
             for field, value in exp.get("fields", {}).items():
                 field_checks.append(normalize(out.get(field)) == normalize(value))
             required = set(exp.get("sourceBlockIds", []))
-            if required:
-                evidence_checks.append(required <= set(out.get("sourceBlockIds", [])) and required <= blocks)
+            spans = exp.get("sourceEvidenceTexts", [])
+            if required or spans:
+                references = set(out.get("sourceBlockIds", []))
+                linked = "\n".join(b.get("text", "") for b in prediction.get("sourceDocument", {}).get("blocks", [])
+                                   if b.get("id") in references)
+                evidence_checks.append(bool(references) and references <= blocks and required <= references
+                                       and all(normalize(span) in normalize(linked) for span in spans))
         totals["fieldCorrect"] += sum(field_checks)
         totals["fieldTotal"] += len(field_checks) + sum(len(gold[g].get("fields", {})) for g in range(len(gold)) if g not in matched_gold)
         totals["evidenceCorrect"] += sum(evidence_checks)
-        totals["evidenceTotal"] += len(evidence_checks) + sum(bool(gold[g].get("sourceBlockIds")) for g in range(len(gold)) if g not in matched_gold)
+        totals["evidenceTotal"] += len(evidence_checks) + sum(bool(gold[g].get("sourceBlockIds") or gold[g].get("sourceEvidenceTexts")) for g in range(len(gold)) if g not in matched_gold)
         totals["evidenceCovered"] += sum(bool(o.get("sourceBlockIds")) and set(o["sourceBlockIds"]) <= blocks for o in outputs)
         unmatched_gold = []
         used = set(owners)

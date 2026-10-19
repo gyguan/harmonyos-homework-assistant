@@ -106,6 +106,20 @@ class JointMetricsTest(unittest.TestCase):
         result = evaluate(case, pred)
         self.assertEqual(0, result['total']['evidenceAccuracy'])
 
+    def test_evidence_spans_do_not_depend_on_model_block_id_numbering(self):
+        case = HomeworkEvaluationTest().fixture()
+        case['cases'][0]['expected'][0]['sourceEvidenceTexts'] = ['国13']
+        pred = HomeworkEvaluationTest().prediction([
+            dict(subject='语文', title='国学13页', sourceBlockIds=['provider-block-9']),
+            dict(subject='数学', title='口算20题')])
+        pred['results'][0]['sourceDocument'] = {'blocks': [{'id':'provider-block-9','text':'语文：朗读国13'}]}
+        self.assertEqual(1, evaluate(case, pred)['total']['evidenceAccuracy'])
+
+    def test_literal_shorthand_echo_cannot_pass_expanded_experience_gold(self):
+        case = {'cases': [{'id':'x','reviewStatus':'VERIFIED','expected':[{'subject':'语文','keywords':['摘抄','3个好词','2个好句']}]}]}
+        pred = {'results':[{'caseId':'x','assignments':[{'subject':'语文','title':'完成摘抄（3+2）'}]}]}
+        self.assertEqual(0, evaluate(case,pred)['total']['recallProxy'])
+
     def test_gold_edits_invalidate_comparison(self):
         from evaluate_homework_organizer import compare
         with self.assertRaisesRegex(ValueError, 'identical fixture'):

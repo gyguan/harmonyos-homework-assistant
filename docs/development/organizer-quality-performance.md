@@ -19,7 +19,7 @@
 
 `python scripts/evaluate_homework_organizer.py --fixtures scripts/fixtures/homework_organizer_cases.json --predictions scripts/fixtures/homework_organizer_predictions_empty.json --report /tmp/organizer-report.json`
 
-全为 DRAFT 时退出码 2、NO_VERIFIED_GOLD，不报告语义准确率。DRAFT 仍可输出性能数据。VERIFIED 必须来自真实老师输入、经家长人工核验，不能把测试构造样本标记成真实金标。expected 的 keywords 是**任务匹配代理**；fields 是人工标注的实际 DTO 字段精确对比，sourceBlockIds 是独立证据标注。关键词 P/R 与字段准确率均不能替代独立语义复核。
+全为 DRAFT 时退出码 2、NO_VERIFIED_GOLD，不报告语义准确率。DRAFT 仍可输出性能数据。VERIFIED 必须来自真实老师输入、经家长人工核验，不能把测试构造样本标记成真实金标。expected 的 keywords 是**任务匹配代理**；fields 是人工标注的实际 DTO 字段精确对比，sourceEvidenceTexts 是独立原文片段标注（不依赖模型给图片块编号的方式），也支持严格 sourceBlockIds 标注。图片未提供实际图像前保持证据未标注，不能伪造块ID。关键词 P/R 与字段准确率均不能替代独立语义复核。
 
 真实模型 baseline：在隔离测试家庭准备学生、已确认老师/经验与后端模型配置；通过环境变量 ORGANIZER_EVAL_TOKEN 提供家长 session。不要提交 key/session/真实儿童资料。固定服务器时区/日期、模型版本、原文/图片、老师/经验版本和网络；真实模型测量会消耗提供商额度。
 
