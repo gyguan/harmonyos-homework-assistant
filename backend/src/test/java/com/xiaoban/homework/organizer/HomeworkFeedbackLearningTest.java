@@ -130,9 +130,13 @@ class HomeworkFeedbackLearningTest {
         () -> service.promote(family, "child1", record.id,
             new HomeworkOrganizerFeedbackDtos.Promote("听读U*", meaning)));
     record.teacherName = "";
-    assertThrows(ApiExceptions.BadRequest.class,
-        () -> service.promote(family, "child1", record.id,
-            new HomeworkOrganizerFeedbackDtos.Promote("国*", meaning)));
+    record.sourceLabel = "家长录入文字";
+    record.sourceExcerpt = "语文：朗读国13";
+    when(experiences.save(any(HomeworkTeacherExperienceEntity.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
+    var subjectRule = service.promote(family, "child1", record.id,
+        new HomeworkOrganizerFeedbackDtos.Promote("国*", meaning));
+    assertEquals("学科归属:语文", subjectRule.teacherName());
     record.teacherName = "王老师";
     when(types.findById("SHORTHAND")).thenReturn(Optional.of(type(false)));
     assertThrows(ApiExceptions.BadRequest.class,
@@ -207,6 +211,92 @@ class HomeworkFeedbackLearningTest {
         "转发李老师消息：朗读国13", false);
     assertTrue(result.contains("王老师的国学页码规则"));
     assertFalse(result.contains("李老师另一套不同教材规则"));
+  }
+
+  @Test
+  void subjectScopedApprovedExperienceOnlyReachesSameStudentAndUnambiguousSubject() {
+    var students = mock(StudentRepository.class);
+    var family = UUID.randomUUID();
+    var owner = owned(family, "child1", students);
+    var other = owned(family, "child2", students);
+    var experiences = mock(HomeworkTeacherExperienceRepository.class);
+    var record = new HomeworkTeacherExperienceEntity();
+    record.id = UUID.randomUUID();
+    record.familyId = family;
+    record.studentId = "child1";
+    record.teacherName = "学科归属:语文";
+    record.subject = "语文";
+    record.cue = "国*";
+    record.interpretation = "国加数字指国学课本页码";
+    record.exampleSource = "";
+    record.exampleResult = "";
+    record.active = true;
+    when(experiences.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "child1"))
+        .thenReturn(List.of(record));
+    var service = new HomeworkTeacherExperienceService(experiences, students);
+    assertTrue(service.context(owner, "家长录入文字", "语文：朗读国14", false)
+        .contains("本学生学科经验"));
+    assertEquals("", service.context(owner, "家长录入文字", "数学：口算国14", false));
+    assertEquals("", service.context(owner, "家长录入文字",
+        "语文：朗读国14；数学：口算20题", false));
+    assertEquals("", service.context(owner, "家长录入文字",
+        "王老师：语文朗读国14", false));
+    assertEquals("", service.context(owner, "家长录入文字",
+        "王老师：语文朗读国14；李老师：语文抄写生字", false));
+    assertEquals("", service.context(other, "家长录入文字", "语文：朗读国14", false));
+  }
+
+  @Test
+  void feedbackUsesCapturedSourceNotUnverifiedAiExcerptForTeacherIdentity() {
+    UUID family = UUID.randomUUID();
+    var students = mock(StudentRepository.class);
+    owned(family, "child1", students);
+    var types = mock(HomeworkFeedbackTypeRepository.class);
+    when(types.findById("SHORTHAND")).thenReturn(Optional.of(type(true)));
+    var feedbacks = mock(HomeworkOrganizerFeedbackRepository.class);
+    when(feedbacks.save(any(HomeworkOrganizerFeedbackEntity.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
+    var experiences = mock(HomeworkTeacherExperienceRepository.class);
+    var snapshots = mock(HomeworkOrganizerAiSnapshotRepository.class);
+    var source = new HomeworkOrganizerAiSnapshotEntity();
+    source.candidateId = "ai-text-100-1";
+    source.teacherName = "李老师";
+    when(snapshots.findByFamilyIdAndStudentIdAndBatchIdOrderByCandidateIdAsc(
+        family, "child1", "text-100")).thenReturn(List.of(source));
+    var service = new HomeworkOrganizerFeedbackService(
+        students, types, feedbacks, experiences, snapshots);
+    var request = new HomeworkOrganizerFeedbackDtos.Create(
+        "req1", "ai-text-100-1", "text-100", "", "语文", "SHORTHAND",
+        "家长录入文字", "王老师：朗读国13", "读国13", "朗读国学13", "老师发了简称");
+    service.submit(family, "child1", request);
+    var saved = org.mockito.ArgumentCaptor.forClass(HomeworkOrganizerFeedbackEntity.class);
+    verify(feedbacks).save(saved.capture());
+    assertEquals("李老师", saved.getValue().teacherName);
+  }
+
+  @Test
+  void aiExcerptWithoutProvenanceCannotInventTeacher() {
+    UUID family = UUID.randomUUID();
+    var students = mock(StudentRepository.class);
+    owned(family, "child1", students);
+    var types = mock(HomeworkFeedbackTypeRepository.class);
+    when(types.findById("SHORTHAND")).thenReturn(Optional.of(type(true)));
+    var feedbacks = mock(HomeworkOrganizerFeedbackRepository.class);
+    when(feedbacks.save(any(HomeworkOrganizerFeedbackEntity.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
+    var experiences = mock(HomeworkTeacherExperienceRepository.class);
+    var snapshots = mock(HomeworkOrganizerAiSnapshotRepository.class);
+    when(snapshots.findByFamilyIdAndStudentIdAndBatchIdOrderByCandidateIdAsc(
+        family, "child1", "text-100")).thenReturn(List.of());
+    var service = new HomeworkOrganizerFeedbackService(
+        students, types, feedbacks, experiences, snapshots);
+    var request = new HomeworkOrganizerFeedbackDtos.Create(
+        "req2", "ai-text-100-1", "text-100", "", "语文", "SHORTHAND",
+        "家长录入文字", "王老师：朗读国13", "读国13", "朗读国学13", "老师发了简称");
+    service.submit(family, "child1", request);
+    var saved = org.mockito.ArgumentCaptor.forClass(HomeworkOrganizerFeedbackEntity.class);
+    verify(feedbacks).save(saved.capture());
+    assertEquals("学科归属:语文", saved.getValue().teacherName);
   }
 
 }

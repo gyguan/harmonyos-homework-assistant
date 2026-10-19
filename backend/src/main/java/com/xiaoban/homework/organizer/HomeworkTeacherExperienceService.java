@@ -160,14 +160,24 @@ public class HomeworkTeacherExperienceService {
     int matches = 0;
     for (var entry : records) {
       if (!entry.active) continue;
-      boolean teacherFound = boundTeacher.isBlank()
-          ? source.contains(entry.teacherName) : boundTeacher.equals(entry.teacherName);
+      boolean subjectOnly = HomeworkTeacherAttribution.isSubjectScope(entry.teacherName);
       boolean cueFound = HomeworkExperienceCueMatcher.matches(entry.cue, source);
-      if (!image && (!teacherFound || !cueFound)) continue;
-      if (image && !boundTeacher.isBlank() && !teacherFound) continue;
+      if (subjectOnly) {
+        // Explicit teacher attribution must never be replaced by a generic subject rule.
+        // For mixed-subject notices the cue's teacher is not provable before AI parsing.
+        if (!cueFound || !boundTeacher.isBlank()
+            || HomeworkTeacherAttribution.hasNamedTeachers(source)
+            || !HomeworkTeacherAttribution.matchesUnambiguousSubject(source, entry.subject)) continue;
+      } else {
+        boolean teacherFound = boundTeacher.isBlank()
+            ? source.contains(entry.teacherName) : boundTeacher.equals(entry.teacherName);
+        if (!image && (!teacherFound || !cueFound)) continue;
+        if (image && !boundTeacher.isBlank() && !teacherFound) continue;
+      }
       if (image && matches >= 6) break;
       if (!image && matches >= 8) break;
-      String item = "老师「" + entry.teacherName + "」/科目「" + entry.subject
+      String item = (subjectOnly ? "本学生学科经验（并非具体老师身份）" :
+          "老师「" + entry.teacherName + "」") + "/科目「" + entry.subject
           + "」，原文线索「" + entry.cue + "」："
           + entry.interpretation
           + (entry.exampleSource.isBlank() ? "" :

@@ -59,7 +59,10 @@ public class HomeworkOrganizerService {
     List<HomeworkOrganizerDtos.Candidate> normalized =
         normalizeDefaultTaskDates(organized, request.text());
     if (snapshots != null) {
-      snapshots.capture(familyId, studentId, request.importId(), request.teacherName(), normalized);
+      String sourcedTeacher = request.teacherName() == null || request.teacherName().isBlank()
+          ? HomeworkTeacherAttribution.explicitSourceTeacher(request.text())
+          : request.teacherName();
+      snapshots.capture(familyId, studentId, request.importId(), sourcedTeacher, normalized);
     }
     log.info("homework_import organized studentId={} assignments={}", studentId, normalized.size());
     return new HomeworkOrganizerDtos.Response(normalized, "AI");

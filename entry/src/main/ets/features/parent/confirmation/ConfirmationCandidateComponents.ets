@@ -178,7 +178,6 @@ export struct ConfirmationCandidateEditor {
   @State private feedbackLoading: boolean = false;
   @State private feedbackSubmitting: boolean = false;
   @State private feedbackSelectedCode: string = '';
-  @State private feedbackTeacherName: string = '';
   @State private feedbackDetails: string = '';
   @State private feedbackMessage: string = '';
   @State private feedbackHasError: boolean = false;
@@ -207,8 +206,6 @@ export struct ConfirmationCandidateEditor {
     this.confirmDelete = false;
     this.showFeedbackPanel = false;
     this.feedbackSelectedCode = '';
-    this.feedbackTeacherName = this.item.sourceEvidence.teacherName === undefined ? '' :
-      this.item.sourceEvidence.teacherName;
     this.feedbackDetails = '';
     this.feedbackMessage = '';
     this.feedbackHasError = false;
@@ -250,7 +247,7 @@ export struct ConfirmationCandidateEditor {
         .listExperiences(this.item.studentId);
     } catch {
       this.feedbackHasError = true;
-      this.feedbackMessage = '老师经验列表加载失败';
+      this.feedbackMessage = '作业经验列表加载失败';
     } finally {
       this.loadingExperiences = false;
     }
@@ -263,7 +260,7 @@ export struct ConfirmationCandidateEditor {
       this.savedExperiences = this.savedExperiences.map((old: HomeworkTeacherExperienceSummary) =>
         old.id === updated.id ? updated : old);
       this.feedbackHasError = false;
-      this.feedbackMessage = updated.active ? '已重新启用这条老师经验' : '已停用，后续整理不再引用这条经验';
+      this.feedbackMessage = updated.active ? '已重新启用这条作业经验' : '已停用，后续整理不再引用这条经验';
     } catch {
       this.feedbackHasError = true;
       this.feedbackMessage = '经验状态更新失败，请重试';
@@ -291,11 +288,6 @@ export struct ConfirmationCandidateEditor {
       return;
     }
     if (this.feedbackSaveAsRule && type.canBecomeExperience) {
-      if (this.feedbackTeacherName.trim().length < 2) {
-        this.feedbackHasError = true;
-        this.feedbackMessage = '要形成老师经验，请填写确定的老师姓名';
-        return;
-      }
       if (this.feedbackCue.trim().length < 2 || this.feedbackInterpretation.trim().length < 6) {
         this.feedbackHasError = true;
         this.feedbackMessage = '请填写原文中出现的触发词（如国*）及完整正确解释';
@@ -310,7 +302,7 @@ export struct ConfirmationCandidateEditor {
       clientRequestId: this.feedbackRequestId.substring(0, 160),
       candidateId: this.item.id.substring(0, 180),
       batchId: evidence.batchId === undefined ? '' : evidence.batchId.substring(0, 180),
-      teacherName: this.feedbackTeacherName.trim().substring(0, 80),
+      teacherName: evidence.teacherName === undefined ? '' : evidence.teacherName.substring(0, 80),
       subject: this.item.subject,
       feedbackTypeCode: type.code,
       sourceLabel: evidence.sourceLabel.substring(0, 200),
@@ -333,13 +325,13 @@ export struct ConfirmationCandidateEditor {
             });
         } catch {
           this.feedbackHasError = true;
-          this.feedbackMessage = '反馈已经保存，但老师经验暂未生效。请核对触发词是否出现在原文中，然后重试';
+          this.feedbackMessage = '反馈已经保存，但作业经验暂未生效。请核对触发词是否出现在原文中，然后重试';
           return;
         }
       }
       this.feedbackHasError = false;
       this.feedbackMessage = this.feedbackSaveAsRule
-        ? '已保存反馈并启用该学生、该老师的专属经验'
+        ? '已保存反馈，并按当前学生与作业来源启用经验'
         : '反馈已保存，暂不会自动改变 AI 解析规则';
       this.showFeedbackPanel = false;
       this.feedbackSelectedCode = '';
@@ -576,14 +568,6 @@ export struct ConfirmationCandidateEditor {
           }
           .width('100%');
 
-          TextInput({ text: this.feedbackTeacherName, placeholder: '老师姓名（选填，用于归纳老师习惯）' })
-            .width('100%')
-            .height(AppTheme.INPUT_HEIGHT)
-            .onChange((value: string) => {
-              this.feedbackTeacherName = value;
-              this.feedbackRequestId = '';
-            });
-
           TextArea({ text: this.feedbackDetails, placeholder: '具体问题、正确内容或老师缩写的含义' })
             .width('100%')
             .height(100)
@@ -595,7 +579,7 @@ export struct ConfirmationCandidateEditor {
           if (this.selectedFeedbackType() !== null &&
             this.selectedFeedbackType()!.canBecomeExperience) {
             ChoiceSelectionChip({
-              label: '同时保存为该老师的专属经验',
+              label: '同时保存为本学生的作业经验',
               selected: this.feedbackSaveAsRule,
               compact: false,
               onSelect: () => {
@@ -603,7 +587,7 @@ export struct ConfirmationCandidateEditor {
               }
             });
             if (this.feedbackSaveAsRule) {
-              Text('只有当前学生、老师及触发词匹配，后续才会使用这条经验；可随时停用。')
+              Text('按当前学生、科目及原文线索归属；原文明确老师时可进一步区分老师。可随时停用。')
                 .fontSize(AppTheme.META_SIZE)
                 .fontColor(AppTheme.SUBTEXT)
                 .width('100%');
@@ -637,7 +621,7 @@ export struct ConfirmationCandidateEditor {
         }
       }
 
-      Button(this.showSavedExperiences ? '收起已保存的老师经验' : '查看或停用老师经验',
+      Button(this.showSavedExperiences ? '收起已保存的作业经验' : '查看或停用作业经验',
         { type: ButtonType.Normal })
         .width('100%')
         .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
@@ -648,14 +632,14 @@ export struct ConfirmationCandidateEditor {
 
       if (this.showSavedExperiences) {
         if (this.loadingExperiences) {
-          Text('正在加载老师经验…').fontColor(AppTheme.SUBTEXT);
+          Text('正在加载作业经验…').fontColor(AppTheme.SUBTEXT);
         } else if (this.savedExperiences.length === 0) {
-          Text('当前学生尚未积累老师经验').fontColor(AppTheme.SUBTEXT);
+          Text('当前学生尚未积累作业经验').fontColor(AppTheme.SUBTEXT);
         } else {
           ForEach(this.savedExperiences, (experience: HomeworkTeacherExperienceSummary) => {
             Row({ space: 8 }) {
               Column({ space: 4 }) {
-                Text(`${experience.teacherName} · ${experience.subject} · ${experience.cue}`)
+                Text(`${experience.teacherName.startsWith('学科归属:') ? '按科目' : experience.teacherName} · ${experience.subject} · ${experience.cue}`)
                   .fontSize(AppTheme.META_SIZE)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(AppTheme.TEXT);
