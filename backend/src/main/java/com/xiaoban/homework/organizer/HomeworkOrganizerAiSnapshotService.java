@@ -71,11 +71,11 @@ public class HomeworkOrganizerAiSnapshotService {
         if (match == null || !match.title.equals(clean(candidate.title(), 400))
             || !match.subject.equals(clean(candidate.subject(), 20))
             || !match.teacherName.equals(clean(teacherName, 80))
-            || !match.instruction.equals(clean(candidate.instruction(), 1500))
-            || !match.textbookRef.equals(clean(candidate.textbookRef(), 100))
+            || !match.instruction.equals(defaulted(candidate.instruction(), candidate.title(), 1500))
+            || !match.textbookRef.equals(defaulted(candidate.textbookRef(), "待家长确认", 100))
             || !match.taskDate.equals(date(candidate.taskDate()))
             || match.expectedMinutes != Math.max(5, Math.min(120, candidate.expectedMinutes()))
-            || !match.sourceExcerpt.equals(clean(candidate.sourceExcerpt(), 500))) {
+            || !match.sourceExcerpt.equals(defaulted(candidate.sourceExcerpt(), candidate.title(), 500))) {
           throw new ApiExceptions.BadRequest("导入批次已存在不同版本，请重新整理");
         }
       }
@@ -94,15 +94,19 @@ public class HomeworkOrganizerAiSnapshotService {
       row.teacherName = clean(teacherName, 80);
       row.subject = clean(candidate.subject(), 20);
       row.title = clean(candidate.title(), 400);
-      row.instruction = clean(candidate.instruction(), 1500);
-      row.textbookRef = clean(candidate.textbookRef(), 100);
+      row.instruction = defaulted(candidate.instruction(), candidate.title(), 1500);
+      row.textbookRef = defaulted(candidate.textbookRef(), "待家长确认", 100);
       row.taskDate = date(candidate.taskDate());
       row.expectedMinutes = Math.max(5, Math.min(120, candidate.expectedMinutes()));
-      row.sourceExcerpt = clean(candidate.sourceExcerpt(), 500);
+      row.sourceExcerpt = defaulted(candidate.sourceExcerpt(), candidate.title(), 500);
       row.createdAt = now;
       rows.add(row);
     }
     repository.saveAll(rows);
+  }
+
+  private static String defaulted(String v, String fallback, int max) {
+    return v == null || v.isBlank() ? clean(fallback, max) : clean(v, max);
   }
 
   private static String clean(String v, int max) {
