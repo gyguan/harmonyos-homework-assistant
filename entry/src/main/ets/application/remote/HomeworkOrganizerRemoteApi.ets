@@ -9,6 +9,7 @@ import { AssignmentTaskDate } from '../../domain/service/AssignmentTaskDate';
 interface OrganizePayload {
   text: string;
   sourceLabel: string;
+  teacherName: string;
 }
 
 interface RemoteCandidate {
@@ -32,6 +33,7 @@ interface ImageOrganizePayload {
   contentType: string;
   sourceLabel: string;
   text: string;
+  teacherName: string;
 }
 
 interface ImageOrganizeResponse {
@@ -124,7 +126,8 @@ export class HomeworkOrganizerRemoteApi {
       imageBase64: encoded.imageBase64,
       contentType: encoded.contentType,
       sourceLabel: input.sourceLabel,
-      text: input.text
+      text: input.text,
+      teacherName: input.teacherName === undefined ? '' : input.teacherName
     };
     let requestStarted = Date.now();
     let response = await BackendHttpClient.instance.requestFor(
@@ -164,7 +167,8 @@ export class HomeworkOrganizerRemoteApi {
     try {
       let payload: OrganizePayload = {
         text: input.text,
-        sourceLabel: input.sourceLabel
+        sourceLabel: input.sourceLabel,
+        teacherName: input.teacherName === undefined ? '' : input.teacherName
       };
       let response = await BackendHttpClient.instance.requestFor(
         'homework.organize',
@@ -216,6 +220,7 @@ export class HomeworkOrganizerRemoteApi {
         sourceEvidence: {
           sourceLabel: input.sourceLabel,
           excerpt: this.value(remote.sourceExcerpt, remote.title),
+          teacherName: input.teacherName === undefined ? '' : input.teacherName,
           rawText: rawTextOverride === undefined ? input.text : rawTextOverride
         },
         confidence: confidence
