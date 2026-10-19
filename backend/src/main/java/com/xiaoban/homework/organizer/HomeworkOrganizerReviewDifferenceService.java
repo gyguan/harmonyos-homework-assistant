@@ -17,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class HomeworkOrganizerReviewDifferenceService {
   private static final Set<String> FIELDS = Set.of(
-      "title", "instruction", "subject", "taskDate", "expectedMinutes", "textbookRef", "task");
-  private static final Set<String> TYPES = Set.of("CHANGED", "ADDED", "REMOVED");
+      "title", "instruction", "subject", "taskDate", "expectedMinutes", "textbookRef", "task",
+      "structure");
+  private static final Set<String> TYPES = Set.of(
+      "CHANGED", "ADDED", "REMOVED", "SPLIT_SUSPECTED", "MERGE_SUSPECTED");
   private final HomeworkOrganizerReviewDifferenceRepository repository;
   private final HomeworkStudentTeacherService teachers;
   private final HomeworkOrganizerAiSnapshotRepository snapshots;
@@ -124,8 +126,53 @@ public class HomeworkOrganizerReviewDifferenceService {
             "", safe(entry.getValue().title), safe(entry.getValue().sourceExcerpt)));
       }
     }
+    changes.addAll(structureCandidates(originals, published));
     if (changes.isEmpty()) return new Result(0, 0);
     return save(familyId, studentId, new Review(request.batchId(), teacher, changes));
+  }
+
+  /**
+   * Source excerpts must match exactly and contain enough text to be meaningful.
+   * These are hypotheses for parents, never autonomous evidence of a mis-split.
+   */
+  static List<Difference> structureCandidates(
+      List<HomeworkOrganizerAiSnapshotEntity> originals,
+      java.util.Map<String, AssignmentEntity> published) {
+    var result = new java.util.ArrayList<Difference>();
+    java.util.Map<String, List<HomeworkOrganizerAiSnapshotEntity>> groups =
+        new java.util.LinkedHashMap<>();
+    for (var item : originals) {
+      String excerpt = safe(item.sourceExcerpt);
+      if (excerpt.length() < 8) continue;
+      groups.computeIfAbsent(excerpt, ignored -> new java.util.ArrayList<>()).add(item);
+    }
+    java.util.Set<String> originalIds = new java.util.HashSet<>();
+    for (var row : originals) originalIds.add(row.candidateId);
+    for (var group : groups.entrySet()) {
+      var before = group.getValue();
+      var after = new java.util.ArrayList<String>();
+      for (var row : before) {
+        var actual = published.get(row.candidateId);
+        if (actual != null) after.add(safe(actual.title));
+      }
+      for (var publishedEntry : published.entrySet()) {
+        if (originalIds.contains(publishedEntry.getKey())) continue;
+        if (group.getKey().equals(safe(publishedEntry.getValue().sourceExcerpt))) {
+          after.add(safe(publishedEntry.getValue().title));
+        }
+      }
+      String type = "";
+      if (before.size() == 1 && after.size() >= 2) type = "SPLIT_SUSPECTED";
+      if (before.size() >= 2 && after.size() == 1) type = "MERGE_SUSPECTED";
+      if (type.isBlank()) continue;
+      String beforeTitles = String.join("；", before.stream().map(e -> safe(e.title)).toList());
+      String afterTitles = String.join("；", after);
+      result.add(new Difference(before.getFirst().candidateId, type, "structure",
+          beforeTitles.substring(0, Math.min(1500, beforeTitles.length())),
+          afterTitles.substring(0, Math.min(1500, afterTitles.length())),
+          group.getKey().substring(0, Math.min(500, group.getKey().length()))));
+    }
+    return result;
   }
 
   private static void append(List<Difference> changes, String id, String field,
@@ -145,8 +192,10 @@ public class HomeworkOrganizerReviewDifferenceService {
       String type = change.changeType().trim();
       String field = change.fieldName().trim();
       if (!TYPES.contains(type) || !FIELDS.contains(field)
-          || ("CHANGED".equals(type) && "task".equals(field))
-          || (!"CHANGED".equals(type) && !"task".equals(field))) {
+          || ("CHANGED".equals(type) && ("task".equals(field) || "structure".equals(field)))
+          || (("ADDED".equals(type) || "REMOVED".equals(type)) && !"task".equals(field))
+          || (("SPLIT_SUSPECTED".equals(type) || "MERGE_SUSPECTED".equals(type))
+              && !"structure".equals(field))) {
         throw new ApiExceptions.BadRequest("作业纠错差异类型不合法");
       }
       boolean exists = repository.existsByFamilyIdAndStudentIdAndBatchIdAndCandidateIdAndChangeTypeAndFieldName(
