@@ -45,7 +45,9 @@ require("PhotoPreviewDialog" in strip and "previewController.open()" in strip an
         "查看作业照片大图" in strip,
         "cloud submission thumbnails must open a large photo preview")
 require("@CustomDialog" in preview and "Image(this.uri)" in preview and
-        "ImageFit.Contain" in preview and "关闭照片预览" in preview,
+        "ImageFit.Contain" in preview and
+        ".accessibilityText('关闭图片全屏预览')" in preview and
+        ".onClick(() => this.controller.close())" in preview,
         "shared photo preview must render the full image with an explicit close action")
 # Slice 4 moved submission evidence out of the old all-in-one Progress page and into the
 # dedicated Parent Review surface. Keep the photo gate bound to the surface that now owns
