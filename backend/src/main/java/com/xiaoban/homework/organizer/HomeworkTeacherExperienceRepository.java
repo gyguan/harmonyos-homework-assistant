@@ -9,6 +9,7 @@ public interface HomeworkTeacherExperienceRepository
     extends JpaRepository<HomeworkTeacherExperienceEntity, UUID> {
   List<HomeworkTeacherExperienceEntity> findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(
       UUID familyId, String studentId);
+  Optional<HomeworkTeacherExperienceEntity> findBySourceFeedbackId(UUID sourceFeedbackId);
   Optional<HomeworkTeacherExperienceEntity> findByIdAndFamilyIdAndStudentId(
       UUID id, UUID familyId, String studentId);
 }
