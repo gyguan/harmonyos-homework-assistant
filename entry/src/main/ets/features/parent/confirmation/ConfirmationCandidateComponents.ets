@@ -2,6 +2,7 @@ import {
   HomeworkOrganizerFeedbackRemoteApi,
   HomeworkFeedbackType,
   HomeworkFeedbackInput,
+  HomeworkExperienceDetail,
   HomeworkTeacherExperienceSummary
 } from '../../../application/remote/HomeworkOrganizerFeedbackRemoteApi';
 import { HomeworkOrganizerRemoteApi } from '../../../application/remote/HomeworkOrganizerRemoteApi';
@@ -157,6 +158,202 @@ export struct ConfirmationCandidateCard {
       `${this.item.subject}，${this.item.title}，当前编辑` :
       `${this.item.subject}，${this.item.title}，打开编辑`)
     .onClick(() => this.onSelect());
+  }
+}
+
+/**
+ * Readable, full-width experience card. The row is only a preview; the
+ * expandable section shows every stored experience field and fetches original
+ * feedback evidence on demand. No fixed height/maxLines in the detail.
+ */
+@Component
+struct SavedHomeworkExperienceCard {
+  @Prop experience: HomeworkTeacherExperienceSummary;
+  @Prop studentId: string;
+  onToggleActive: (item: HomeworkTeacherExperienceSummary) => void = (_item) => {};
+  @State private expanded: boolean = false;
+  @State private loadingDetail: boolean = false;
+  @State private detailError: string = '';
+  @State private detail: HomeworkExperienceDetail | null = null;
+
+  private async toggleDetail(): Promise<void> {
+    if (this.expanded) {
+      this.expanded = false;
+      return;
+    }
+    this.expanded = true;
+    if (this.detail !== null || this.experience.sourceFeedbackId === null) return;
+    await this.loadDetail();
+  }
+
+  private async loadDetail(): Promise<void> {
+    if (this.loadingDetail) return;
+    this.loadingDetail = true;
+    this.detailError = '';
+    try {
+      this.detail = await HomeworkOrganizerFeedbackRemoteApi.instance
+        .experienceDetail(this.studentId, this.experience.id);
+    } catch {
+      this.detailError = '原始反馈详情加载失败，可重试；经验规则信息仍可查看';
+    } finally {
+      this.loadingDetail = false;
+    }
+  }
+
+  private originLabel(origin: string): string {
+    if (origin === 'FEEDBACK_AUTO') return '反馈自动学习';
+    if (origin === 'FEEDBACK_APPROVED') return '家长确认的反馈';
+    if (origin === 'CONFIRMED_EDIT') return '家长修改作业后确认';
+    if (origin === 'MANUAL') return '手工保存';
+    return origin;
+  }
+
+  private feedbackLabel(code: string): string {
+    if (code === 'OMISSION') return '漏掉了作业';
+    if (code === 'WRONG_SPLIT') return '拆分或合并不对';
+    if (code === 'WRONG_SUBJECT') return '学科不对';
+    if (code === 'SHORTHAND') return '老师缩写理解错了';
+    if (code === 'WRONG_CONTENT') return '内容或要求不准确';
+    if (code === 'WRONG_DATE') return '作业日期不对';
+    if (code === 'DUPLICATE') return '重复生成作业';
+    if (code === 'OTHER') return '其他问题';
+    return code;
+  }
+
+  private teacherLabel(name: string): string {
+    return name.startsWith('学科归属:') ? '按科目归属（未指定老师）' : name;
+  }
+
+  @Builder
+  private DetailField(name: string, value: string) {
+    Column({ space: 3 }) {
+      Text(name)
+        .fontSize(AppTheme.META_SIZE)
+        .fontColor(AppTheme.TERTIARY_TEXT)
+        .width('100%');
+      Text(value.length > 0 ? value : '未记录')
+        .fontSize(AppTheme.META_SIZE)
+        .fontColor(AppTheme.TEXT)
+        .width('100%');
+    }
+    .width('100%')
+    .alignItems(HorizontalAlign.Start);
+  }
+
+  build() {
+    Column({ space: 9 }) {
+      Row({ space: 8 }) {
+        Column({ space: 4 }) {
+          Text(`${this.experience.subject} · ${this.teacherLabel(this.experience.teacherName)}`)
+            .fontSize(AppTheme.META_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT)
+            .width('100%');
+          Text(`触发词：${this.experience.cue}`)
+            .fontSize(AppTheme.META_SIZE)
+            .fontColor(AppTheme.SUBTEXT)
+            .width('100%')
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis });
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+        Text(this.experience.active ? '已启用' : '已停用')
+          .fontSize(AppTheme.META_SIZE)
+          .fontColor(this.experience.active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
+      }
+      .width('100%');
+
+      if (!this.expanded) {
+        Text(this.experience.interpretation)
+          .fontSize(AppTheme.META_SIZE)
+          .fontColor(AppTheme.SUBTEXT)
+          .width('100%')
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
+      }
+
+      Row({ space: 8 }) {
+        Button(this.expanded ? '收起详情' : '查看完整信息', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .fontColor(AppTheme.PRIMARY)
+          .onClick(() => { void this.toggleDetail(); });
+        Button(this.experience.active ? '停用经验' : '启用经验', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .fontColor(AppTheme.PRIMARY)
+          .onClick(() => { this.onToggleActive(this.experience); });
+      }
+      .width('100%');
+
+      if (this.expanded) {
+        Divider().color(AppTheme.DIVIDER);
+        Column({ space: 10 }) {
+          this.DetailField('适用学生科目', this.experience.subject);
+          this.DetailField('老师归属', this.teacherLabel(this.experience.teacherName));
+          this.DetailField('原文触发词（完整）', this.experience.cue);
+          this.DetailField('经验解释（完整）', this.experience.interpretation);
+          this.DetailField('历史作业原文', this.experience.exampleSource);
+          this.DetailField('家长确认的结果', this.experience.exampleResult);
+          this.DetailField('经验来源', this.originLabel(this.experience.origin));
+          this.DetailField('当前状态', this.experience.active ? '启用中' : '已停用');
+          this.DetailField('创建时间', this.experience.createdAt);
+          this.DetailField('最后更新时间', this.experience.updatedAt);
+          this.DetailField('经验编号', this.experience.id);
+
+          if (this.experience.sourceFeedbackId !== null) {
+            Divider().color(AppTheme.DIVIDER);
+            Text('原始问题反馈')
+              .fontSize(AppTheme.LABEL_TITLE_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT)
+              .width('100%');
+            if (this.loadingDetail) {
+              Text('正在加载关联反馈…')
+                .fontSize(AppTheme.META_SIZE)
+                .fontColor(AppTheme.SUBTEXT);
+            }
+            if (this.detailError.length > 0) {
+              Text(this.detailError)
+                .fontSize(AppTheme.META_SIZE)
+                .fontColor(AppTheme.DANGER)
+                .width('100%');
+              Button('重新加载反馈详情', { type: ButtonType.Normal })
+                .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+                .fontColor(AppTheme.PRIMARY)
+                .onClick(() => { void this.loadDetail(); });
+            }
+            if (this.detail !== null) {
+              if (this.detail!.feedback !== null) {
+                this.DetailField('反馈问题类型', this.feedbackLabel(this.detail!.feedback!.typeCode));
+                this.DetailField('家长反馈内容', this.detail!.feedback!.details);
+                this.DetailField('反馈时原始标题', this.detail!.feedback!.originalTitle);
+                this.DetailField('反馈时修正标题', this.detail!.feedback!.currentTitle);
+                this.DetailField('作业来源', this.detail!.feedback!.sourceLabel);
+                this.DetailField('反馈时的来源原文', this.detail!.feedback!.sourceExcerpt);
+                this.DetailField('反馈处理状态', this.detail!.feedback!.processingStatus);
+                this.DetailField('反馈提交时间', this.detail!.feedback!.createdAt);
+              } else {
+                Text('这条经验没有可查询的关联反馈，可能是历史手工创建的记录。')
+                  .fontSize(AppTheme.META_SIZE)
+                  .fontColor(AppTheme.SUBTEXT)
+                  .width('100%');
+              }
+            }
+            this.DetailField('关联反馈编号', this.experience.sourceFeedbackId!);
+          }
+        }
+        .width('100%')
+        .alignItems(HorizontalAlign.Start);
+      }
+    }
+    .width('100%')
+    .padding(AppTheme.CARD_PADDING_COMPACT)
+    .backgroundColor(AppTheme.CARD_SURFACE)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
   }
 }
 
@@ -532,7 +729,7 @@ export struct ConfirmationCandidateEditor {
                   compact: true,
                   onSelect: () => {
                     this.feedbackSelectedCode = option.code;
-                                    this.feedbackMessage = '';
+                    this.feedbackMessage = '';
                     this.feedbackRequestId = '';
                   }
                 });
@@ -589,29 +786,18 @@ export struct ConfirmationCandidateEditor {
         } else if (this.savedExperiences.length === 0) {
           Text('当前学生尚未积累作业经验').fontColor(AppTheme.SUBTEXT);
         } else {
-          ForEach(this.savedExperiences, (experience: HomeworkTeacherExperienceSummary) => {
-            Row({ space: 8 }) {
-              Column({ space: 4 }) {
-                Text(`${experience.teacherName.startsWith('学科归属:') ? '按科目' : experience.teacherName} · ${experience.subject} · ${experience.cue}`)
-                  .fontSize(AppTheme.META_SIZE)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(AppTheme.TEXT);
-                Text(experience.interpretation)
-                  .fontSize(AppTheme.META_SIZE)
-                  .maxLines(2)
-                  .fontColor(AppTheme.SUBTEXT);
-              }
-              .layoutWeight(1);
-              Button(experience.active ? '停用' : '启用', { type: ButtonType.Normal })
-                .fontSize(AppTheme.META_SIZE)
-                .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-                .backgroundColor(AppTheme.SURFACE_EMPHASIS)
-                .fontColor(AppTheme.PRIMARY)
-                .onClick(() => { void this.setSavedExperienceActive(experience); });
-            }
-            .width('100%');
-          }, (experience: HomeworkTeacherExperienceSummary) =>
-            `${experience.id}-${experience.active}`);
+          Column({ space: 9 }) {
+            ForEach(this.savedExperiences, (experience: HomeworkTeacherExperienceSummary) => {
+              SavedHomeworkExperienceCard({
+                experience: experience,
+                studentId: this.item.studentId,
+                onToggleActive: (item: HomeworkTeacherExperienceSummary) => {
+                  void this.setSavedExperienceActive(item);
+                }
+              });
+            }, (experience: HomeworkTeacherExperienceSummary) => experience.id);
+          }
+          .width('100%');
         }
       }
     }

@@ -3,6 +3,7 @@ package com.xiaoban.homework.organizer;
 import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.student.StudentEntity;
 import com.xiaoban.homework.student.StudentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +18,20 @@ public class HomeworkTeacherExperienceService {
   private static final int MAX_CONTEXT_CHARS = 2100;
   private final HomeworkTeacherExperienceRepository repository;
   private final StudentRepository students;
+  private final HomeworkOrganizerFeedbackRepository feedback;
 
   public HomeworkTeacherExperienceService(
       HomeworkTeacherExperienceRepository repository, StudentRepository students) {
+    this(repository, students, null);
+  }
+
+  @Autowired
+  public HomeworkTeacherExperienceService(
+      HomeworkTeacherExperienceRepository repository, StudentRepository students,
+      HomeworkOrganizerFeedbackRepository feedback) {
     this.repository = repository;
     this.students = students;
+    this.feedback = feedback;
   }
 
   private StudentEntity owned(UUID familyId, String studentId) {
@@ -36,6 +46,27 @@ public class HomeworkTeacherExperienceService {
     owned(familyId, studentId);
     return repository.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(familyId, studentId)
         .stream().map(HomeworkTeacherExperienceDtos.Response::from).toList();
+  }
+
+  /**
+   * One experience with all rule fields and its original parent feedback.
+   * Both records are scoped by the signed-in family and student; records from
+   * other children must never be exposed even with a guessed UUID.
+   */
+  @Transactional(readOnly = true)
+  public HomeworkTeacherExperienceDtos.DetailResponse detail(
+      UUID familyId, String studentId, UUID experienceId) {
+    owned(familyId, studentId);
+    var record = repository.findByIdAndFamilyIdAndStudentId(experienceId, familyId, studentId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("作业经验不存在"));
+    HomeworkTeacherExperienceDtos.FeedbackEvidence evidence = null;
+    if (feedback != null && record.sourceFeedbackId != null) {
+      evidence = feedback.findByIdAndFamilyIdAndStudentId(
+          record.sourceFeedbackId, familyId, studentId)
+          .map(HomeworkTeacherExperienceDtos.FeedbackEvidence::from).orElse(null);
+    }
+    return new HomeworkTeacherExperienceDtos.DetailResponse(
+        HomeworkTeacherExperienceDtos.Response.from(record), evidence);
   }
 
   @Transactional
