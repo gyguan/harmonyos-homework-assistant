@@ -569,7 +569,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "科学", "观察植物", "观察并记录", "", "今天", 20, "观察植物", 0.9),
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
-                "语文作业", "背诵第12课", "背诵课文", "", "明天", 15, "背诵第12课", 0.95))));
+                "语文", "背诵第12课", "背诵课文", "", "明天", 15, "背诵第12课", 0.95))));
 
     assertEquals(2, result.sourceCount());
     assertEquals(1, result.candidates().size());
