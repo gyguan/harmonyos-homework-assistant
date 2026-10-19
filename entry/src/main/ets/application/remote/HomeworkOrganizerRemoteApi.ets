@@ -118,7 +118,9 @@ export class HomeworkOrganizerRemoteApi {
     if (batchId === undefined || batchId.length === 0) return;
     let originallyGenerated: OrganizerOriginalCandidate[] = [];
     let beforeById: Map<string, OrganizerOriginalCandidate> = new Map<string, OrganizerOriginalCandidate>();
-    for (let [candidateId, old] of this.originalById) {
+    for (let entry of this.originalById.entries()) {
+      let candidateId = entry[0];
+      let old = entry[1];
       if (old.studentId === studentId && old.batchId === batchId) {
         originallyGenerated.push(old);
         beforeById.set(candidateId, old);
@@ -136,7 +138,9 @@ export class HomeworkOrganizerRemoteApi {
     }
     let teacherName = teacherNames.length === 1 ? teacherNames[0] : '';
     let changes: OrganizerReviewDifference[] = [];
-    for (let [candidateId, old] of this.originalById) {
+    for (let entry of this.originalById.entries()) {
+      let candidateId = entry[0];
+      let old = entry[1];
       if (old.studentId !== studentId || old.batchId !== batchId) continue;
       let accepted = acceptedById.get(candidateId);
       if (accepted === undefined) {
@@ -178,7 +182,8 @@ export class HomeworkOrganizerRemoteApi {
         // Structured analytics are best effort, not part of the publish transaction.
       }
     }
-    await this.reportConfirmedEdits(candidates);
+    // Release only this imported batch after a successful publication.
+    for (let candidateId of beforeById.keys()) this.originalById.delete(candidateId);
   }
 
   /** 家长成功发布后静默记录真正发生的标题纠错；上报失败不影响已发布作业。 */
