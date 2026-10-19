@@ -272,4 +272,35 @@ class HomeworkFeedbackAutoLearningServiceTest {
         "SHORTHAND", "第13页"));
   }
 
+  @Test void parentExplainedExcerptFourPlusTwoLearnsReusableMeaningWithoutChangingTitle() {
+    UUID family = UUID.randomUUID();
+    var experiences = mock(HomeworkTeacherExperienceRepository.class);
+    var snapshots = mock(HomeworkOrganizerAiSnapshotRepository.class);
+    var original = original();
+    original.title = "完成摘抄（4+2）";
+    original.subject = "语文";
+    original.sourceExcerpt = "摘抄：（4+2）";
+    when(snapshots.findByFamilyIdAndStudentIdAndBatchIdOrderByCandidateIdAsc(
+        family, "child-1", "text-100")).thenReturn(List.of(original));
+    when(experiences.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "child-1"))
+        .thenReturn(List.of());
+    when(experiences.findBySourceFeedbackId(any(UUID.class))).thenReturn(Optional.empty());
+
+    var feedback = feedback(family, "child-1");
+    feedback.feedbackTypeCode = "WRONG_CONTENT";
+    feedback.sourceExcerpt = "摘抄：（4+2）";
+    feedback.originalTitle = "完成摘抄（4+2）";
+    feedback.currentTitle = "完成摘抄（4+2）"; // only the description is corrected
+    feedback.details = "对于摘抄这类作业，里面的数字代表多少个好词好句，比如4+2标识4个好词，2个好句";
+    assertEquals("APPLIED",
+        new HomeworkFeedbackAutoLearningService(experiences, snapshots).evaluate(feedback));
+    var saved = org.mockito.ArgumentCaptor.forClass(HomeworkTeacherExperienceEntity.class);
+    verify(experiences).save(saved.capture());
+    assertEquals("摘抄", saved.getValue().cue);
+    assertTrue(saved.getValue().interpretation.contains(
+        HomeworkExcerptCountConvention.CONFIRMED_MEANING));
+    assertTrue(saved.getValue().active);
+  }
+
+
 }
