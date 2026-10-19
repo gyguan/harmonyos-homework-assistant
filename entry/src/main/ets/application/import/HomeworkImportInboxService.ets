@@ -190,7 +190,8 @@ export class HomeworkImportInboxService {
       sourceKind: this.legacySourceKind(batch.sourceType),
       sourceLabel: batch.sourceLabel,
       resourceUri: resourceUri,
-      rawText: text
+      rawText: text,
+      teacherName: candidates.length > 0 ? candidates[0].sourceEvidence.teacherName : undefined
     });
     this.drafts.replaceCandidates(candidates);
     return true;
