@@ -69,10 +69,21 @@ interface OrganizerReviewDifference {
   sourceExcerpt: string;
 }
 
-interface OrganizerReviewPayload {
-  batchId: string;
+interface OrganizerOriginalCandidateResponse {
+  candidateId: string;
   teacherName: string;
-  differences: OrganizerReviewDifference[];
+  title: string;
+  subject: string;
+  instruction: string;
+  textbookRef: string;
+  taskDate: string;
+  expectedMinutes: number;
+  sourceExcerpt: string;
+}
+
+interface OrganizerFinalizePayload {
+  batchId: string;
+  publishedCandidateIds: string[];
 }
 
 interface OrganizerConfirmedEdit {
@@ -99,93 +110,60 @@ export class HomeworkOrganizerRemoteApi {
     return item === undefined ? fallback : item.title;
   }
 
-  private addDifference(changes: OrganizerReviewDifference[], candidateId: string,
-    fieldName: string, before: string, after: string, sourceExcerpt: string): void {
-    if (before === after) return;
-    changes.push({
-      candidateId: candidateId,
-      changeType: 'CHANGED',
-      fieldName: fieldName,
-      beforeValue: before.substring(0, 1500),
-      afterValue: after.substring(0, 1500),
-      sourceExcerpt: sourceExcerpt.substring(0, 500)
-    });
+  /** Retrieve server originals after an app restart; never fabricate missing AI evidence. */
+  async restoreOriginals(studentId: string, batchId: string): Promise<void> {
+    if (studentId.length === 0 || batchId.length === 0) return;
+    let response = await BackendHttpClient.instance.requestFor(
+      'homework.organize.snapshots',
+      `/api/v1/students/${encodeURIComponent(studentId)}/homework/ai-snapshots/${encodeURIComponent(batchId)}`,
+      http.RequestMethod.GET);
+    if (response.statusCode < 200 || response.statusCode >= 300) return;
+    let rows = JSON.parse(response.body) as OrganizerOriginalCandidateResponse[];
+    if (!Array.isArray(rows)) return;
+    for (let row of rows) {
+      if (typeof row.candidateId !== 'string' || row.candidateId.length === 0) continue;
+      this.originalById.set(row.candidateId, {
+        title: row.title,
+        subject: row.subject,
+        instruction: row.instruction,
+        textbookRef: row.textbookRef,
+        taskDate: row.taskDate,
+        expectedMinutes: row.expectedMinutes,
+        sourceExcerpt: row.sourceExcerpt,
+        studentId: studentId,
+        batchId: batchId,
+        teacherName: row.teacherName
+      });
+    }
   }
 
-  /** Only compare the AI batch actually published. No source inference, no global learning. */
+  /** The server compares original snapshot with actual persisted published assignments. */
   async reportConfirmedReview(candidates: CandidateAssignment[]): Promise<void> {
     if (candidates.length === 0) return;
     let studentId = candidates[0].studentId;
     let batchId = candidates[0].sourceEvidence.batchId;
     if (batchId === undefined || batchId.length === 0) return;
-    let originallyGenerated: OrganizerOriginalCandidate[] = [];
-    let beforeById: Map<string, OrganizerOriginalCandidate> = new Map<string, OrganizerOriginalCandidate>();
+    let ids: string[] = [];
+    for (let item of candidates) {
+      if (item.studentId !== studentId || item.sourceEvidence.batchId !== batchId) return;
+      ids.push(item.id);
+    }
+    let payload: OrganizerFinalizePayload = {
+      batchId: batchId,
+      publishedCandidateIds: ids
+    };
+    let response = await BackendHttpClient.instance.requestFor(
+      'homework.organize.review-differences.finalize',
+      `/api/v1/students/${encodeURIComponent(studentId)}/homework/review-differences/finalize`,
+      http.RequestMethod.POST, payload);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw new Error('作业已发布，差异分析上传失败');
+    }
     for (let entry of this.originalById.entries()) {
-      let candidateId = entry[0];
-      let old = entry[1];
-      if (old.studentId === studentId && old.batchId === batchId) {
-        originallyGenerated.push(old);
-        beforeById.set(candidateId, old);
+      if (entry[1].studentId === studentId && entry[1].batchId === batchId) {
+        this.originalById.delete(entry[0]);
       }
     }
-    if (originallyGenerated.length === 0) return;
-    let teacherNames: string[] = [];
-    let acceptedById: Map<string, CandidateAssignment> = new Map<string, CandidateAssignment>();
-    for (let candidate of candidates) {
-      if (candidate.studentId !== studentId || candidate.sourceEvidence.batchId !== batchId) return;
-      acceptedById.set(candidate.id, candidate);
-      let name = candidate.sourceEvidence.teacherName === undefined ? '' :
-        candidate.sourceEvidence.teacherName.trim();
-      if (name.length > 0 && teacherNames.indexOf(name) < 0) teacherNames.push(name);
-    }
-    let teacherName = teacherNames.length === 1 ? teacherNames[0] : '';
-    let changes: OrganizerReviewDifference[] = [];
-    for (let entry of this.originalById.entries()) {
-      let candidateId = entry[0];
-      let old = entry[1];
-      if (old.studentId !== studentId || old.batchId !== batchId) continue;
-      let accepted = acceptedById.get(candidateId);
-      if (accepted === undefined) {
-        changes.push({
-          candidateId: candidateId, changeType: 'REMOVED', fieldName: 'task',
-          beforeValue: old.title.substring(0, 1500), afterValue: '',
-          sourceExcerpt: old.sourceExcerpt.substring(0, 500)
-        });
-        continue;
-      }
-      this.addDifference(changes, candidateId, 'title', old.title, accepted.title, old.sourceExcerpt);
-      this.addDifference(changes, candidateId, 'subject', old.subject, accepted.subject, old.sourceExcerpt);
-      this.addDifference(changes, candidateId, 'instruction', old.instruction, accepted.instruction, old.sourceExcerpt);
-      this.addDifference(changes, candidateId, 'textbookRef', old.textbookRef, accepted.textbookRef, old.sourceExcerpt);
-      this.addDifference(changes, candidateId, 'taskDate', old.taskDate, accepted.taskDate, old.sourceExcerpt);
-      this.addDifference(changes, candidateId, 'expectedMinutes',
-        String(old.expectedMinutes), String(accepted.expectedMinutes), old.sourceExcerpt);
-    }
-    for (let candidate of candidates) {
-      if (!beforeById.has(candidate.id)) {
-        changes.push({
-          candidateId: candidate.id, changeType: 'ADDED', fieldName: 'task',
-          beforeValue: '', afterValue: candidate.title.substring(0, 1500),
-          sourceExcerpt: candidate.sourceEvidence.excerpt.substring(0, 500)
-        });
-      }
-    }
-    if (changes.length > 0) {
-      let payload: OrganizerReviewPayload = {
-        batchId: batchId.substring(0, 180), teacherName: teacherName.substring(0, 80),
-        differences: changes.slice(0, 150)
-      };
-      try {
-        await BackendHttpClient.instance.requestFor(
-          'homework.organize.review-differences',
-          `/api/v1/students/${encodeURIComponent(studentId)}/homework/review-differences`,
-          http.RequestMethod.POST, payload);
-      } catch {
-        // Structured analytics are best effort, not part of the publish transaction.
-      }
-    }
-    // Release only this imported batch after a successful publication.
-    for (let candidateId of beforeById.keys()) this.originalById.delete(candidateId);
   }
 
   /** 家长成功发布后静默记录真正发生的标题纠错；上报失败不影响已发布作业。 */
