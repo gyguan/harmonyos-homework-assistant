@@ -19,6 +19,13 @@ public class HomeworkOrganizerReviewDifferenceController {
   public HomeworkOrganizerReviewDifferenceController(HomeworkOrganizerReviewDifferenceService service) {
     this.service = service;
   }
+  @PostMapping("/finalize")
+  public HomeworkOrganizerReviewDifferenceService.Result finalizePublished(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId, @PathVariable String studentId,
+      @Valid @RequestBody HomeworkOrganizerReviewDifferenceService.Finalize request) {
+    return service.finalizePublished(familyId, studentId, request);
+  }
+
   @PostMapping
   public HomeworkOrganizerReviewDifferenceService.Result save(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId, @PathVariable String studentId,
