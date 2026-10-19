@@ -25,6 +25,12 @@ public class HomeworkOrganizerReviewDifferenceController {
       @Valid @RequestBody HomeworkOrganizerReviewDifferenceService.Review request) {
     return service.save(familyId, studentId, request);
   }
+  @GetMapping("/summary")
+  public List<HomeworkOrganizerReviewDifferenceService.Summary> summary(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId, @PathVariable String studentId) {
+    return service.summary(familyId, studentId);
+  }
+
   @GetMapping
   public List<HomeworkOrganizerReviewDifferenceService.History> history(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId, @PathVariable String studentId) {
