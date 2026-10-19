@@ -47,6 +47,10 @@ export interface HomeworkExperiencePromotion {
   interpretation: string;
 }
 
+interface HomeworkExperienceActiveRequest {
+  active: boolean;
+}
+
 export class HomeworkOrganizerFeedbackRemoteApi {
   static readonly instance: HomeworkOrganizerFeedbackRemoteApi = new HomeworkOrganizerFeedbackRemoteApi();
   private constructor() {}
@@ -77,10 +81,11 @@ export class HomeworkOrganizerFeedbackRemoteApi {
 
   async setExperienceActive(studentId: string, experienceId: string,
     active: boolean): Promise<HomeworkTeacherExperienceSummary> {
+    let payload: HomeworkExperienceActiveRequest = { active: active };
     let response = await BackendHttpClient.instance.requestFor(
       'homework.organize.experiences.active',
       `/api/v1/students/${encodeURIComponent(studentId)}/homework/teacher-experiences/${encodeURIComponent(experienceId)}/active`,
-      http.RequestMethod.PUT, { active: active });
+      http.RequestMethod.PUT, payload);
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw new Error('调整经验状态失败');
     }

@@ -308,8 +308,11 @@ export class HomeworkOrganizerRemoteApi {
         teacherName: input.teacherName === undefined ? '' : input.teacherName
       });
       if (this.originalById.size > 100) {
-        let oldest = this.originalById.keys().next().value;
-        if (oldest !== undefined) this.originalById.delete(oldest);
+        // 避免 IteratorResult.value 在严格 ArkTS 下被推断为 any/unknown。
+        for (let oldestKey of this.originalById.keys()) {
+          this.originalById.delete(oldestKey);
+          break;
+        }
       }
       result.push({
         id: candidateId,
