@@ -51,8 +51,17 @@ public class HomeworkFeedbackAutoLearningService {
     String excerpt = clean(source.sourceExcerpt);
     // Reject spoofed/mixed-batch source excerpts; a model summary is not a trusted
     // full transcript, so we learn only narrow cues and never mutate global rules.
-    if (excerpt.length() < 6 || !excerpt.equals(clean(record.sourceExcerpt)) ||
-        excerpt.equals(clean(source.title))) return "PENDING_EVIDENCE";
+    // Short school shorthand such as "国13" or "U4" is itself meaningful
+    // evidence when the parent gave a concrete explanation and it contains
+    // exactly one safe numeric abbreviation. Generic short text remains unsafe.
+    String proposedCue = autoCue(record.feedbackTypeCode, excerpt);
+    boolean confirmedShorthand = "SHORTHAND".equals(record.feedbackTypeCode)
+        && clean(record.details).length() >= 6
+        && proposedCue.contains("*")
+        && HomeworkExperienceCueMatcher.matches(proposedCue, excerpt);
+    if (!excerpt.equals(clean(record.sourceExcerpt)) ||
+        (!confirmedShorthand && (excerpt.length() < 6 ||
+            excerpt.equals(clean(source.title))))) return "PENDING_EVIDENCE";
 
     String details = clean(record.details);
     String after = clean(record.currentTitle);
