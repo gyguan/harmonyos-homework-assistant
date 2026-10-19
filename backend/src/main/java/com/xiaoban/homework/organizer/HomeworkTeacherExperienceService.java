@@ -116,7 +116,21 @@ public class HomeworkTeacherExperienceService {
     HomeworkTeacherExperienceEntity record = repository
         .findByIdAndFamilyIdAndStudentId(id, familyId, studentId)
         .orElseThrow(() -> new ApiExceptions.NotFound("经验不存在"));
-    repository.delete(record);
+    // Soft deactivate: source feedback and rule provenance remain auditable.
+    record.active = false;
+    record.updatedAt = Instant.now();
+    repository.save(record);
+  }
+
+  @Transactional
+  public HomeworkTeacherExperienceDtos.Response setActive(UUID familyId, String studentId,
+      UUID id, boolean active) {
+    owned(familyId, studentId);
+    var record = repository.findByIdAndFamilyIdAndStudentId(id, familyId, studentId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("经验不存在"));
+    record.active = active;
+    record.updatedAt = Instant.now();
+    return HomeworkTeacherExperienceDtos.Response.from(repository.save(record));
   }
 
   /**
@@ -136,8 +150,9 @@ public class HomeworkTeacherExperienceService {
         + "不能通过学生姓名、同姓或推测为两位老师建立关联：\n");
     int matches = 0;
     for (var entry : records) {
+      if (!entry.active) continue;
       boolean teacherFound = source.contains(entry.teacherName);
-      boolean cueFound = source.contains(entry.cue);
+      boolean cueFound = HomeworkExperienceCueMatcher.matches(entry.cue, source);
       if (!image && (!teacherFound || !cueFound)) continue;
       if (image && matches >= 6) break;
       if (!image && matches >= 8) break;
