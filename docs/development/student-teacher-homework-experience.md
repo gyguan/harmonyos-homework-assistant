@@ -246,3 +246,14 @@ python scripts/evaluate_homework_organizer.py --fixtures scripts/fixtures/homewo
 `python -m unittest discover -s scripts/tests -p test_evaluate_homework_organizer.py -v` 测试该评测器并被纳入 `.github/workflows/static-gate.yml` 的独立 job；后端 outbox 与发布事务也分别有对应 JUnit 用例。
 
 **仍未完成的验收**：真实老师通知经家长确认的金标、同输入/同模型跨版本跑分、HarmonyOS HAP 完整编译和手机交互、全量 PostgreSQL 功能 E2E（部分其他模块门禁仍未通过）。保持 PR Draft。
+
+
+## 2026-10-19 验收收口：真实 PostgreSQL 与现行 HarmonyOS 门禁
+
+本轮增加 `backend/scripts/homework_review_outbox_e2e.py`，在真实 Postgres 容器里只插入**匿名固定 AI 初稿测试数据**，然后调用**正式后端 HTTP 批量发布**，检查 Outbox 的事务性排队、Worker 消费、CHANGED/REMOVED/ADDED 差异持久化、再次提交幂等性。CI 在 `Run batch publish E2E` 与 `Run voice material daily automation E2E` 之间执行。真实 Outbox E2E 已在 Run 39198164023 成功，避免只凭 Mockito 假设队列可运行。
+
+工程门禁曾长期检测已弃用的家长导入行为：同时提交文字和图片、强制展示 OCR 回退、显示旧版判重 UI。已改为核对当前确定的 **文字/图片二选一 + 图片直送 AI + 明确老师来源 + 家长可持久反馈**，继续检查拍照/相册无障碍入口、选中内容、固定底部按钮、候选保存失败不可关闭、CoreVision 真实缩放参数和图片资源释放等实际能力。没有通过删掉测试来收口。确认页和语音顺延等相邻门禁也更新了旧方法签名/文案，保留原有重要行为断言。
+
+安全整改：`entry/src/main/ets/common/config/AppConfig.ets` 不再内置明文 `http://` 公网服务器地址；已保存 BackendSession 地址不受影响，新安装需在「设置 → 后端连接」配置 HTTPS 地址。**没有自动假定旧服务器已启用 TLS，也没有发布任何证书信息。**
+
+验收边界：当前 CI 的 HAP 自托管 Runner 仍跳过真正 ArkTS 编译；UI 门禁静态验证通过不等于模拟器/真机验证。固定老师样本仍是 DRAFT，不代表真实模型准确率。主 PR 继续 Draft，不自动合入 main。
