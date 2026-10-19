@@ -160,6 +160,7 @@ export struct HomeworkConfirmationPage {
       sourceEvidence: {
         sourceLabel: item.sourceEvidence.sourceLabel,
         excerpt: item.sourceEvidence.excerpt,
+        teacherName: item.sourceEvidence.teacherName,
         batchId: item.sourceEvidence.batchId,
         sourceType: item.sourceEvidence.sourceType,
         sourceMessageIds: item.sourceEvidence.sourceMessageIds === undefined ?
