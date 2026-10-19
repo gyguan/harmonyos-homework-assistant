@@ -92,6 +92,24 @@ class HomeworkExcerptCountConventionTest {
     assertEquals(20, output.getFirst().expectedMinutes());
   }
 
+  @Test void shortenedAiExcerptNeedsMatchingPairInBothTitleAndOriginal() {
+    UUID family = UUID.randomUUID();
+    var repo = mock(HomeworkTeacherExperienceRepository.class);
+    var students = mock(StudentRepository.class);
+    var row = saved("摘抄：（4+2）", "摘抄：（4+2）",
+        "4个好词，2个好句", "child1", family);
+    when(repo.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "child1"))
+        .thenReturn(List.of(row));
+    var loader = new HomeworkTeacherExperienceService(repo, students);
+    var shortened = candidate("语文", "完成摘抄（3+2）", "完成摘抄", "摘抄");
+    var result = loader.applyConfirmedExcerptCounts(student("child1", family),
+        "老师文字", "语文：摘抄：（3+2）", List.of(shortened));
+    assertEquals("完成摘抄3个好词、2个好句", result.getFirst().title());
+    var contradiction = loader.applyConfirmedExcerptCounts(student("child1", family),
+        "老师文字", "语文：摘抄：（4+2）", List.of(shortened));
+    assertEquals(shortened.title(), contradiction.getFirst().title());
+  }
+
   @Test void disabledExperienceOtherStudentSubjectAndOtherTeacherNeverApply() {
     UUID family = UUID.randomUUID();
     var repo = mock(HomeworkTeacherExperienceRepository.class);
