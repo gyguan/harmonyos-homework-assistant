@@ -28,7 +28,7 @@ import tools.jackson.databind.json.JsonMapper;
 public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganizerModelClient {
   private static final Logger log = LoggerFactory.getLogger(ConfigurableHomeworkOrganizerModelClient.class);
   private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai");
-  /** 模型漏填 confidence 时的兜底置信度：任务确实是模型整理出来的，不能当成"低置信度猜测"。 */
+  /** Compatibility default only, never a measured probability of correctness. */
   private static final double DEFAULT_CONFIDENCE = 0.8;
   /**
    * 行首或句首的阿拉伯序号（1、 1. 1) ）。要求序号前面是行首/空白/标点，
@@ -109,8 +109,13 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   @Override
   public Optional<HomeworkOrganizerDtos.ImageResponse> organizeImage(StudentEntity student,
       String sourceLabel, String imageDataUrl, String text) {
+    long retrievalStarted = System.nanoTime();
     HomeworkOrganizerRuleService.Snapshot activeRules = ruleSnapshot(student, sourceLabel, text);
     String experienceContext = studentTeacherContext(student, sourceLabel, text, true);
+    HomeworkOrganizerTelemetry.stage("experienceRetrieval", retrievalStarted);
+    HomeworkOrganizerTelemetry.versions(properties.getImageOrganizerModel(), properties.getProvider().toString(),
+        instructionsWithShorthand(activeRules) + activeRules.template("BLACKBOARD"),
+        activeRules.encodedShorthand() + new java.util.TreeMap<>(activeRules.templates()), experienceContext);
     Optional<String> output;
     try {
       output = transport.completeWithImage(
@@ -133,10 +138,12 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     } catch (ImageAiRequestException error) {
       throw new ApiExceptions.ServiceUnavailable(error.getMessage());
     }
-    if (output.isEmpty()) return Optional.empty();
+    if (output.isEmpty()) { HomeworkOrganizerTelemetry.flag("MODEL_EMPTY"); return Optional.empty(); }
+    long validationStarted = System.nanoTime();
     try {
       var first = parseImageOutput(output.get(), activeRules.encodedShorthand());
-      if (first.isEmpty()) return first;
+      HomeworkOrganizerTelemetry.stage("localValidation", validationStarted);
+      if (first.isEmpty()) { HomeworkOrganizerTelemetry.flag("SCHEMA_REJECTED"); return first; }
       if (experienceContext.isBlank() || first.get().assignments().isEmpty()) return first;
       // Initial visual hints were conditional. Only incur a second model call
       // when the first vision result provides text evidence for an applicable
@@ -276,8 +283,13 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
 
   private Optional<List<HomeworkOrganizerDtos.Candidate>> organizeRaw(
       StudentEntity student, String sourceLabel, String text) {
+    long retrievalStarted = System.nanoTime();
     HomeworkOrganizerRuleService.Snapshot activeRules = ruleSnapshot(student, sourceLabel, text);
     String experienceContext = studentTeacherContext(student, sourceLabel, text, false);
+    HomeworkOrganizerTelemetry.stage("experienceRetrieval", retrievalStarted);
+    HomeworkOrganizerTelemetry.versions(properties.getOrganizerModel(), properties.getProvider().toString(),
+        instructionsWithShorthand(activeRules) ,
+        activeRules.encodedShorthand() + new java.util.TreeMap<>(activeRules.templates()), experienceContext);
     long started = System.nanoTime();
     Optional<String> outputText = transport.complete(
         properties.getOrganizerModel(),
@@ -290,10 +302,13 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         "homework_organization",
         structuredSchema());
     long modelMs = elapsedMs(started);
-    if (outputText.isEmpty()) return Optional.empty();
+    if (outputText.isEmpty()) { HomeworkOrganizerTelemetry.flag("MODEL_EMPTY"); return Optional.empty(); }
+    long validationStarted = System.nanoTime();
     try {
       StructuredResult structured = readStructured(outputText.get());
       ConversionResult converted = toCandidates(structured, activeRules.encodedShorthand());
+      HomeworkOrganizerTelemetry.stage("localValidation", validationStarted);
+      if (converted.missingFieldCount() > 0) HomeworkOrganizerTelemetry.flag("MISSING_COMPATIBILITY_FIELDS");
       log.info(
           "[AI-PERF] homework_text model={} modelMs={} outputChars={} assignments={}",
           properties.getOrganizerModel(), modelMs,
@@ -314,6 +329,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       return Optional.of(reviewWithExperience(
           properties.getOrganizerModel(), text, experienceContext, outputText.get(), converted.candidates()));
     } catch (Exception error) {
+      HomeworkOrganizerTelemetry.flag("SCHEMA_REJECTED");
       log.warn("[AI] organizer parse failed model={} outputChars={} exception={}",
           properties.getOrganizerModel(), outputText.get().length(), error.getClass().getSimpleName());
       return Optional.empty();
@@ -338,6 +354,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       String source, String context, String initialOutput,
       List<HomeworkOrganizerDtos.Candidate> initial) {
     if (context == null || context.isBlank() || initial == null || initial.isEmpty()) return initial;
+    HomeworkOrganizerTelemetry.review("LEGACY_EXPERIENCE_MATCH");
+    long reviewStarted = System.nanoTime();
     String instructions = instructions()
         + "\n你正在进行第二轮作业整理质量复核。重点判断上面的家长已确认经验是否与当前原文相关，"
         + "如适用，必须按本次原文的变量与数字完整解释任务，并在 title/instruction 写出清晰要求。"
@@ -351,7 +369,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     try {
       var answer = transport.complete(model, instructions, input,
           2000, "homework_experience_review", structuredSchema());
-      if (answer.isEmpty()) return initial;
+      if (answer.isEmpty()) { HomeworkOrganizerTelemetry.flag("REVIEW_UNAVAILABLE"); return initial; }
       var reviewed = toCandidates(readStructured(answer.get()));
       // A semantic review must not silently lose any previously recognized task,
       // nor bypass the common schema and field safeguards.
@@ -367,7 +385,10 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     } catch (Exception error) {
       log.warn("[AI] homework_experience_review_failed model={} exception={}",
           model, error.getClass().getSimpleName());
+      HomeworkOrganizerTelemetry.flag("REVIEW_FAILED");
       return initial;
+    } finally {
+      HomeworkOrganizerTelemetry.stage("review", reviewStarted);
     }
   }
 

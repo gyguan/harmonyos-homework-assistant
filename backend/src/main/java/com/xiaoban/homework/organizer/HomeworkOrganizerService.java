@@ -48,6 +48,7 @@ public class HomeworkOrganizerService {
   }
 
   public HomeworkOrganizerDtos.Response organize(UUID familyId, String studentId, HomeworkOrganizerDtos.Request request) {
+    try (var trace = HomeworkOrganizerTelemetry.open(request.importId(), "TEXT")) {
     StudentEntity student = students.findById(studentId)
         .orElseThrow(() -> new ApiExceptions.NotFound("孩子不存在"));
     if (!familyId.equals(student.familyId)) throw new ApiExceptions.NotFound("孩子不存在");
@@ -65,11 +66,14 @@ public class HomeworkOrganizerService {
       snapshots.capture(familyId, studentId, request.importId(), sourcedTeacher, normalized);
     }
     log.info("homework_import organized studentId={} assignments={}", studentId, normalized.size());
+    trace.success(normalized.size());
     return new HomeworkOrganizerDtos.Response(normalized, "AI");
+    }
   }
 
   public HomeworkOrganizerDtos.ImageResponse organizeImage(UUID familyId, String studentId,
       HomeworkOrganizerDtos.ImageRequest request) {
+    try (var trace = HomeworkOrganizerTelemetry.open(request.importId(), "IMAGE")) {
     long totalStarted = System.nanoTime();
     StudentEntity student = students.findById(studentId)
         .orElseThrow(() -> new ApiExceptions.NotFound("孩子不存在"));
@@ -78,6 +82,7 @@ public class HomeworkOrganizerService {
     long validateStarted = System.nanoTime();
     String imageDataUrl = HomeworkImageInput.dataUrl(request);
     long validateMs = elapsedMs(validateStarted);
+    HomeworkOrganizerTelemetry.stage("imagePreparation", validateStarted);
 
     if (!model.imageAvailable()) throw new ApiExceptions.ServiceUnavailable("AI图片解析暂未配置");
     long modelStarted = System.nanoTime();
@@ -100,8 +105,10 @@ public class HomeworkOrganizerService {
         elapsedMs(totalStarted),
         normalized.size(),
         result.recognizedText() == null ? 0 : result.recognizedText().length());
+    trace.success(normalized.size());
     return new HomeworkOrganizerDtos.ImageResponse(
         normalized, result.mode(), result.recognizedText());
+    }
   }
 
   private static long elapsedMs(long started) {

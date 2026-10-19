@@ -186,7 +186,7 @@ public class OpenAiCompatibleTransport {
         throw new ImageAiRequestException(error.getStatusCode().value(), reason);
       }
       String providerError = redactExact(
-          sanitizeProviderError(error.getResponseBodyAsString()),
+          AiCallMetrics.active() ? "<private-organizer-error>" : sanitizeProviderError(error.getResponseBodyAsString()),
           properties.getApiKey());
       log.warn(
           "[AI] response error protocol={} model={} path={} status={} elapsedMs={} exception={} providerError={}",
@@ -197,7 +197,7 @@ public class OpenAiCompatibleTransport {
       log.warn(
           "[AI] request failed protocol={} model={} path={} elapsedMs={} exception={} message={}",
           protocol, model, path, elapsedMs(started), error.getClass().getSimpleName(),
-          imageDataUrl == null ? safeMessage(error.getMessage()) : "<image-request-error>");
+          imageDataUrl == null && !AiCallMetrics.active() ? safeMessage(error.getMessage()) : "<private-request-error>");
       return Optional.empty();
     }
   }
@@ -262,7 +262,7 @@ public class OpenAiCompatibleTransport {
       Map<String, Object> format = structuredFormat(outputMode, schemaName, schema);
       if (format != null) body.put("text", Map.of("format", format));
     }
-    ResponsesResponse response = post(properties.getResponsesPath(), body, ResponsesResponse.class, imageDataUrl != null);
+    ResponsesResponse response = post(properties.getResponsesPath(), body, ResponsesResponse.class, imageDataUrl != null, schemaName);
     return extractResponsesText(response);
   }
 
@@ -297,7 +297,7 @@ public class OpenAiCompatibleTransport {
           chatStructuredResponseFormat(outputMode, schemaName, schema);
       if (responseFormat != null) body.put("response_format", responseFormat);
     }
-    ChatResponse response = post(properties.getChatCompletionsPath(), body, ChatResponse.class, imageDataUrl != null);
+    ChatResponse response = post(properties.getChatCompletionsPath(), body, ChatResponse.class, imageDataUrl != null, schemaName);
     return extractChatText(response);
   }
 
@@ -315,23 +315,38 @@ public class OpenAiCompatibleTransport {
         Map.of("type", "image_url", "image_url", Map.of("url", imageDataUrl)));
   }
 
-  private <T> T post(String path, Map<String, Object> body, Class<T> responseType, boolean imageRequest) throws Exception {
+  private <T> T post(String path, Map<String, Object> body, Class<T> responseType, boolean imageRequest, String schemaName) throws Exception {
     RestClient.RequestBodySpec request = client.post().uri(path).accept(MediaType.APPLICATION_JSON);
     if (properties.getApiKey() != null && !properties.getApiKey().isBlank()) {
       request.header(HttpHeaders.AUTHORIZATION, "Bearer " + properties.getApiKey());
     }
 
-    if (properties.isLogPayloads() && !imageRequest) {
+    if (properties.isLogPayloads() && !imageRequest && !AiCallMetrics.active()) {
       log.info("[AI-PAYLOAD] request path={} body={}", path, payloadForLog(body));
     }
 
-    String rawResponse = request.body(body).retrieve().body(String.class);
-    if (properties.isLogPayloads() && !imageRequest) {
-      log.info("[AI-PAYLOAD] response path={} body={}", path,
-          sanitizePayloadForLog(rawResponse, properties.getApiKey()));
+    long started = System.nanoTime();
+    boolean success = false;
+    var usage = new AiCallMetrics.Usage(null, null, null);
+    try {
+      String rawResponse = request.body(body).retrieve().body(String.class);
+      // Organizer payloads contain children's private source material, even for text requests.
+      boolean organizer = AiCallMetrics.active();
+      if (properties.isLogPayloads() && !imageRequest && !organizer) {
+        log.info("[AI-PAYLOAD] response path={} body={}", path,
+            sanitizePayloadForLog(rawResponse, properties.getApiKey()));
+      }
+      if (rawResponse == null || rawResponse.isBlank()) return null;
+      var root = jsonMapper.readTree(rawResponse);
+      usage = AiCallMetrics.usage(root);
+      T result = jsonMapper.treeToValue(root, responseType);
+      success = true;
+      return result;
+    } finally {
+      // Actual HTTP attempts, including failed/empty responses; no estimated token counts.
+      AiCallMetrics.record(new AiCallMetrics.Call(schemaName != null && schemaName.endsWith("review") ? "REVIEW" : "PRIMARY",
+          String.valueOf(body.get("model")), elapsedMs(started), success, usage));
     }
-    if (rawResponse == null || rawResponse.isBlank()) return null;
-    return jsonMapper.readValue(rawResponse, responseType);
   }
 
   private String payloadForLog(Object value) {
