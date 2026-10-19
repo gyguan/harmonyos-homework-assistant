@@ -28,7 +28,11 @@ public class HomeworkOrganizerRuleService {
       templates = Map.copyOf(templates);
     }
     public String template(String key) { return templates.getOrDefault(key, ""); }
-    public String encodedShorthand() { return String.join("\n", shorthand); }
+    public String encodedShorthand() {
+      // Runtime DB entries use the record separator, not the legacy env's semicolon:
+      // descriptions often contain natural-language Chinese semicolons.
+      return shorthand.isEmpty() ? "" : "\u001e" + String.join("\u001e", shorthand);
+    }
   }
 
   @Transactional(readOnly = true)
