@@ -90,7 +90,7 @@ public class HomeworkOrganizerReviewDifferenceService {
     for (String rawId : request.publishedCandidateIds()) {
       String id = rawId.trim();
       if (published.containsKey(id)) throw new ApiExceptions.BadRequest("同一任务不能重复发布");
-      if (!originalById.containsKey(id) && !id.startsWith("manual-")) {
+      if (!originalById.containsKey(id) && !id.startsWith("manual-" + request.batchId() + "-")) {
         throw new ApiExceptions.BadRequest("包含不属于 AI 初稿的任务");
       }
       var record = assignments.findById("a-published-" + id)
