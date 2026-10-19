@@ -54,6 +54,7 @@ export class HomeworkConfirmationViewModel {
       sourceEvidence: {
         sourceLabel: raw.sourceLabel.length > 0 ? raw.sourceLabel : '家长手工新增',
         excerpt: excerpt,
+        teacherName: raw.teacherName,
         batchId: activeBatchId.length > 0 ? activeBatchId : undefined,
         sourceType: activeBatchId.length > 0 ? 'MANUAL_REVIEW' : undefined,
         sourceMessageIds: sourceMessageIds,
