@@ -20,7 +20,7 @@ public class HomeworkFeedbackAutoLearningService {
       "SHORTHAND", "WRONG_CONTENT", "WRONG_SPLIT", "OMISSION", "WRONG_SUBJECT",
       "WRONG_DATE", "DUPLICATE", "OTHER");
   private static final Pattern ABBREVIATION =
-      Pattern.compile("(?<![\\p{L}\\p{N}])([\\p{IsHan}]{1,3}|[A-Za-z]{1,5})([0-9]{1,3})(?![0-9])");
+      Pattern.compile("(?<![\\p{L}\\p{N}])([\\p{IsHan}A-Za-z]{1,5})([0-9]{1,3})(?![0-9])");
 
   private final HomeworkTeacherExperienceRepository experiences;
   private final HomeworkOrganizerAiSnapshotRepository snapshots;
@@ -135,8 +135,9 @@ public class HomeworkFeedbackAutoLearningService {
       String only = "";
       while (matcher.find()) {
         String prefix = matcher.group(1);
-        if (prefix.equals("第") || prefix.equals("页") || prefix.equals("题") ||
-            prefix.equals("月") || prefix.equals("日") || prefix.equals("P")) continue;
+        if (prefix.endsWith("第") || prefix.endsWith("页") ||
+            prefix.endsWith("题") || prefix.endsWith("月") ||
+            prefix.endsWith("日") || prefix.equalsIgnoreCase("P")) continue;
         String candidate = prefix + "*";
         if (!only.isEmpty() && !only.equals(candidate)) {
           only = "";
