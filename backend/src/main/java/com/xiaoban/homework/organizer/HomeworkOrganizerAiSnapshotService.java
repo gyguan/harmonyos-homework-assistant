@@ -65,12 +65,17 @@ public class HomeworkOrganizerAiSnapshotService {
       }
       for (int i = 0; i < candidates.size(); i++) {
         HomeworkOrganizerDtos.Candidate candidate = candidates.get(i);
-        var prior = existing.get(i);
         // Query order is lexicographic; compare by candidate ID rather than row index.
         String id = "ai-" + importId + "-" + (i + 1);
         var match = existing.stream().filter(row -> row.candidateId.equals(id)).findFirst().orElse(null);
         if (match == null || !match.title.equals(clean(candidate.title(), 400))
-            || !match.subject.equals(clean(candidate.subject(), 20))) {
+            || !match.subject.equals(clean(candidate.subject(), 20))
+            || !match.teacherName.equals(clean(teacherName, 80))
+            || !match.instruction.equals(clean(candidate.instruction(), 1500))
+            || !match.textbookRef.equals(clean(candidate.textbookRef(), 100))
+            || !match.taskDate.equals(date(candidate.taskDate()))
+            || match.expectedMinutes != Math.max(5, Math.min(120, candidate.expectedMinutes()))
+            || !match.sourceExcerpt.equals(clean(candidate.sourceExcerpt(), 500))) {
           throw new ApiExceptions.BadRequest("导入批次已存在不同版本，请重新整理");
         }
       }
