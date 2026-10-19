@@ -201,9 +201,11 @@ require("createRequestId" in voice_page and "createFromFolder" in voice_vm,
         "server-folder creation must use an idempotent request id")
 require("queryFolders(" in voice_vm,
         "voice assignment ViewModel must use the reusable-folder query boundary")
-require("private generatedTitle(): string" in voice_page and " · 语音练习" in voice_page and
+require("private generatedTitle(): string" in voice_page and
+        "return `绘本-${folder.directoryName}`;" in voice_page and
+        "this.title = this.generatedTitle();" in voice_page and
         "this.title = item.directoryName" not in voice_page,
-        "folder reuse must auto-generate task naming independently from the folder name")
+        "folder reuse must use the current generated 绘本-目录 naming contract, never raw folder name")
 require("Select([" in voice_page and "subjectFromIndex" in voice_page and
         "syncGeneratedTaskCopy()" in voice_page,
         "voice assignment subject must use a single selector and regenerate task copy")
