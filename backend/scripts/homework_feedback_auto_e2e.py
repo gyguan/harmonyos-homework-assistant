@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Verify automatic parent feedback learning through real HTTP + PostgreSQL.
+"""Verify feedback persistence and scoped experience details without AI credentials.
 
-No AI key is required: insert an immutable AI snapshot fixture, then run the real
-feedback endpoint (including transaction, foreign keys, and experience service).
+No AI key is configured in CI. A matching report must remain PENDING_AI,
+never falsely claim APPLIED. Seed a separate representative AI experience row
+only for the details/read-isolation contract; model output is covered by unit tests.
 """
 from __future__ import annotations
 
@@ -52,14 +53,26 @@ def main() -> int:
         }
         path = f"/api/v1/students/{student_id}/homework/feedback"
         receipt = expect(http(DEFAULT_BASE_URL, "POST", path, token=token, payload=payload),
-                         (200,), "parent feedback auto-applied").json()
-        require(receipt["processingStatus"] == "APPLIED",
-                "verified feedback did not auto-apply: " + str(receipt))
-        rule_rows = sql(container, f"""select cue || ':' || origin || ':' || active::text
-            from homework_teacher_experience where family_id='{family}'
-            and student_id='{student_id}' and source_feedback_id='{receipt["id"]}'""")
-        require(rule_rows == "听读U*:FEEDBACK_AUTO:true",
-                "feedback did not create a scoped active shorthand: " + rule_rows)
+                         (200,), "feedback saved when AI unavailable").json()
+        require(receipt["processingStatus"] == "PENDING_AI",
+                "unavailable model must not claim learning success: " + str(receipt))
+        count = sql(container, f"""select count(*) from homework_teacher_experience
+            where family_id='{family}' and student_id='{student_id}'
+            and source_feedback_id='{receipt["id"]}'""")
+        require(count == "0", "AI-disabled backend silently manufactured an experience")
+
+        # Model-produced experience representation: seed a separate record to
+        # verify detailed access and provenance without making external AI calls.
+        seeded_id = str(uuid.uuid4())
+        sql(container, f"""
+          insert into homework_teacher_experience(
+            id, family_id, student_id, teacher_name, subject, cue, interpretation,
+            example_source, example_result, origin, active, source_feedback_id,
+            created_at, updated_at)
+          values ('{seeded_id}','{family}','{student_id}','学科归属:英语',
+            '英语','听读','适用条件：听读课本的单元简写；整理要求：按本次出现的单元号展开作业',
+            '{source}','听读课本第4单元课文','FEEDBACK_AI',true,
+            '{receipt["id"]}',now(),now())""")
 
         # Complete experience detail must include the original untruncated
         # parent feedback, before/after titles, source and timestamps.
@@ -73,7 +86,7 @@ def main() -> int:
                          (200,), "full saved experience details").json()
         require(details["experience"]["id"] == experience_id,
                 "detail endpoint returned another experience")
-        require(details["experience"]["cue"] == "听读U*" and
+        require(details["experience"]["cue"] == "听读" and
                 details["experience"]["exampleSource"] == source,
                 "detail endpoint lost complete stored experience fields")
         require(bool(details["experience"].get("createdAt")) and
@@ -95,7 +108,7 @@ def main() -> int:
                         (200,), "idempotent feedback replay").json()
         require(replay["id"] == receipt["id"], "retry created another feedback")
         count = sql(container, f"""select count(*) from homework_teacher_experience
-            where family_id='{family}' and student_id='{student_id}' and origin='FEEDBACK_AUTO'""")
+            where family_id='{family}' and student_id='{student_id}' and origin='FEEDBACK_AI'""")
         require(count == "1", "retry created duplicate learned rules")
 
         # No matching authoritative source means the report is preserved but not learned.
@@ -107,10 +120,10 @@ def main() -> int:
         require(pending["processingStatus"] == "PENDING_EVIDENCE",
                 "unverified candidate falsely reported effective")
         count = sql(container, f"""select count(*) from homework_teacher_experience
-            where family_id='{family}' and student_id='{student_id}' and origin='FEEDBACK_AUTO'""")
+            where family_id='{family}' and student_id='{student_id}' and origin='FEEDBACK_AI'""")
         require(count == "1", "unverified feedback became a learning rule")
 
-        print("HOMEWORK_FEEDBACK_AUTO_E2E_PASS effective scoped rule, idempotency, evidence gate")
+        print("HOMEWORK_FEEDBACK_AUTO_E2E_PASS unavailable AI status, saved feedback, detail isolation")
         return 0
     except (SmokeFailure, subprocess.SubprocessError, KeyError, ValueError, TypeError) as err:
         print("HOMEWORK_FEEDBACK_AUTO_E2E_FAIL:", err, file=sys.stderr)

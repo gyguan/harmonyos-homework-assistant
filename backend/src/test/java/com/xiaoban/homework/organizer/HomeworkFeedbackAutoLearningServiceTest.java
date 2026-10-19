@@ -1,8 +1,9 @@
 package com.xiaoban.homework.organizer;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,266 +11,142 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 class HomeworkFeedbackAutoLearningServiceTest {
-  private static HomeworkOrganizerFeedbackEntity feedback(UUID family, String student) {
-    var f = new HomeworkOrganizerFeedbackEntity();
-    f.id = UUID.randomUUID();
-    f.familyId = family;
-    f.studentId = student;
-    f.batchId = "text-100";
-    f.candidateId = "ai-text-100-1";
-    f.teacherName = "学科归属:语文";
-    f.subject = "语文";
-    f.sourceExcerpt = "语文：朗读国13";
-    f.originalTitle = "朗读国13";
-    f.currentTitle = "朗读《国学》第13页";
-    f.details = "国后面的数字表示国学课本对应页码";
-    f.feedbackTypeCode = "SHORTHAND";
-    return f;
+  private record Setup(UUID family, HomeworkTeacherExperienceRepository experiences,
+      HomeworkOrganizerAiSnapshotRepository snapshots,
+      HomeworkFeedbackExperienceModel model, HomeworkFeedbackAutoLearningService service) {}
+
+  private static HomeworkOrganizerFeedbackEntity report(UUID family, String student,
+      String excerpt, String details) {
+    var row = new HomeworkOrganizerFeedbackEntity();
+    row.id = UUID.randomUUID();
+    row.familyId = family;
+    row.studentId = student;
+    row.batchId = "batch-1";
+    row.candidateId = "ai-batch-1";
+    row.feedbackTypeCode = "WRONG_CONTENT";
+    row.subject = "语文";
+    row.sourceExcerpt = excerpt;
+    row.originalTitle = "完成摘抄（4+2）";
+    row.currentTitle = "完成摘抄（4+2）";
+    row.details = details;
+    return row;
   }
-  private static HomeworkOrganizerAiSnapshotEntity original() {
-    var s = new HomeworkOrganizerAiSnapshotEntity();
-    s.candidateId = "ai-text-100-1";
-    s.teacherName = "";
-    s.subject = "语文";
-    s.title = "朗读国13";
-    s.sourceExcerpt = "语文：朗读国13";
-    return s;
-  }
-  private static HomeworkFeedbackAutoLearningService service(
-      UUID family, String student, HomeworkTeacherExperienceRepository experiences,
-      HomeworkOrganizerAiSnapshotRepository snapshots) {
+
+  private static Setup setup(String excerpt) {
+    UUID family = UUID.randomUUID();
+    var experiences = mock(HomeworkTeacherExperienceRepository.class);
+    var snapshots = mock(HomeworkOrganizerAiSnapshotRepository.class);
+    var model = mock(HomeworkFeedbackExperienceModel.class);
+    var original = new HomeworkOrganizerAiSnapshotEntity();
+    original.studentId = "child-1";
+    original.familyId = family;
+    original.candidateId = "ai-batch-1";
+    original.subject = "语文";
+    original.teacherName = "";
+    original.sourceExcerpt = excerpt;
+    original.title = "完成摘抄（4+2）";
+    original.instruction = "完成摘抄（4+2）";
     when(snapshots.findByFamilyIdAndStudentIdAndBatchIdOrderByCandidateIdAsc(
-        family, student, "text-100")).thenReturn(List.of(original()));
-    when(experiences.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, student))
-        .thenReturn(List.of());
+        family, "child-1", "batch-1")).thenReturn(List.of(original));
     when(experiences.findBySourceFeedbackId(any(UUID.class)))
         .thenReturn(Optional.empty());
+    when(experiences.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(
+        family, "child-1")).thenReturn(List.of());
     when(experiences.save(any(HomeworkTeacherExperienceEntity.class)))
-        .thenAnswer(invocation -> invocation.getArgument(0));
-    return new HomeworkFeedbackAutoLearningService(experiences, snapshots);
+        .thenAnswer(inv -> inv.getArgument(0));
+    when(model.available()).thenReturn(true);
+    return new Setup(family, experiences, snapshots, model,
+        new HomeworkFeedbackAutoLearningService(experiences, snapshots, model));
   }
 
-  @Test void shorthandFeedbackIsImmediatelyAnActiveStudentScopedRule() {
-    UUID family = UUID.randomUUID();
-    var experiences = mock(HomeworkTeacherExperienceRepository.class);
-    var snapshots = mock(HomeworkOrganizerAiSnapshotRepository.class);
-    var f = feedback(family, "child-1");
-    var learning = service(family, "child-1", experiences, snapshots);
-    assertEquals("APPLIED", learning.evaluate(f));
-    var rule = ArgumentCaptor.forClass(HomeworkTeacherExperienceEntity.class);
-    verify(experiences).save(rule.capture());
-    assertEquals("FEEDBACK_AUTO", rule.getValue().origin);
-    assertEquals("child-1", rule.getValue().studentId);
-    assertEquals(family, rule.getValue().familyId);
-    assertTrue(rule.getValue().active);
-    assertEquals("学科归属:语文", rule.getValue().teacherName);
-    assertEquals("朗读国*", rule.getValue().cue);
-    assertEquals(f.id, rule.getValue().sourceFeedbackId);
-    assertTrue(rule.getValue().interpretation.contains("国后面的数字"));
-  }
-
-  @Test void ordinaryFeedbackCanAutoApplyButOnlyToTheExactOriginalCue() {
-    UUID family = UUID.randomUUID();
-    var exp = mock(HomeworkTeacherExperienceRepository.class);
-    var snap = mock(HomeworkOrganizerAiSnapshotRepository.class);
-    var learning = service(family, "child-1", exp, snap);
-    var f = feedback(family, "child-1");
-    f.feedbackTypeCode = "WRONG_SPLIT";
-    f.details = "这一行有两个不同动作，要拆为两个任务";
-    assertEquals("APPLIED", learning.evaluate(f));
-    var cap = ArgumentCaptor.forClass(HomeworkTeacherExperienceEntity.class);
-    verify(exp).save(cap.capture());
-    assertEquals("语文：朗读国13", cap.getValue().cue);
-    assertFalse(cap.getValue().cue.contains("*"));
-    assertTrue(cap.getValue().interpretation.contains("两个任务"));
-  }
-
-  @Test void sourceNotInAuthoritativeSnapshotNeverBecomesRule() {
-    UUID family = UUID.randomUUID();
-    var exp = mock(HomeworkTeacherExperienceRepository.class);
-    var snap = mock(HomeworkOrganizerAiSnapshotRepository.class);
-    var learning = service(family, "child-1", exp, snap);
-    var f = feedback(family, "child-1");
-    f.sourceExcerpt = "英语：听读U4"; // client-side substitution
-    assertEquals("PENDING_EVIDENCE", learning.evaluate(f));
-    verify(exp, never()).save(any());
-  }
-
-  @Test void noMeaningfulCorrectionDoesNotClaimApplied() {
-    UUID family = UUID.randomUUID();
-    var exp = mock(HomeworkTeacherExperienceRepository.class);
-    var snap = mock(HomeworkOrganizerAiSnapshotRepository.class);
-    var learning = service(family, "child-1", exp, snap);
-    var f = feedback(family, "child-1");
-    f.feedbackTypeCode = "DUPLICATE";
-    f.details = "";
-    f.currentTitle = f.originalTitle;
-    assertEquals("PENDING_EVIDENCE", learning.evaluate(f));
-    verify(exp, never()).save(any());
-  }
-
-  @Test void conflictingActiveRuleNeverSilentlyOverwritten() {
-    UUID family = UUID.randomUUID();
-    var exp = mock(HomeworkTeacherExperienceRepository.class);
-    var snap = mock(HomeworkOrganizerAiSnapshotRepository.class);
-    var learning = service(family, "child-1", exp, snap);
-    var prior = new HomeworkTeacherExperienceEntity();
-    prior.active = true;
-    prior.teacherName = "学科归属:语文";
-    prior.subject = "语文";
-    prior.cue = "朗读国*";
-    prior.interpretation = "不同版本的解释";
-    when(exp.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "child-1"))
-        .thenReturn(List.of(prior));
-    assertEquals("REVIEW_REQUIRED", learning.evaluate(feedback(family, "child-1")));
-    verify(exp, never()).save(any());
-  }
-
-  @Test void retryDoesNotReenableDisabledRule() {
-    UUID family = UUID.randomUUID();
-    var exp = mock(HomeworkTeacherExperienceRepository.class);
-    var snap = mock(HomeworkOrganizerAiSnapshotRepository.class);
-    var learning = service(family, "child-1", exp, snap);
-    var f = feedback(family, "child-1");
-    var prior = new HomeworkTeacherExperienceEntity();
-    prior.active = false;
-    when(exp.findBySourceFeedbackId(f.id)).thenReturn(Optional.of(prior));
-    assertEquals("APPLIED", learning.evaluate(f));
-    verify(exp, never()).save(any());
-  }
-
-  @Test void unrelatedBatchOrStudentCannotCrossReadEvidence() {
-    UUID family = UUID.randomUUID();
-    var exp = mock(HomeworkTeacherExperienceRepository.class);
-    var snap = mock(HomeworkOrganizerAiSnapshotRepository.class);
-    var learning = service(family, "child-1", exp, snap);
-    var f = feedback(family, "child-2");
-    assertEquals("PENDING_EVIDENCE", learning.evaluate(f));
-    verify(exp, never()).save(any());
-  }
-  @Test void nextTextPromptReusesAutoCorrectionOnlyForMatchingStudentAndSubject() {
-    UUID family = UUID.randomUUID();
-    var experiences = mock(HomeworkTeacherExperienceRepository.class);
-    var snapshots = mock(HomeworkOrganizerAiSnapshotRepository.class);
-    var feedback = feedback(family, "child-1");
-    var learning = service(family, "child-1", experiences, snapshots);
-    assertEquals("APPLIED", learning.evaluate(feedback));
-    var cap = ArgumentCaptor.forClass(HomeworkTeacherExperienceEntity.class);
-    verify(experiences).save(cap.capture());
-    var rule = cap.getValue();
-    var students = mock(com.xiaoban.homework.student.StudentRepository.class);
-    var student = new com.xiaoban.homework.student.StudentEntity() {};
-    student.id = "child-1";
-    student.familyId = family;
-    var other = new com.xiaoban.homework.student.StudentEntity() {};
-    other.id = "child-2";
-    other.familyId = family;
-    when(experiences.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "child-1"))
-        .thenReturn(List.of(rule));
-    var loader = new HomeworkTeacherExperienceService(experiences, students);
-    assertTrue(loader.context(student, "家长录入文字", "语文：朗读国14", false)
-        .contains("国后面的数字表示"));
-    assertEquals("", loader.context(student, "家长录入文字",
-        "数学：口算国14", false));
-    assertEquals("", loader.context(student, "家长录入文字",
-        "王老师：语文朗读国14", false));
-    assertEquals("", loader.context(other, "家长录入文字", "语文：朗读国14", false));
-  }
-
-  @Test void imageRuleOnlyOffersConditionalGuidanceForLongExactCue() {
-    UUID family = UUID.randomUUID();
-    var experiences = mock(HomeworkTeacherExperienceRepository.class);
-    var students = mock(com.xiaoban.homework.student.StudentRepository.class);
-    var row = new HomeworkTeacherExperienceEntity();
-    row.teacherName = "学科归属:语文";
-    row.subject = "语文";
-    row.cue = "语文：课外阅读30分钟，完成心情日记";
-    row.interpretation = "课外阅读和心情日记是两个不同任务";
-    row.origin = "FEEDBACK_AUTO";
-    row.active = true;
-    row.exampleSource = "语文：课外阅读30分钟，完成心情日记";
-    row.exampleResult = "";
-    when(experiences.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "child-1"))
-        .thenReturn(List.of(row));
-    var student = new com.xiaoban.homework.student.StudentEntity() {};
-    student.id = "child-1";
-    student.familyId = family;
-    var loader = new HomeworkTeacherExperienceService(experiences, students);
-    var hint = loader.context(student, "拍照上传", "", true);
-    assertTrue(hint.contains("图片里必须识别出符合的老师和线索"), hint);
-    assertTrue(hint.contains("课外阅读和心情日记"));
-  }
-
-  @Test void clientProvidedTeacherMustNotOverrideServerSnapshotAttribution() {
-    UUID family = UUID.randomUUID();
-    var exp = mock(HomeworkTeacherExperienceRepository.class);
-    var snap = mock(HomeworkOrganizerAiSnapshotRepository.class);
-    var learning = service(family, "child-1", exp, snap);
-    var f = feedback(family, "child-1");
-    f.teacherName = "未经核实的李老师";
-    assertEquals("APPLIED", learning.evaluate(f));
+  @Test void aiGeneralizesParentsExactFourPlusTwoExplanationWithNoJavaPatternRule() {
+    String excerpt = "摘抄：（4+2）";
+    Setup s = setup(excerpt);
+    String note = "对于摘抄这类作业，里面的数字代表多少个好词好句，比如4+2标识4个好词，2个好句";
+    var report = report(s.family(), "child-1", excerpt, note);
+    when(s.model().extract(eq(report), any(HomeworkOrganizerAiSnapshotEntity.class)))
+        .thenReturn(Optional.of(new HomeworkFeedbackExperienceModel.Experience(
+            true, "摘抄", "当前语文摘抄类作业出现括号内 N+M 的要求时",
+            "把 N 解为本次要摘抄的好词数量、M 解为好句数量；根据本次数字写出完整任务标题及要求，不照抄历史数量。",
+            0.96)));
+    assertEquals("APPLIED", s.service().evaluate(report));
     var saved = ArgumentCaptor.forClass(HomeworkTeacherExperienceEntity.class);
-    verify(exp).save(saved.capture());
-    assertEquals("学科归属:语文", saved.getValue().teacherName);
+    verify(s.experiences()).save(saved.capture());
+    var rule = saved.getValue();
+    assertEquals("FEEDBACK_AI", rule.origin);
+    assertEquals("摘抄", rule.cue);
+    assertEquals("学科归属:语文", rule.teacherName);
+    assertEquals(report.id, rule.sourceFeedbackId);
+    assertEquals(excerpt, rule.exampleSource);
+    assertTrue(rule.interpretation.contains("N 解为"));
+    assertTrue(rule.active);
   }
 
-  @Test void parentExplainedVeryShortSchoolAbbreviationIsStillLearnable() {
-    UUID family = UUID.randomUUID();
-    var exp = mock(HomeworkTeacherExperienceRepository.class);
-    var snap = mock(HomeworkOrganizerAiSnapshotRepository.class);
-    var source = original();
-    source.subject = "英语";
-    source.title = "U4";
-    source.sourceExcerpt = "U4";
-    when(snap.findByFamilyIdAndStudentIdAndBatchIdOrderByCandidateIdAsc(
-        family, "child-1", "text-100")).thenReturn(List.of(source));
-    when(exp.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "child-1"))
-        .thenReturn(List.of());
-    when(exp.findBySourceFeedbackId(any(UUID.class))).thenReturn(Optional.empty());
-    var record = feedback(family, "child-1");
-    record.teacherName = "";
-    record.subject = "英语";
-    record.sourceExcerpt = "U4";
-    record.originalTitle = "U4";
-    record.currentTitle = "听读课本第4单元课文";
-    record.details = "U表示Unit单元，数字是课文单元号";
-    assertEquals("APPLIED", new HomeworkFeedbackAutoLearningService(exp, snap).evaluate(record));
-    var saved = ArgumentCaptor.forClass(HomeworkTeacherExperienceEntity.class);
-    verify(exp).save(saved.capture());
-    assertEquals("U*", saved.getValue().cue);
-    assertEquals("学科归属:英语", saved.getValue().teacherName);
+  @Test void noSnapshotMeansNoAiCallOrRule() {
+    Setup s = setup("摘抄：（4+2）");
+    var report = report(s.family(), "child-1", "篡改后的原文", "4+2是4个好词，2个好句");
+    assertEquals("PENDING_EVIDENCE", s.service().evaluate(report));
+    verify(s.model(), never()).extract(any(), any());
+    verify(s.experiences(), never()).save(any());
   }
 
-  @Test void confirmedShorthandIsAvailableToImageAiOnlyAsConditionalGuidance() {
-    UUID family = UUID.randomUUID();
-    var experiences = mock(HomeworkTeacherExperienceRepository.class);
-    var students = mock(com.xiaoban.homework.student.StudentRepository.class);
-    var row = new HomeworkTeacherExperienceEntity();
-    row.teacherName = "学科归属:英语";
-    row.subject = "英语";
-    row.cue = "听读U*";
-    row.interpretation = "家长确认U后面数字是英语课文单元号";
-    row.origin = "FEEDBACK_AUTO";
-    row.exampleSource = "英语：听读U4";
-    row.exampleResult = "";
-    row.active = true;
-    when(experiences.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(family, "child-1"))
-        .thenReturn(List.of(row));
-    var student = new com.xiaoban.homework.student.StudentEntity() {};
-    student.id = "child-1";
-    student.familyId = family;
-    var loader = new HomeworkTeacherExperienceService(experiences, students);
-    String hint = loader.context(student, "拍照上传", "", true);
-    assertTrue(hint.contains("听读U*"));
-    assertTrue(hint.contains("图片里必须识别出符合的老师和线索"));
-    assertEquals("", loader.context(student, "家长录入文字", "数学：口算20题", false));
+  @Test void unavailableAiIsTruthfullyReportedAsPending() {
+    Setup s = setup("摘抄：（4+2）");
+    when(s.model().available()).thenReturn(false);
+    var report = report(s.family(), "child-1", "摘抄：（4+2）", "4+2是4个好词，2个好句");
+    assertEquals("PENDING_AI", s.service().evaluate(report));
+    verify(s.experiences(), never()).save(any());
   }
 
-  @Test void mixedChineseEnglishAbbreviationGeneralizesButPageReferencesDoNot() {
-    assertEquals("听读U*", HomeworkFeedbackAutoLearningService.autoCue(
-        "SHORTHAND", "英语：听读U4"));
-    assertEquals("第13页", HomeworkFeedbackAutoLearningService.autoCue(
-        "SHORTHAND", "第13页"));
+  @Test void modelMustExplicitlyApproveAndMeetConfidenceAndContentChecks() {
+    Setup s = setup("语文：摘抄：（4+2）");
+    var report = report(s.family(), "child-1", "语文：摘抄：（4+2）", "请按正确要求整理");
+    when(s.model().extract(any(), any())).thenReturn(Optional.of(
+        new HomeworkFeedbackExperienceModel.Experience(false, "", "", "", 0.95)));
+    assertEquals("PENDING_EVIDENCE", s.service().evaluate(report));
+    when(s.model().extract(any(), any())).thenReturn(Optional.of(
+        new HomeworkFeedbackExperienceModel.Experience(true, "摘抄",
+            "本次同类的摘抄作业中", "按本次家长确认的内容解释并展开任务标题", 0.3)));
+    assertEquals("PENDING_EVIDENCE", s.service().evaluate(report));
+    when(s.model().extract(any(), any())).thenReturn(Optional.of(
+        new HomeworkFeedbackExperienceModel.Experience(true, "摘抄", "", "泛化规则", 0.98)));
+    assertEquals("REVIEW_REQUIRED", s.service().evaluate(report));
+    verify(s.experiences(), never()).save(any());
   }
 
+  @Test void existingContradictoryRuleIsNotSilentlyOverwritten() {
+    Setup s = setup("摘抄：（4+2）");
+    var report = report(s.family(), "child-1", "摘抄：（4+2）", "4+2是4个好词，2个好句");
+    when(s.model().extract(any(), any())).thenReturn(Optional.of(
+        new HomeworkFeedbackExperienceModel.Experience(true, "摘抄",
+            "本学生语文摘抄作业中有两数相加时",
+            "第一数表示好词，第二数表示好句，按本次要求展开完整标题", 0.99)));
+    var old = new HomeworkTeacherExperienceEntity();
+    old.active = true;
+    old.teacherName = "学科归属:语文";
+    old.subject = "语文";
+    old.cue = "摘抄";
+    old.interpretation = "旧规则：不同数量对应不同任务要求";
+    when(s.experiences().findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(
+        s.family(), "child-1")).thenReturn(List.of(old));
+    assertEquals("REVIEW_REQUIRED", s.service().evaluate(report));
+    verify(s.experiences(), never()).save(any());
+  }
+
+  @Test void studentAndTeacherScopeComesOnlyFromOriginalServerSnapshot() {
+    Setup s = setup("摘抄：（4+2）");
+    var report = report(s.family(), "child-1", "摘抄：（4+2）",
+        "4+2表示4个好词与2个好句");
+    report.teacherName = "伪造的老师";
+    when(s.model().extract(any(), any())).thenReturn(Optional.of(
+        new HomeworkFeedbackExperienceModel.Experience(true, "摘抄",
+            "语文中的摘抄类作业含两项数量时",
+            "使用原文第一个数量描述好词，第二个数量描述好句", 0.98)));
+    assertEquals("APPLIED", s.service().evaluate(report));
+    var cap = ArgumentCaptor.forClass(HomeworkTeacherExperienceEntity.class);
+    verify(s.experiences()).save(cap.capture());
+    assertEquals("学科归属:语文", cap.getValue().teacherName);
+    assertEquals(s.family(), cap.getValue().familyId);
+    assertEquals("child-1", cap.getValue().studentId);
+  }
 }
