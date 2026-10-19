@@ -138,13 +138,18 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       var first = parseImageOutput(output.get(), activeRules.encodedShorthand());
       if (first.isEmpty()) return first;
       if (experienceContext.isBlank() || first.get().assignments().isEmpty()) return first;
-      // Use the model's image excerpts as review evidence; never interpret
-      // teacher-specific expressions in Java. Image pixels were analyzed by
-      // the first model; this pass is a text-only critique of that result.
+      // Initial visual hints were conditional. Only incur a second model call
+      // when the first vision result provides text evidence for an applicable
+      // parent experience. This avoids duplicate image token spending for
+      // unrelated homework or students with many historical experiences.
+      String visualEvidence = String.join("\n", value(text, ""),
+          recognizedText(first.get().assignments()));
+      String matchingContext = studentTeacherContext(
+          student, sourceLabel, visualEvidence, false);
+      if (matchingContext.isBlank()) return first;
       List<HomeworkOrganizerDtos.Candidate> checked = reviewWithExperience(
-          properties.getImageOrganizerModel(),
-          String.join("\n", value(text, ""), recognizedText(first.get().assignments())),
-          experienceContext, output.get(), first.get().assignments());
+          properties.getImageOrganizerModel(), visualEvidence,
+          matchingContext, output.get(), first.get().assignments());
       return Optional.of(new HomeworkOrganizerDtos.ImageResponse(
           checked, "AI_IMAGE", recognizedText(checked)));
     } catch (Exception error) {
