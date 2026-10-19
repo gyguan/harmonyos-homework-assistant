@@ -130,9 +130,13 @@ class HomeworkFeedbackLearningTest {
         () -> service.promote(family, "child1", record.id,
             new HomeworkOrganizerFeedbackDtos.Promote("听读U*", meaning)));
     record.teacherName = "";
-    assertThrows(ApiExceptions.BadRequest.class,
-        () -> service.promote(family, "child1", record.id,
-            new HomeworkOrganizerFeedbackDtos.Promote("国*", meaning)));
+    record.sourceLabel = "家长录入文字";
+    record.sourceExcerpt = "语文：朗读国13";
+    when(experiences.save(any(HomeworkTeacherExperienceEntity.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
+    var subjectRule = service.promote(family, "child1", record.id,
+        new HomeworkOrganizerFeedbackDtos.Promote("国*", meaning));
+    assertEquals("学科归属:语文", subjectRule.teacherName());
     record.teacherName = "王老师";
     when(types.findById("SHORTHAND")).thenReturn(Optional.of(type(false)));
     assertThrows(ApiExceptions.BadRequest.class,
