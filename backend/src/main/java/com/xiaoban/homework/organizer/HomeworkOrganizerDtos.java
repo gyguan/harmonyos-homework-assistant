@@ -31,9 +31,29 @@ public final class HomeworkOrganizerDtos {
       String duplicateAssignmentId,
       String duplicateAssignmentTitle,
       double duplicateConfidence,
-      String duplicateReason) {}
+      String duplicateReason,
+      List<String> sourceBlockIds) {
+    public Candidate {
+      sourceBlockIds = sourceBlockIds == null ? List.of() : List.copyOf(sourceBlockIds);
+    }
+    public Candidate(String subject, String title, String instruction, String textbookRef,
+        String taskDate, int expectedMinutes, String sourceExcerpt, double confidence,
+        String sameTaskGroup, String duplicateAssignmentId, String duplicateAssignmentTitle,
+        double duplicateConfidence, String duplicateReason) {
+      this(subject, title, instruction, textbookRef, taskDate, expectedMinutes, sourceExcerpt,
+          confidence, sameTaskGroup, duplicateAssignmentId, duplicateAssignmentTitle,
+          duplicateConfidence, duplicateReason, List.of());
+    }
+  }
 
-  public record Response(List<Candidate> assignments, String mode) {}
+  public record QualityFlag(String code, List<String> sourceBlockIds, List<Integer> assignmentIndexes) {}
+
+  public record Response(List<Candidate> assignments, String mode,
+      HomeworkSourceDocument sourceDocument, List<QualityFlag> qualityFlags, boolean needsReview) {
+    public Response(List<Candidate> assignments, String mode) {
+      this(assignments, mode, null, List.of(), false);
+    }
+  }
 
   public record ImageRequest(
       @NotBlank @Size(max = 5592408) String imageBase64,
@@ -51,5 +71,10 @@ public final class HomeworkOrganizerDtos {
     }
   }
 
-  public record ImageResponse(List<Candidate> assignments, String mode, String recognizedText) {}
+  public record ImageResponse(List<Candidate> assignments, String mode, String recognizedText,
+      HomeworkSourceDocument sourceDocument, List<QualityFlag> qualityFlags, boolean needsReview) {
+    public ImageResponse(List<Candidate> assignments, String mode, String recognizedText) {
+      this(assignments, mode, recognizedText, null, List.of(), false);
+    }
+  }
 }

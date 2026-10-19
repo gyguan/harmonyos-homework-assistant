@@ -20,6 +20,7 @@ public class HomeworkOrganizerService {
   private final HomeworkOrganizerModelClient model;
   private final HomeworkStudentTeacherService teachers;
   private final HomeworkOrganizerAiSnapshotService snapshots;
+  private final HomeworkSourceEvidenceService evidence;
 
   public HomeworkOrganizerService(StudentRepository students, HomeworkOrganizerModelClient model) {
     this(students, model, null, null);
@@ -30,9 +31,16 @@ public class HomeworkOrganizerService {
     this(students, model, teachers, null);
   }
 
-  @org.springframework.beans.factory.annotation.Autowired
   public HomeworkOrganizerService(StudentRepository students, HomeworkOrganizerModelClient model,
       HomeworkStudentTeacherService teachers, HomeworkOrganizerAiSnapshotService snapshots) {
+    this(students, model, teachers, snapshots, null);
+  }
+
+  @org.springframework.beans.factory.annotation.Autowired
+  public HomeworkOrganizerService(StudentRepository students, HomeworkOrganizerModelClient model,
+      HomeworkStudentTeacherService teachers, HomeworkOrganizerAiSnapshotService snapshots,
+      HomeworkSourceEvidenceService evidence) {
+    this.evidence = evidence;
     this.students = students;
     this.model = model;
     this.teachers = teachers;
@@ -54,20 +62,22 @@ public class HomeworkOrganizerService {
     if (!familyId.equals(student.familyId)) throw new ApiExceptions.NotFound("孩子不存在");
     if (!model.available()) throw new ApiExceptions.ServiceUnavailable("AI整理暂未配置");
 
-    List<HomeworkOrganizerDtos.Candidate> organized = model
-        .organize(student, teacherLabel(familyId, studentId, request.sourceLabel(), request.teacherName()), request.text())
+    var organized = model
+        .organizeDocument(student, teacherLabel(familyId, studentId, request.sourceLabel(), request.teacherName()), request.text())
         .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI整理暂时不可用"));
     List<HomeworkOrganizerDtos.Candidate> normalized =
-        normalizeDefaultTaskDates(organized, request.text());
+        normalizeDefaultTaskDates(organized.assignments(), request.text());
     if (snapshots != null) {
       String sourcedTeacher = request.teacherName() == null || request.teacherName().isBlank()
           ? HomeworkTeacherAttribution.explicitSourceTeacher(request.text())
           : request.teacherName();
-      snapshots.capture(familyId, studentId, request.importId(), sourcedTeacher, normalized);
+      if (evidence != null) evidence.capture(familyId, studentId, request.importId(), sourcedTeacher, normalized,
+          organized.sourceDocument(), organized.qualityFlags(), organized.needsReview());
+      else snapshots.capture(familyId, studentId, request.importId(), sourcedTeacher, normalized);
     }
     log.info("homework_import organized studentId={} assignments={}", studentId, normalized.size());
     trace.success(normalized.size());
-    return new HomeworkOrganizerDtos.Response(normalized, "AI");
+    return new HomeworkOrganizerDtos.Response(normalized, "AI", organized.sourceDocument(), organized.qualityFlags(), organized.needsReview());
     }
   }
 
@@ -94,7 +104,9 @@ public class HomeworkOrganizerService {
     List<HomeworkOrganizerDtos.Candidate> normalized =
         normalizeDefaultTaskDates(result.assignments(), result.recognizedText());
     if (snapshots != null) {
-      snapshots.capture(familyId, studentId, request.importId(), request.teacherName(), normalized);
+      if (evidence != null) evidence.capture(familyId, studentId, request.importId(), request.teacherName(), normalized,
+          result.sourceDocument(), result.qualityFlags(), result.needsReview());
+      else snapshots.capture(familyId, studentId, request.importId(), request.teacherName(), normalized);
     }
     log.info(
         "[AI-PERF] homework_image studentId={} base64Chars={} imageValidateMs={} modelMs={} totalMs={} assignments={} recognizedChars={}",
@@ -107,7 +119,7 @@ public class HomeworkOrganizerService {
         result.recognizedText() == null ? 0 : result.recognizedText().length());
     trace.success(normalized.size());
     return new HomeworkOrganizerDtos.ImageResponse(
-        normalized, result.mode(), result.recognizedText());
+        normalized, result.mode(), result.recognizedText(), result.sourceDocument(), result.qualityFlags(), result.needsReview());
     }
   }
 
@@ -130,7 +142,7 @@ public class HomeworkOrganizerService {
       result.add(new HomeworkOrganizerDtos.Candidate(
           candidate.subject(), candidate.title(), candidate.instruction(), candidate.textbookRef(),
           taskDate, candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
-          "", "", "", 0.0, ""));
+          "", "", "", 0.0, "", candidate.sourceBlockIds()));
     }
     return result;
   }

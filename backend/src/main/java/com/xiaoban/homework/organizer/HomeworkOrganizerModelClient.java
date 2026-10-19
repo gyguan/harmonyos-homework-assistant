@@ -10,6 +10,12 @@ public interface HomeworkOrganizerModelClient {
   Optional<List<HomeworkOrganizerDtos.Candidate>> organize(
       StudentEntity student, String sourceLabel, String text);
 
+  default Optional<HomeworkOrganizerDtos.Response> organizeDocument(
+      StudentEntity student, String sourceLabel, String text) {
+    return organize(student, sourceLabel, text).map(items ->
+        HomeworkSourceEvidence.response(items, "AI", HomeworkSourceDocument.text(text)));
+  }
+
   boolean imageAvailable();
 
   Optional<HomeworkOrganizerDtos.ImageResponse> organizeImage(

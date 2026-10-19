@@ -41,6 +41,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - **Capture Session（采集会话）**：家长主动发起、经系统授权的短时屏幕采集过程，只负责收集变化画面及 OCR 证据；聊天重建、来源校验和作业理解属于后续独立 Pipeline。
 - **Candidate Assignment（候选作业）**：AI 从非结构化内容解析出的、尚待家长确认的 Assignment。
 - **Homework Confirmation（作业确认）**：家长对候选作业进行修改、拆分、合并并最终发布给学生的动作。
+- **SourceDocument / SourceBlock（独立来源文档/片段）**：整理时独立于任务输出保存的原文片段、文字/图片位置和可辨认/作业分类状态；Candidate 通过 sourceBlockIds 多对多关联。文本原文不可被 AI 改写；像素不入库，来源与初稿按家庭/学生/导入批次共同隔离。
 - **Source Evidence（来源证据）**：Candidate Assignment 与老师原始文字、截图区域、文件页码或音视频时间段之间的可追溯关系。
 - **Progress（进度）**：Assignment 从未开始、进行中、暂停、待提交、已提交、完成或待订正的状态与时间记录。逾期在 V2 中优先作为基于 `dueAt + status` 的派生属性，而不是依赖定时任务修改状态。
 - **Today（今天）**：学生端最核心的工作视图，重点回答“我现在应该做什么”。

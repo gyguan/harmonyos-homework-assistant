@@ -136,7 +136,8 @@ class ConfigurableHomeworkOrganizerModelClientTest {
 
     assertEquals(List.of("语文", "数学"),
         result.assignments().stream().map(HomeworkOrganizerDtos.Candidate::subject).toList());
-    assertEquals("语文背诵\n数学口算", result.recognizedText());
+    assertEquals("", result.recognizedText());
+    assertTrue(result.needsReview());
     assertTrue(client.parseImageOutput("{\"assignments\":[]}").isEmpty());
     assertTrue(client.parseImageOutput(output.replace("\"数学\"", "\"InvalidSubject\"")).isEmpty());
   }
