@@ -207,7 +207,8 @@ export struct ConfirmationCandidateEditor {
     this.confirmDelete = false;
     this.showFeedbackPanel = false;
     this.feedbackSelectedCode = '';
-    this.feedbackTeacherName = '';
+    this.feedbackTeacherName = this.item.sourceEvidence.teacherName === undefined ? '' :
+      this.item.sourceEvidence.teacherName;
     this.feedbackDetails = '';
     this.feedbackMessage = '';
     this.feedbackHasError = false;
