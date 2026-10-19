@@ -48,7 +48,29 @@ interface OrganizerErrorResponse { message: string; }
 interface OrganizerOriginalCandidate {
   title: string;
   subject: string;
+  instruction: string;
+  textbookRef: string;
+  taskDate: string;
+  expectedMinutes: number;
   sourceExcerpt: string;
+  studentId: string;
+  batchId: string;
+  teacherName: string;
+}
+
+interface OrganizerReviewDifference {
+  candidateId: string;
+  changeType: string;
+  fieldName: string;
+  beforeValue: string;
+  afterValue: string;
+  sourceExcerpt: string;
+}
+
+interface OrganizerReviewPayload {
+  batchId: string;
+  teacherName: string;
+  differences: OrganizerReviewDifference[];
 }
 
 interface OrganizerConfirmedEdit {
@@ -75,6 +97,90 @@ export class HomeworkOrganizerRemoteApi {
     return item === undefined ? fallback : item.title;
   }
 
+  private addDifference(changes: OrganizerReviewDifference[], candidateId: string,
+    fieldName: string, before: string, after: string, sourceExcerpt: string): void {
+    if (before === after) return;
+    changes.push({
+      candidateId: candidateId,
+      changeType: 'CHANGED',
+      fieldName: fieldName,
+      beforeValue: before.substring(0, 1500),
+      afterValue: after.substring(0, 1500),
+      sourceExcerpt: sourceExcerpt.substring(0, 500)
+    });
+  }
+
+  /** Only compare the AI batch actually published. No source inference, no global learning. */
+  async reportConfirmedReview(candidates: CandidateAssignment[]): Promise<void> {
+    if (candidates.length === 0) return;
+    let studentId = candidates[0].studentId;
+    let batchId = candidates[0].sourceEvidence.batchId;
+    if (batchId === undefined || batchId.length === 0) return;
+    let originallyGenerated: OrganizerOriginalCandidate[] = [];
+    let beforeById: Map<string, OrganizerOriginalCandidate> = new Map<string, OrganizerOriginalCandidate>();
+    for (let [candidateId, old] of this.originalById) {
+      if (old.studentId === studentId && old.batchId === batchId) {
+        originallyGenerated.push(old);
+        beforeById.set(candidateId, old);
+      }
+    }
+    if (originallyGenerated.length === 0) return;
+    let teacherNames: string[] = [];
+    let acceptedById: Map<string, CandidateAssignment> = new Map<string, CandidateAssignment>();
+    for (let candidate of candidates) {
+      if (candidate.studentId !== studentId || candidate.sourceEvidence.batchId !== batchId) return;
+      acceptedById.set(candidate.id, candidate);
+      let name = candidate.sourceEvidence.teacherName === undefined ? '' :
+        candidate.sourceEvidence.teacherName.trim();
+      if (name.length > 0 && teacherNames.indexOf(name) < 0) teacherNames.push(name);
+    }
+    let teacherName = teacherNames.length === 1 ? teacherNames[0] : '';
+    let changes: OrganizerReviewDifference[] = [];
+    for (let [candidateId, old] of this.originalById) {
+      if (old.studentId !== studentId || old.batchId !== batchId) continue;
+      let accepted = acceptedById.get(candidateId);
+      if (accepted === undefined) {
+        changes.push({
+          candidateId: candidateId, changeType: 'REMOVED', fieldName: 'task',
+          beforeValue: old.title.substring(0, 1500), afterValue: '',
+          sourceExcerpt: old.sourceExcerpt.substring(0, 500)
+        });
+        continue;
+      }
+      this.addDifference(changes, candidateId, 'title', old.title, accepted.title, old.sourceExcerpt);
+      this.addDifference(changes, candidateId, 'subject', old.subject, accepted.subject, old.sourceExcerpt);
+      this.addDifference(changes, candidateId, 'instruction', old.instruction, accepted.instruction, old.sourceExcerpt);
+      this.addDifference(changes, candidateId, 'textbookRef', old.textbookRef, accepted.textbookRef, old.sourceExcerpt);
+      this.addDifference(changes, candidateId, 'taskDate', old.taskDate, accepted.taskDate, old.sourceExcerpt);
+      this.addDifference(changes, candidateId, 'expectedMinutes',
+        String(old.expectedMinutes), String(accepted.expectedMinutes), old.sourceExcerpt);
+    }
+    for (let candidate of candidates) {
+      if (!beforeById.has(candidate.id)) {
+        changes.push({
+          candidateId: candidate.id, changeType: 'ADDED', fieldName: 'task',
+          beforeValue: '', afterValue: candidate.title.substring(0, 1500),
+          sourceExcerpt: candidate.sourceEvidence.excerpt.substring(0, 500)
+        });
+      }
+    }
+    if (changes.length > 0) {
+      let payload: OrganizerReviewPayload = {
+        batchId: batchId.substring(0, 180), teacherName: teacherName.substring(0, 80),
+        differences: changes.slice(0, 150)
+      };
+      try {
+        await BackendHttpClient.instance.requestFor(
+          'homework.organize.review-differences',
+          `/api/v1/students/${encodeURIComponent(studentId)}/homework/review-differences`,
+          http.RequestMethod.POST, payload);
+      } catch {
+        // Structured analytics are best effort, not part of the publish transaction.
+      }
+    }
+    await this.reportConfirmedEdits(candidates);
+  }
+
   /** 家长成功发布后静默记录真正发生的标题纠错；上报失败不影响已发布作业。 */
   async reportConfirmedEdits(candidates: CandidateAssignment[]): Promise<void> {
     if (candidates.length === 0) return;
@@ -91,6 +197,9 @@ export class HomeworkOrganizerRemoteApi {
     }
     // 一个批次出现多位老师，或者根本没写老师姓名时，不推测归属。
     let teacherName = teacherNames.length === 1 ? teacherNames[0] : '';
+    let explicitlyBound = first.sourceEvidence.teacherName === undefined ? '' :
+      first.sourceEvidence.teacherName.trim();
+    if (explicitlyBound.length > 0) teacherName = explicitlyBound;
     for (let candidate of candidates) {
       let previous = this.originalById.get(candidate.id);
       this.originalById.delete(candidate.id);
@@ -202,7 +311,14 @@ export class HomeworkOrganizerRemoteApi {
       this.originalById.set(candidateId, {
         title: remote.title.trim(),
         subject: subject,
-        sourceExcerpt: this.value(remote.sourceExcerpt, remote.title)
+        instruction: this.value(remote.instruction, remote.title),
+        textbookRef: this.value(remote.textbookRef, '待家长确认'),
+        taskDate: AssignmentTaskDate.resolve(this.value(remote.taskDate, AssignmentTaskDate.today())),
+        expectedMinutes: this.expectedMinutes(remote.expectedMinutes),
+        sourceExcerpt: this.value(remote.sourceExcerpt, remote.title),
+        studentId: input.studentId,
+        batchId: input.importId,
+        teacherName: input.teacherName === undefined ? '' : input.teacherName
       });
       if (this.originalById.size > 100) {
         let oldest = this.originalById.keys().next().value;
