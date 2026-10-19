@@ -95,7 +95,7 @@ export struct HomeworkImportPage {
       this.teacherDraft = '';
       this.teacherError = '';
     } catch {
-      if (studentId === this.viewModel.activeStudentId()) this.teacherError = '保存老师失败，请检查后端连接';
+      if (studentId === this.viewModel.activeStudentId()) this.teacherError = '保存失败；若存在同名老师，请补充学科或完整姓名以区分';
     } finally {
       this.teacherBusy = false;
     }
