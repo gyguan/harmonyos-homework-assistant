@@ -118,8 +118,10 @@ public class HomeworkOrganizerFeedbackService {
     // source/correction pair may create a reversible experience automatically.
     entity.processingStatus = "PENDING_EVIDENCE";
     entity.createdAt = Instant.now();
-    feedback.save(entity);
     if (autoLearning != null) {
+      // Persist the feedback first: learned experience.source_feedback_id is a FK.
+      // JPA rolls both writes back together if either one fails.
+      feedback.save(entity);
       entity.processingStatus = autoLearning.evaluate(entity);
     }
     return HomeworkOrganizerFeedbackDtos.Response.from(feedback.save(entity));
