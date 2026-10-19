@@ -83,7 +83,7 @@ export class HomeworkBatchPublishService {
     DefaultAssignmentRepository.instance.applyAuthoritativeBatch(mapped);
     inbox.markBatchPublished(batchId);
     // 只在服务端确认成功发布后学习家长纠错；学习接口与发布解耦，不能阻断作业。
-    void HomeworkOrganizerRemoteApi.instance.reportConfirmedEdits(candidates);
+    void HomeworkOrganizerRemoteApi.instance.reportConfirmedEdits(candidates).catch(() => {});
     if (clearCurrentDraft) this.drafts.clearCandidates();
     return { publishedCount: mapped.length, assignments: mapped.slice() };
   }
