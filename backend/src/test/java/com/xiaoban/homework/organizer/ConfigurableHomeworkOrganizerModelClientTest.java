@@ -22,6 +22,53 @@ import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
 
 class ConfigurableHomeworkOrganizerModelClientTest {
+  private static String migrationSql() {
+    try (var stream = ConfigurableHomeworkOrganizerModelClientTest.class.getClassLoader()
+        .getResourceAsStream("db/migration/V40__homework_organizer_rules.sql")) {
+      if (stream == null) throw new IllegalStateException("V40 rules migration missing");
+      return new String(stream.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+    } catch (java.io.IOException error) {
+      throw new IllegalStateException(error);
+    }
+  }
+
+  private static String seededShorthand() {
+    String sql = migrationSql();
+    var pattern = java.util.regex.Pattern.compile(
+        "'GLOBAL_SHORTHAND_[0-9]+'\\s*,\\s*'SHORTHAND'\\s*,"
+        + "\\s*\\$seed\\$(.*?)\\$seed\\$\\s*,\\s*\\$seed\\$(.*?)\\$seed\\$\\s*,"
+        + "\\s*\\$seed\\$(.*?)\\$seed\\$\\s*,\\s*\\$seed\\$(.*?)\\$seed\\$",
+        java.util.regex.Pattern.DOTALL);
+    var matcher = pattern.matcher(sql);
+    var entries = new java.util.ArrayList<String>();
+    while (matcher.find()) {
+      entries.add(String.join("|", matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4)));
+    }
+    assertEquals(10, entries.size(), "Flyway must seed the full existing shorthand glossary");
+    return String.join(";", entries);
+  }
+
+  private static String seededTemplate(String key) {
+    var pattern = java.util.regex.Pattern.compile(
+        "'PROMPT_" + key + "'\\s*,\\s*'PROMPT'\\s*,\\s*\\$seed\\$.*?\\$seed\\$"
+        + "\\s*,\\s*\\$seed\\$(.*?)\\$seed\\$",
+        java.util.regex.Pattern.DOTALL);
+    var matcher = pattern.matcher(migrationSql());
+    assertTrue(matcher.find(), "missing migrated template " + key);
+    return matcher.group(1);
+  }
+
+  private static ConfigurableHomeworkOrganizerModelClient.ConversionResult seededCandidates(
+      ConfigurableHomeworkOrganizerModelClient.StructuredResult result) {
+    return ConfigurableHomeworkOrganizerModelClient.toCandidates(result, seededShorthand());
+  }
+
+  private static ConfigurableHomeworkOrganizerModelClient.ConversionResult seededCandidates(
+      ConfigurableHomeworkOrganizerModelClient.StructuredResult result, String extra) {
+    return ConfigurableHomeworkOrganizerModelClient.toCandidates(result, seededShorthand() + ";" + extra);
+  }
+
+
 
   static class TestStudent extends StudentEntity {
     TestStudent() { super(); }
@@ -204,7 +251,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   void shorthandGlossaryExplainsTeacherAbbreviations() {
     // 老师（官士棋）惯用极简短写，模型按字面读会丢任务或理解错，
     // 例如「课外30分」被当成时长丢掉、「一起作业」被当成「一起做作业」。
-    String section = ConfigurableHomeworkOrganizerModelClient.shorthandSection("");
+    String section = ConfigurableHomeworkOrganizerModelClient.shorthandSection(seededShorthand());
 
     assertTrue(section.contains("一起作业"));
     assertTrue(section.contains("阅读绘本"), section);
@@ -226,7 +273,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   void shorthandGlossaryAppendsConfiguredEntriesWithoutDroppingBuiltins() {
     // 家长后续要加简写只改环境变量，不该动代码，也不该覆盖内置词条。
     String section = ConfigurableHomeworkOrganizerModelClient.shorthandSection(
-        "数学|口算|口算题卡;英语|周练|周末练习单");
+        seededShorthand() + ";数学|口算|口算题卡;英语|周练|周末练习单");
 
     assertTrue(section.contains("数学："));
     assertTrue(section.contains("「口算」＝口算题卡"));
@@ -239,7 +286,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   void teacherFormatSectionHandlesThreePartNotification() {
     // 官桐羽老师（语文）的通知固定分三段：学习进度 / 常规作业 / 今日作业。
     // 不写进提示词的话，模型会把「学习进度」当成一项作业、把常规作业的两项并成一条。
-    String section = ConfigurableHomeworkOrganizerModelClient.teacherFormatSection();
+    String section = seededTemplate("THREE_PART");
 
     assertTrue(section.contains("学习进度"));
     assertTrue(section.contains("常规作业"));
@@ -253,7 +300,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   @Test
   void dropsLearningProgressEntryAndFillsLessonNameIntoTitles() {
     // 模型把「学习进度」段当成了一条作业；且后面的项只写「课文」不写篇名。
-    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+    var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "语文", "今天我们学了《黄山奇石》。", "今天我们学了《黄山奇石》。", "语文书", null, 5,
@@ -296,7 +343,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     // 官桐羽 / 官士棋（同一位英语老师）的作业：条目少、简写重，
     // 一个序号里用「/」并列多个听读对象——写两点实际是三个任务；
     // 且绘本那一项由定时语音任务自动布置，整理结果里不能再出现。
-    String section = ConfigurableHomeworkOrganizerModelClient.englishTeacherFormatSection();
+    String section = seededTemplate("ENGLISH");
 
     assertTrue(section.contains("U＋数字"), "要说明 U 是 Unit 的缩写");
     assertTrue(section.contains("不要输出这一条任务"), "绘本由定时语音任务生成，不能重复产出");
@@ -308,7 +355,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   void blackboardFormatSectionHandlesNoticeBoardTable() {
     // 官士棋老师把作业写在黑板《作业公示栏》里：学科是行、内容在手写格子里、时长在独立列。
     // 不写进提示词时，模型会把表头当作业、把「其他」行的课外阅读归到阅读/其他。
-    String section = ConfigurableHomeworkOrganizerModelClient.blackboardFormatSection();
+    String section = seededTemplate("BLACKBOARD");
 
     assertTrue(section.contains("作业公示栏"));
     assertTrue(section.contains("预计时长"), "要说明时长列不是作业");
@@ -341,7 +388,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   void dropsEnglishPictureBookTaskAlreadyGeneratedByVoiceScheduler() {
     // 「听读课文U4/绘本」里的绘本由定时语音任务自动布置（标题「绘本-文件夹目录」），
     // AI 整理如果再产出一条，孩子就会看到两条重复作业。
-    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+    var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "英语", "听读课文U4/绘本，10分钟", "听读课本第4单元课文并阅读绘本，每项各10分钟",
@@ -361,7 +408,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   @Test
   void dropsTaskWhoseOnlyShorthandIsPictureBook() {
     // 整条就只是「绘本」：定时语音任务已经布置过，整理结果里一条都不该出现。
-    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+    var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "英语", "绘本", "阅读绘本10分钟", "沪教版", null, 10, "绘本", 0.9))),
@@ -375,7 +422,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   void splitsOneTaskCoveringTwoDifferentShorthands() {
     // 黑板英语格写成「一起作业. 绘本」，模型常理解成"在平台上读绘本"并成一条，
     // 而这是两项作业。简写是老师固定用法，这里确定性拆开。
-    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+    var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "英语", "一起作业平台作业及听读课文U4",
@@ -392,7 +439,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   @Test
   void keepsOneTaskWhenOnlyASingleShorthandMatches() {
     // 「预习8、10课 订小白」只有「订小白」一个简写，不能拆
-    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+    var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "语文", "预习8、10课 订小白",
@@ -407,7 +454,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   @Test
   void shorthandGlossaryIgnoresMalformedEntries() {
     String section = ConfigurableHomeworkOrganizerModelClient.shorthandSection(
-        "只有一项;|缺科目|缺含义;;数学||空简写");
+        seededShorthand() + ";只有一项;|缺科目|缺含义;;数学||空简写");
 
     assertTrue(section.contains("课外阅读 30 分钟"), "非法条目不应影响内置词典");
     assertFalse(section.contains("只有一项"));
@@ -419,7 +466,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   void splitsMergedNumberedItemsIntoOneTaskEach() {
     // 线上真实黑板图：语文格子里写了「1、复习P28-38 周一练习」「2、预习8、10课 订正小白张」，
     // glm-4.6v-flashx 把它们并成一条，第 2 点只剩在 instruction 里，家长直接漏做。
-    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+    var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "语文", "复习P28-38 周一练习",
@@ -435,7 +482,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
 
   @Test
   void splitsCircledNumberedItems() {
-    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+    var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "语文", "抄写和背诵", "①抄写第12课生字表两遍 ②背诵《古诗二首》并默写", "部编版",
@@ -449,7 +496,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   @Test
   void keepsSingleTaskWhenDigitsAreNotAnOrdinalList() {
     // 「第1、2课」「P32-34」都不是序号，不能被拆成多条
-    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+    var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "语文", "预习第1、2课", "预习课本第1、2课，读熟P32-34", "部编版", "2026-10-16",
@@ -463,7 +510,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   void conversionClampsOverlongTitleToDatabaseLimit() {
     // assignment.title 是 varchar(300)，超长会直接报库错误；写长标题的提示词更容易撞上。
     String tooLong = "背诵".repeat(400);
-    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+    var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "语文", tooLong, "背诵课文", "部编版", "2026-10-17", 20, "背诵", 0.9))));
@@ -508,7 +555,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
 
   @Test
   void conversionFallsBackWhenPrimitiveFieldsAreAbsentOrNull() {
-    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+    var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "语文", "背诵第12课", "背诵课文", null, "2026-10-14", null, null, null))));
@@ -536,7 +583,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
 
   @Test
   void conversionReportsRejectedAssignmentsAndClearsLegacyDuplicateFields() {
-    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+    var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "科学", "观察植物", "观察并记录", "", "今天", 20, "观察植物", 0.9),
@@ -623,7 +670,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
 
   @Test
   void missingAndOutOfRangeDurationsUseDeterministicSafeValues() {
-    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+    var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "语文", "书写汉字", "书写汉字一行", "", null, null,
