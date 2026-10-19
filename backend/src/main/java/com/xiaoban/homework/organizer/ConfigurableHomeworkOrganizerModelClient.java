@@ -168,6 +168,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     StructuredResult parsed = readStructured(output);
     if (parsed == null || parsed.assignments() == null || parsed.assignments().size() > 30) return Optional.empty();
     ConversionResult converted = toCandidates(parsed, glossary);
+    if (converted.sourceCount() == 0) return Optional.empty();
     // Do not turn uncertain rows into published tasks, nor drop rows silently.
     // An explicitly empty AI result is valid; loss of any non-null returned row is not.
     if (converted.sourceCount() > 0 &&
