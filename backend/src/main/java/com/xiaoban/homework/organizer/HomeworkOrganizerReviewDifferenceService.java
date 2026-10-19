@@ -128,7 +128,10 @@ public class HomeworkOrganizerReviewDifferenceService {
     }
     changes.addAll(structureCandidates(originals, published));
     if (changes.isEmpty()) return new Result(0, 0);
-    return save(familyId, studentId, new Review(request.batchId(), teacher, changes));
+    // Original teacher identity was verified when the immutable AI snapshot was created.
+    // Do not re-validate mutable teacher roster after publish: a later removal must
+    // not prevent queued reconciliation from finishing.
+    return persist(familyId, studentId, request.batchId(), teacher, changes);
   }
 
   /**
@@ -186,9 +189,14 @@ public class HomeworkOrganizerReviewDifferenceService {
   @Transactional
   public Result save(UUID familyId, String studentId, Review request) {
     String teacher = teachers.verifiedTeacher(familyId, studentId, request.teacherName());
+    return persist(familyId, studentId, request.batchId(), teacher, request.differences());
+  }
+
+  private Result persist(UUID familyId, String studentId, String batchId,
+      String teacher, List<Difference> differences) {
     int saved = 0;
     int ignored = 0;
-    for (Difference change : request.differences()) {
+    for (Difference change : differences) {
       String type = change.changeType().trim();
       String field = change.fieldName().trim();
       if (!TYPES.contains(type) || !FIELDS.contains(field)
@@ -199,7 +207,7 @@ public class HomeworkOrganizerReviewDifferenceService {
         throw new ApiExceptions.BadRequest("作业纠错差异类型不合法");
       }
       boolean exists = repository.existsByFamilyIdAndStudentIdAndBatchIdAndCandidateIdAndChangeTypeAndFieldName(
-          familyId, studentId, request.batchId(), change.candidateId(), type, field);
+          familyId, studentId, batchId, change.candidateId(), type, field);
       if (exists) {
         ignored++;
         continue;
@@ -208,7 +216,7 @@ public class HomeworkOrganizerReviewDifferenceService {
       entity.id = UUID.randomUUID();
       entity.familyId = familyId;
       entity.studentId = studentId;
-      entity.batchId = request.batchId();
+      entity.batchId = batchId;
       entity.candidateId = change.candidateId();
       entity.teacherName = teacher;
       entity.changeType = type;
