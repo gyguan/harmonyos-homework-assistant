@@ -39,5 +39,10 @@ const image = await api.organizeImage(input, 'private-local-image');
 assert.equal(image.candidates.length, 1);
 assert.ok(image.candidates[0].sourceEvidence.reviewNotice.length > 0);
 assert.equal(image.recognizedText, ''); // no fabricated full transcription from candidate excerpt
+response = { mode: 'AI_IMAGE', recognizedText: '口算20题', assignments: [candidate], needsReview: true,
+  qualityFlags: [{ code: 'IMAGE_ORIENTATION_UNCERTAIN', sourceBlockIds: [], assignmentIndexes: [] }] };
+const orientationWarning = await api.organizeImage(input, 'private-local-image');
+assert.equal(orientationWarning.candidates.length, 1);
+assert.ok(orientationWarning.candidates[0].sourceEvidence.reviewNotice.includes('核对图片方向'));
 assert.ok(calls.every(call => call[1].includes('/students/student-one/')));
 console.log('ORGANIZER_QUALITY_CONTRACT_PASS: warnings, source location, legacy fields, image evidence gap, student scope');

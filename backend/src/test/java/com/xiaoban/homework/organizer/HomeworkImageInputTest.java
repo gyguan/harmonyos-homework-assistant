@@ -58,6 +58,25 @@ class HomeworkImageInputTest {
         eq(student), eq("图片"), startsWith("data:image/png;base64,"), eq("数学口算20题"), anyString());
   }
 
+  @Test
+  void optionalOrientationWarningSurvivesSuccessfulModelAndSnapshotCapture() throws Exception {
+    var students=mock(StudentRepository.class); var model=mock(HomeworkOrganizerModelClient.class);
+    var snapshots=mock(HomeworkOrganizerAiSnapshotService.class); var evidence=mock(HomeworkSourceEvidenceService.class);
+    var family=UUID.randomUUID(); StudentEntity student=new ConfigurableHomeworkOrganizerModelClientTest.TestStudent(); student.familyId=family;
+    when(students.findById("student-1")).thenReturn(Optional.of(student)); when(model.imageAvailable()).thenReturn(true);
+    var task=new HomeworkOrganizerDtos.Candidate("数学","口算20题","口算20题","P1","今天",10,"口算20题",.9,"","","",0,"");
+    when(model.organizeImage(any(),any(),any(),any(),any())).thenReturn(Optional.of(new HomeworkOrganizerDtos.ImageResponse(List.of(task),"AI_IMAGE","口算20题")));
+    var service=new HomeworkOrganizerService(students,model,null,snapshots,evidence);
+    byte[] original=Base64.getDecoder().decode(png());
+    byte[] invalid=HomeworkImageOrientationTest.pngWithExif(original,new byte[0]);
+    var request=new HomeworkOrganizerDtos.ImageRequest(Base64.getEncoder().encodeToString(invalid),"image/png","图片",null,"","orientation-warning");
+    var actual=service.organizeImage(family,"student-1",request);
+    assertEquals(1,actual.assignments().size()); assertTrue(actual.needsReview());
+    assertTrue(actual.qualityFlags().stream().anyMatch(f->f.code().equals("IMAGE_ORIENTATION_UNCERTAIN")));
+    verify(model,times(1)).organizeImage(eq(student),any(),eq("data:image/png;base64,"+Base64.getEncoder().encodeToString(original)),isNull(),anyString());
+    verify(evidence).capture(eq(family),eq("student-1"),eq("orientation-warning"),eq(""),anyList(),isNull(),eq(actual.qualityFlags()),eq(true),any());
+  }
+
   static String png() throws Exception {
     var bytes = new ByteArrayOutputStream();
     ImageIO.write(new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB), "png", bytes);

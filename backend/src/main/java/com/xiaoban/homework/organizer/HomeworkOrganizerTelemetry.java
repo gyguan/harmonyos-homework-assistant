@@ -83,7 +83,14 @@ final class HomeworkOrganizerTelemetry implements AutoCloseable {
     if (t != null) t.data.put("imagePreparation", Map.of("version", HomeworkImageInput.PROCESSING_VERSION,
         "width", image.width(), "height", image.height(), "outputWidth", image.outputWidth(),
         "outputHeight", image.outputHeight(), "orientation", image.orientation(),
-        "inputBytes", image.inputBytes(), "outputBytes", image.outputBytes()));
+        "inputBytes", image.inputBytes(), "outputBytes", image.outputBytes(), "orientationStatus", image.orientationStatus()));
+  }
+  static void imageOrientationUncertain(java.util.List<HomeworkOrganizerDtos.QualityFlag> flags) {
+    var t = CURRENT.get();
+    if (t == null) return;
+    flag("IMAGE_ORIENTATION_UNCERTAIN");
+    if (!"HIGH".equals(t.data.get("riskLevel"))) t.data.put("riskLevel", "MEDIUM");
+    t.data.put("finalQualityFlags", flags.stream().map(HomeworkOrganizerDtos.QualityFlag::code).distinct().toList());
   }
   static void visualCrop(HomeworkImageCrop.Crop crop) {
     var t = CURRENT.get();

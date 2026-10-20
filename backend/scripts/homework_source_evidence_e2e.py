@@ -272,9 +272,28 @@ def main():
             # Recompute CRC so the invalid orientation (not CRC alone) is exercised.
             bad[33+8+26:33+12+26] = struct.pack('>I',zlib.crc32(bad[33+4:33+8+26])&0xffffffff)
             calls_before = CALLS
+            uncertain = expect(http(base,'POST',route+'/organize-image',token=token,
+                                   payload=dict(imageBase64=base64.b64encode(bad).decode(),contentType='image/png',importId='uncertain-'+run)),(200,),'invalid optional orientation remains usable').json()
+            require(CALLS-calls_before == 1 and IMAGE_SIZES[-1] == (7,3),'optional metadata added inference or rotated untrusted orientation')
+            require(uncertain['needsReview'] and any(flag['code'] == 'IMAGE_ORIENTATION_UNCERTAIN' for flag in uncertain['qualityFlags']),'uncertain orientation hidden from parent')
+            saved_uncertain=expect(http(base,'GET',route+'/source-evidence/uncertain-'+run,token=token),(200,),'persisted orientation warning').json()
+            require(saved_uncertain['needsReview'] and saved_uncertain['qualityFlags'] == uncertain['qualityFlags'],'orientation warning not persisted')
+            calls_before = CALLS
+            uncertain_cached=expect(http(base,'POST',route+'/organize-image',token=token,
+                                         payload=dict(imageBase64=base64.b64encode(bad).decode(),contentType='image/png',importId='uncertain-cached-'+run)),(200,),'cached inference retains input warning').json()
+            require(CALLS == calls_before and uncertain_cached['needsReview'] and uncertain_cached['qualityFlags'] == uncertain['qualityFlags'],'cached response hid orientation uncertainty')
+            # Complete IFD0 entry with omitted IFD1 pointer is common in minimal exports.
+            short_tiff=tiff[:22]
+            short_chunk=struct.pack('>I',len(short_tiff))+kind+short_tiff+struct.pack('>I',zlib.crc32(kind+short_tiff)&0xffffffff)
+            minimal=upright[:33]+short_chunk+upright[33:]
+            calls_before = CALLS
             expect(http(base,'POST',route+'/organize-image',token=token,
-                        payload=dict(imageBase64=base64.b64encode(bad).decode(),contentType='image/png')),(400,),'invalid orientation rejected')
-            require(CALLS == calls_before,'malformed orientation reached provider')
+                        payload=dict(imageBase64=base64.b64encode(minimal).decode(),contentType='image/png')),(200,),'minimal orientation entry')
+            require(CALLS-calls_before == 1 and IMAGE_SIZES[-1] == (3,7),'minimal complete orientation lost')
+            calls_before = CALLS
+            expect(http(base,'POST',route+'/organize-image',token=token,
+                        payload=dict(imageBase64=base64.b64encode(upright[:40]).decode(),contentType='image/png')),(400,),'damaged image pixels still rejected')
+            require(CALLS == calls_before,'broken image reached provider')
             # Reboot keeps independent evidence. Read using the same persisted session.
             proc.terminate(); proc.wait(timeout=30)
             proc = start_backend(log)
@@ -282,6 +301,8 @@ def main():
             require(restored == saved, 'evidence changed across restart')
             visual_restored=expect(http(base,'GET',route+'/source-evidence/'+vision_batch,token=token),(200,),'visual audit restart').json()
             require(visual_restored == visual_saved,'visual evidence revision changed across restart')
+            restored_uncertain=expect(http(base,'GET',route+'/source-evidence/uncertain-'+run,token=token),(200,),'orientation warning restart').json()
+            require(restored_uncertain == saved_uncertain,'orientation warning changed across restart')
         contents = log_path.read_text()
         require('[AI-PAYLOAD]' not in contents, 'organizer leaked provider payload in debug mode')
         require('语文朗读13页' not in contents and '数学口算20题' not in contents, 'source content leaked to logs')

@@ -76,21 +76,60 @@ class HomeworkImageOrientationTest {
     assertEquals("data:image/jpeg;base64,"+Base64.getEncoder().encodeToString(jpeg),prepare(jpeg,"image/jpeg").dataUrl());
     assertEquals(1,prepare(jpeg,"image/jpeg").orientation());
   }
-  @Test void invalidTruncatedOverflowingDuplicateMetadataAndBadCrcNeverReachProvider() throws Exception {
+  private void ignoredExifKeepsOriginalPixels(byte[] input, byte[] clean, String type) throws Exception {
+    var result = prepare(input, type);
+    assertEquals("IGNORED_INVALID", result.orientationStatus());
+    assertEquals(1, result.orientation());
+    assertArrayEquals(clean, Base64.getDecoder().decode(result.dataUrl().split(",",2)[1]));
+    var expected = ImageIO.read(new ByteArrayInputStream(clean));
+    var actual = decode(result);
+    assertEquals(expected.getWidth(), actual.getWidth()); assertEquals(expected.getHeight(), actual.getHeight());
+    for (int y=0; y<expected.getHeight(); y++) for (int x=0; x<expected.getWidth(); x++)
+      assertEquals(expected.getRGB(x,y), actual.getRGB(x,y));
+  }
+  @Test void malformedOptionalPngExifIsStrippedWithoutBlockingOrReencodingPixels() throws Exception {
     byte[] png=encoded(sample(),"PNG");
-    for(int value: new int[]{0,9,65535}) assertThrows(ApiExceptions.BadRequest.class,()->prepare(pngWithExif(png,tiff(value,ByteOrder.BIG_ENDIAN)),"image/png"));
-    for(int length=0;length<26;length++) {
-      byte[] shortTiff=Arrays.copyOf(tiff(6,ByteOrder.BIG_ENDIAN),length);
-      assertThrows(ApiExceptions.BadRequest.class,()->prepare(pngWithExif(png,shortTiff),"image/png"));
-    }
+    for(int value: new int[]{0,9,65535}) ignoredExifKeepsOriginalPixels(pngWithExif(png,tiff(value,ByteOrder.BIG_ENDIAN)),png,"image/png");
+    for(int length=0;length<22;length++)
+      ignoredExifKeepsOriginalPixels(pngWithExif(png,Arrays.copyOf(tiff(6,ByteOrder.BIG_ENDIAN),length)),png,"image/png");
     for(int field: new int[]{4,8,12,14}) {
       byte[] corrupt=tiff(6,ByteOrder.BIG_ENDIAN); corrupt[field]=(byte)255;
-      assertThrows(ApiExceptions.BadRequest.class,()->prepare(pngWithExif(png,corrupt),"image/png"));
+      ignoredExifKeepsOriginalPixels(pngWithExif(png,corrupt),png,"image/png");
     }
     byte[] twice=pngWithExif(pngWithExif(png,tiff(2,ByteOrder.BIG_ENDIAN)),tiff(6,ByteOrder.BIG_ENDIAN));
-    assertThrows(ApiExceptions.BadRequest.class,()->prepare(twice,"image/png"));
+    ignoredExifKeepsOriginalPixels(twice,png,"image/png");
     byte[] crc=pngWithExif(png,tiff(6,ByteOrder.BIG_ENDIAN)); crc[33+8+26]^=1;
-    assertThrows(ApiExceptions.BadRequest.class,()->prepare(crc,"image/png"));
+    ignoredExifKeepsOriginalPixels(crc,png,"image/png");
+  }
+  @Test void malformedJpegExifDoesNotRecompressPhotoOrRemoveOtherAppSegments() throws Exception {
+    byte[] jpeg=encoded(new BufferedImage(3,2,BufferedImage.TYPE_INT_RGB),"JPEG");
+    var xmp=new ByteArrayOutputStream(); xmp.write(jpeg,0,2);
+    byte[] contents="http://ns.adobe.com/xap/1.0/\0metadata".getBytes(java.nio.charset.StandardCharsets.US_ASCII);
+    xmp.write(new byte[]{(byte)255,(byte)0xe1}); xmp.write(ByteBuffer.allocate(2).putShort((short)(contents.length+2)).array());
+    xmp.write(contents); xmp.write(jpeg,2,jpeg.length-2);
+    byte[] original=xmp.toByteArray();
+    for(byte[] metadata:List.of(new byte[0],Arrays.copyOf(tiff(6,ByteOrder.BIG_ENDIAN),16),tiff(0,ByteOrder.LITTLE_ENDIAN)))
+      ignoredExifKeepsOriginalPixels(jpegWithExif(original,metadata),original,"image/jpeg");
+    byte[] twice=jpegWithExif(jpegWithExif(original,tiff(6,ByteOrder.BIG_ENDIAN)),tiff(8,ByteOrder.BIG_ENDIAN));
+    ignoredExifKeepsOriginalPixels(twice,original,"image/jpeg");
+  }
+  @Test void completeOrientationWithoutUnrelatedIfd1PointerStillRotatesCorrectly() throws Exception {
+    byte[] png=encoded(sample(),"PNG");
+    for(var order:List.of(ByteOrder.LITTLE_ENDIAN,ByteOrder.BIG_ENDIAN)) for(int length=22;length<26;length++) {
+      var result=prepare(pngWithExif(png,Arrays.copyOf(tiff(6,order),length)),"image/png");
+      assertEquals(6,result.orientation()); assertEquals("VALID",result.orientationStatus());
+      assertEquals(2,result.outputWidth()); assertEquals(3,result.outputHeight());
+    }
+  }
+  @Test void pngExifIdentifierAndTrailingExporterDataDoNotInvalidateAValidImage() throws Exception {
+    byte[] png=encoded(sample(),"PNG");
+    var prefixed=new ByteArrayOutputStream(); prefixed.write(new byte[]{'E','x','i','f',0,0}); prefixed.write(tiff(8,ByteOrder.BIG_ENDIAN));
+    assertEquals(8,prepare(pngWithExif(png,prefixed.toByteArray()),"image/png").orientation());
+    byte[] trailer=Arrays.copyOf(png,png.length+20); Arrays.fill(trailer,png.length,trailer.length,(byte)0xff);
+    var result=prepare(trailer,"image/png");
+    assertEquals("ABSENT",result.orientationStatus());
+    assertArrayEquals(trailer,Base64.getDecoder().decode(result.dataUrl().split(",",2)[1]));
+    assertThrows(ApiExceptions.BadRequest.class,()->prepare(Arrays.copyOf(png,40),"image/png"));
   }
   @Test void normalizedOutputBudgetIsHardAndDoesNotFallBackToJpegOrDownscale() {
     var random=new java.util.Random(591); var image=new BufferedImage(32,32,BufferedImage.TYPE_INT_ARGB);
