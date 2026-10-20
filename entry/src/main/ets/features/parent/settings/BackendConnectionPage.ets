@@ -839,18 +839,28 @@ export struct BackendConnectionPage {
       Scroll() {
         Column() {
           Column({ space: 18 }) {
-            Column() {
-              this.FamilySettingsSection();
-              Divider().color(AppTheme.DIVIDER);
-              this.ParentAccessSettingsSection();
-              Divider().color(AppTheme.DIVIDER);
-              this.TutorRulesSettingsSection();
-              Divider().color(AppTheme.DIVIDER);
-              this.DataSyncSettingsSection();
+            if (this.embeddedInDeepPage) {
+              Column() {
+                this.CloudPanel();
+              }
+              .width('100%')
+              .padding(16)
+              .backgroundColor(AppTheme.SURFACE)
+              .borderRadius(AppTheme.CARD_RADIUS);
+            } else {
+              Column() {
+                this.FamilySettingsSection();
+                Divider().color(AppTheme.DIVIDER);
+                this.ParentAccessSettingsSection();
+                Divider().color(AppTheme.DIVIDER);
+                this.TutorRulesSettingsSection();
+                Divider().color(AppTheme.DIVIDER);
+                this.DataSyncSettingsSection();
+              }
+              .width('100%')
+              .backgroundColor(AppTheme.SURFACE)
+              .borderRadius(AppTheme.CARD_RADIUS);
             }
-            .width('100%')
-            .backgroundColor(AppTheme.SURFACE)
-            .borderRadius(AppTheme.CARD_RADIUS);
 
             if (this.message.length > 0) {
               Text(this.message).width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
