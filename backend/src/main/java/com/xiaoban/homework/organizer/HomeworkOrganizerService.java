@@ -105,6 +105,13 @@ public class HomeworkOrganizerService {
         .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI图片解析失败，请确认模型支持图片"));
     long modelMs = elapsedMs(modelStarted);
 
+    if ("IGNORED_INVALID".equals(preparedImage.orientationStatus())) {
+      var flags = new java.util.ArrayList<>(result.qualityFlags());
+      HomeworkSourceEvidence.add(flags, "IMAGE_ORIENTATION_UNCERTAIN", List.of(), List.of());
+      HomeworkOrganizerTelemetry.imageOrientationUncertain(flags);
+      result = new HomeworkOrganizerDtos.ImageResponse(result.assignments(), result.mode(), result.recognizedText(),
+          result.sourceDocument(), List.copyOf(flags), true, result.experiences());
+    }
     List<HomeworkOrganizerDtos.Candidate> normalized =
         normalizeDefaultTaskDates(result.assignments(), result.recognizedText());
     if (snapshots != null) {

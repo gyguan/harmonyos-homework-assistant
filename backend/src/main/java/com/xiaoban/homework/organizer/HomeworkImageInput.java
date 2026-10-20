@@ -19,9 +19,9 @@ final class HomeworkImageInput {
   static final int MAX_BYTES = 4 * 1024 * 1024;
   static final int MAX_BASE64_CHARS = 4 * ((MAX_BYTES + 2) / 3);
 
-  static final String PROCESSING_VERSION = "orientation-v1";
+  static final String PROCESSING_VERSION = "orientation-v2";
   record Prepared(String dataUrl, String originalHash, int width, int height, int outputWidth,
-      int outputHeight, int orientation, int inputBytes, int outputBytes) {}
+      int outputHeight, int orientation, int inputBytes, int outputBytes, String orientationStatus) {}
 
   private HomeworkImageInput() {}
 
@@ -48,6 +48,7 @@ final class HomeworkImageInput {
     byte[] payload = bytes;
     String payloadType = contentType;
     int width, height, orientation;
+    String orientationStatus;
     try (var input = new MemoryCacheImageInputStream(new ByteArrayInputStream(bytes))) {
       var readers = ImageIO.getImageReaders(input);
       if (!readers.hasNext()) throw new ApiExceptions.BadRequest("图片格式不合法");
@@ -65,14 +66,18 @@ final class HomeworkImageInput {
         // Decode after dimension checks so a truncated or malformed image cannot reach the provider.
         BufferedImage decoded = reader.read(0);
         if (decoded == null) throw new ApiExceptions.BadRequest("图片内容不合法");
-        orientation = HomeworkImageOrientation.read(bytes, contentType);
-        if (orientation != 1) {
-          var upright = HomeworkImageOrientation.upright(decoded, orientation);
-          try { payload = encodePng(upright, MAX_BYTES); }
-          finally { upright.flush(); }
-          payloadType = "image/png";
-        }
-        decoded.flush();
+        try {
+          var metadata = HomeworkImageOrientation.inspect(bytes, contentType);
+          orientation = metadata.orientation();
+          orientationStatus = metadata.status();
+          payload = metadata.bytes();
+          if (orientation != 1) {
+            var upright = HomeworkImageOrientation.upright(decoded, orientation);
+            try { payload = encodePng(upright, MAX_BYTES); }
+            finally { upright.flush(); }
+            payloadType = "image/png";
+          }
+        } finally { decoded.flush(); }
       } finally {
         reader.dispose();
       }
@@ -86,7 +91,7 @@ final class HomeworkImageInput {
     catch (java.security.NoSuchAlgorithmException impossible) { throw new IllegalStateException(impossible); }
     return new Prepared("data:" + payloadType + ";base64," + Base64.getEncoder().encodeToString(payload),
         originalHash, width, height, orientation >= 5 ? height : width, orientation >= 5 ? width : height,
-        orientation, bytes.length, payload.length);
+        orientation, bytes.length, payload.length, orientationStatus);
   }
 
   /** Explicit memory-only output with a hard limit before a cache buffer can grow past it. */

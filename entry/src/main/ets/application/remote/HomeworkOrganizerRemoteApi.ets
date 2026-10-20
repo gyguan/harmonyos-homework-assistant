@@ -382,6 +382,7 @@ export class HomeworkOrganizerRemoteApi {
         if (flag.code === 'POSSIBLE_OMISSION') reason = '可能遗漏作业';
         if (flag.code === 'UNSUPPORTED_NUMBER' || flag.code === 'UNSUPPORTED_DATE') reason = '数量、页码或日期需要核对';
         if (flag.code === 'UNREADABLE_SOURCE') reason = '有看不清的原文';
+        if (flag.code === 'IMAGE_ORIENTATION_UNCERTAIN') reason = '图片方向信息无法确认，请核对图片方向和作业内容';
         if (flag.code === 'TASK_WITHOUT_EVIDENCE' || flag.code === 'UNKNOWN_SOURCE_REFERENCE') reason = '这项作业缺少可核对的原文';
         if (flag.code.indexOf('REVIEW_') === 0) reason = 'AI复核未能确认，请核对后发布';
         let excerpt: string = '';
