@@ -147,3 +147,26 @@ manifest 格式参考 `scripts/fixtures/organizer_benchmark_manifest.example.jso
 ### 文字复核的差异留痕
 
 文字风险复核输出升级为 `reviewVersion=2`，新增任务与修正一样必须给出非空、最多 300 字的模型理由。第二轮通过原有范围及质量检查后，`SourceDocument` schema 3 的 `revisions` 保存 `TEXT_RISK_REVIEW`：逐块原始/复核分类、原始/修改任务、索引及模型理由；来源文字和定位始终不改写。跨块修改在相关块下分别关联同一索引，未涉及的来源不复制进审计。旧 schema 2 读取仍默认 revisions 为空。旧模型复核格式、缺理由、失败或风险未下降时保留初稿，不持久化半成品审计，不增加第三次调用。沿用既有家庭/学生/批次证据接口和私有存储，不另建表，也不将正文或理由写入日志。
+
+### 从现有批次建立人工核验金标（#582 复用）
+
+`scripts/prepare_homework_organizer_gold.py` 提供 collect → draft → inspect → verify → check。只读已有家庭会话的 source-evidence / ai-snapshots / assignments / review-differences 接口，不另建反馈表、Outbox 或标注后台，不调用模型、不写生产数据库。凭据复用 `ORGANIZER_EVAL_TOKEN` 环境变量；远程仅 HTTPS，本机允许 HTTP；拒绝重定向避免转发凭据。输出新建文件、POSIX 权限 0600、不覆盖现有文件或符号链接，控制台只输出状态码/计数。Windows 仍需使用家庭私有目录的 ACL。
+
+1. 由已授权家长保存实际批量发布响应为 `.organizer-eval/publication.json`。它给出完整 candidate ID 集合；不能从仅保留最新 100 条的差异历史猜测所有任务或“零修改”。
+2. 导出该批次现有证据、AI 初稿、实际发布任务的当前值和可用差异。任务可能在发布后继续编辑，因此这是采集时状态，并非历史发布快照。来源真实性和完整性仍需人工确认。
+3. 生成 DRAFT，手工脱敏老师原文、图片和任务。工具不自动遮挡图片、不按姓名正则改正文，避免破坏数量、页码或省略作业；人工确认脱敏后仍保持同样业务含义。teacherKey/reviewerKey 用无个人信息的 ASCII 别名，teacherName 如需使用应与隔离测试学生的老师配置一致。图片必须补入真实脱敏资产路径和正确 MIME，不以转录文本代替原图。不要上传私有 bundle、会话 token、原图或真实个人信息到 Git。
+4. 以发布任务为标注参考，人工增删/拆合到完整可执行任务集合，填写每项 keywords（仅匹配代理）、所有关键字段 subject/title/instruction/textbookRef/taskDate/expectedMinutes，以及独立 sourceEvidenceTexts。程序不从 AI 摘录自动认定证据；文字片段必须逐字出现在脱敏原文。图片片段须人工对照实际图片。确认无需任务的真实来源可以显式标注 expected=[]。
+5. 编辑完成后 inspect 生成全为 false 的核验声明模板和精确 annotationDigest/inputFingerprint。家长逐项核验真实老师来源、完整任务、老师归属、关键字段、来源证据及隐私，再填写匿名 reviewerKey、含时区的 reviewedAt 并逐项设 true。verify 校验通过才生成 VERIFIED 新文件；输入、图片字节或标注在 inspect 后变化均须重新审核。声明是人工记录，不是程序证明真实来源或正确性。禁止为演示/Mock 样本填写真实老师声明。
+6. check 再次核验冻结文件及图片字节；回放和原 evaluator/benchmark 直接使用同一格式。对于工具生成的 VERIFIED，评测器会拒绝修改后的标注或 inputFingerprint 不同的预测；既有手工 VERIFIED 语料保持兼容，不声称其具有新审核回执。
+
+以下命令每条均为单行（PowerShell / CMD 均可使用；先在当前终端安全配置环境变量，勿把 token 写入命令、文件或报告）：
+
+```text
+python scripts/prepare_homework_organizer_gold.py collect --base-url http://localhost:8080 --student-id EVAL_STUDENT --batch-id IMPORT_BATCH --publication .organizer-eval/publication.json --output .organizer-eval/private-bundle.json
+python scripts/prepare_homework_organizer_gold.py draft --bundle .organizer-eval/private-bundle.json --case-id teacher-case-001 --teacher-key teacher-a --output .organizer-eval/draft.json
+python scripts/prepare_homework_organizer_gold.py inspect --fixtures .organizer-eval/draft.json --output .organizer-eval/reviews.json
+python scripts/prepare_homework_organizer_gold.py verify --fixtures .organizer-eval/draft.json --reviews .organizer-eval/reviews.json --output .organizer-eval/verified.json
+python scripts/prepare_homework_organizer_gold.py check --fixtures .organizer-eval/verified.json
+```
+
+输出文件同名时会拒绝覆盖。复核变更后换新文件名；verify 输出保持在 fixtures 同目录，避免相对图片路径变化。collect 需要已有实际发布响应；历史响应丢失时，不推断发布集合，改用现有人工语料格式逐项核对。差异没有记录不能视作家长已确认；一次发布也不会自动计入金标或“一次确认无实质修改率”。新增测试和真实 PostgreSQL E2E 只验证采集、边界和人工升级协议；仓库示例仍全部 DRAFT，没有增加虚构 VERIFIED 数量。

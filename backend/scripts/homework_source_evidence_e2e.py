@@ -7,6 +7,8 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import tempfile
+import sys
 import threading
 import time
 import uuid
@@ -187,6 +189,33 @@ def main():
             saved_review = expect(http(base,'GET',route+'/source-evidence/text-review-'+run,token=token),(200,),'persisted text review audit').json()
             require(saved_review['sourceDocument'] == reviewed['sourceDocument'],'text review audit not persisted with evidence')
             expect(http(base,'GET',f'/api/v1/students/{other}/homework/source-evidence/text-review-'+run,token=token),(404,),'sibling review audit isolation')
+            # Reuse the REAL publish/snapshot/source routes to collect a private DRAFT annotation aid.
+            # No synthetic fixture in this E2E is promoted to real teacher gold.
+            published_items = []
+            for index, task in enumerate(reviewed['assignments'], 1):
+                candidate_id = 'ai-text-review-' + run + '-' + str(index)
+                fields = {key: task[key] for key in ('subject','title','instruction','textbookRef','taskDate','expectedMinutes','sourceExcerpt')}
+                published_items.append(dict(candidateId=candidate_id,assignment=dict(fields,id='a-published-'+candidate_id,status='NOT_STARTED')))
+            publication = expect(http(base,'POST',f'/api/v1/students/{student}/assignments/batch',token=token,
+                                      payload=dict(batchId='text-review-'+run,items=published_items)),(200,),'publish gold intake source').json()
+            with tempfile.TemporaryDirectory() as temp:
+                root = Path(temp)
+                receipt = root/'publication.json'
+                receipt.write_text(json.dumps(publication),encoding='utf-8')
+                bundle = root/'private-bundle.json'
+                fixtures = root/'draft.json'
+                command = [sys.executable,'scripts/prepare_homework_organizer_gold.py']
+                collection = subprocess.run(command+['collect','--base-url',base,'--student-id',student,'--batch-id','text-review-'+run,
+                                                      '--publication',str(receipt),'--output',str(bundle)],
+                                            env=dict(os.environ,ORGANIZER_EVAL_TOKEN=token),capture_output=True,text=True)
+                require(collection.returncode == 0,'private gold collection failed')
+                require(len(json.loads(bundle.read_text(encoding='utf-8'))['published']) == 2,'collection lost published tasks')
+                prepared = subprocess.run(command+['draft','--bundle',str(bundle),'--case-id','e2e-draft','--teacher-key','anonymous-teacher',
+                                                    '--output',str(fixtures)],capture_output=True,text=True)
+                require(prepared.returncode == 0,'private draft preparation failed')
+                gold_case = json.loads(fixtures.read_text(encoding='utf-8'))['cases'][0]
+                require(gold_case['reviewStatus'] == 'DRAFT' and len(gold_case['expected']) == 2,'publication falsely promoted to gold')
+                require(all(not item['keywords'] and not item['sourceEvidenceTexts'] for item in gold_case['expected']),'model output automatically became annotation')
             REVIEW_REPLY = None
             REPLY = dict(schemaVersion=2, sourceBlocks=[block('i1', '数学口算20题', image=True), block('i2', '语文朗读13页', image=True)], assignments=[candidate('i1')])
             image = expect(http(base, 'POST', route + '/organize-image', token=token,

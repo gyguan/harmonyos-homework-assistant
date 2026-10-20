@@ -5,6 +5,7 @@ Only cases with reviewStatus=VERIFIED are scored. Draft examples can document
 edge cases, but must never be represented as teacher-validated ground truth.
 The title/instruction keyword metric is a transparent proxy, not semantic accuracy.
 """
+from organizer_gold import validate_receipt
 import argparse
 import json
 import hashlib
@@ -64,6 +65,7 @@ def evaluate(fixtures, predictions):
     prompt_versions = set()
     for case in verified:
         prediction = by_id[case["id"]]
+        validate_receipt(case, prediction=prediction)
         outputs = prediction.get("assignments", [])
         gold = case["expected"]
         if not isinstance(outputs, list) or not isinstance(gold, list):
