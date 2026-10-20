@@ -52,11 +52,15 @@ public final class AiCallMetrics implements AutoCloseable {
   }
   public static Usage usage(JsonNode root) {
     var usage = root.path("usage");
+    Long cached = number(usage.path("input_tokens_details"), "cached_tokens", "cached_tokens");
+    if (cached == null) cached = number(usage.path("prompt_tokens_details"), "cached_tokens", "cached_tokens");
+    // DeepSeek documents an actual root usage counter; never infer hits from cache misses.
+    // https://api-docs.deepseek.com/guides/kv_cache/
+    Long rootCached = number(usage, "prompt_cache_hit_tokens", "prompt_cache_hit_tokens");
+    if (cached == null) cached = rootCached;
+    else if (rootCached != null && !cached.equals(rootCached)) cached = null;
     return new Usage(number(usage, "input_tokens", "prompt_tokens"),
-        number(usage, "output_tokens", "completion_tokens"),
-        number(usage.path("input_tokens_details"), "cached_tokens", "cached_tokens") != null
-            ? number(usage.path("input_tokens_details"), "cached_tokens", "cached_tokens")
-            : number(usage.path("prompt_tokens_details"), "cached_tokens", "cached_tokens"),
+        number(usage, "output_tokens", "completion_tokens"), cached,
         number(usage.path("input_tokens_details"), "image_tokens", "image_tokens") != null
             ? number(usage.path("input_tokens_details"), "image_tokens", "image_tokens")
             : number(usage.path("prompt_tokens_details"), "image_tokens", "image_tokens"));

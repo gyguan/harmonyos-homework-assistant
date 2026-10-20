@@ -51,4 +51,15 @@ class AiCallMetricsTest {
     }
   }
 
+  @Test void deepSeekActualRootCacheCounterSupportsZeroButNeverEstimatesMissingOrConflictingUsage() {
+    for(long value : new long[]{0,4}) {
+      var result=AiCallMetrics.usage(json.readTree("{\"usage\":{\"prompt_tokens\":12,\"prompt_cache_hit_tokens\":"+value+",\"prompt_cache_miss_tokens\":8}}"));
+      assertEquals(value,result.cachedTokens());
+    }
+    assertNull(AiCallMetrics.usage(json.readTree("{\"usage\":{\"prompt_tokens\":12,\"prompt_cache_miss_tokens\":8}}")).cachedTokens());
+    assertNull(AiCallMetrics.usage(json.readTree("{\"usage\":{\"prompt_tokens_details\":{\"cached_tokens\":3},\"prompt_cache_hit_tokens\":4}}")).cachedTokens());
+    for(String invalid : java.util.List.of("-1","1.5","true","\"4\"","null"))
+      assertNull(AiCallMetrics.usage(json.readTree("{\"usage\":{\"prompt_cache_hit_tokens\":"+invalid+"}}")).cachedTokens());
+  }
+
 }

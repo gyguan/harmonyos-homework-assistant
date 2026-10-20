@@ -107,7 +107,7 @@ JPEG APP1 / PNG eXIf 的 IFD0 Orientation 采用 CIPA DC-008 的 1–8 方向约
 
 成功视觉复核返回 SourceDocument schemaVersion=3，增加可选 `revisions`：保存该来源校正前/后的独立文字、原定位、理由及候选差异。未校正的来源完全不动，补充文字原文不变；旧 schema=2/历史 JSON 缺 revisions 时默认空列表。沿用 V43 私有证据 JSON 与当前事务，不新建存储或迁移，不保存原图/局部像素。审计仍按 family/student/import 隔离。`ORGANIZER_IMAGE_VISUAL_REVIEW_ENABLED=false` 可关闭此分支，保留初稿风险提示；开关也参与缓存键。
 
-测量增加 `imageReviewPreparation`、局部宽高/字节数、实际第二轮 provider call；provider 若明确返回 `input_tokens_details.image_tokens` 或 `prompt_tokens_details.image_tokens` 才累计 `imageTokensIn`，缺失/部分缺失为 unavailable，不按像素估算。`cachedTokensIn` 同样取实际细分 usage。图片准备/裁剪本身不产生 AI Token。
+测量增加 `imageReviewPreparation`、局部宽高/字节数、实际第二轮 provider call；provider 若明确返回 `input_tokens_details.image_tokens` 或 `prompt_tokens_details.image_tokens` 才累计 `imageTokensIn`，缺失/部分缺失为 unavailable，不按像素估算。`cachedTokensIn` 同样取实际细分 usage，也支持 DeepSeek 官方根字段 `usage.prompt_cache_hit_tokens`（https://api-docs.deepseek.com/guides/kv_cache/）；不以 miss 或总量倒推缓存命中，字段冲突时为 unavailable。图片准备/裁剪本身不产生 AI Token。
 
 这些测试只证明几何、协议、调用上限、范围、风险和隔离。真实裁剪是否提高小字/手写/表格召回，必须在固定 VERIFIED 图片金标上对比，不据 fake-provider 通过而宣称准确率改善。
 
