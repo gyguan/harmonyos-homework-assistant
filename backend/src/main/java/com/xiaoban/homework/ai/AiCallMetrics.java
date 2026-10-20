@@ -10,7 +10,11 @@ public final class AiCallMetrics implements AutoCloseable {
   private final AiCallMetrics previous;
   private final List<Call> calls = new ArrayList<>();
   public record Usage(Long tokensIn, Long tokensOut, Long cachedTokens) {}
-  public record Call(String stage, String model, long elapsedMs, boolean success, Usage usage) {}
+  public record Call(String stage, String model, long elapsedMs, boolean success, Usage usage, String provider) {
+    public Call(String stage, String model, long elapsedMs, boolean success, Usage usage) {
+      this(stage, model, elapsedMs, success, usage, "unavailable");
+    }
+  }
 
   private AiCallMetrics() { previous = CURRENT.get(); CURRENT.set(this); }
   public static boolean active() { return CURRENT.get() != null; }

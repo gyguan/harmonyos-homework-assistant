@@ -442,7 +442,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
-  void splitsMergedNumberedItemsIntoOneTaskEach() {
+  void flagsMergedItemsWithoutJavaSemanticSplitting() {
     // 线上真实黑板图：语文格子里写了「1、复习P28-38 周一练习」「2、预习8、10课 订正小白张」，
     // glm-4.6v-flashx 把它们并成一条，第 2 点只剩在 instruction 里，家长直接漏做。
     var result = seededCandidates(
@@ -452,24 +452,21 @@ class ConfigurableHomeworkOrganizerModelClientTest {
                 "1、复习P28-38，周一练习 2、预习8、10课，订正小白张", "部编版", "2026-10-16",
                 15, "1、复习P28-38. 周一练习 2、预习8、10课 订小白张", 0.9))));
 
-    assertEquals(2, result.candidates().size());
-    assertEquals("复习P28-38，周一练习", result.candidates().get(0).title());
-    assertEquals("预习8、10课，订正小白张", result.candidates().get(1).title());
-    assertEquals("语文", result.candidates().get(1).subject());
-    assertEquals(15, result.candidates().get(1).expectedMinutes());
+    assertEquals(1, result.candidates().size());
+    assertEquals("复习P28-38 周一练习", result.candidates().getFirst().title());
+    assertTrue(result.candidates().getFirst().instruction().contains("2、预习"));
   }
 
   @Test
-  void splitsCircledNumberedItems() {
+  void preservesCircledActionsForAiReview() {
     var result = seededCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "语文", "抄写和背诵", "①抄写第12课生字表两遍 ②背诵《古诗二首》并默写", "部编版",
                 "2026-10-16", 20, "①抄写 …②背诵 …", 0.9))));
 
-    assertEquals(2, result.candidates().size());
-    assertEquals("抄写第12课生字表两遍", result.candidates().get(0).title());
-    assertEquals("背诵《古诗二首》并默写", result.candidates().get(1).title());
+    assertEquals(1, result.candidates().size());
+    assertEquals("抄写和背诵", result.candidates().getFirst().title());
   }
 
   @Test
@@ -667,7 +664,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
-  void confirmedExperienceTriggersAiReviewRatherThanJavaKeywordRewrite() {
+  void evidenceRiskTriggersPatchReviewRatherThanJavaKeywordRewrite() {
     var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
     var experiences = mock(HomeworkTeacherExperienceService.class);
     var student = new TestStudent();
@@ -680,12 +677,14 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
         .thenAnswer(inv -> {
           String scene = inv.getArgument(4);
-          if ("homework_experience_review".equals(scene)) {
+          if ("homework_risk_review".equals(scene)) {
             return java.util.Optional.of("""
-                {"assignments":[{"subject":"语文","title":"摘抄3个好词、2个好句",
+                {"reviewVersion":1,"corrections":[{"assignmentIndex":0,"reason":"根据来源补充证据并展开经验",
+                "assignment":{"subject":"语文","title":"摘抄3个好词、2个好句",
                 "instruction":"摘抄3个好词、2个好句","textbookRef":"待家长确认",
-                "taskDate":"2026-10-19","expectedMinutes":15,
-                "sourceExcerpt":"摘抄：（3+2）","confidence":0.95}]}
+                "taskDate":"今天","expectedMinutes":15,
+                "sourceExcerpt":"摘抄：（3+2）","confidence":0.95,"sourceBlockIds":["t1"]}}],
+                "additions":[],"blockDecisions":[{"blockId":"t1","classification":"TASK","reason":"来源是作业"}],"appliedExperienceIds":[]}
                 """);
           }
           return java.util.Optional.of("""
@@ -716,7 +715,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     when(experiences.retrieve(eq(student), anyString(), anyString(), eq(false)))
         .thenReturn(new HomeworkTeacherExperienceService.Retrieval("家长经验：需按原文解释", List.of()));
     when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
-        .thenAnswer(inv -> "homework_experience_review".equals(inv.getArgument(4))
+        .thenAnswer(inv -> "homework_risk_review".equals(inv.getArgument(4))
             ? java.util.Optional.empty()
             : java.util.Optional.of("""
                 {"assignments":[{"subject":"语文","title":"完成摘抄（3+2）",

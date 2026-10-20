@@ -69,8 +69,6 @@ class HomeworkEvaluationTest(unittest.TestCase):
             evaluate(fixture, self.prediction([]))
 
 
-if __name__ == "__main__":
-    unittest.main()
 
 class JointMetricsTest(unittest.TestCase):
     def test_latency_tokens_failures_and_missing_usage(self):
@@ -99,6 +97,39 @@ class JointMetricsTest(unittest.TestCase):
         self.assertEqual(0, result['total']['evidenceAccuracy'])
         self.assertEqual(0, result['total']['evidenceCoverage'])
 
+    def test_matching_reference_without_real_source_block_is_not_evidence_accuracy(self):
+        case = HomeworkEvaluationTest().fixture()
+        case['cases'][0]['expected'][0]['sourceBlockIds'] = ['b1']
+        pred = HomeworkEvaluationTest().prediction([
+            dict(subject='语文', title='国学13页', sourceBlockIds=['b1']),
+            dict(subject='数学', title='口算20题')])
+        result = evaluate(case, pred)
+        self.assertEqual(0, result['total']['evidenceAccuracy'])
+
+    def test_evidence_spans_do_not_depend_on_model_block_id_numbering(self):
+        case = HomeworkEvaluationTest().fixture()
+        case['cases'][0]['expected'][0]['sourceEvidenceTexts'] = ['国13']
+        pred = HomeworkEvaluationTest().prediction([
+            dict(subject='语文', title='国学13页', sourceBlockIds=['provider-block-9']),
+            dict(subject='数学', title='口算20题')])
+        pred['results'][0]['sourceDocument'] = {'blocks': [{'id':'provider-block-9','text':'语文：朗读国13'}]}
+        self.assertEqual(1, evaluate(case, pred)['total']['evidenceAccuracy'])
+
+    def test_literal_shorthand_echo_cannot_pass_expanded_experience_gold(self):
+        case = {'cases': [{'id':'x','reviewStatus':'VERIFIED','expected':[{'subject':'语文','keywords':['摘抄','3个好词','2个好句']}]}]}
+        pred = {'results':[{'caseId':'x','assignments':[{'subject':'语文','title':'完成摘抄（3+2）'}]}]}
+        self.assertEqual(0, evaluate(case,pred)['total']['recallProxy'])
+
+    def test_http_failure_without_model_metadata_is_counted_not_mixed_variant(self):
+        fixture = HomeworkEvaluationTest().fixture()
+        fixture['cases'].append(dict(id='blank', reviewStatus='VERIFIED', expected=[]))
+        prediction = HomeworkEvaluationTest().prediction([])
+        prediction['results'].append(dict(caseId='blank',success=False,assignments=[],httpStatus=400))
+        result = evaluate(fixture,prediction)
+        self.assertEqual(.5,result['performance']['failureRate'])
+        self.assertEqual('fixture-model',result['model'])
+        self.assertEqual(0,result['total']['recallProxy'])
+
     def test_gold_edits_invalidate_comparison(self):
         from evaluate_homework_organizer import compare
         with self.assertRaisesRegex(ValueError, 'identical fixture'):
@@ -116,3 +147,26 @@ class JointMetricsTest(unittest.TestCase):
         with patch.dict('os.environ', {'ORGANIZER_EVAL_TOKEN': 'not-real'}):
             with self.assertRaisesRegex(ValueError, 'actual imagePath'):
                 replay({'cases': [{'id': 'img', 'sourceType': 'IMAGE'}]}, 'http://localhost', 's', Path('.'))
+
+class PerformanceGateTest(unittest.TestCase):
+    def test_speed_cannot_hide_field_regression_or_missing_usage(self):
+        from evaluate_homework_organizer import performance_gate, compare
+        baseline = dict(fixtureHash='same', status='SCORED_KEYWORD_PROXY',
+                        total={'recallProxy': 1, 'precisionProxy': 1, 'keyFieldAccuracy': 1},
+                        performance=dict(p50Ms=100, p95Ms=200, failureRate=0, averageTokensIn=100, averageTokensOut=50, usageUnavailableRequests=0))
+        candidate = dict(fixtureHash='same', status='SCORED_KEYWORD_PROXY',
+                         total={'recallProxy': .5, 'precisionProxy': 1, 'keyFieldAccuracy': .5},
+                         performance=dict(p50Ms=50, p95Ms=100, failureRate=0, averageTokensIn=80, averageTokensOut=40, usageUnavailableRequests=0))
+        self.assertEqual('PASS', performance_gate(baseline, candidate))
+        self.assertTrue(compare(baseline, candidate)['regressed'])
+        candidate['performance']['usageUnavailableRequests'] = 1
+        self.assertEqual('UNAVAILABLE', performance_gate(baseline, candidate))
+
+    def test_latency_or_cost_regression_is_not_pass(self):
+        from evaluate_homework_organizer import performance_gate
+        baseline = {'performance': dict(p50Ms=10, p95Ms=100, failureRate=0, averageTokensIn=100, averageTokensOut=50)}
+        candidate = {'performance': dict(p50Ms=10, p95Ms=101, failureRate=0, averageTokensIn=90, averageTokensOut=40)}
+        self.assertEqual('REGRESSED', performance_gate(baseline, candidate))
+
+if __name__ == "__main__":
+    unittest.main()

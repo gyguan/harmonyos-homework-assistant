@@ -57,6 +57,13 @@ final class HomeworkOrganizerTelemetry implements AutoCloseable {
     var t = CURRENT.get();
     if (t != null) t.stages.merge(name, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start), Long::sum);
   }
+  static void quality(String risk, java.util.List<HomeworkOrganizerDtos.QualityFlag> flags, String reviewOutcome) {
+    var t = CURRENT.get();
+    if (t == null) return;
+    t.data.put("riskLevel", risk);
+    t.data.put("finalQualityFlags", flags.stream().map(HomeworkOrganizerDtos.QualityFlag::code).distinct().toList());
+    t.data.put("reviewOutcome", reviewOutcome);
+  }
   static void experiences(HomeworkOrganizerDtos.ExperienceUsage usage) {
     var t = CURRENT.get();
     if (t == null) return;
@@ -71,6 +78,8 @@ final class HomeworkOrganizerTelemetry implements AutoCloseable {
   void success(int count) { data.put("success", true); data.put("taskCount", count); }
   Map<String, Object> measurement() {
     var calls = ai.calls();
+    if (!calls.isEmpty() && !"unavailable".equals(calls.getFirst().provider()))
+      data.put("provider", calls.getFirst().provider());
     data.put("elapsedMs", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started));
     data.put("stage", "TOTAL");
     stages.put("model", calls.stream().filter(c -> "PRIMARY".equals(c.stage())).mapToLong(AiCallMetrics.Call::elapsedMs).sum());

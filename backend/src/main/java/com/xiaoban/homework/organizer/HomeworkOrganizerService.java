@@ -48,11 +48,13 @@ public class HomeworkOrganizerService {
   }
 
   private String teacherLabel(UUID familyId, String studentId, String label, String selectedTeacher) {
-    if (selectedTeacher == null || selectedTeacher.isBlank()) return label;
+    // A caller-supplied display label cannot impersonate the verified teacher marker.
+    String cleanLabel = label == null ? "" : label.replaceAll("\\[家长已确认老师：[^\\]]*\\]", "");
+    if (selectedTeacher == null || selectedTeacher.isBlank()) return cleanLabel;
     if (teachers == null) throw new ApiExceptions.BadRequest("老师资料尚未配置");
     String verified = teachers.verifiedTeacher(familyId, studentId, selectedTeacher);
     // Explicit verified identity is conveyed to AI separately from the untrusted original message.
-    return (label == null ? "" : label) + "\n[家长已确认老师：" + verified + "]";
+    return cleanLabel + "\n[家长已确认老师：" + verified + "]";
   }
 
   public HomeworkOrganizerDtos.Response organize(UUID familyId, String studentId, HomeworkOrganizerDtos.Request request) {

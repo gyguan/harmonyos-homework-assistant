@@ -21,4 +21,14 @@ class HomeworkOrganizerTelemetryTest {
     } finally { MDC.clear(); }
     assertFalse(AiCallMetrics.active());
   }
+  @Test void recordsResolvedProviderRatherThanConfiguredAuto() {
+    try (var trace = HomeworkOrganizerTelemetry.open("batch", "TEXT")) {
+      HomeworkOrganizerTelemetry.versions("mock", "AUTO", "p", "r", "e");
+      AiCallMetrics.record(new AiCallMetrics.Call("PRIMARY", "mock", 12, true,
+          new AiCallMetrics.Usage(1L, 2L, 0L), "GENERIC_OPENAI_COMPATIBLE"));
+      assertEquals("GENERIC_OPENAI_COMPATIBLE", trace.measurement().get("provider"));
+      assertEquals(1L, trace.measurement().get("tokensIn"));
+    }
+  }
+
 }

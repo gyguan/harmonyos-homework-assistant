@@ -26,6 +26,7 @@ def valid_test_png():
 
 REPLY = {}
 CALLS = 0
+REVIEW_REPLY = None
 
 
 class Provider(BaseHTTPRequestHandler):
@@ -49,7 +50,8 @@ class Provider(BaseHTTPRequestHandler):
             raw = self.rfile.read(int(self.headers.get('Content-Length', '0')))
         body = json.loads(raw)
         require('messages' in body, 'expected chat protocol')
-        data = json.dumps({'choices': [{'message': {'role': 'assistant', 'content': json.dumps(REPLY, ensure_ascii=False)}}],
+        reply = REVIEW_REPLY if 'reviewVersion=1' in body['messages'][0]['content'] and REVIEW_REPLY is not None else REPLY
+        data = json.dumps({'choices': [{'message': {'role': 'assistant', 'content': json.dumps(reply, ensure_ascii=False)}}],
                            'usage': {'prompt_tokens': 120, 'completion_tokens': 80}}).encode()
         self.send_response(200)
         self.send_header('Content-Type', 'application/json')
@@ -89,7 +91,7 @@ def start_backend(log):
 
 
 def main():
-    global REPLY
+    global REPLY, REVIEW_REPLY
     provider = ThreadingHTTPServer(('127.0.0.1', 8765), Provider)
     threading.Thread(target=provider.serve_forever, daemon=True).start()
     proc = None
@@ -122,6 +124,26 @@ def main():
             foreign_student = 's-foreign-' + run
             sql(container, f"insert into family values ('{foreign}','隔离家庭',now(),now()); insert into student select '{foreign_student}','{foreign}',name,grade,class_name,semester,textbook_summary,created_at,updated_at from student where id='{student}'")
             expect(http(base, 'GET', f'/api/v1/students/{foreign_student}/homework/source-evidence/{batch}', token=token), (404,), 'cross-family isolation')
+            # Low risk stays one call even when a relevant private experience is available.
+            family = sql(container, f"select family_id from student where id='{student}'")
+            experience = str(uuid.uuid4())
+            sql(container, f"""insert into homework_teacher_experience(
+                id,family_id,student_id,teacher_name,subject,cue,interpretation,example_source,example_result,origin,active,created_at,updated_at)
+                values ('{experience}','{family}','{student}','学科归属:数学','数学','口算',
+                '只使用本次原文的题量','口算20题','完成口算20题','FEEDBACK_AI',true,now(),now())""")
+            REPLY = dict(schemaVersion=2,sourceBlocks=[block('t1','数学口算20题')],assignments=[candidate()],appliedExperienceIds=[experience])
+            calls_before = CALLS
+            low = expect(http(base,'POST',route+'/organize',token=token,payload={'text':'数学口算20题'}),(200,),'low risk with experience').json()
+            require(CALLS-calls_before == 1 and not low['needsReview'],'low risk incurred extra inference')
+            require(low['experiences']['appliedExperienceIds'] == [experience],'applied experience lost evidence provenance')
+            # A risk can trigger the second call without any experience matching this mixed source.
+            REPLY = dict(schemaVersion=2,sourceBlocks=[block('t1','数学口算20题'),block('t2','语文朗读13页')],assignments=[candidate()])
+            addition = dict(candidate('t2'),subject='语文',title='朗读13页',instruction='朗读13页',sourceExcerpt='语文朗读13页')
+            REVIEW_REPLY = dict(reviewVersion=1,corrections=[],additions=[addition],blockDecisions=[],appliedExperienceIds=[])
+            calls_before = CALLS
+            reviewed = expect(http(base,'POST',route+'/organize',token=token,payload={'text':'数学口算20题\n语文朗读13页'}),(200,),'targeted risk review').json()
+            require(CALLS-calls_before == 2 and len(reviewed['assignments']) == 2 and not reviewed['needsReview'],'targeted correction failed or exceeded two calls')
+            REVIEW_REPLY = None
             REPLY = dict(schemaVersion=2, sourceBlocks=[block('i1', '数学口算20题', image=True), block('i2', '语文朗读13页', image=True)], assignments=[candidate('i1')])
             image = expect(http(base, 'POST', route + '/organize-image', token=token,
                                payload=dict(imageBase64=base64.b64encode(valid_test_png()).decode(), contentType='image/png', importId='img-' + run)), (200,), 'vision evidence').json()
