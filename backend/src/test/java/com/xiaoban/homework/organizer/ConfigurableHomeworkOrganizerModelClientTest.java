@@ -679,7 +679,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
           String scene = inv.getArgument(4);
           if ("homework_risk_review".equals(scene)) {
             return java.util.Optional.of("""
-                {"reviewVersion":1,"corrections":[{"assignmentIndex":0,"reason":"根据来源补充证据并展开经验",
+                {"reviewVersion":2,"corrections":[{"assignmentIndex":0,"reason":"根据来源补充证据并展开经验",
                 "assignment":{"subject":"语文","title":"摘抄3个好词、2个好句",
                 "instruction":"摘抄3个好词、2个好句","textbookRef":"待家长确认",
                 "taskDate":"今天","expectedMinutes":15,

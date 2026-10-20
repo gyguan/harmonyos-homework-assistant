@@ -60,7 +60,7 @@ class Provider(BaseHTTPRequestHandler):
                     raw_image = base64.b64decode(part['image_url']['url'].split(',',1)[1])
                     require(raw_image.startswith(b'\x89PNG'), 'expected a lossless PNG')
                     IMAGE_SIZES.append(struct.unpack('>II',raw_image[16:24]))
-        reply = VISUAL_REPLY if 'visualReviewVersion=1' in body['messages'][0]['content'] and VISUAL_REPLY is not None else REVIEW_REPLY if 'reviewVersion=1' in body['messages'][0]['content'] and REVIEW_REPLY is not None else REPLY
+        reply = VISUAL_REPLY if 'visualReviewVersion=1' in body['messages'][0]['content'] and VISUAL_REPLY is not None else REVIEW_REPLY if 'reviewVersion=2' in body['messages'][0]['content'] and REVIEW_REPLY is not None else REPLY
         data = json.dumps({'choices': [{'message': {'role': 'assistant', 'content': json.dumps(reply, ensure_ascii=False)}}],
                            'usage': {'prompt_tokens': 120, 'completion_tokens': 80, 'prompt_tokens_details': {'cached_tokens': 0, 'image_tokens': 50 if isinstance(body['messages'][-1]['content'],list) else 0}}}).encode()
         self.send_response(200)
@@ -177,10 +177,16 @@ def main():
             # A risk can trigger the second call without any experience matching this mixed source.
             REPLY = dict(schemaVersion=2,sourceBlocks=[block('t1','数学口算20题'),block('t2','语文朗读13页')],assignments=[candidate()])
             addition = dict(candidate('t2'),subject='语文',title='朗读13页',instruction='朗读13页',sourceExcerpt='语文朗读13页')
-            REVIEW_REPLY = dict(reviewVersion=1,corrections=[],additions=[addition],blockDecisions=[],appliedExperienceIds=[])
+            REVIEW_REPLY = dict(reviewVersion=2,corrections=[],additions=[dict(assignment=addition,reason='原文含遗漏的朗读任务')],blockDecisions=[],appliedExperienceIds=[])
             calls_before = CALLS
-            reviewed = expect(http(base,'POST',route+'/organize',token=token,payload={'text':'数学口算20题\n语文朗读13页'}),(200,),'targeted risk review').json()
+            reviewed = expect(http(base,'POST',route+'/organize',token=token,payload={'text':'数学口算20题\n语文朗读13页','importId':'text-review-'+run}),(200,),'targeted risk review').json()
             require(CALLS-calls_before == 2 and len(reviewed['assignments']) == 2 and not reviewed['needsReview'],'targeted correction failed or exceeded two calls')
+            revisions = reviewed['sourceDocument']['revisions']
+            require(len(revisions) == 1 and revisions[0]['kind'] == 'TEXT_RISK_REVIEW','text review audit missing')
+            require(revisions[0]['changes'][0]['before'] is None and revisions[0]['changes'][0]['reason'] == '原文含遗漏的朗读任务','addition reason or initial draft lost')
+            saved_review = expect(http(base,'GET',route+'/source-evidence/text-review-'+run,token=token),(200,),'persisted text review audit').json()
+            require(saved_review['sourceDocument'] == reviewed['sourceDocument'],'text review audit not persisted with evidence')
+            expect(http(base,'GET',f'/api/v1/students/{other}/homework/source-evidence/text-review-'+run,token=token),(404,),'sibling review audit isolation')
             REVIEW_REPLY = None
             REPLY = dict(schemaVersion=2, sourceBlocks=[block('i1', '数学口算20题', image=True), block('i2', '语文朗读13页', image=True)], assignments=[candidate('i1')])
             image = expect(http(base, 'POST', route + '/organize-image', token=token,
