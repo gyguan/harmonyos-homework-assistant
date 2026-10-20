@@ -136,6 +136,34 @@ def main():
             low = expect(http(base,'POST',route+'/organize',token=token,payload={'text':'数学口算20题'}),(200,),'low risk with experience').json()
             require(CALLS-calls_before == 1 and not low['needsReview'],'low risk incurred extra inference')
             require(low['experiences']['appliedExperienceIds'] == [experience],'applied experience lost evidence provenance')
+            # Exact retries in a new import batch hit cache but still persist independent evidence/snapshots.
+            calls_before = CALLS
+            cache_batch = 'cache-hit-' + run
+            cached = expect(http(base,'POST',route+'/organize',token=token,
+                                 payload={'text':'数学口算20题','importId':cache_batch}),(200,),'cached new batch').json()
+            require(cached == low and CALLS == calls_before, 'identical text did not reuse accepted result')
+            hit_evidence = expect(http(base,'GET',route+'/source-evidence/'+cache_batch,token=token),(200,),'cached batch evidence').json()
+            require(hit_evidence['mappings'][0]['candidateId'] == 'ai-'+cache_batch+'-1','cached candidate retained old batch identity')
+            require(sql(container,f"select count(*) from homework_organizer_ai_snapshot where student_id='{student}' and batch_id='{cache_batch}'") == '1','cached snapshot missing')
+            # A direct committed DB change invalidates even without an application mutation hook.
+            sql(container,f"update homework_teacher_experience set active=false,updated_at=now() where id='{experience}'")
+            REPLY['appliedExperienceIds'] = []
+            calls_before = CALLS
+            disabled = expect(http(base,'POST',route+'/organize',token=token,payload={'text':'数学口算20题'}),(200,),'disabled experience invalidates cache').json()
+            require(CALLS-calls_before == 1 and not disabled['experiences']['retrievedExperienceIds'],'deactivated experience revived cached output')
+            # Identical rules with a newer explicit version also invalidate.
+            rule_code = sql(container,"select code from homework_organizer_rule where enabled=true and scope='GLOBAL' order by code limit 1")
+            require(bool(rule_code),'global migrated rules missing')
+            sql(container,f"update homework_organizer_rule set version=version+1,updated_at=now() where code='{rule_code}'")
+            calls_before = CALLS
+            expect(http(base,'POST',route+'/organize',token=token,payload={'text':'数学口算20题'}),(200,),'rule version invalidates cache')
+            require(CALLS-calls_before == 1,'rule version reused old output')
+            calls_before = CALLS
+            expect(http(base,'POST',f'/api/v1/students/{other}/homework/organize',token=token,payload={'text':'数学口算20题'}),(200,),'cache student isolation')
+            require(CALLS-calls_before == 1,'sibling reused personalized cached output')
+            calls_before = CALLS
+            expect(http(base,'POST',f'/api/v1/students/{foreign_student}/homework/organize',token=token,payload={'text':'数学口算20题'}),(404,),'cache family authorization')
+            require(CALLS == calls_before,'foreign request reached inference or cache')
             # A risk can trigger the second call without any experience matching this mixed source.
             REPLY = dict(schemaVersion=2,sourceBlocks=[block('t1','数学口算20题'),block('t2','语文朗读13页')],assignments=[candidate()])
             addition = dict(candidate('t2'),subject='语文',title='朗读13页',instruction='朗读13页',sourceExcerpt='语文朗读13页')
@@ -148,8 +176,20 @@ def main():
             image = expect(http(base, 'POST', route + '/organize-image', token=token,
                                payload=dict(imageBase64=base64.b64encode(valid_test_png()).decode(), contentType='image/png', importId='img-' + run)), (200,), 'vision evidence').json()
             require('语文朗读13页' in image['recognizedText'], 'vision source incorrectly rebuilt from generated tasks')
+            # Image-only cache reads the entire private experience version before lookup.
+            REPLY = dict(schemaVersion=2,sourceBlocks=[block('i1','数学口算20题',image=True)],assignments=[candidate('i1')])
+            image_payload = dict(imageBase64=base64.b64encode(valid_test_png()).decode(),contentType='image/png')
+            calls_before = CALLS
+            first_image = expect(http(base,'POST',route+'/organize-image',token=token,payload=image_payload),(200,),'image cache fill').json()
+            require(not first_image['needsReview'] and CALLS-calls_before == 1,'image initial inference failed')
+            calls_before = CALLS
+            warm_image = expect(http(base,'POST',route+'/organize-image',token=token,payload=dict(image_payload,importId='image-hit-'+run)),(200,),'image cache hit').json()
+            require(warm_image == first_image and CALLS == calls_before,'image cache changed independent evidence or called AI')
+            sql(container,f"update homework_teacher_experience set interpretation='更新后的确认说明',updated_at=now() where id='{experience}'")
+            expect(http(base,'POST',route+'/organize-image',token=token,payload=image_payload),(200,),'image-only experience version invalidation')
+            require(CALLS-calls_before == 1,'image-only cache ignored experience changes')
             REPLY = dict(assignments=[candidate('fake')])
-            legacy = expect(http(base, 'POST', route + '/organize', token=token, payload={'text': '数学口算20题'}), (200,), 'legacy request/response compatibility').json()
+            legacy = expect(http(base, 'POST', route + '/organize', token=token, payload={'text': '数学口算20题','sourceLabel':'旧接口兼容'}), (200,), 'legacy request/response compatibility').json()
             require(legacy['needsReview'] and len(legacy['assignments']) == 1, 'old API dropped candidate or concealed evidence gap')
             # Reboot keeps independent evidence. Read using the same persisted session.
             proc.terminate(); proc.wait(timeout=30)
@@ -159,6 +199,12 @@ def main():
         contents = log_path.read_text()
         require('[AI-PAYLOAD]' not in contents, 'organizer leaked provider payload in debug mode')
         require('语文朗读13页' not in contents and '数学口算20题' not in contents, 'source content leaked to logs')
+        measurements = [json.loads(line.split('homework_import measurement data=',1)[1]) for line in contents.splitlines()
+                        if 'homework_import measurement data=' in line]
+        for hit_id in ('cache-hit-'+run,'image-hit-'+run):
+            hit = next(row for row in measurements if row['importId'] == hit_id)
+            require(hit['cacheHit'] and hit['callCount'] == 0 and hit['tokensIn'] == 0 and hit['tokensOut'] == 0,
+                    'cache telemetry fabricated calls or unavailable usage')
         print('HOMEWORK_SOURCE_EVIDENCE_E2E_PASS PostgreSQL/Flyway, HTTP fake-provider, isolation, compatibility, restart, privacy')
     finally:
         if proc and proc.poll() is None:

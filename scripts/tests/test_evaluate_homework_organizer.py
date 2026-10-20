@@ -82,6 +82,21 @@ class JointMetricsTest(unittest.TestCase):
         self.assertEqual(1, report['usageUnavailableRequests'])
         self.assertEqual(1.5, report['averageCalls'])
 
+    def test_cache_buckets_preserve_missing_usage_and_do_not_hide_cold_regressions(self):
+        from organizer_metrics import summarize
+        from evaluate_homework_organizer import performance_gate
+        cold = dict(cacheHit=False, elapsedMs=100, tokensIn=100, tokensOut=50, success=True)
+        warm = dict(cacheHit=True, elapsedMs=1, tokensIn=0, tokensOut=0, success=True)
+        report = summarize([cold, warm])
+        self.assertEqual(.5, report['cacheHitRate'])
+        self.assertEqual(0, report['cacheBuckets']['HIT']['averageTokensIn'])
+        self.assertEqual(100, report['cacheBuckets']['MISS']['p95Ms'])
+        prior = {'performance': summarize([cold])}
+        faster_warm_slower_cold = {'performance': summarize([dict(cold, elapsedMs=150)] + [warm]*100)}
+        self.assertEqual('REGRESSED', performance_gate(prior, faster_warm_slower_cold))
+        self.assertEqual('UNAVAILABLE', performance_gate(prior, {'performance': summarize([warm])}))
+        self.assertIsNone(summarize([dict(cacheHit=True)])['averageTokensIn'])
+
     def test_duplicate_predictions_rejected_even_without_gold(self):
         with self.assertRaisesRegex(ValueError, 'Duplicate prediction'):
             evaluate({'cases': []}, {'results': [{'caseId': 'a'}, {'caseId': 'a'}]})

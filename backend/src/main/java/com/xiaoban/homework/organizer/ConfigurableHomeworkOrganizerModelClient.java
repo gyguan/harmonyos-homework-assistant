@@ -32,6 +32,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   private final JsonMapper jsonMapper;
   private final HomeworkTeacherExperienceService teacherExperiences;
   private final HomeworkOrganizerRuleService rules;
+  private final HomeworkOrganizerCache cache;
 
   /**
    * 注意：expectedMinutes / confidence 必须用装箱类型。
@@ -71,10 +72,18 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     this(properties, transport, jsonMapper, teacherExperiences, null);
   }
 
-  @Autowired
   public ConfigurableHomeworkOrganizerModelClient(AiProviderProperties properties,
       OpenAiCompatibleTransport transport, JsonMapper jsonMapper,
       HomeworkTeacherExperienceService teacherExperiences, HomeworkOrganizerRuleService rules) {
+    this(properties, transport, jsonMapper, teacherExperiences, rules, null);
+  }
+
+  @Autowired
+  public ConfigurableHomeworkOrganizerModelClient(AiProviderProperties properties,
+      OpenAiCompatibleTransport transport, JsonMapper jsonMapper,
+      HomeworkTeacherExperienceService teacherExperiences, HomeworkOrganizerRuleService rules,
+      HomeworkOrganizerCache cache) {
+    this.cache = cache;
     this.properties = properties;
     this.transport = transport;
     this.jsonMapper = jsonMapper;
@@ -92,6 +101,52 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   private HomeworkTeacherExperienceService.Retrieval selection(StudentEntity student, String sourceLabel, String text, boolean image) {
     var result = teacherExperiences == null ? null : teacherExperiences.retrieve(student, sourceLabel, text, image);
     return result == null ? HomeworkTeacherExperienceService.Retrieval.empty() : result;
+  }
+
+  private String experienceEpoch(StudentEntity student) {
+    return teacherExperiences == null ? "NO_EXPERIENCE_SERVICE" : teacherExperiences.cacheVersion(student);
+  }
+
+  private String cacheKey(StudentEntity student, String kind, String label, String text, String image,
+      HomeworkOrganizerRuleService.Snapshot active, String epoch) {
+    if (cache == null || !cache.enabled() || epoch == null || student == null
+        || student.familyId == null || student.id == null) return null;
+    // Length-delimited JSON avoids ambiguous concatenations. No raw input, image, key or endpoint
+    // is retained in the cache key. Exact source whitespace and original image bytes matter.
+    return HomeworkOrganizerTelemetry.fingerprint(jsonMapper.writeValueAsString(java.util.Arrays.asList(
+        "organizer-cache-v1", student.familyId, student.id, kind, text,
+        image == null ? null : HomeworkOrganizerTelemetry.fingerprint(image),
+        buildInput(student, label, text), properties.getProvider(), properties.getProtocol(),
+        properties.getBaseUrl(), properties.getResponsesPath(), properties.getChatCompletionsPath(),
+        "IMAGE".equals(kind) ? properties.getImageOrganizerModel() : properties.getOrganizerModel(),
+        properties.isStructuredOutput(), properties.isDisableThinking(),
+        instructionsWithShorthand(active), evidenceInstructions("IMAGE".equals(kind)), structuredSchema(),
+        active.encodedShorthand(), new java.util.TreeMap<>(active.templates()), active.version(), epoch)));
+  }
+
+  private Optional<HomeworkOrganizerDtos.Response> cached(String key, String model) {
+    if (cache == null) return Optional.empty();
+    long started = System.nanoTime();
+    try {
+      var stored = cache.get(key);
+      if (stored.isEmpty()) return Optional.empty();
+      var result = jsonMapper.readValue(stored.get(), HomeworkOrganizerDtos.Response.class);
+      var checked = new HomeworkQualityValidator().validate(result.sourceDocument(), result.assignments(), result.experiences());
+      if (result.needsReview() || !result.qualityFlags().isEmpty() || !checked.flags().isEmpty()) return Optional.empty();
+      HomeworkOrganizerTelemetry.quality(checked.risk().name(), checked.flags(), "CACHE_HIT");
+      HomeworkOrganizerTelemetry.experiences(result.experiences());
+      var capabilities = transport.capabilities(model);
+      HomeworkOrganizerTelemetry.cacheHit(capabilities == null ? null : capabilities.provider().name());
+      return Optional.of(result);
+    } finally { HomeworkOrganizerTelemetry.stage("cacheLookup", started); }
+  }
+
+  private void cacheAccepted(String key, String epoch, StudentEntity student, String label, String text,
+      HomeworkOrganizerRuleService.Snapshot active, HomeworkOrganizerDtos.Response result) {
+    if (key == null || result.assignments().isEmpty() || result.needsReview() || !result.qualityFlags().isEmpty()) return;
+    // An edit committed during inference must not populate an entry under the old context.
+    if (!epoch.equals(experienceEpoch(student)) || !active.equals(ruleSnapshot(student, label, text))) return;
+    cache.put(key, jsonMapper.writeValueAsString(result));
   }
 
   static HomeworkOrganizerDtos.ExperienceUsage usage(HomeworkTeacherExperienceService.Retrieval selected,
@@ -134,7 +189,15 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     HomeworkOrganizerTelemetry.stage("experienceRetrieval", retrievalStarted);
     HomeworkOrganizerTelemetry.versions(properties.getImageOrganizerModel(), properties.getProvider().toString(),
         instructionsWithShorthand(activeRules) + evidenceInstructions(true) + activeRules.template("BLACKBOARD"),
-        activeRules.encodedShorthand() + new java.util.TreeMap<>(activeRules.templates()), experienceContext);
+        activeRules.version() + activeRules.encodedShorthand() + new java.util.TreeMap<>(activeRules.templates()), experienceContext);
+    String epoch = cache == null || !cache.enabled() ? null : experienceEpoch(student);
+    String key = cacheKey(student, "IMAGE", sourceLabel, text, imageDataUrl, activeRules, epoch);
+    var hit = cached(key, properties.getImageOrganizerModel());
+    if (hit.isPresent()) {
+      var value = hit.get();
+      return Optional.of(new HomeworkOrganizerDtos.ImageResponse(value.assignments(), value.mode(),
+          value.sourceDocument().readableText(), value.sourceDocument(), value.qualityFlags(), value.needsReview(), value.experiences()));
+    }
     Optional<String> output;
     try {
       output = transport.completeWithImage(
@@ -170,6 +233,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       if (!matching.selected().isEmpty()) retrieved = matching;
       var result = reviewWithExperience(properties.getImageOrganizerModel(), "AI_IMAGE",
           initial.sourceDocument(), initial.assignments(), retrieved, readStructured(output.get()).appliedExperienceIds());
+      cacheAccepted(key, epoch, student, sourceLabel, text, activeRules, result);
       return Optional.of(new HomeworkOrganizerDtos.ImageResponse(result.assignments(), "AI_IMAGE",
           result.sourceDocument().readableText(), result.sourceDocument(), result.qualityFlags(), result.needsReview(), result.experiences()));
     } catch (Exception error) {
@@ -307,7 +371,11 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     HomeworkOrganizerTelemetry.stage("experienceRetrieval", retrievalStarted);
     HomeworkOrganizerTelemetry.versions(properties.getOrganizerModel(), properties.getProvider().toString(),
         instructionsWithShorthand(activeRules) + evidenceInstructions(false),
-        activeRules.encodedShorthand() + new java.util.TreeMap<>(activeRules.templates()), experienceContext);
+        activeRules.version() + activeRules.encodedShorthand() + new java.util.TreeMap<>(activeRules.templates()), experienceContext);
+    String epoch = cache == null || !cache.enabled() ? null : experienceEpoch(student);
+    String key = cacheKey(student, "TEXT", sourceLabel, text, null, activeRules, epoch);
+    var hit = cached(key, properties.getOrganizerModel());
+    if (hit.isPresent()) return hit;
     long started = System.nanoTime();
     Optional<String> outputText = transport.complete(
         properties.getOrganizerModel(),
@@ -347,8 +415,10 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         return Optional.empty();
       }
       var document = HomeworkSourceEvidence.reconcileText(HomeworkSourceDocument.text(text), structured.sourceBlocks());
-      return Optional.of(reviewWithExperience(properties.getOrganizerModel(), "AI", document,
-          converted.candidates(), retrieved, structured.appliedExperienceIds()));
+      var result = reviewWithExperience(properties.getOrganizerModel(), "AI", document,
+          converted.candidates(), retrieved, structured.appliedExperienceIds());
+      cacheAccepted(key, epoch, student, sourceLabel, text, activeRules, result);
+      return Optional.of(result);
     } catch (Exception error) {
       HomeworkOrganizerTelemetry.flag("SCHEMA_REJECTED");
       log.warn("[AI] organizer parse failed model={} outputChars={} exception={}",
@@ -629,7 +699,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   }
 
   /**
-   * Only schema/range normalization and generic numbered-list splitting happen in Java.
+   * Only schema/range normalization happens in Java.
    * The model, with database prompts + confirmed experiences, owns subject attribution,
    * abbreviation meaning, task relevance and title wording. Do not post-process those
    * from keyword lists, which can silently override newly learned feedback.

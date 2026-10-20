@@ -63,4 +63,21 @@ class HomeworkExperienceRetrievalTest {
     var noEvidence=ConfigurableHomeworkOrganizerModelClient.usage(retrieval,List.of(id),doc,List.of(HomeworkSourceEvidenceTest.task("口算20题")));
     assertTrue(noEvidence.appliedExperienceIds().isEmpty());
   }
+  @Test void cacheVersionObservesInactiveEditsConfigurationAndScopeWithoutSourceText() {
+    var student = new ConfigurableHomeworkOrganizerModelClientTest.TestStudent();
+    student.id="child"; student.familyId=UUID.randomUUID();
+    var own = experience(student.familyId,student.id,"线索","王老师","语文");
+    var foreign = experience(UUID.randomUUID(),student.id,"线索","王老师","语文");
+    var repo = mock(HomeworkTeacherExperienceRepository.class);
+    when(repo.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(student.familyId,student.id)).thenReturn(List.of(own,foreign));
+    var service = new HomeworkTeacherExperienceService(repo,mock(StudentRepository.class));
+    String before=service.cacheVersion(student); foreign.interpretation="other family";
+    assertEquals(before,service.cacheVersion(student));
+    own.active=false; String disabled=service.cacheVersion(student); assertNotEquals(before,disabled);
+    own.interpretation="edited while disabled"; assertNotEquals(disabled,service.cacheVersion(student));
+    String configured=service.cacheVersion(student); ReflectionTestUtils.setField(service,"topK",3);
+    assertNotEquals(configured,service.cacheVersion(student));
+    assertFalse(service.cacheVersion(student).contains("线索"));
+  }
+
 }
