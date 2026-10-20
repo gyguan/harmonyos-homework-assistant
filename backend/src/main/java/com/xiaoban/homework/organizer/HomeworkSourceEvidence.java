@@ -40,8 +40,7 @@ final class HomeworkSourceEvidence {
         add(flags, "UNREADABLE_SOURCE", List.of(b.id()), List.of());
       if (b.imageIndex() != null && b.imageIndex() != 0)
         add(flags, "INVALID_SOURCE_LOCATION", List.of(b.id()), List.of());
-      if (!b.region().isEmpty() && (b.region().size() != 4 || b.region().stream().anyMatch(
-          v -> v == null || !Double.isFinite(v) || v < 0 || v > 1)))
+      if (!validRegion(b.region()))
         add(flags, "INVALID_SOURCE_LOCATION", List.of(b.id()), List.of());
     }
     var covered = new HashSet<String>();
@@ -65,6 +64,12 @@ final class HomeworkSourceEvidence {
     }
     flags.forEach(f -> HomeworkOrganizerTelemetry.flag(f.code()));
     return List.copyOf(flags);
+  }
+  static boolean validRegion(List<Double> region) {
+    return region.isEmpty() || region.size() == 4 && region.stream().allMatch(
+        v -> v != null && Double.isFinite(v) && v >= 0 && v <= 1)
+        && region.get(2) > 0 && region.get(3) > 0
+        && region.get(0) + region.get(2) <= 1.000000001 && region.get(1) + region.get(3) <= 1.000000001;
   }
   static void add(List<HomeworkOrganizerDtos.QualityFlag> flags, String code, List<String> blocks, List<Integer> indexes) {
     flags.add(new HomeworkOrganizerDtos.QualityFlag(code, blocks, indexes));

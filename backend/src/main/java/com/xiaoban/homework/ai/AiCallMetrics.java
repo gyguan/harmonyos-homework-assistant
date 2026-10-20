@@ -9,7 +9,9 @@ public final class AiCallMetrics implements AutoCloseable {
   private static final ThreadLocal<AiCallMetrics> CURRENT = new ThreadLocal<>();
   private final AiCallMetrics previous;
   private final List<Call> calls = new ArrayList<>();
-  public record Usage(Long tokensIn, Long tokensOut, Long cachedTokens) {}
+  public record Usage(Long tokensIn, Long tokensOut, Long cachedTokens, Long imageTokens) {
+    public Usage(Long tokensIn, Long tokensOut, Long cachedTokens) { this(tokensIn,tokensOut,cachedTokens,null); }
+  }
   public record Call(String stage, String model, long elapsedMs, boolean success, Usage usage, String provider) {
     public Call(String stage, String model, long elapsedMs, boolean success, Usage usage) {
       this(stage, model, elapsedMs, success, usage, "unavailable");
@@ -30,7 +32,10 @@ public final class AiCallMetrics implements AutoCloseable {
         number(usage, "output_tokens", "completion_tokens"),
         number(usage.path("input_tokens_details"), "cached_tokens", "cached_tokens") != null
             ? number(usage.path("input_tokens_details"), "cached_tokens", "cached_tokens")
-            : number(usage.path("prompt_tokens_details"), "cached_tokens", "cached_tokens"));
+            : number(usage.path("prompt_tokens_details"), "cached_tokens", "cached_tokens"),
+        number(usage.path("input_tokens_details"), "image_tokens", "image_tokens") != null
+            ? number(usage.path("input_tokens_details"), "image_tokens", "image_tokens")
+            : number(usage.path("prompt_tokens_details"), "image_tokens", "image_tokens"));
   }
   private static Long number(JsonNode node, String primary, String alternate) {
     var value = node.has(primary) ? node.path(primary) : node.path(alternate);

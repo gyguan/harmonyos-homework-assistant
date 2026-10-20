@@ -85,6 +85,11 @@ final class HomeworkOrganizerTelemetry implements AutoCloseable {
         "outputHeight", image.outputHeight(), "orientation", image.orientation(),
         "inputBytes", image.inputBytes(), "outputBytes", image.outputBytes()));
   }
+  static void visualCrop(HomeworkImageCrop.Crop crop) {
+    var t = CURRENT.get();
+    if (t != null) t.data.put("visualReview", Map.of("kind", "REGION_CROP", "width", crop.width(),
+        "height", crop.height(), "bytes", crop.bytes()));
+  }
   static void flag(String code) { var t = CURRENT.get(); if (t != null) t.flags.add(code); }
   static void review(String reason) {
     var t = CURRENT.get();
@@ -107,7 +112,14 @@ final class HomeworkOrganizerTelemetry implements AutoCloseable {
         ? "unavailable" : calls.stream().mapToLong(c -> c.usage().tokensIn()).sum());
     data.put("tokensOut", calls.isEmpty() && !Boolean.TRUE.equals(data.get("cacheHit")) || calls.stream().anyMatch(c -> c.usage().tokensOut() == null)
         ? "unavailable" : calls.stream().mapToLong(c -> c.usage().tokensOut()).sum());
+    data.put("cachedTokensIn", tokenDetail(calls, false));
+    data.put("imageTokensIn", tokenDetail(calls, true));
     return Map.copyOf(data);
+  }
+  private Object tokenDetail(java.util.List<AiCallMetrics.Call> calls, boolean image) {
+    if (calls.isEmpty()) return Boolean.TRUE.equals(data.get("cacheHit")) ? 0L : "unavailable";
+    var values = calls.stream().map(c -> image ? c.usage().imageTokens() : c.usage().cachedTokens()).toList();
+    return values.stream().anyMatch(java.util.Objects::isNull) ? "unavailable" : values.stream().mapToLong(Long::longValue).sum();
   }
   static String fingerprint(String value) {
     try {
