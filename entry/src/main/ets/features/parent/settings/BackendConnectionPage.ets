@@ -106,6 +106,7 @@ export struct BackendConnectionPage {
 
   aboutToAppear(): void {
     this.baseUrl = BackendSession.instance.getBaseUrl();
+    if (this.embeddedInDeepPage) this.dataSyncExpanded = true;
     this.syncLocalStudents();
     if (BackendSession.instance.isConnected() && !this.forceLogin) {
       void this.refreshStudents();
