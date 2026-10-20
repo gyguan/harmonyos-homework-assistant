@@ -129,6 +129,7 @@ def main(argv=None):
         else:
             data = read(args.fixtures)
             cases = data['cases']
+            require(bool(cases), 'EMPTY_CORPUS')
             require(len(cases) == len({case['id'] for case in cases}), 'DUPLICATE_CASE_ID')
             if args.command == 'inspect':
                 data = {'reviews': [{ 'caseId': case['id'], 'annotationDigest': annotation_digest(case),

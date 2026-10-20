@@ -98,6 +98,16 @@ class GoldAnnotationTest(unittest.TestCase):
         verified = verify_case(item, declaration(item, '.'), '.')
         self.assertEqual([], verified['expected'])
 
+    def test_generated_draft_cannot_become_gold_by_only_changing_status_or_dropping_receipt(self):
+        item = case(); item['provenance'] = dict(kind='EXISTING_PRIVATE_BATCH', batchFingerprint='anonymous')
+        manually_changed = {**item, 'reviewStatus': 'VERIFIED'}
+        with self.assertRaisesRegex(ValueError, 'MANAGED_GOLD_REQUIRES_RECEIPT'):
+            evaluate(dict(cases=[manually_changed]), dict(results=[dict(caseId=item['id'], assignments=[])]))
+        verified = verify_case(item, declaration(item, '.'), '.')
+        del verified['verification']
+        with self.assertRaisesRegex(ValueError, 'MANAGED_GOLD_REQUIRES_RECEIPT'):
+            validate_receipt(verified)
+
     def test_legacy_hand_curated_fixtures_remain_compatible(self):
         validate_receipt(dict(reviewStatus='VERIFIED', expected=[]))
 

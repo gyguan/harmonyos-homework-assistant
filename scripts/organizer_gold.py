@@ -72,6 +72,7 @@ def verify_case(case, declaration, root):
 def validate_receipt(case, prediction=None, root=None):
     receipt = case.get('verification')
     if receipt is None:
+        require(case.get('provenance', {}).get('kind') != 'EXISTING_PRIVATE_BATCH', 'MANAGED_GOLD_REQUIRES_RECEIPT')
         return  # Existing manually curated fixtures remain compatible.
     require(isinstance(receipt, dict) and case.get('reviewStatus') == 'VERIFIED' and receipt.get('method') == 'HUMAN_DECLARATION_V1', 'INVALID_VERIFICATION_RECEIPT')
     validate_annotations(case)
