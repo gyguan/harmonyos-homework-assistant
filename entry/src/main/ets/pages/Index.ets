@@ -87,6 +87,10 @@ struct Index {
   }
 
   onBackPress(): boolean {
+    if (this.showCloudConnectionPage) {
+      this.closeCloudConnectionPage();
+      return true;
+    }
     if (this.selectedRole === AppRole.NONE) return false;
     return this.shellBackHandler();
   }
