@@ -90,14 +90,13 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     var input = org.mockito.ArgumentCaptor.forClass(String.class);
     verify(transport).completeWithImage(
         anyString(), instructions.capture(), input.capture(),
-        eq("data:image/jpeg;base64,PRIVATE"), eq(1800), anyString(), anyMap());
+        eq("data:image/jpeg;base64,PRIVATE"), eq(6000), anyString(), anyMap());
 
     assertTrue(input.getValue().contains("补充文字（可能为空）：\n数学口算20题"));
     assertFalse(instructions.getValue().contains("sameTaskGroup"));
     assertFalse(instructions.getValue().contains("duplicateAssignmentId"));
     assertFalse(instructions.getValue().contains("数学口算20题"));
-    assertTrue(instructions.getValue().contains("不要额外") ||
-        ConfigurableHomeworkOrganizerModelClient.imageInput(new TestStudent(), "相册", null).contains("不要额外转写整张图片"));
+    assertTrue(ConfigurableHomeworkOrganizerModelClient.imageInput(new TestStudent(), "相册", null).contains("独立提取所有可见来源片段"));
     assertFalse(ConfigurableHomeworkOrganizerModelClient.imageInput(new TestStudent(), "相册", null)
         .endsWith("null"));
   }
@@ -136,7 +135,8 @@ class ConfigurableHomeworkOrganizerModelClientTest {
 
     assertEquals(List.of("语文", "数学"),
         result.assignments().stream().map(HomeworkOrganizerDtos.Candidate::subject).toList());
-    assertEquals("语文背诵\n数学口算", result.recognizedText());
+    assertEquals("", result.recognizedText());
+    assertTrue(result.needsReview());
     assertTrue(client.parseImageOutput("{\"assignments\":[]}").isEmpty());
     assertTrue(client.parseImageOutput(output.replace("\"数学\"", "\"InvalidSubject\"")).isEmpty());
   }
@@ -614,7 +614,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
 
     assertEquals(1, result.size());
     verify(transport).complete(
-        anyString(), anyString(), anyString(), eq(2000), eq("homework_organization"), anyMap());
+        anyString(), anyString(), anyString(), eq(6000), eq("homework_organization"), anyMap());
   }
 
   @Test

@@ -43,8 +43,9 @@ public class ApiPayloadLogAdvice extends RequestBodyAdviceAdapter implements Res
   public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter,
       Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
     if (!properties.isLogPayloads()) return body;
-    if (body instanceof HomeworkOrganizerDtos.ImageRequest) return body;
+    if (body instanceof HomeworkOrganizerDtos.ImageRequest || body instanceof HomeworkOrganizerDtos.Request) return body;
     HttpServletRequest request = currentRequest(inputMessage);
+    if (privateHomework(request)) return body;
     log.info("[HTTP-REQUEST-BODY] requestId={} scene={} body={}",
         requestAttribute(request, AccessLogFilter.ATTR_REQUEST_ID),
         requestAttribute(request, AccessLogFilter.ATTR_CLIENT_SCENE),
@@ -62,10 +63,11 @@ public class ApiPayloadLogAdvice extends RequestBodyAdviceAdapter implements Res
       Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request,
       ServerHttpResponse response) {
     if (!properties.isLogPayloads()) return body;
-    if (body instanceof HomeworkOrganizerDtos.ImageResponse) return body;
+    if (body instanceof HomeworkOrganizerDtos.ImageResponse || body instanceof HomeworkOrganizerDtos.Response) return body;
     HttpServletRequest servletRequest = request instanceof ServletServerHttpRequest servlet
         ? servlet.getServletRequest() : null;
-    // Image requests and their recognized text must never enter diagnostic payload logs.
+    // Private source evidence / feedback / candidates must never enter diagnostic payload logs.
+    if (privateHomework(servletRequest)) return body;
     if (servletRequest != null && servletRequest.getRequestURI().endsWith("/homework/organize-image")) return body;
     log.info("[HTTP-RESPONSE] requestId={} scene={} status={} body={}",
         requestAttribute(servletRequest, AccessLogFilter.ATTR_REQUEST_ID),
@@ -73,6 +75,10 @@ public class ApiPayloadLogAdvice extends RequestBodyAdviceAdapter implements Res
         responseStatus(response),
         payload(body));
     return body;
+  }
+
+  private static boolean privateHomework(HttpServletRequest request) {
+    return request != null && request.getRequestURI().contains("/homework/");
   }
 
   private HttpServletRequest currentRequest(HttpInputMessage inputMessage) {
