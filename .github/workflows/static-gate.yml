@@ -24,6 +24,8 @@ jobs:
         run: python -m unittest discover -s scripts/tests -p test_evaluate_homework_organizer.py -v
       - name: Test controlled model benchmark and actual-usage pricing
         run: python -m unittest discover -s scripts/tests -p test_benchmark_homework_organizer.py -v
+      - name: Test private gold intake and human review receipts
+        run: python -m unittest discover -s scripts/tests -p test_organizer_gold.py -v
 
   validate-backend-logging:
     runs-on: ubuntu-latest
