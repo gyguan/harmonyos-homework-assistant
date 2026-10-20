@@ -12,7 +12,7 @@ def percentile(values, fraction):
     return ordered[max(0, math.ceil(len(ordered) * fraction) - 1)] if ordered else None
 
 
-def summarize(rows, prices=None):
+def summarize(rows, prices=None, *, include_cache_buckets=True):
     """Unavailable provider usage stays missing; partial sums aren't presented as totals."""
     def avg(key):
         values = [r[key] for r in rows if numeric(r.get(key))]
@@ -25,11 +25,12 @@ def summarize(rows, prices=None):
             costs.append((row['tokensIn'] * rate['inputPerMillion'] +
                           row['tokensOut'] * rate['outputPerMillion']) / 1_000_000)
     stages = sorted({k for row in rows for k in row.get('stagesMs', {})})
-    return {
+    result = {
         'requests': len(rows),
         'failureRate': mean(not r.get('success', True) for r in rows) if rows else None,
         'p50Ms': percentile([r.get('elapsedMs') for r in rows], .5),
         'p95Ms': percentile([r.get('elapsedMs') for r in rows], .95),
+        'cacheHitRate': mean(bool(r.get('cacheHit')) for r in rows) if rows else None,
         'reviewRate': mean(bool(r.get('reviewTriggered')) for r in rows) if rows else None,
         'averageCalls': avg('callCount'),
         'averageTokensIn': avg('tokensIn'), 'averageTokensOut': avg('tokensOut'),
@@ -41,3 +42,12 @@ def summarize(rows, prices=None):
                          'p95Ms': percentile([r.get('stagesMs', {}).get(key) for r in rows], .95)}
                    for key in stages},
     }
+
+    if include_cache_buckets:
+        # A warm response must not hide a regression in uncached model inference.
+        result['cacheBuckets'] = {
+            'HIT': summarize([r for r in rows if r.get('cacheHit') is True], prices, include_cache_buckets=False),
+            'MISS': summarize([r for r in rows if r.get('cacheHit') is False], prices, include_cache_buckets=False),
+            'UNKNOWN': summarize([r for r in rows if not isinstance(r.get('cacheHit'), bool)], prices, include_cache_buckets=False),
+        }
+    return result

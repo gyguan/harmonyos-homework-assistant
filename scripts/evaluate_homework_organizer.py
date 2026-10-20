@@ -182,6 +182,14 @@ def compare(prior, candidate):
 
 def performance_gate(prior, candidate):
     old, new = prior.get("performance", {}), candidate.get("performance", {})
+    # Compare cold inference separately whenever cache-enabled measurements are present.
+    if any(p.get("cacheBuckets", {}).get("HIT", {}).get("requests", 0) for p in (old, new)):
+        cold = [p.get("cacheBuckets", {}).get("MISS", {}) for p in (old, new)]
+        if any(not bucket.get("requests") for bucket in cold):
+            return "UNAVAILABLE"
+        cold_gate = performance_gate({"performance": cold[0]}, {"performance": cold[1]})
+        if cold_gate != "PASS":
+            return cold_gate
     required = ("p50Ms", "p95Ms", "failureRate", "averageTokensIn", "averageTokensOut")
     if any(old.get(k) is None or new.get(k) is None for k in required):
         return "UNAVAILABLE"

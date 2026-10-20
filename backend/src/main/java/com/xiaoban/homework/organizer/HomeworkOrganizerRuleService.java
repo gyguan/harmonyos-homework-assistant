@@ -22,7 +22,10 @@ public class HomeworkOrganizerRuleService {
     this.repository = repository;
   }
 
-  public record Snapshot(List<String> shorthand, Map<String, String> templates) {
+  public record Snapshot(List<String> shorthand, Map<String, String> templates, String version) {
+    public Snapshot(List<String> shorthand, Map<String, String> templates) {
+      this(shorthand, templates, HomeworkOrganizerTelemetry.fingerprint(shorthand + ":" + new java.util.TreeMap<>(templates)));
+    }
     public Snapshot {
       shorthand = List.copyOf(shorthand);
       templates = Map.copyOf(templates);
@@ -40,10 +43,12 @@ public class HomeworkOrganizerRuleService {
   public Snapshot snapshot(StudentEntity student, String sourceLabel, String sourceText) {
     var shorthands = new LinkedHashMap<String, String>();
     var templates = new LinkedHashMap<String, String>();
+    var versions = new ArrayList<String>();
     for (var rule : repository.findApplicable(
         student == null ? null : student.familyId,
         student == null ? null : student.id)) {
       if (!applicable(rule, student, sourceLabel, sourceText)) continue;
+      versions.add(rule.code + ":" + rule.version + ":" + rule.updatedAt);
       if ("SHORTHAND".equals(rule.ruleType)) {
         String term = safe(rule.triggerText);
         String subject = safe(rule.subject);
@@ -61,7 +66,8 @@ public class HomeworkOrganizerRuleService {
         }
       }
     }
-    return new Snapshot(new ArrayList<>(shorthands.values()), templates);
+    return new Snapshot(new ArrayList<>(shorthands.values()), templates,
+        HomeworkOrganizerTelemetry.fingerprint(String.join("\n", versions)));
   }
 
   private boolean applicable(HomeworkOrganizerRuleEntity rule, StudentEntity student,

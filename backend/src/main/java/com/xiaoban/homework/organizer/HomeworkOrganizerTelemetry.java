@@ -70,6 +70,14 @@ final class HomeworkOrganizerTelemetry implements AutoCloseable {
     t.data.put("retrievedExperienceIds", usage.retrievedExperienceIds());
     t.data.put("appliedExperienceIds", usage.appliedExperienceIds());
   }
+  static void cacheHit(String provider) {
+    var t = CURRENT.get();
+    if (t != null) {
+      t.data.put("cacheHit", true);
+      if (provider != null) t.data.put("provider", safeId(provider));
+      t.data.put("reviewOutcome", "CACHE_HIT");
+    }
+  }
   static void flag(String code) { var t = CURRENT.get(); if (t != null) t.flags.add(code); }
   static void review(String reason) {
     var t = CURRENT.get();
@@ -88,9 +96,9 @@ final class HomeworkOrganizerTelemetry implements AutoCloseable {
     data.put("qualityFlags", Set.copyOf(flags));
     data.put("aiCalls", calls);
     data.put("callCount", calls.size());
-    data.put("tokensIn", calls.isEmpty() || calls.stream().anyMatch(c -> c.usage().tokensIn() == null)
+    data.put("tokensIn", calls.isEmpty() && !Boolean.TRUE.equals(data.get("cacheHit")) || calls.stream().anyMatch(c -> c.usage().tokensIn() == null)
         ? "unavailable" : calls.stream().mapToLong(c -> c.usage().tokensIn()).sum());
-    data.put("tokensOut", calls.isEmpty() || calls.stream().anyMatch(c -> c.usage().tokensOut() == null)
+    data.put("tokensOut", calls.isEmpty() && !Boolean.TRUE.equals(data.get("cacheHit")) || calls.stream().anyMatch(c -> c.usage().tokensOut() == null)
         ? "unavailable" : calls.stream().mapToLong(c -> c.usage().tokensOut()).sum());
     return Map.copyOf(data);
   }

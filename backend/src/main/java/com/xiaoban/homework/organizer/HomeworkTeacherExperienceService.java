@@ -247,6 +247,21 @@ public class HomeworkTeacherExperienceService {
     return selected.isEmpty() ? Retrieval.empty() : new Retrieval(section.toString(), selected);
   }
 
+  /** Re-read committed state before every cache lookup, including image-only requests.
+   * Includes disabled rows so a deactivate/reactivate cycle cannot revive an older result.
+   */
+  @Transactional(readOnly = true)
+  public String cacheVersion(StudentEntity student) {
+    if (student == null || student.familyId == null || student.id == null) return null;
+    var rows = repository.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(student.familyId, student.id)
+        .stream().filter(e -> student.familyId.equals(e.familyId) && student.id.equals(e.studentId))
+        .sorted(java.util.Comparator.comparing(e -> e.id.toString()))
+        .map(e -> java.util.Arrays.asList(e.id, e.teacherName, e.subject, e.cue, e.interpretation,
+            e.exampleSource, e.exampleResult, e.origin, e.active, e.updatedAt)).toList();
+    return HomeworkOrganizerTelemetry.fingerprint(tools.jackson.databind.json.JsonMapper.builder().build()
+        .writeValueAsString(java.util.Arrays.asList(topK, maxContextChars, rows)));
+  }
+
   private static String boundTeacher(String label) {
     String marker = "[家长已确认老师：";
     int begin = safe(label).indexOf(marker);

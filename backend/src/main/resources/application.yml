@@ -46,6 +46,11 @@ app:
   media-sync:
     worker-delay-ms: ${MEDIA_SYNC_WORKER_DELAY_MS:5000}
   organizer:
+    cache:
+      enabled: ${ORGANIZER_CACHE_ENABLED:true}
+      ttl-seconds: ${ORGANIZER_CACHE_TTL_SECONDS:300}
+      max-entries: ${ORGANIZER_CACHE_MAX_ENTRIES:128}
+      max-bytes: ${ORGANIZER_CACHE_MAX_BYTES:8388608}
     experience:
       top-k: ${ORGANIZER_EXPERIENCE_TOP_K:4}
       max-chars: ${ORGANIZER_EXPERIENCE_MAX_CHARS:2400}
