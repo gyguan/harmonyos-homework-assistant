@@ -153,6 +153,7 @@ def evaluate(fixtures, predictions):
         "fixtureCount": len(cases), "verifiedCount": len(verified),
         "model": next(iter(model_names), "UNAVAILABLE"), "promptVersion": next(iter(prompt_versions), "UNAVAILABLE"),
         "fixtureHash": fixture_hash, "performance": performance, "buckets": buckets,
+        "counts": dict(totals),
         "total": dict(score(totals),
                       keyFieldAccuracy=round(totals["fieldCorrect"] / totals["fieldTotal"], 4) if totals["fieldTotal"] else None,
                       evidenceAccuracy=round(totals["evidenceCorrect"] / totals["evidenceTotal"], 4) if totals["evidenceTotal"] else None,

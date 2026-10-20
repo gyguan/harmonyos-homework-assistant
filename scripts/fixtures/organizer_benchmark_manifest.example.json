@@ -1,0 +1,8 @@
+{
+  "baseline": "baseline-model",
+  "comparisonKind": "MODEL",
+  "variants": {
+    "baseline-model": ["baseline-run-1.enriched.json", "baseline-run-2.enriched.json"],
+    "candidate-model": ["candidate-run-1.enriched.json", "candidate-run-2.enriched.json"]
+  }
+}

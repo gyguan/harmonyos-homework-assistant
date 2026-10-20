@@ -54,3 +54,6 @@ __pycache__/
 .clangd
 .clang-tidy
 entry/oh-package-lock.json5
+
+# Private organizer replays, gold images and benchmark reports - never commit
+.organizer-eval/

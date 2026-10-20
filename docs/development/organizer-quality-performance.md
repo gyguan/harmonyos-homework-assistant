@@ -107,6 +107,39 @@ JPEG APP1 / PNG eXIf 的 IFD0 Orientation 采用 CIPA DC-008 的 1–8 方向约
 
 成功视觉复核返回 SourceDocument schemaVersion=3，增加可选 `revisions`：保存该来源校正前/后的独立文字、原定位、理由及候选差异。未校正的来源完全不动，补充文字原文不变；旧 schema=2/历史 JSON 缺 revisions 时默认空列表。沿用 V43 私有证据 JSON 与当前事务，不新建存储或迁移，不保存原图/局部像素。审计仍按 family/student/import 隔离。`ORGANIZER_IMAGE_VISUAL_REVIEW_ENABLED=false` 可关闭此分支，保留初稿风险提示；开关也参与缓存键。
 
-测量增加 `imageReviewPreparation`、局部宽高/字节数、实际第二轮 provider call；provider 若明确返回 `input_tokens_details.image_tokens` 或 `prompt_tokens_details.image_tokens` 才累计 `imageTokensIn`，缺失/部分缺失为 unavailable，不按像素估算。`cachedTokensIn` 同样取实际细分 usage。图片准备/裁剪本身不产生 AI Token。
+测量增加 `imageReviewPreparation`、局部宽高/字节数、实际第二轮 provider call；provider 若明确返回 `input_tokens_details.image_tokens` 或 `prompt_tokens_details.image_tokens` 才累计 `imageTokensIn`，缺失/部分缺失为 unavailable，不按像素估算。`cachedTokensIn` 同样取实际细分 usage，也支持 DeepSeek 官方根字段 `usage.prompt_cache_hit_tokens`（https://api-docs.deepseek.com/guides/kv_cache/）；不以 miss 或总量倒推缓存命中，字段冲突时为 unavailable。图片准备/裁剪本身不产生 AI Token。
 
 这些测试只证明几何、协议、调用上限、范围、风险和隔离。真实裁剪是否提高小字/手写/表格召回，必须在固定 VERIFIED 图片金标上对比，不据 fake-provider 通过而宣称准确率改善。
+
+## P1：跨模型质量 × 延迟 × 配置费用比较
+
+`scripts/benchmark_homework_organizer.py` 直接复用当前 gold-only evaluator，不再造另一套任务匹配。它消费固定语料的回放文件，不发模型请求、不切换生产模型，适合先比较候选大/小模型后再决定是否改复核配置。当前没有真实模型结果与 VERIFIED 老师图片金标，因此未提供虚构的实际成绩或模型排名。
+
+比较约束：
+
+- 每个候选具有相同次数的完整回放，每次恰好覆盖同一 case ID 矩阵；漏样本、重复/额外样本直接拒绝。fixtureHash 包括标注与 DRAFT/VERIFIED 状态；inputFingerprint 绑定实际发送的文字、老师归属、补充文字、MIME 和图片字节。图片路径相同但内容变化也不能通过，截图不能用转录文字冒充。
+- `MODEL` 比较固定逐样本 Prompt/规则/经验版本，允许模型变化；`PIPELINE` 比较固定模型，允许 Prompt/规则/检索改变。一个配置可分别使用文字/图片模型，但同一输入类型及重复回放不得无说明地漂移模型，同一样本各次回放版本必须稳定。实际主模型必须与 aiCalls 的 PRIMARY 一致。每个实际 HTTP 调用还记录 caller instructions（含动态经验）与 Schema 的规范化 SHA-256 Prompt 指纹，覆盖主调用及文字/视觉复核；MODEL 比较不能只凭未变化的首轮通用 Prompt 版本放过第二轮指令漂移。缺失旧细分指纹时标为 UNAVAILABLE，需要重新回放。
+- 回放可通过 `--context` 附带匿名上下文声明，必需字段为 studentScopeHash、teacherStateHash、textbookStateHash（三者均 64 位小写 SHA-256）、businessDate（有效 ISO 日期）、networkProfile（不含隐私的环境标识）。teacherStateHash 应覆盖老师映射与全部启用/停用经验状态，textbookStateHash 覆盖学生年级/学期/教材。声明必须与各配置/重复运行一致；这只是操作者的控制声明，不是程序对网络条件或数据库快照的独立证明。
+- 每个 VERIFIED case 单独复用原评测器，再以原始分子/分母聚合；保留字段/证据精度。某个样本漏项、捏造或关键字段下降不能用其他样本提高抵消。没有 VERIFIED 样本则质量为 NO_VERIFIED_GOLD；只有部分样本确认时仍可报告已确认部分的代理指标，但列出未确认样本且 qualityGate=UNAVAILABLE，不能把未标注图片或文字一并放行。关键词指标始终只是语义质量代理。
+- 独立比较文字/图片及 HIT/MISS/UNKNOWN 分桶。大量热命中不能掩盖冷请求 P50/P95 或失败率退化；缺失耗时/缓存状态/实际调用来源不通过可比性门禁。保留真实失败样本，不用成功子集替代固定语料。
+- 费用优先按每个 aiCall 的实际 provider/model + usage 乘配置费率，不能把便宜复核模型按主模型单价收费。费率可以用 `provider/model` 覆盖同名 model；输入/输出每百万单价必需非负有限数值，可选 cachedInputPerMillion 折扣需要真实 cachedTokens；缺失细分不猜测。图片 token 已包含在 provider 总输入计数时不重复收费。只比较同币种，不转换汇率；缺失费率/usage/币种或部分样本不可计费时 costGate=UNAVAILABLE。配置费率估算不是 provider 账单，未配置缓存折扣时使用全量输入单价，报告明示该口径。
+
+本地准备 `.organizer-eval/` 保存脱敏真实图片、标注、匿名上下文和回放（已加入 gitignore，不提交儿童数据/登录 token）。使用仓库现有模型配置启动各后端配置，冷请求比较应设 `ORGANIZER_CACHE_ENABLED=false`，保持相同数据库快照、日期、机器与网络。登录会话只从 `ORGANIZER_EVAL_TOKEN` 环境变量读取，不放入命令、manifest 或价格表。
+
+每条命令均可在 PowerShell/CMD 单行执行，先分别回放，再用对应服务器日志补齐实际 usage/版本：
+
+```powershell
+python scripts/run_homework_organizer_eval.py --fixtures .organizer-eval/cases.json --context .organizer-eval/context.json --base-url http://localhost:8080 --student-id YOUR_STUDENT_ID --output .organizer-eval/baseline-run-1.json
+python scripts/run_homework_organizer_eval.py --predictions .organizer-eval/baseline-run-1.json --logs .organizer-eval/baseline-server.log --output .organizer-eval/baseline-run-1.enriched.json
+python scripts/benchmark_homework_organizer.py --fixtures .organizer-eval/cases.json --manifest .organizer-eval/manifest.json --prices .organizer-eval/prices.json --report .organizer-eval/comparison.json
+```
+
+manifest 格式参考 `scripts/fixtures/organizer_benchmark_manifest.example.json`，路径相对于 manifest 文件；按同一矩阵至少完成基线与候选回放（多次运行保持次数相同）。prices 为以实际 model 或 provider/model 为键的对象，每项配置 currency（如 CNY）、inputPerMillion、outputPerMillion 和可选 cachedInputPerMillion；填入已核实的配置价格，不把测试费率当作报价。
+
+报告仅保留指标、模型、样本 ID 与退化位置，不包含作业/源文字。qualityGate、latencyGate、costGate 分别显示；退出码 0 表示代理指标与配置费用非退化检查通过，1 表示存在退化，2 表示缺少金标/可比上下文/实际用量/币种/冷样本等，无法判定。`PROXY_NONREGRESSION_PASS` 不是 98% 语义准确率，也不会自动把小模型投入生产。保留人工查看具体原始回放与家长确认入口。
+
+### #591 当前验收边界
+
+已提交的增量均保持 Draft，main 未合入：#592 埋点/离线评测、#593 独立来源、#594 经验检索、#595 风险复核、#596 安全缓存/图片保真、#597 等待生命周期、#598 EXIF 校正、#599 局部视觉复核、本切片跨模型比较工具。
+
+代码与 fake-provider/PostgreSQL CI 可验证结构、执行、权限、兼容和边界；以下仍未完成真实上线验收：真实老师样本的脱敏 VERIFIED 金标积累（约 400 条为后续目标）、同固定语料与模型环境的 main/candidate 实测、不同模型准确性/延迟/价格对比，以及实际 Harmony HAP 编译/设备验证。缺少这些证据不关闭 Issue、不宣称目标指标达成，也不默认开启可能抹去细笔画的锐化/阈值增强。

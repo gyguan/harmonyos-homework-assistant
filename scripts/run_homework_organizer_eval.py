@@ -11,8 +11,10 @@ import uuid
 from pathlib import Path
 from time import perf_counter
 from urllib import request, error
+from urllib.parse import quote
 from evaluate_homework_organizer import read_json
 from organizer_metrics import summarize
+from organizer_eval_inputs import case_fingerprint, digest
 
 
 def measurements(path):
@@ -34,18 +36,21 @@ def replay(fixtures, base, student, root):
         req_id = 'eval-' + uuid.uuid4().hex
         payload = dict(text=case.get('sourceText', ''), sourceLabel=case.get('sourceLabel', ''),
                        teacherName=case.get('teacherName', ''), importId=req_id)
+        image_bytes = None
         image = case.get('imagePath')
         if kind == 'IMAGE':
             if not image:
                 raise ValueError('Image case requires actual imagePath: ' + case['id'])
-            payload.update(imageBase64=base64.b64encode((root / image).read_bytes()).decode(),
+            image_bytes = (root / image).read_bytes()
+            payload.update(imageBase64=base64.b64encode(image_bytes).decode(),
                            contentType=case.get('contentType', 'image/png'))
-        url = base.rstrip('/') + '/api/v1/students/' + student + '/homework/' + ('organize-image' if kind == 'IMAGE' else 'organize')
+        input_fingerprint = case_fingerprint(case, root, image_bytes)
+        url = base.rstrip('/') + '/api/v1/students/' + quote(student, safe='') + '/homework/' + ('organize-image' if kind == 'IMAGE' else 'organize')
         req = request.Request(url, data=json.dumps(payload).encode(), headers={
             'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json',
             'X-Request-Id': req_id, 'X-Client-Scene': 'organizer.eval'})
         started = perf_counter()
-        row = dict(caseId=case['id'], inputType=kind, requestId=req_id, importId=req_id)
+        row = dict(caseId=case['id'], inputType=kind, requestId=req_id, importId=req_id, inputFingerprint=input_fingerprint)
         try:
             with request.urlopen(req, timeout=300) as response:
                 result = json.load(response)
@@ -62,6 +67,7 @@ def replay(fixtures, base, student, root):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--context', type=Path, help='Anonymized controlled benchmark context declaration')
     p.add_argument('--logs', type=Path)
     p.add_argument('--fixtures', type=Path)
     p.add_argument('--base-url', default='http://localhost:8080')
@@ -70,12 +76,17 @@ def main():
     p.add_argument('--prices', type=Path, help='Optional per-model configured price/currency table')
     p.add_argument('--output', required=True, type=Path)
     args = p.parse_args()
+    metadata = {}
     if args.predictions:
-        rows = read_json(args.predictions)['results']
+        prior = read_json(args.predictions)
+        rows = prior['results']
+        metadata = {key: prior[key] for key in ('fixtureHash', 'benchmarkContext') if key in prior}
     elif args.fixtures:
         if not args.student_id:
             p.error('--student-id is required with --fixtures')
-        rows = replay(read_json(args.fixtures), args.base_url, args.student_id, args.fixtures.parent)
+        fixtures = read_json(args.fixtures)
+        rows = replay(fixtures, args.base_url, args.student_id, args.fixtures.parent)
+        metadata['fixtureHash'] = digest(fixtures)
     else:
         rows = []
     observations = measurements(args.logs) if args.logs else []
@@ -85,7 +96,9 @@ def main():
         # The replay wall time includes HTTP; retain it independently.
         row['httpElapsedMs'] = row.get('elapsedMs')
         row.update(observation)
-    data = {'results': rows, 'performance': summarize(rows or observations, read_json(args.prices) if args.prices else None)}
+    if args.context:
+        metadata['benchmarkContext'] = read_json(args.context)
+    data = {**metadata, 'results': rows, 'performance': summarize(rows or observations, read_json(args.prices) if args.prices else None)}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(data['performance'], ensure_ascii=False, indent=2))

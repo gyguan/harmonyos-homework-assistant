@@ -262,7 +262,7 @@ public class OpenAiCompatibleTransport {
       Map<String, Object> format = structuredFormat(outputMode, schemaName, schema);
       if (format != null) body.put("text", Map.of("format", format));
     }
-    ResponsesResponse response = post(properties.getResponsesPath(), body, ResponsesResponse.class, imageDataUrl != null, schemaName);
+    ResponsesResponse response = post(properties.getResponsesPath(), body, ResponsesResponse.class, imageDataUrl != null, schemaName, AiCallMetrics.promptVersion(instructions, schemaName, schema));
     return extractResponsesText(response);
   }
 
@@ -297,7 +297,7 @@ public class OpenAiCompatibleTransport {
           chatStructuredResponseFormat(outputMode, schemaName, schema);
       if (responseFormat != null) body.put("response_format", responseFormat);
     }
-    ChatResponse response = post(properties.getChatCompletionsPath(), body, ChatResponse.class, imageDataUrl != null, schemaName);
+    ChatResponse response = post(properties.getChatCompletionsPath(), body, ChatResponse.class, imageDataUrl != null, schemaName, AiCallMetrics.promptVersion(instructions, schemaName, schema));
     return extractChatText(response);
   }
 
@@ -315,7 +315,7 @@ public class OpenAiCompatibleTransport {
         Map.of("type", "image_url", "image_url", Map.of("url", imageDataUrl)));
   }
 
-  private <T> T post(String path, Map<String, Object> body, Class<T> responseType, boolean imageRequest, String schemaName) throws Exception {
+  private <T> T post(String path, Map<String, Object> body, Class<T> responseType, boolean imageRequest, String schemaName, String promptVersion) throws Exception {
     RestClient.RequestBodySpec request = client.post().uri(path).accept(MediaType.APPLICATION_JSON);
     if (properties.getApiKey() != null && !properties.getApiKey().isBlank()) {
       request.header(HttpHeaders.AUTHORIZATION, "Bearer " + properties.getApiKey());
@@ -346,7 +346,7 @@ public class OpenAiCompatibleTransport {
       // Actual HTTP attempts, including failed/empty responses; no estimated token counts.
       AiCallMetrics.record(new AiCallMetrics.Call(schemaName != null && schemaName.endsWith("review") ? "REVIEW" : "PRIMARY",
           String.valueOf(body.get("model")), elapsedMs(started), success, usage,
-          capabilities(String.valueOf(body.get("model"))).provider().name()));
+          capabilities(String.valueOf(body.get("model"))).provider().name(), promptVersion));
     }
   }
 
