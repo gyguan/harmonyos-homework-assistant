@@ -86,6 +86,13 @@ class HomeworkOrganizerCacheTest {
     client.organizeImage(s,"图片","data:image/png;base64,ORIGINAL1","");
     verify(transport,times(4)).completeWithImage(anyString(),anyString(),anyString(),anyString(),anyInt(),anyString(),anyMap());
   }
+  @Test void identicalNormalizedPixelsWithDistinctOriginalInputsDoNotShareCacheIdentity() {
+    setup(); var s=student();
+    client.organizeImage(s,"图片","data:image/png;base64,NORMALIZED","","original-one");
+    client.organizeImage(s,"图片","data:image/png;base64,NORMALIZED","","original-one");
+    client.organizeImage(s,"图片","data:image/png;base64,NORMALIZED","","original-two");
+    verify(transport,times(2)).completeWithImage(anyString(),anyString(),anyString(),anyString(),anyInt(),anyString(),anyMap());
+  }
   @Test void riskyOrFailedResultsAndContextChangedDuringInferenceAreNeverCached() {
     setup(); var s = student();
     when(transport.complete(anyString(),anyString(),anyString(),anyInt(),anyString(),anyMap())).thenReturn(Optional.empty());

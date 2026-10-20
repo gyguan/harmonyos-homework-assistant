@@ -17,13 +17,14 @@ from batch_publish_e2e import create_student
 from e2e_smoke import expect, http, require, SmokeFailure
 from homework_review_outbox_e2e import pg_container, sql
 
-def valid_test_png():
+def valid_test_png(width=8, height=8):
     def chunk(kind, data):
         return struct.pack('>I', len(data)) + kind + data + struct.pack('>I', zlib.crc32(kind + data) & 0xffffffff)
-    return (b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', 8, 8, 8, 2, 0, 0, 0))
-            + chunk(b'IDAT', zlib.compress((b'\x00' + b'\xff\xff\xff' * 8) * 8)) + chunk(b'IEND', b''))
+    return (b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0))
+            + chunk(b'IDAT', zlib.compress((b'\x00' + b'\xff\xff\xff' * width) * height)) + chunk(b'IEND', b''))
 
 
+IMAGE_SIZES = []
 REPLY = {}
 CALLS = 0
 REVIEW_REPLY = None
@@ -50,6 +51,14 @@ class Provider(BaseHTTPRequestHandler):
             raw = self.rfile.read(int(self.headers.get('Content-Length', '0')))
         body = json.loads(raw)
         require('messages' in body, 'expected chat protocol')
+        for message in body['messages']:
+            if not isinstance(message['content'], list):
+                continue
+            for part in message['content']:
+                if part.get('type') == 'image_url':
+                    raw_image = base64.b64decode(part['image_url']['url'].split(',',1)[1])
+                    require(raw_image.startswith(b'\x89PNG'), 'expected a lossless PNG')
+                    IMAGE_SIZES.append(struct.unpack('>II',raw_image[16:24]))
         reply = REVIEW_REPLY if 'reviewVersion=1' in body['messages'][0]['content'] and REVIEW_REPLY is not None else REPLY
         data = json.dumps({'choices': [{'message': {'role': 'assistant', 'content': json.dumps(reply, ensure_ascii=False)}}],
                            'usage': {'prompt_tokens': 120, 'completion_tokens': 80}}).encode()
@@ -191,6 +200,25 @@ def main():
             REPLY = dict(assignments=[candidate('fake')])
             legacy = expect(http(base, 'POST', route + '/organize', token=token, payload={'text': '数学口算20题','sourceLabel':'旧接口兼容'}), (200,), 'legacy request/response compatibility').json()
             require(legacy['needsReview'] and len(legacy['assignments']) == 1, 'old API dropped candidate or concealed evidence gap')
+            # PNG eXIf uses the same TIFF orientation as JPEG APP1. Pixels reaching the
+            # external provider are already upright; no second inference is needed.
+            upright = valid_test_png(7,3)
+            tiff = b'MM'+struct.pack('>HIHHHIHHI',42,8,1,0x0112,3,1,6,0,0)
+            kind = b'eXIf'
+            chunk = struct.pack('>I',len(tiff))+kind+tiff+struct.pack('>I',zlib.crc32(kind+tiff)&0xffffffff)
+            oriented = upright[:33]+chunk+upright[33:]
+            REPLY = dict(schemaVersion=2,sourceBlocks=[block('i1','数学口算20题',image=True)],assignments=[candidate('i1')])
+            calls_before = CALLS
+            expect(http(base,'POST',route+'/organize-image',token=token,
+                        payload=dict(imageBase64=base64.b64encode(oriented).decode(),contentType='image/png',importId='orientation-'+run)),(200,),'orientation before inference')
+            require(CALLS-calls_before == 1 and IMAGE_SIZES[-1] == (3,7),'orientation added inference or lost pixel dimensions')
+            bad = bytearray(oriented); bad[33+8+18:33+8+20] = b'\x00\x09'
+            # Recompute CRC so the invalid orientation (not CRC alone) is exercised.
+            bad[33+8+26:33+12+26] = struct.pack('>I',zlib.crc32(bad[33+4:33+8+26])&0xffffffff)
+            calls_before = CALLS
+            expect(http(base,'POST',route+'/organize-image',token=token,
+                        payload=dict(imageBase64=base64.b64encode(bad).decode(),contentType='image/png')),(400,),'invalid orientation rejected')
+            require(CALLS == calls_before,'malformed orientation reached provider')
             # Reboot keeps independent evidence. Read using the same persisted session.
             proc.terminate(); proc.wait(timeout=30)
             proc = start_backend(log)
@@ -205,6 +233,9 @@ def main():
             hit = next(row for row in measurements if row['importId'] == hit_id)
             require(hit['cacheHit'] and hit['callCount'] == 0 and hit['tokensIn'] == 0 and hit['tokensOut'] == 0,
                     'cache telemetry fabricated calls or unavailable usage')
+        orientation_row = next(row for row in measurements if row['importId'] == 'orientation-'+run)
+        require(orientation_row['imagePreparation']['orientation'] == 6 and orientation_row['imagePreparation']['outputWidth'] == 3,
+                'orientation measurement missing')
         print('HOMEWORK_SOURCE_EVIDENCE_E2E_PASS PostgreSQL/Flyway, HTTP fake-provider, isolation, compatibility, restart, privacy')
     finally:
         if proc and proc.poll() is None:

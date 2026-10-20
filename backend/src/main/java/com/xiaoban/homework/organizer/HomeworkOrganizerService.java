@@ -92,14 +92,16 @@ public class HomeworkOrganizerService {
     if (!familyId.equals(student.familyId)) throw new ApiExceptions.NotFound("孩子不存在");
 
     long validateStarted = System.nanoTime();
-    String imageDataUrl = HomeworkImageInput.dataUrl(request);
+    var preparedImage = HomeworkImageInput.prepare(request);
+    String imageDataUrl = preparedImage.dataUrl();
+    HomeworkOrganizerTelemetry.image(preparedImage);
     long validateMs = elapsedMs(validateStarted);
     HomeworkOrganizerTelemetry.stage("imagePreparation", validateStarted);
 
     if (!model.imageAvailable()) throw new ApiExceptions.ServiceUnavailable("AI图片解析暂未配置");
     long modelStarted = System.nanoTime();
     var result = model.organizeImage(
-        student, teacherLabel(familyId, studentId, request.sourceLabel(), request.teacherName()), imageDataUrl, request.text())
+        student, teacherLabel(familyId, studentId, request.sourceLabel(), request.teacherName()), imageDataUrl, request.text(), preparedImage.originalHash())
         .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI图片解析失败，请确认模型支持图片"));
     long modelMs = elapsedMs(modelStarted);
 

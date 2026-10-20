@@ -47,7 +47,7 @@ class HomeworkImageInputTest {
         "数学", "口算20题", "完成口算20题", "", "今天", 10, "口算20题", .9,
         "", "", "", 0.0, "");
     when(model.organizeImage(eq(student), eq("图片"), startsWith("data:image/png;base64,"),
-        eq("数学口算20题")))
+        eq("数学口算20题"), anyString()))
         .thenReturn(Optional.of(new HomeworkOrganizerDtos.ImageResponse(
             List.of(todayCandidate), "AI_IMAGE", "图片文字")));
 
@@ -55,7 +55,7 @@ class HomeworkImageInputTest {
         new HomeworkOrganizerDtos.ImageRequest(png(), "image/png", "图片", "数学口算20题"));
 
     verify(model, times(1)).organizeImage(
-        eq(student), eq("图片"), startsWith("data:image/png;base64,"), eq("数学口算20题"));
+        eq(student), eq("图片"), startsWith("data:image/png;base64,"), eq("数学口算20题"), anyString());
   }
 
   static String png() throws Exception {
@@ -114,12 +114,12 @@ class HomeworkImageInputTest {
         "数学", "口算", "口算20题", "", "今天", 10, "口算", .9,
         "", "", "", 0.0, "");
     var expected = new HomeworkOrganizerDtos.ImageResponse(List.of(chinese, math), "AI_IMAGE", "语文朗读；数学口算");
-    when(model.organizeImage(eq(student), eq("图片"), startsWith("data:image/png;base64,"), isNull()))
+    when(model.organizeImage(eq(student), eq("图片"), startsWith("data:image/png;base64,"), isNull(), anyString()))
         .thenReturn(Optional.of(expected));
     var actual = service.organizeImage(family, "student-1", request);
     assertEquals(List.of("语文", "数学"), actual.assignments().stream().map(HomeworkOrganizerDtos.Candidate::subject).toList());
     assertEquals("AI_IMAGE", actual.mode());
-    when(model.organizeImage(any(), any(), any(), any())).thenReturn(Optional.empty());
+    when(model.organizeImage(any(), any(), any(), any(), any())).thenReturn(Optional.empty());
     assertThrows(ApiExceptions.ServiceUnavailable.class, () -> service.organizeImage(family, "student-1", request));
   }
 }

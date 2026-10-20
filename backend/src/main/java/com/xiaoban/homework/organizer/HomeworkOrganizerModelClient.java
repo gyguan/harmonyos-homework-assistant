@@ -20,4 +20,10 @@ public interface HomeworkOrganizerModelClient {
 
   Optional<HomeworkOrganizerDtos.ImageResponse> organizeImage(
       StudentEntity student, String sourceLabel, String imageDataUrl, String text);
+  /** Original-byte identity survives lossless orientation normalization; legacy clients delegate. */
+  default Optional<HomeworkOrganizerDtos.ImageResponse> organizeImage(StudentEntity student,
+      String sourceLabel, String imageDataUrl, String text, String originalImageHash) {
+    return organizeImage(student, sourceLabel, imageDataUrl, text);
+  }
+
 }
