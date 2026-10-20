@@ -45,17 +45,6 @@ app:
     worker-delay-ms: ${HOMEWORK_REVIEW_WORKER_DELAY_MS:30000}
   media-sync:
     worker-delay-ms: ${MEDIA_SYNC_WORKER_DELAY_MS:5000}
-  organizer:
-    image:
-      visual-review-enabled: ${ORGANIZER_IMAGE_VISUAL_REVIEW_ENABLED:true}
-    cache:
-      enabled: ${ORGANIZER_CACHE_ENABLED:true}
-      ttl-seconds: ${ORGANIZER_CACHE_TTL_SECONDS:300}
-      max-entries: ${ORGANIZER_CACHE_MAX_ENTRIES:128}
-      max-bytes: ${ORGANIZER_CACHE_MAX_BYTES:8388608}
-    experience:
-      top-k: ${ORGANIZER_EXPERIENCE_TOP_K:4}
-      max-chars: ${ORGANIZER_EXPERIENCE_MAX_CHARS:2400}
   ai:
     provider: ${AI_PROVIDER:AUTO}
     protocol: ${AI_PROTOCOL:responses}

@@ -94,7 +94,7 @@ export struct ConfirmationCandidateCard {
             .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY);
-          if (this.item.confidence < 0.8 || (this.item.sourceEvidence.reviewNotice !== undefined && this.item.sourceEvidence.reviewNotice.length > 0)) {
+          if (this.item.confidence < 0.8) {
             Text('重点确认')
               .fontSize(AppTheme.META_SIZE)
               .lineHeight(AppTheme.META_LINE_HEIGHT)
@@ -137,14 +137,6 @@ export struct ConfirmationCandidateCard {
         onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
           this.onMinutesChange(candidate, minutes)
       });
-
-      if (this.item.sourceEvidence.reviewNotice !== undefined && this.item.sourceEvidence.reviewNotice.length > 0) {
-        Text(this.item.sourceEvidence.reviewNotice)
-          .width('100%')
-          .fontSize(AppTheme.META_SIZE)
-          .lineHeight(AppTheme.META_LINE_HEIGHT)
-          .fontColor(AppTheme.WARNING);
-      }
 
       Text(`来源 · ${this.item.sourceEvidence.excerpt}`)
         .width('100%')
@@ -592,9 +584,6 @@ export struct ConfirmationCandidateEditor {
       taskDate: this.taskDateDraft,
       expectedMinutes: this.expectedMinutesDraft,
       sourceEvidence: {
-        reviewNotice: this.item.sourceEvidence.reviewNotice,
-        sourceBlockIds: this.item.sourceEvidence.sourceBlockIds === undefined ?
-          undefined : this.item.sourceEvidence.sourceBlockIds.slice(),
         sourceLabel: this.item.sourceEvidence.sourceLabel,
         excerpt: this.item.sourceEvidence.excerpt,
         teacherName: this.item.sourceEvidence.teacherName,
@@ -879,13 +868,6 @@ export struct ConfirmationCandidateEditor {
               .fontSize(13)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
-            if (this.item.sourceEvidence.reviewNotice !== undefined && this.item.sourceEvidence.reviewNotice.length > 0) {
-              Text(this.item.sourceEvidence.reviewNotice)
-                .width('100%')
-                .fontSize(AppTheme.META_SIZE)
-                .lineHeight(AppTheme.META_LINE_HEIGHT)
-                .fontColor(AppTheme.WARNING);
-            }
             Text(this.item.sourceEvidence.excerpt)
               .width('100%')
               .fontSize(13)

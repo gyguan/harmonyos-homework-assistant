@@ -36,7 +36,7 @@ require("TextArea" in page and "作业内容" in page,
         "parent assignment create page must expose one editable assignment-content input")
 require("整理并继续" in page and "private async organize()" in page,
         "parent assignment create page must expose one organize action")
-require("this.viewModel.parseText(text, this.selectedSubject, '', '', '', operation)" in page and
+require("this.viewModel.parseText(text, this.selectedSubject)" in page and
         "private TeacherSelector()" not in page and "saveTeacher()" not in page,
         "text homework follows current student's assignment without teacher registration")
 require("private SubjectSelector()" in page and "@State private selectedSubject: Subject | null = null" in page and
@@ -49,7 +49,7 @@ require("HomeworkImageRecognitionMode.OCR" not in page and
         "parent-facing image parsing must use direct AI image flow without retired OCR fallback buttons")
 require("this.sourceImageRef, this.selectedSubject, this.sourceImageLabel" in page and
         "text: text.trim()" in service and "补充文字：" in service and
-        "HomeworkImportService.instance.parseImage(imageRef, subject, sourceLabel, text, teacherName, operation)" in view_model,
+        "HomeworkImportService.instance.parseImage(imageRef, subject, sourceLabel, text, teacherName)" in view_model,
         "parent's exclusive image mode must use current student and optional subject without teacher selection")
 selected_image = page.split("private applySelectedImage(", 1)[-1].split("private selectInputMode(", 1)[0]
 require("this.textDraft = '';" in selected_image and
@@ -74,10 +74,10 @@ require("this.FeedbackBanner();" in page and "if (this.parseMessage.length > 0)"
 require("HomeworkConfirmationPage" not in page,
         "assignment create page must navigate to confirmation rather than duplicate confirmation UI")
 
-require("HomeworkImportService.instance.parseText(text, subject, imageRef, imageSourceLabel, teacherName, operation)" in view_model and
+require("HomeworkImportService.instance.parseText(text, subject, imageRef, imageSourceLabel, teacherName)" in view_model and
         "HomeworkImportService.instance.selectImage()" in view_model and
         "HomeworkImportService.instance.captureImage()" in view_model and
-        "HomeworkImportService.instance.parseImage(imageRef, subject, sourceLabel, text, teacherName, operation)" in view_model,
+        "HomeworkImportService.instance.parseImage(imageRef, subject, sourceLabel, text, teacherName)" in view_model,
         "import ViewModel must delegate text/image parsing with teacher source binding and device image selection")
 require("HomeworkImportDraftRepository" in service and "DefaultHomeworkImportDraftRepository" in service,
         "HomeworkImportService must persist drafts through the draft repository boundary")

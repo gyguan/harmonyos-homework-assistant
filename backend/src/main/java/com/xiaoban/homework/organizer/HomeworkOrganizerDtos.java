@@ -31,38 +31,9 @@ public final class HomeworkOrganizerDtos {
       String duplicateAssignmentId,
       String duplicateAssignmentTitle,
       double duplicateConfidence,
-      String duplicateReason,
-      List<String> sourceBlockIds) {
-    public Candidate {
-      sourceBlockIds = sourceBlockIds == null ? List.of() : List.copyOf(sourceBlockIds);
-    }
-    public Candidate(String subject, String title, String instruction, String textbookRef,
-        String taskDate, int expectedMinutes, String sourceExcerpt, double confidence,
-        String sameTaskGroup, String duplicateAssignmentId, String duplicateAssignmentTitle,
-        double duplicateConfidence, String duplicateReason) {
-      this(subject, title, instruction, textbookRef, taskDate, expectedMinutes, sourceExcerpt,
-          confidence, sameTaskGroup, duplicateAssignmentId, duplicateAssignmentTitle,
-          duplicateConfidence, duplicateReason, List.of());
-    }
-  }
+      String duplicateReason) {}
 
-  public record ExperienceUsage(List<String> retrievedExperienceIds, List<String> appliedExperienceIds,
-      List<String> unsupportedAppliedExperienceIds) {
-    public static ExperienceUsage empty() { return new ExperienceUsage(List.of(), List.of(), List.of()); }
-  }
-
-  public record QualityFlag(String code, List<String> sourceBlockIds, List<Integer> assignmentIndexes) {}
-
-  public record Response(List<Candidate> assignments, String mode,
-      HomeworkSourceDocument sourceDocument, List<QualityFlag> qualityFlags, boolean needsReview, ExperienceUsage experiences) {
-    public Response(List<Candidate> assignments, String mode, HomeworkSourceDocument document,
-        List<QualityFlag> flags, boolean needsReview) {
-      this(assignments, mode, document, flags, needsReview, ExperienceUsage.empty());
-    }
-    public Response(List<Candidate> assignments, String mode) {
-      this(assignments, mode, null, List.of(), false);
-    }
-  }
+  public record Response(List<Candidate> assignments, String mode) {}
 
   public record ImageRequest(
       @NotBlank @Size(max = 5592408) String imageBase64,
@@ -80,14 +51,5 @@ public final class HomeworkOrganizerDtos {
     }
   }
 
-  public record ImageResponse(List<Candidate> assignments, String mode, String recognizedText,
-      HomeworkSourceDocument sourceDocument, List<QualityFlag> qualityFlags, boolean needsReview, ExperienceUsage experiences) {
-    public ImageResponse(List<Candidate> assignments, String mode, String recognizedText, HomeworkSourceDocument document,
-        List<QualityFlag> flags, boolean needsReview) {
-      this(assignments, mode, recognizedText, document, flags, needsReview, ExperienceUsage.empty());
-    }
-    public ImageResponse(List<Candidate> assignments, String mode, String recognizedText) {
-      this(assignments, mode, recognizedText, null, List.of(), false);
-    }
-  }
+  public record ImageResponse(List<Candidate> assignments, String mode, String recognizedText) {}
 }

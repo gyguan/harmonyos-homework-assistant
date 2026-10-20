@@ -1,4 +1,3 @@
-import { HomeworkImportOperation, HomeworkImportPhase } from '../import/HomeworkImportOperation';
 import { http } from '@kit.NetworkKit';
 import { CandidateAssignment, Subject } from '../../domain/model/HomeworkModels';
 import { ExtractedHomeworkText } from '../../domain/model/ImportModels';
@@ -14,26 +13,7 @@ interface OrganizePayload {
   teacherName: string;
 }
 
-interface OrganizerSourceBlock {
-  id: string;
-  text: string;
-}
-
-interface OrganizerSourceDocument {
-  schemaVersion: number;
-  inputKind: string;
-  originalText: string;
-  blocks: OrganizerSourceBlock[];
-}
-
-interface OrganizerQualityFlag {
-  code: string;
-  sourceBlockIds: string[];
-  assignmentIndexes: number[];
-}
-
 interface RemoteCandidate {
-  sourceBlockIds?: string[];
   subject: string;
   title: string;
   instruction: string;
@@ -45,9 +25,6 @@ interface RemoteCandidate {
 }
 
 interface OrganizeResponse {
-  sourceDocument?: OrganizerSourceDocument;
-  qualityFlags?: OrganizerQualityFlag[];
-  needsReview?: boolean;
   assignments: RemoteCandidate[];
   mode: string;
 }
@@ -62,9 +39,6 @@ interface ImageOrganizePayload {
 }
 
 interface ImageOrganizeResponse {
-  sourceDocument?: OrganizerSourceDocument;
-  qualityFlags?: OrganizerQualityFlag[];
-  needsReview?: boolean;
   assignments: RemoteCandidate[];
   mode: string;
   recognizedText: string;
@@ -236,13 +210,11 @@ export class HomeworkOrganizerRemoteApi {
     }
   }
 
-  async organizeImage(input: ExtractedHomeworkText, imageRef: string, operation?: HomeworkImportOperation): Promise<OrganizedHomeworkImage> {
+  async organizeImage(input: ExtractedHomeworkText, imageRef: string): Promise<OrganizedHomeworkImage> {
     if (!BackendSession.instance.isConnected()) throw new Error('请先连接后端后再解析作业图片');
-    operation?.report(HomeworkImportPhase.PREPARING_IMAGE);
     let totalStarted = Date.now();
     let encodeStarted = Date.now();
     let encoded = await HomeworkImageEncoder.encode(imageRef);
-    operation?.ensureActive();
     let encodeMs = Date.now() - encodeStarted;
     let payload: ImageOrganizePayload = {
       importId: input.importId,
@@ -252,13 +224,11 @@ export class HomeworkOrganizerRemoteApi {
       text: input.text,
       teacherName: input.teacherName === undefined ? '' : input.teacherName
     };
-    operation?.report(HomeworkImportPhase.WAITING_FOR_AI);
     let requestStarted = Date.now();
     let response = await BackendHttpClient.instance.requestFor(
       'homework.organize.image',
       `/api/v1/students/${encodeURIComponent(input.studentId)}/homework/organize-image`,
-      http.RequestMethod.POST, payload, true, 300000, operation === undefined ? null : operation.requestControl);
-    operation?.report(HomeworkImportPhase.VALIDATING_RESPONSE);
+      http.RequestMethod.POST, payload, true, 120000);
     let requestMs = Date.now() - requestStarted;
     console.info(`[AI-PERF] homework_image encodeMs=${encodeMs} requestMs=${requestMs} totalMs=${Date.now() - totalStarted} imageBytes=${encoded.encodedBytes}`);
     if (response.statusCode === 401) throw new Error('登录已失效，请重新登录后重试');
@@ -275,18 +245,17 @@ export class HomeworkOrganizerRemoteApi {
     let parsed = JSON.parse(response.body) as ImageOrganizeResponse;
     if (parsed.mode !== 'AI_IMAGE' || typeof parsed.recognizedText !== 'string' ||
       !Array.isArray(parsed.assignments) ||
-      (parsed.assignments.length > 0 && parsed.recognizedText.trim().length === 0 && parsed.needsReview !== true)) {
+      (parsed.assignments.length > 0 && parsed.recognizedText.trim().length === 0)) {
       throw new Error('AI图片解析结果不完整，请换一张清晰图片后重试');
     }
-    let candidates = this.toCandidates(input, parsed.assignments, parsed.recognizedText.trim(), parsed.qualityFlags, parsed.sourceDocument, parsed.needsReview);
+    let candidates = this.toCandidates(input, parsed.assignments, parsed.recognizedText.trim());
     if (candidates.length !== parsed.assignments.length) {
       throw new Error('AI返回的作业科目或标题无效，请重试');
     }
     return { candidates: candidates, recognizedText: parsed.recognizedText.trim() };
   }
 
-  async organize(input: ExtractedHomeworkText, operation?: HomeworkImportOperation): Promise<CandidateAssignment[] | null> {
-    operation?.ensureActive();
+  async organize(input: ExtractedHomeworkText): Promise<CandidateAssignment[] | null> {
     if (!BackendSession.instance.isConnected()) {
       return null;
     }
@@ -297,27 +266,24 @@ export class HomeworkOrganizerRemoteApi {
         sourceLabel: input.sourceLabel,
         teacherName: input.teacherName === undefined ? '' : input.teacherName
       };
-      operation?.report(HomeworkImportPhase.WAITING_FOR_AI);
       let response = await BackendHttpClient.instance.requestFor(
         'homework.organize',
         `/api/v1/students/${encodeURIComponent(input.studentId)}/homework/organize`,
         http.RequestMethod.POST,
-        payload, true, 300000, operation === undefined ? null : operation.requestControl
+        payload
       );
-      operation?.report(HomeworkImportPhase.VALIDATING_RESPONSE);
       if (response.statusCode < 200 || response.statusCode >= 300) {
         return null;
       }
       let parsed = JSON.parse(response.body) as OrganizeResponse;
-      return this.toCandidates(input, parsed.assignments, undefined, parsed.qualityFlags, parsed.sourceDocument, parsed.needsReview);
+      return this.toCandidates(input, parsed.assignments);
     } catch {
-      operation?.ensureActive();
       return null;
     }
   }
 
   private toCandidates(input: ExtractedHomeworkText, assignments: RemoteCandidate[],
-    rawTextOverride?: string, flags?: OrganizerQualityFlag[], document?: OrganizerSourceDocument, needsReview?: boolean): CandidateAssignment[] {
+    rawTextOverride?: string): CandidateAssignment[] {
     let result: CandidateAssignment[] = [];
     for (let i = 0; i < assignments.length; i++) {
       let remote = assignments[i];
@@ -358,8 +324,6 @@ export class HomeworkOrganizerRemoteApi {
         taskDate: AssignmentTaskDate.resolve(this.value(remote.taskDate, AssignmentTaskDate.today())),
         expectedMinutes: this.expectedMinutes(remote.expectedMinutes),
         sourceEvidence: {
-          reviewNotice: this.reviewNotice(flags, document, i, needsReview),
-          sourceBlockIds: remote.sourceBlockIds === undefined ? undefined : remote.sourceBlockIds.slice(),
           sourceLabel: input.sourceLabel,
           excerpt: this.value(remote.sourceExcerpt, remote.title),
           teacherName: input.teacherName === undefined ? '' : input.teacherName,
@@ -369,37 +333,6 @@ export class HomeworkOrganizerRemoteApi {
       });
     }
     return result;
-  }
-
-  private reviewNotice(flags: OrganizerQualityFlag[] | undefined, document: OrganizerSourceDocument | undefined,
-    index: number, needsReview: boolean | undefined): string {
-    if (needsReview !== true) return '';
-    let notices: string[] = [];
-    if (flags !== undefined) {
-      for (let flag of flags) {
-        if (flag.assignmentIndexes.length > 0 && flag.assignmentIndexes.indexOf(index) < 0) continue;
-        let reason: string = '内容仍有不确定之处，请核对原文';
-        if (flag.code === 'POSSIBLE_OMISSION') reason = '可能遗漏作业';
-        if (flag.code === 'UNSUPPORTED_NUMBER' || flag.code === 'UNSUPPORTED_DATE') reason = '数量、页码或日期需要核对';
-        if (flag.code === 'UNREADABLE_SOURCE') reason = '有看不清的原文';
-        if (flag.code === 'IMAGE_ORIENTATION_UNCERTAIN') reason = '图片方向信息无法确认，请核对图片方向和作业内容';
-        if (flag.code === 'TASK_WITHOUT_EVIDENCE' || flag.code === 'UNKNOWN_SOURCE_REFERENCE') reason = '这项作业缺少可核对的原文';
-        if (flag.code.indexOf('REVIEW_') === 0) reason = 'AI复核未能确认，请核对后发布';
-        let excerpt: string = '';
-        if (document !== undefined) {
-          for (let block of document.blocks) {
-            if (flag.sourceBlockIds.indexOf(block.id) >= 0 && block.text.length > 0) {
-              excerpt = block.text.substring(0, 80);
-              break;
-            }
-          }
-        }
-        let notice: string = excerpt.length > 0 ? `${reason}：${excerpt}` : reason;
-        if (notices.indexOf(notice) < 0) notices.push(notice);
-        if (notices.length >= 3) break;
-      }
-    }
-    return notices.length > 0 ? notices.join('；') : '请核对老师原文后再发布';
   }
 
   private subject(value: string): Subject | null {

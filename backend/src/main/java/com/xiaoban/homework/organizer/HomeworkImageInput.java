@@ -1,13 +1,12 @@
 package com.xiaoban.homework.organizer;
 
 import com.xiaoban.homework.common.ApiExceptions;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.util.HexFormat;
-import javax.imageio.stream.MemoryCacheImageOutputStream;
 import java.util.Base64;
 import java.util.Locale;
 import javax.imageio.ImageIO;
@@ -19,15 +18,19 @@ final class HomeworkImageInput {
   static final int MAX_BYTES = 4 * 1024 * 1024;
   static final int MAX_BASE64_CHARS = 4 * ((MAX_BYTES + 2) / 3);
 
-  static final String PROCESSING_VERSION = "orientation-v2";
-  record Prepared(String dataUrl, String originalHash, int width, int height, int outputWidth,
-      int outputHeight, int orientation, int inputBytes, int outputBytes, String orientationStatus) {}
+  /**
+   * 送给视觉模型的图片长边上限。
+   *
+   * 视觉 token 数与像素数成正比，而预填充阶段全部花在等待上：同一张黑板图实测
+   * 首 token 延迟 2048px≈22.6 秒、1536px≈5.3 秒、1280px≈11.8 秒（免费档有抖动，
+   * 但 2048 明显更慢）。作业照片里的字一般在 1536px 下仍然清晰可辨，
+   * 再往下压识别率会掉，所以统一收到 1536。
+   */
+  static final int MAX_SIDE = 1536;
 
   private HomeworkImageInput() {}
 
-  static String dataUrl(HomeworkOrganizerDtos.ImageRequest request) { return prepare(request).dataUrl(); }
-
-  static Prepared prepare(HomeworkOrganizerDtos.ImageRequest request) {
+  static String dataUrl(HomeworkOrganizerDtos.ImageRequest request) {
     if (request.imageBase64() == null || request.imageBase64().isBlank()
         || request.imageBase64().length() > MAX_BASE64_CHARS) {
       throw new ApiExceptions.BadRequest("图片不能为空且不得超过4MB");
@@ -47,8 +50,6 @@ final class HomeworkImageInput {
     if (bytes.length == 0 || bytes.length > MAX_BYTES) throw new ApiExceptions.BadRequest("图片不得超过4MB");
     byte[] payload = bytes;
     String payloadType = contentType;
-    int width, height, orientation;
-    String orientationStatus;
     try (var input = new MemoryCacheImageInputStream(new ByteArrayInputStream(bytes))) {
       var readers = ImageIO.getImageReaders(input);
       if (!readers.hasNext()) throw new ApiExceptions.BadRequest("图片格式不合法");
@@ -58,26 +59,19 @@ final class HomeworkImageInput {
           throw new ApiExceptions.BadRequest("图片格式与声明不一致");
         }
         reader.setInput(input, true, true);
-        width = reader.getWidth(0);
-        height = reader.getHeight(0);
+        int width = reader.getWidth(0);
+        int height = reader.getHeight(0);
         if (width <= 0 || height <= 0 || (long) width * height > 40_000_000L) {
           throw new ApiExceptions.BadRequest("图片尺寸过大，请缩小后重试");
         }
         // Decode after dimension checks so a truncated or malformed image cannot reach the provider.
         BufferedImage decoded = reader.read(0);
         if (decoded == null) throw new ApiExceptions.BadRequest("图片内容不合法");
-        try {
-          var metadata = HomeworkImageOrientation.inspect(bytes, contentType);
-          orientation = metadata.orientation();
-          orientationStatus = metadata.status();
-          payload = metadata.bytes();
-          if (orientation != 1) {
-            var upright = HomeworkImageOrientation.upright(decoded, orientation);
-            try { payload = encodePng(upright, MAX_BYTES); }
-            finally { upright.flush(); }
-            payloadType = "image/png";
-          }
-        } finally { decoded.flush(); }
+        byte[] shrunk = shrinkToMaxSide(decoded);
+        if (shrunk != null) {
+          payload = shrunk;
+          payloadType = "image/jpeg";
+        }
       } finally {
         reader.dispose();
       }
@@ -86,37 +80,36 @@ final class HomeworkImageInput {
     } catch (Exception invalid) {
       throw new ApiExceptions.BadRequest("图片内容不合法");
     }
-    String originalHash;
-    try { originalHash = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes)); }
-    catch (java.security.NoSuchAlgorithmException impossible) { throw new IllegalStateException(impossible); }
-    return new Prepared("data:" + payloadType + ";base64," + Base64.getEncoder().encodeToString(payload),
-        originalHash, width, height, orientation >= 5 ? height : width, orientation >= 5 ? width : height,
-        orientation, bytes.length, payload.length, orientationStatus);
+    return "data:" + payloadType + ";base64," + Base64.getEncoder().encodeToString(payload);
   }
 
-  /** Explicit memory-only output with a hard limit before a cache buffer can grow past it. */
-  static byte[] encodePng(BufferedImage image, int limit) {
-    var bytes = new ByteArrayOutputStream();
-    try (var output = new MemoryCacheImageOutputStream(bytes) {
-      private void budget(int count) throws IOException {
-        if (count < 0 || getStreamPosition() > (long) limit - count) throw new BudgetExceeded();
-      }
-      @Override public void write(int value) throws IOException { budget(1); super.write(value); }
-      @Override public void write(byte[] buffer, int offset, int length) throws IOException {
-        budget(length); super.write(buffer, offset, length);
-      }
-      @Override public void seek(long position) throws IOException {
-        if (position > limit) throw new BudgetExceeded(); super.seek(position);
-      }
-    }) {
-      if (!ImageIO.write(image, "PNG", output)) throw new IOException("PNG writer unavailable");
-      output.flush();
-      return bytes.toByteArray();
-    } catch (IOException failure) {
-      for (Throwable cause = failure; cause != null; cause = cause.getCause())
-        if (cause instanceof BudgetExceeded) throw new ApiExceptions.BadRequest("图片方向校正后超过4MB，请裁剪所需区域后重试");
-      throw new ApiExceptions.BadRequest("图片方向校正失败，请重新导出图片后重试");
+  /**
+   * 把超过 {@link #MAX_SIDE} 的图缩到长边 {@link #MAX_SIDE} 并重编码为 JPEG。
+   * 返回 null 表示不需要缩放（保持原始字节，避免一次无谓的有损重编码）。
+   */
+  static byte[] shrinkToMaxSide(BufferedImage image) {
+    int width = image.getWidth();
+    int height = image.getHeight();
+    if (width <= 0 || height <= 0) return null;
+    int longest = Math.max(width, height);
+    if (longest <= MAX_SIDE) return null;
+
+    double ratio = (double) MAX_SIDE / longest;
+    int targetWidth = Math.max(1, (int) Math.round(width * ratio));
+    int targetHeight = Math.max(1, (int) Math.round(height * ratio));
+    BufferedImage scaled = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+    Graphics2D graphics = scaled.createGraphics();
+    try {
+      graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+      graphics.drawImage(image, 0, 0, targetWidth, targetHeight, null);
+    } finally {
+      graphics.dispose();
+    }
+    try (var output = new ByteArrayOutputStream()) {
+      if (!ImageIO.write(scaled, "JPEG", output)) return null;
+      return output.toByteArray();
+    } catch (IOException unwritable) {
+      return null;
     }
   }
-  private static final class BudgetExceeded extends IOException {}
 }

@@ -136,9 +136,6 @@ export class HomeworkImportInboxStore {
       taskDate: source.taskDate,
       expectedMinutes: source.expectedMinutes,
       sourceEvidence: {
-        reviewNotice: source.sourceEvidence.reviewNotice,
-        sourceBlockIds: source.sourceEvidence.sourceBlockIds === undefined ?
-          undefined : source.sourceEvidence.sourceBlockIds.slice(),
         sourceLabel: source.sourceEvidence.sourceLabel,
         excerpt: source.sourceEvidence.excerpt,
         batchId: source.sourceEvidence.batchId,

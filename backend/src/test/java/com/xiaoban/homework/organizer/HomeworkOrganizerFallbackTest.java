@@ -34,8 +34,8 @@ class HomeworkOrganizerFallbackTest {
     var candidate = new HomeworkOrganizerDtos.Candidate(
         "数学", "口算20题", "完成口算20题", "", tomorrow.toString(), 10,
         "数学：口算20题", 0.95, "", "", "", 0.0, "");
-    when(model.organizeDocument(eq(student), eq("老师通知"), eq("数学：口算20题")))
-        .thenReturn(Optional.of(new HomeworkOrganizerDtos.Response(List.of(candidate), "AI")));
+    when(model.organize(eq(student), eq("老师通知"), eq("数学：口算20题")))
+        .thenReturn(Optional.of(List.of(candidate)));
 
     var result = service.organize(
         family, "student-1", new HomeworkOrganizerDtos.Request("数学：口算20题", "老师通知"));
@@ -62,8 +62,8 @@ class HomeworkOrganizerFallbackTest {
     var candidate = new HomeworkOrganizerDtos.Candidate(
         "数学", "口算20题", "完成口算20题", "", tomorrow.toString(), 10,
         "明天完成数学口算20题", 0.95, "", "", "", 0.0, "");
-    when(model.organizeDocument(eq(student), eq("老师通知"), eq("明天完成数学口算20题")))
-        .thenReturn(Optional.of(new HomeworkOrganizerDtos.Response(List.of(candidate), "AI")));
+    when(model.organize(eq(student), eq("老师通知"), eq("明天完成数学口算20题")))
+        .thenReturn(Optional.of(List.of(candidate)));
 
     var result = service.organize(
         family, "student-1",

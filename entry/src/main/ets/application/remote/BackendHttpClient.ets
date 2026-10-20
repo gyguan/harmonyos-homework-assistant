@@ -1,6 +1,5 @@
 import { http } from '@kit.NetworkKit';
 import { BackendSession } from './BackendSession';
-import { BackendRequestControl } from './BackendRequestControl';
 
 export interface BackendResponse {
   statusCode: number;
@@ -13,9 +12,8 @@ export class BackendHttpClient {
   private constructor() {}
 
   async requestFor(scene: string, path: string, method: http.RequestMethod,
-    body: Object | null = null, authenticated: boolean = true, readTimeoutMs: number = 60000,
-    control: BackendRequestControl | null = null): Promise<BackendResponse> {
-    return this.request(path, method, body, authenticated, scene, readTimeoutMs, control);
+    body: Object | null = null, authenticated: boolean = true, readTimeoutMs: number = 60000): Promise<BackendResponse> {
+    return this.request(path, method, body, authenticated, scene, readTimeoutMs);
   }
 
   traceHeaders(path: string, method: http.RequestMethod, scene: string): Record<string, string> {
@@ -29,9 +27,7 @@ export class BackendHttpClient {
   }
 
   async request(path: string, method: http.RequestMethod, body: Object | null = null,
-    authenticated: boolean = true, scene: string = 'unclassified', readTimeoutMs: number = 60000,
-    control: BackendRequestControl | null = null): Promise<BackendResponse> {
-    control?.ensureActive();
+    authenticated: boolean = true, scene: string = 'unclassified', readTimeoutMs: number = 60000): Promise<BackendResponse> {
     let session = BackendSession.instance;
     if (session.getBaseUrl().length === 0) throw new Error('请先配置后端地址');
     let headers: Record<string, string> = this.traceHeaders(path, method, scene);
@@ -41,31 +37,19 @@ export class BackendHttpClient {
       headers['Authorization'] = `Bearer ${session.getToken()}`;
     }
     let client = http.createHttp();
-    let destroyed: boolean = false;
-    let destroy: () => void = () => {
-      if (destroyed) return;
-      destroyed = true;
-      // Native cleanup is best effort; retain the original response/error.
-      try { client.destroy(); } catch {}
-    };
-    let detach: () => void = control === null ? () => {} : control.onStop(destroy);
     try {
-      control?.ensureActive();
       let options: http.HttpRequestOptions = {
         method: method, header: headers, connectTimeout: 15000, readTimeout: readTimeoutMs
       };
       if (body !== null) options.extraData = JSON.stringify(body);
       let response = await client.request(session.getBaseUrl() + path, options);
-      control?.ensureActive();
       if (authenticated && response.responseCode === 401) session.disconnect();
       let text = typeof response.result === 'string' ? response.result : JSON.stringify(response.result);
       return { statusCode: response.responseCode, body: text };
     } catch {
-      control?.ensureActive();
       throw new Error('后端请求失败，请检查网络或后端地址');
     } finally {
-      detach();
-      destroy();
+      try { client.destroy(); } catch {}
     }
   }
 

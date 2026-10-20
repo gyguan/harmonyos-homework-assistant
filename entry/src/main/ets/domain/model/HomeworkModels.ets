@@ -97,8 +97,6 @@ export interface RawHomeworkImport {
 }
 
 export interface SourceEvidence {
-  reviewNotice?: string;
-  sourceBlockIds?: string[];
   sourceLabel: string;
   excerpt: string;
   teacherName?: string;
