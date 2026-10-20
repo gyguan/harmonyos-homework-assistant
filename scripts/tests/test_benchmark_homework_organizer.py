@@ -50,6 +50,14 @@ class BenchmarkTest(unittest.TestCase):
         self.assertEqual('NO_VERIFIED_GOLD',result['qualityStatus'])
         self.assertEqual('UNAVAILABLE',result['decision'])
         self.assertIsNone(result['quality']['recallProxy'])
+    def test_partial_gold_cannot_bless_unverified_image_or_text_quality(self):
+        self.fixtures['cases'][1]['reviewStatus']='DRAFT'
+        result=self.compare()
+        self.assertEqual(1,result['quality']['recallProxy'])
+        self.assertEqual('UNAVAILABLE',result['qualityGate'])
+        self.assertEqual('UNAVAILABLE',result['decision'])
+        self.assertEqual(['chinese'],result['goldCoverage']['unverifiedCaseIds'])
+
     def test_faster_cheaper_candidate_cannot_hide_task_or_field_loss(self):
         for loss in ('task','field'):
             candidate=self.run_data('B',1)
@@ -114,6 +122,15 @@ class BenchmarkTest(unittest.TestCase):
         result=self.compare(base,candidate)
         self.assertEqual(1,result['performance']['p95Ms'])
         self.assertEqual('REGRESSED',result['latencyGate'])
+    def test_warm_hits_cannot_hide_more_expensive_cold_model(self):
+        self.fixtures['cases']=[dict(copy.deepcopy(self.fixtures['cases'][0]),id='case-'+str(i)) for i in range(20)]
+        self.prices['B']['inputPerMillion']=2;self.prices['B']['outputPerMillion']=2
+        base=self.run_data();candidate=self.run_data('B',80)
+        for row in candidate['results'][1:]:row.update(cacheHit=True,callCount=0,tokensIn=0,tokensOut=0,aiCalls=[])
+        result=self.compare(base,candidate)
+        self.assertLess(result['performance']['averageConfiguredCost'],summarize(base['results'],self.prices)['averageConfiguredCost'])
+        self.assertEqual('REGRESSED',result['costGate'])
+
     def test_same_image_path_with_changed_bytes_invalidates_comparison(self):
         with tempfile.TemporaryDirectory() as folder:
             self.root=Path(folder);image=self.root/'case.png';image.write_bytes(b'actual fixture image bytes')

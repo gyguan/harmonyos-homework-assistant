@@ -120,7 +120,7 @@ JPEG APP1 / PNG eXIf 的 IFD0 Orientation 采用 CIPA DC-008 的 1–8 方向约
 - 每个候选具有相同次数的完整回放，每次恰好覆盖同一 case ID 矩阵；漏样本、重复/额外样本直接拒绝。fixtureHash 包括标注与 DRAFT/VERIFIED 状态；inputFingerprint 绑定实际发送的文字、老师归属、补充文字、MIME 和图片字节。图片路径相同但内容变化也不能通过，截图不能用转录文字冒充。
 - `MODEL` 比较固定逐样本 Prompt/规则/经验版本，允许模型变化；`PIPELINE` 比较固定模型，允许 Prompt/规则/检索改变。一个配置可分别使用文字/图片模型，但同一输入类型及重复回放不得无说明地漂移模型，同一样本各次回放版本必须稳定。实际主模型必须与 aiCalls 的 PRIMARY 一致。每个实际 HTTP 调用还记录 caller instructions（含动态经验）与 Schema 的规范化 SHA-256 Prompt 指纹，覆盖主调用及文字/视觉复核；MODEL 比较不能只凭未变化的首轮通用 Prompt 版本放过第二轮指令漂移。缺失旧细分指纹时标为 UNAVAILABLE，需要重新回放。
 - 回放可通过 `--context` 附带匿名上下文声明，必需字段为 studentScopeHash、teacherStateHash、textbookStateHash（三者均 64 位小写 SHA-256）、businessDate（有效 ISO 日期）、networkProfile（不含隐私的环境标识）。teacherStateHash 应覆盖老师映射与全部启用/停用经验状态，textbookStateHash 覆盖学生年级/学期/教材。声明必须与各配置/重复运行一致；这只是操作者的控制声明，不是程序对网络条件或数据库快照的独立证明。
-- 每个 VERIFIED case 单独复用原评测器，再以原始分子/分母聚合；保留字段/证据精度。某个样本漏项、捏造或关键字段下降不能用其他样本提高抵消。没有 VERIFIED 样本则质量为 NO_VERIFIED_GOLD，不能输出可用模型结论。关键词指标始终只是语义质量代理。
+- 每个 VERIFIED case 单独复用原评测器，再以原始分子/分母聚合；保留字段/证据精度。某个样本漏项、捏造或关键字段下降不能用其他样本提高抵消。没有 VERIFIED 样本则质量为 NO_VERIFIED_GOLD；只有部分样本确认时仍可报告已确认部分的代理指标，但列出未确认样本且 qualityGate=UNAVAILABLE，不能把未标注图片或文字一并放行。关键词指标始终只是语义质量代理。
 - 独立比较文字/图片及 HIT/MISS/UNKNOWN 分桶。大量热命中不能掩盖冷请求 P50/P95 或失败率退化；缺失耗时/缓存状态/实际调用来源不通过可比性门禁。保留真实失败样本，不用成功子集替代固定语料。
 - 费用优先按每个 aiCall 的实际 provider/model + usage 乘配置费率，不能把便宜复核模型按主模型单价收费。费率可以用 `provider/model` 覆盖同名 model；输入/输出每百万单价必需非负有限数值，可选 cachedInputPerMillion 折扣需要真实 cachedTokens；缺失细分不猜测。图片 token 已包含在 provider 总输入计数时不重复收费。只比较同币种，不转换汇率；缺失费率/usage/币种或部分样本不可计费时 costGate=UNAVAILABLE。配置费率估算不是 provider 账单，未配置缓存折扣时使用全量输入单价，报告明示该口径。
 

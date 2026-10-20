@@ -36,6 +36,13 @@ def lower_gate(prior, current, keys):
     return 'REGRESSED' if any(current[k] > prior[k] for k in keys) else 'PASS'
 
 
+def cost_gate(prior, current):
+    currency = prior.get('costCurrency')
+    complete = (isinstance(currency, str) and re.fullmatch('[A-Z]{3}', currency) and currency == current.get('costCurrency')
+                and not prior.get('costUnavailableRequests') and not current.get('costUnavailableRequests'))
+    return lower_gate(prior, current, ('averageConfiguredCost',)) if complete else 'UNAVAILABLE'
+
+
 def context_valid(context):
     try:
         date.fromisoformat(context.get('businessDate', ''))
@@ -136,7 +143,8 @@ def benchmark(fixtures, variants, baseline, prices=None, root=Path('.'), compari
         # Keep private task/source text out of the benchmark summary.
         call_models = sorted({(str(call.get('stage')), str(call.get('provider')), str(call.get('model')))
                               for row in rows for call in row.get('aiCalls', []) if isinstance(call, dict)})
-        scored[name] = dict(callModels=[dict(stage=stage, provider=provider, model=model) for stage, provider, model in call_models], models={kind: sorted(str(m) for m in models) for kind, models in model_by_type.items()},
+        scored[name] = dict(goldCoverage=dict(verifiedCases=sum(c.get('reviewStatus') == 'VERIFIED' for c in cases), totalCases=len(cases),
+                                              unverifiedCaseIds=[c['id'] for c in cases if c.get('reviewStatus') != 'VERIFIED']), callModels=[dict(stage=stage, provider=provider, model=model) for stage, provider, model in call_models], models={kind: sorted(str(m) for m in models) for kind, models in model_by_type.items()},
                             qualityStatus='KEYWORD_PROXY' if any(r['verifiedCount'] for r in reports) else 'NO_VERIFIED_GOLD',
                             quality=quality(reports), performance=perf,
                             buckets={kind: summarize([r for r in rows if r['inputType'] == kind], prices) for kind in sorted({r['inputType'] for r in rows})},
@@ -171,7 +179,7 @@ def benchmark(fixtures, variants, baseline, prices=None, root=Path('.'), compari
                     regressions.append(dict(caseId=ident, repeat=repeat))
         result['contextIssues'] = sorted(issues)
         result['qualityRegressions'] = regressions
-        result['qualityGate'] = 'UNAVAILABLE' if result['qualityStatus'] == 'NO_VERIFIED_GOLD' else 'REGRESSED' if regressions else 'PASS'
+        result['qualityGate'] = 'UNAVAILABLE' if result['goldCoverage']['unverifiedCaseIds'] else 'REGRESSED' if regressions else 'PASS'
         latency = [lower_gate(baseline_result['performance'], result['performance'], ('p50Ms', 'p95Ms', 'failureRate'))]
         for kind, before in baseline_result['buckets'].items():
             after = result['buckets'][kind]
@@ -180,10 +188,13 @@ def benchmark(fixtures, variants, baseline, prices=None, root=Path('.'), compari
                 latency.append(lower_gate(before['cacheBuckets']['MISS'], after['cacheBuckets']['MISS'], ('p50Ms', 'p95Ms', 'failureRate')))
         result['latencyGate'] = 'REGRESSED' if 'REGRESSED' in latency else 'UNAVAILABLE' if 'UNAVAILABLE' in latency else 'PASS'
         old, new = baseline_result['performance'], result['performance']
-        currency = old['costCurrency']
-        complete = (isinstance(currency, str) and re.fullmatch('[A-Z]{3}', currency) and currency == new['costCurrency']
-                    and not old['costUnavailableRequests'] and not new['costUnavailableRequests'])
-        result['costGate'] = lower_gate(old, new, ('averageConfiguredCost',)) if complete else 'UNAVAILABLE'
+        costs = [cost_gate(old, new)]
+        for kind, before in baseline_result['buckets'].items():
+            after = result['buckets'][kind]
+            costs.append(cost_gate(before, after))
+            if before['cacheBuckets']['HIT']['requests'] or after['cacheBuckets']['HIT']['requests']:
+                costs.append(cost_gate(before['cacheBuckets']['MISS'], after['cacheBuckets']['MISS']))
+        result['costGate'] = 'REGRESSED' if 'REGRESSED' in costs else 'UNAVAILABLE' if 'UNAVAILABLE' in costs else 'PASS'
         result['deltas'] = {key: new[key]-old[key] if numeric(old.get(key)) and numeric(new.get(key)) else None
                             for key in ('p50Ms', 'p95Ms', 'averageCalls', 'averageTokensIn', 'averageTokensOut', 'averageConfiguredCost')}
         result['decision'] = ('BASELINE' if name == baseline else 'UNAVAILABLE' if issues or 'UNAVAILABLE' in (result['qualityGate'], result['latencyGate'], result['costGate'])
