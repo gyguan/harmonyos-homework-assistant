@@ -126,9 +126,7 @@ final class HomeworkVisualReview {
     props.put("visualReviewVersion",Map.of("type","integer","enum",List.of(1)));
     props.put("reading",Map.of("type","object","additionalProperties",false,"properties",reading,"required",List.copyOf(reading.keySet())));
     props.put("corrections",existing.get("corrections"));
-    Object assignment=((Map<?,?>)existing.get("additions")).get("items");
-    props.put("additions",Map.of("type","array","maxItems",30,"items",Map.of("type","object","additionalProperties",false,
-        "properties",Map.of("assignment",assignment,"reason",Map.of("type","string","maxLength",300)),"required",List.of("assignment","reason"))));
+    props.put("additions",existing.get("additions"));
     props.put("appliedExperienceIds",existing.get("appliedExperienceIds"));
     return Map.of("type","object","additionalProperties",false,"properties",props,"required",List.copyOf(props.keySet()));
   }

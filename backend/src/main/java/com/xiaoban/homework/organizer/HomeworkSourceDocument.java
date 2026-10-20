@@ -13,7 +13,7 @@ public record HomeworkSourceDocument(int schemaVersion, String inputKind, String
   public HomeworkSourceDocument(int schemaVersion, String inputKind, String originalText, List<Block> blocks) {
     this(schemaVersion, inputKind, originalText, blocks, List.of());
   }
-  /** Model-independent audit of a bounded visual second pass. No image bytes are stored. */
+  /** Model-independent audit of an accepted bounded second pass. No image bytes are stored. */
   public record Revision(String kind, Block before, Block after, String reason, List<AssignmentChange> changes) {
     public Revision { changes = List.copyOf(changes); }
   }
