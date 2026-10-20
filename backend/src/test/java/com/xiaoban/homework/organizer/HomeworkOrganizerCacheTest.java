@@ -71,7 +71,9 @@ class HomeworkOrganizerCacheTest {
     client.organizeDocument(s,"来源","数学口算20题");
     when(rules.snapshot(any(),any(),any())).thenReturn(new HomeworkOrganizerRuleService.Snapshot(List.of(),Map.of("BLACKBOARD","new prompt")));
     client.organizeDocument(s,"来源","数学口算20题");
-    verify(transport,times(13)).complete(anyString(),anyString(),anyString(),anyInt(),anyString(),anyMap());
+    verify(transport,times(13)).complete(anyString(),anyString(),anyString(),anyInt(),eq("homework_organization"),anyMap());
+    // The whitespace change also makes the fixed fake block differ from the raw source.
+    verify(transport,times(1)).complete(anyString(),anyString(),anyString(),anyInt(),eq("homework_risk_review"),anyMap());
   }
   @Test void imageHashSupplementAndImageOnlyExperienceChangesInvalidate() {
     setup(); var s = student();
