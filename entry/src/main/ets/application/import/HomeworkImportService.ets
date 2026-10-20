@@ -315,8 +315,7 @@ export class HomeworkImportService {
       rawText: ''
     };
 
-    let output: HomeworkImportPipelineResult = await this.runSmart(rawImport, operation);
-    operation?.report(HomeworkImportPhase.SAVING_DRAFT);
+    let output: HomeworkImportPipelineResult = await this.runSmart(rawImport);
     HomeworkImportInboxService.instance.commitParsedImport(
       rawImport, HomeworkImportSourceType.SCREENSHOT, output.extracted.text,
       output.candidates, rawImport.resourceUri);

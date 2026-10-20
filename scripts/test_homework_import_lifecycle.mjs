@@ -22,6 +22,7 @@ function fixture({encodeGate,extractGate,networkError=false}={}){
       return {request:async(url,options)=>{call.url=url;call.options=options;
         if(networkError)throw Error('network');return pending.promise;},destroy:()=>{destroyed++;}};}},
     BackendSession:{instance:{isConnected:()=>true,getBaseUrl:()=> 'http://backend',getToken:()=> 'synthetic',disconnect:()=>disconnected++}},
+    photoAccessHelper:{PhotoViewPicker:class {async select(){return {photoUris:['private-uri']};}}, PhotoViewMIMETypes:{IMAGE_TYPE:'image/*'}},
     HomeworkImageEncoder:{encode:async()=>{if(encodeGate)await encodeGate.promise;
       return {imageBase64:'synthetic',contentType:'image/png',encodedBytes:8};}},
     AssignmentTaskDate:{today:()=> '2026-10-20',resolve:v=>v},Subject:subjects,
@@ -91,5 +92,10 @@ for(const kind of ['text','image']){
  await tick();f.switchStudent();f.replyImage();await assert.rejects(pending,/孩子已切换/);op.finish();
  assert.equal(f.commits[0][0].studentId,'student-one');assert.ok(f.calls[0].url.includes('/students/student-one/'));
  assert.equal(JSON.parse(f.calls[0].options.extraData).text,'补充文字');
+}
+// Legacy picker+parse entry remains callable without a cancellation operation.
+{
+ const f=fixture();const pending=f.service.selectImageAndParse();await tick();f.reply();
+ const result=await pending;assert.equal(result.selected,true);assert.equal(f.commits.length,1);
 }
 console.log('HOMEWORK_IMPORT_LIFECYCLE_PASS: real phases, stop before/during HTTP, late responses, timeout, retry isolation, fallback, student scope');
