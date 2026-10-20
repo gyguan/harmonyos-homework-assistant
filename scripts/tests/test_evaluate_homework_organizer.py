@@ -71,3 +71,48 @@ class HomeworkEvaluationTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class JointMetricsTest(unittest.TestCase):
+    def test_latency_tokens_failures_and_missing_usage(self):
+        from organizer_metrics import summarize
+        report = summarize([
+            dict(elapsedMs=10, tokensIn=100, tokensOut=50, reviewTriggered=False, success=True, callCount=1),
+            dict(elapsedMs=100, tokensIn='unavailable', tokensOut='unavailable', reviewTriggered=True, success=False, callCount=2)])
+        self.assertEqual(10, report['p50Ms'])
+        self.assertEqual(100, report['p95Ms'])
+        self.assertEqual(.5, report['failureRate'])
+        self.assertEqual(1, report['usageUnavailableRequests'])
+        self.assertEqual(1.5, report['averageCalls'])
+
+    def test_duplicate_predictions_rejected_even_without_gold(self):
+        with self.assertRaisesRegex(ValueError, 'Duplicate prediction'):
+            evaluate({'cases': []}, {'results': [{'caseId': 'a'}, {'caseId': 'a'}]})
+
+    def test_field_error_and_fabricated_evidence_are_not_counted_correct(self):
+        case = HomeworkEvaluationTest().fixture()
+        case['cases'][0]['expected'][0].update(fields={'taskDate': '2026-10-19'}, sourceBlockIds=['b1'])
+        pred = HomeworkEvaluationTest().prediction([
+            dict(subject='语文', title='国学13页', taskDate='2026-10-20', sourceBlockIds=['fake']),
+            dict(subject='数学', title='口算20题')])
+        result = evaluate(case, pred)
+        self.assertEqual(0, result['total']['keyFieldAccuracy'])
+        self.assertEqual(0, result['total']['evidenceAccuracy'])
+        self.assertEqual(0, result['total']['evidenceCoverage'])
+
+    def test_gold_edits_invalidate_comparison(self):
+        from evaluate_homework_organizer import compare
+        with self.assertRaisesRegex(ValueError, 'identical fixture'):
+            compare({'fixtureHash': 'old'}, {'fixtureHash': 'edited'})
+
+    def test_missing_field_metric_is_regression(self):
+        from evaluate_homework_organizer import compare
+        result = compare(dict(fixtureHash='same', status='SCORED_KEYWORD_PROXY', total={'keyFieldAccuracy': 1}),
+                         dict(fixtureHash='same', status='SCORED_KEYWORD_PROXY', total={}))
+        self.assertTrue(result['regressed'])
+
+    def test_image_replay_refuses_text_substitute(self):
+        from run_homework_organizer_eval import replay
+        from unittest.mock import patch
+        with patch.dict('os.environ', {'ORGANIZER_EVAL_TOKEN': 'not-real'}):
+            with self.assertRaisesRegex(ValueError, 'actual imagePath'):
+                replay({'cases': [{'id': 'img', 'sourceType': 'IMAGE'}]}, 'http://localhost', 's', Path('.'))

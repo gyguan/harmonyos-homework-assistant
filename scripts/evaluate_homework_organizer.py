@@ -7,6 +7,8 @@ The title/instruction keyword metric is a transparent proxy, not semantic accura
 """
 import argparse
 import json
+import hashlib
+from organizer_metrics import summarize
 from collections import defaultdict
 from pathlib import Path
 
@@ -30,7 +32,14 @@ def match(expected, predicted):
 
 
 def evaluate(fixtures, predictions):
-    by_id = {p["caseId"]: p for p in predictions.get("results", [])}
+    results = predictions.get("results", [])
+    by_id = {p["caseId"]: p for p in results}
+    if len(by_id) != len(results):
+        raise ValueError("Duplicate prediction case IDs")
+    fixture_hash = hashlib.sha256(json.dumps(fixtures, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+    performance = summarize(results)
+    buckets = {kind: summarize([r for r in results if r.get("inputType") == kind])
+               for kind in sorted({r.get("inputType", "UNSPECIFIED") for r in results})}
     cases = fixtures.get("cases", [])
     if len({case["id"] for case in cases}) != len(cases):
         raise ValueError("Duplicate case IDs in fixtures")
@@ -39,6 +48,7 @@ def evaluate(fixtures, predictions):
         return {
             "status": "NO_VERIFIED_GOLD",
             "warning": "No parent-verified cases. Do not calculate or report model accuracy.",
+            "fixtureHash": fixture_hash, "performance": performance, "buckets": buckets,
             "fixtureCount": len(cases),
             "verifiedCount": 0,
             "cases": []
@@ -61,14 +71,39 @@ def evaluate(fixtures, predictions):
         if any(not item.get("keywords") or not item.get("subject") for item in gold):
             raise ValueError("Verified case has empty expected subject/keywords: " + case["id"])
         used = set()
+        # Maximum bipartite matching, not order-sensitive greedy assignment.
+        edges = [[i for i, out in enumerate(outputs) if match(exp, out)] for exp in gold]
+        owners = {}
+        def assign(g, visited):
+            for i in edges[g]:
+                if i in visited:
+                    continue
+                visited.add(i)
+                if i not in owners or assign(owners[i], visited):
+                    owners[i] = g
+                    return True
+            return False
+        for g in range(len(gold)):
+            assign(g, set())
+        matched_gold = set(owners.values())
+        field_checks = []
+        evidence_checks = []
+        blocks = {b.get("id") for b in prediction.get("sourceDocument", {}).get("blocks", []) if b.get("text")}
+        for i, g in owners.items():
+            exp, out = gold[g], outputs[i]
+            for field, value in exp.get("fields", {}).items():
+                field_checks.append(normalize(out.get(field)) == normalize(value))
+            required = set(exp.get("sourceBlockIds", []))
+            if required:
+                evidence_checks.append(required <= set(out.get("sourceBlockIds", [])))
+        totals["fieldCorrect"] += sum(field_checks)
+        totals["fieldTotal"] += len(field_checks) + sum(len(gold[g].get("fields", {})) for g in range(len(gold)) if g not in matched_gold)
+        totals["evidenceCorrect"] += sum(evidence_checks)
+        totals["evidenceTotal"] += len(evidence_checks) + sum(bool(gold[g].get("sourceBlockIds")) for g in range(len(gold)) if g not in matched_gold)
+        totals["evidenceCovered"] += sum(bool(o.get("sourceBlockIds")) and set(o["sourceBlockIds"]) <= blocks for o in outputs)
         unmatched_gold = []
-        for expected in gold:
-            found = next((i for i, predicted in enumerate(outputs)
-                          if i not in used and match(expected, predicted)), None)
-            if found is None:
-                unmatched_gold.append(expected)
-            else:
-                used.add(found)
+        used = set(owners)
+        unmatched_gold = [gold[g] for g in range(len(gold)) if g not in matched_gold]
         extras = [outputs[i] for i in range(len(outputs)) if i not in used]
         teacher = case.get("teacherKey", "UNSPECIFIED")
         row = {
@@ -105,10 +140,32 @@ def evaluate(fixtures, predictions):
         "warning": "Keyword coverage is a deterministic proxy, not verified semantic accuracy.",
         "fixtureCount": len(cases), "verifiedCount": len(verified),
         "model": next(iter(model_names)), "promptVersion": next(iter(prompt_versions)),
-        "total": score(totals),
+        "fixtureHash": fixture_hash, "performance": performance, "buckets": buckets,
+        "total": dict(score(totals),
+                      keyFieldAccuracy=round(totals["fieldCorrect"] / totals["fieldTotal"], 4) if totals["fieldTotal"] else None,
+                      evidenceAccuracy=round(totals["evidenceCorrect"] / totals["evidenceTotal"], 4) if totals["evidenceTotal"] else None,
+                      evidenceCoverage=round(totals["evidenceCovered"] / totals["predicted"], 4) if totals["predicted"] else None),
         "teachers": {teacher: score(values) for teacher, values in by_teacher.items()},
         "cases": rows,
     }
+
+
+def compare(prior, candidate):
+    if prior.get("fixtureHash") != candidate.get("fixtureHash") or not candidate.get("fixtureHash"):
+        raise ValueError("Baseline must use identical fixture content/status/annotations")
+    if prior.get("status") != candidate.get("status"):
+        raise ValueError("Baseline and candidate gold status differs")
+    deltas = {}
+    regression = False
+    for key in ("recallProxy", "precisionProxy", "keyFieldAccuracy", "evidenceAccuracy", "evidenceCoverage"):
+        old, new = prior.get("total", {}).get(key), candidate.get("total", {}).get(key)
+        deltas[key] = new - old if old is not None and new is not None else None
+        regression |= old is not None and (new is None or new < old)
+    for key in ("p50Ms", "p95Ms", "averageTokensIn", "averageTokensOut", "reviewRate", "failureRate"):
+        old, new = prior.get("performance", {}).get(key), candidate.get("performance", {}).get(key)
+        deltas[key] = new - old if old is not None and new is not None else None
+    return {"regressed": regression, "baselineDeltas": deltas,
+            "comparisonNote": "Confirm identical model, hardware/network, date and teacher/experience setup before attributing latency changes."}
 
 
 def main():
@@ -120,17 +177,8 @@ def main():
                         help="Optional prior report, scored against the identical verified cases")
     args = parser.parse_args()
     result = evaluate(read_json(args.fixtures), read_json(args.predictions))
-    if args.baseline and result["status"] == "SCORED_KEYWORD_PROXY":
-        prior = read_json(args.baseline)
-        if prior.get("status") != "SCORED_KEYWORD_PROXY" or {
-            row["caseId"] for row in prior.get("cases", [])
-        } != {row["caseId"] for row in result["cases"]}:
-            raise ValueError("Baseline must contain exactly the same verified case IDs")
-        old_recall = prior["total"]["recallProxy"]
-        new_recall = result["total"]["recallProxy"]
-        result["baselineRecallProxy"] = old_recall
-        result["regressed"] = new_recall is not None and old_recall is not None and (
-            new_recall < old_recall)
+    if args.baseline:
+        result.update(compare(read_json(args.baseline), result))
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n",
