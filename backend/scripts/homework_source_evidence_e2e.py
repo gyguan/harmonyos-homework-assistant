@@ -263,6 +263,9 @@ def main():
         require(visual_row['callCount'] == 2 and visual_row['reviewTriggered'] and visual_row['visualReview']['width'] == 4,
                 'visual review measurement missing')
         require(visual_row['imageTokensIn'] == 100 and visual_row['cachedTokensIn'] == 0,'actual provider detail usage missing')
+        require(all(len(call['promptVersion']) == 64 for call in visual_row['aiCalls'])
+                and visual_row['aiCalls'][0]['promptVersion'] != visual_row['aiCalls'][1]['promptVersion'],
+                'actual primary/review prompt fingerprints missing')
         print('HOMEWORK_SOURCE_EVIDENCE_E2E_PASS PostgreSQL/Flyway, HTTP fake-provider, isolation, compatibility, restart, privacy')
     finally:
         if proc and proc.poll() is None:

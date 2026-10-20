@@ -38,4 +38,17 @@ class AiCallMetricsTest {
       assertNull(AiCallMetrics.usage(json.readTree("{\"usage\":{\"input_tokens_details\":{\"image_tokens\":"+value+"}}}")).imageTokens());
   }
 
+  @Test void actualPrimaryAndReviewInstructionsHavePrivateStableSchemaFingerprints() {
+    assertEquals("unavailable",AiCallMetrics.promptVersion("private", "schema", java.util.Map.of()));
+    try(var trace=AiCallMetrics.open()) {
+      var a=new java.util.LinkedHashMap<String,Object>();a.put("b",2);a.put("a",java.util.Map.of("z",3,"c",1));
+      var b=new java.util.LinkedHashMap<String,Object>();b.put("a",java.util.Map.of("c",1,"z",3));b.put("b",2);
+      String first=AiCallMetrics.promptVersion("private prompt", "schema",a);
+      assertEquals(first,AiCallMetrics.promptVersion("private prompt","schema",b));
+      assertNotEquals(first,AiCallMetrics.promptVersion("changed review prompt","schema",b));
+      assertNotEquals(first,AiCallMetrics.promptVersion("private prompt","schema-review",b));
+      assertEquals(64,first.length());assertFalse(first.contains("private"));
+    }
+  }
+
 }

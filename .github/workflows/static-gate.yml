@@ -22,6 +22,8 @@ jobs:
           python-version: '3.12'
       - name: Test gold-only homework organizer evaluator
         run: python -m unittest discover -s scripts/tests -p test_evaluate_homework_organizer.py -v
+      - name: Test controlled model benchmark and actual-usage pricing
+        run: python -m unittest discover -s scripts/tests -p test_benchmark_homework_organizer.py -v
 
   validate-backend-logging:
     runs-on: ubuntu-latest
