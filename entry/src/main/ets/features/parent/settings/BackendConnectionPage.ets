@@ -827,14 +827,22 @@ export struct BackendConnectionPage {
   build() {
     Column() {
       if (this.embeddedInDeepPage) {
-        DeepPageHeader({
-          title: '连接云服务器',
-          subtitle: '连接家庭云端并同步作业数据',
-          backAccessibilityText: '返回上一页',
-          onBack: () => this.onBack()
-        })
-          .padding({ left: AppTheme.PAGE_PADDING_COMPACT, right: AppTheme.PAGE_PADDING_COMPACT,
-            top: 10, bottom: 8 });
+        Column() {
+          DeepPageHeader({
+            title: '连接云服务器',
+            subtitle: '连接家庭云端并同步作业数据',
+            backAccessibilityText: '返回上一页',
+            onBack: () => this.onBack()
+          });
+        }
+        .width('100%')
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
+        .padding({
+          left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+          right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+          top: AppTheme.DEEP_PAGE_TOP_PADDING,
+          bottom: AppTheme.DEEP_PAGE_CONTENT_GAP
+        });
       }
       Scroll() {
         Column() {
@@ -869,7 +877,12 @@ export struct BackendConnectionPage {
           }
           .width('100%')
           .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
-          .padding({ left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), top: AppTheme.PAGE_PADDING_COMPACT, bottom: AppTheme.PAGE_PADDING_COMPACT });
+          .padding({
+            left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+            right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+            top: this.embeddedInDeepPage ? 0 : AppTheme.PAGE_PADDING_COMPACT,
+            bottom: this.embeddedInDeepPage ? AppTheme.DEEP_PAGE_BOTTOM_PADDING : AppTheme.PAGE_PADDING_COMPACT
+          });
         }
         .width('100%')
         .alignItems(HorizontalAlign.Center);
@@ -881,6 +894,7 @@ export struct BackendConnectionPage {
     }
     .width('100%')
     .height('100%')
+    .alignItems(HorizontalAlign.Center)
     .backgroundColor(AppTheme.BACKGROUND)
     .onAreaChange((_oldValue, newValue) => {
       this.availableWidthVp = LayoutPolicy.areaLengthToVp(newValue.width, this.availableWidthVp);
