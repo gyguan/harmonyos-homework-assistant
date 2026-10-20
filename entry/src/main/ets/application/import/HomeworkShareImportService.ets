@@ -137,9 +137,6 @@ export class HomeworkShareImportService {
       taskDate: candidate.taskDate,
       expectedMinutes: candidate.expectedMinutes,
       sourceEvidence: {
-        reviewNotice: candidate.sourceEvidence.reviewNotice,
-        sourceBlockIds: candidate.sourceEvidence.sourceBlockIds === undefined ?
-          undefined : candidate.sourceEvidence.sourceBlockIds.slice(),
         sourceLabel: candidate.sourceEvidence.sourceLabel,
         excerpt: candidate.sourceEvidence.excerpt,
         batchId: batchId,

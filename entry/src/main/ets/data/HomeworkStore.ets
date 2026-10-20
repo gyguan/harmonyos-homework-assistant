@@ -203,9 +203,6 @@ export class HomeworkStore {
       taskDate: AssignmentTaskDate.isValid(source.taskDate) ? source.taskDate : AssignmentTaskDate.today(),
       expectedMinutes: source.expectedMinutes > 0 ? source.expectedMinutes : 20,
       sourceEvidence: {
-        reviewNotice: source.sourceEvidence.reviewNotice,
-        sourceBlockIds: source.sourceEvidence.sourceBlockIds === undefined ?
-          undefined : source.sourceEvidence.sourceBlockIds.slice(),
         sourceLabel: source.sourceEvidence.sourceLabel,
         excerpt: source.sourceEvidence.excerpt,
         batchId: source.sourceEvidence.batchId,

@@ -10,20 +10,8 @@ public interface HomeworkOrganizerModelClient {
   Optional<List<HomeworkOrganizerDtos.Candidate>> organize(
       StudentEntity student, String sourceLabel, String text);
 
-  default Optional<HomeworkOrganizerDtos.Response> organizeDocument(
-      StudentEntity student, String sourceLabel, String text) {
-    return organize(student, sourceLabel, text).map(items ->
-        HomeworkSourceEvidence.response(items, "AI", HomeworkSourceDocument.text(text)));
-  }
-
   boolean imageAvailable();
 
   Optional<HomeworkOrganizerDtos.ImageResponse> organizeImage(
       StudentEntity student, String sourceLabel, String imageDataUrl, String text);
-  /** Original-byte identity survives lossless orientation normalization; legacy clients delegate. */
-  default Optional<HomeworkOrganizerDtos.ImageResponse> organizeImage(StudentEntity student,
-      String sourceLabel, String imageDataUrl, String text, String originalImageHash) {
-    return organizeImage(student, sourceLabel, imageDataUrl, text);
-  }
-
 }

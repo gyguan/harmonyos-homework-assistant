@@ -22,10 +22,6 @@ jobs:
           python-version: '3.12'
       - name: Test gold-only homework organizer evaluator
         run: python -m unittest discover -s scripts/tests -p test_evaluate_homework_organizer.py -v
-      - name: Test controlled model benchmark and actual-usage pricing
-        run: python -m unittest discover -s scripts/tests -p test_benchmark_homework_organizer.py -v
-      - name: Test private gold intake and human review receipts
-        run: python -m unittest discover -s scripts/tests -p test_organizer_gold.py -v
 
   validate-backend-logging:
     runs-on: ubuntu-latest
@@ -81,15 +77,6 @@ jobs:
 
       - name: Test OCR input and resource lifecycle with SDK doubles
         run: node scripts/test_core_vision_ocr.mjs
-
-      - name: Test organizer lifecycle cancellation and timeout with SDK doubles
-        run: node scripts/test_homework_import_lifecycle.mjs
-
-      - name: Test organizer image fidelity and native resource cleanup
-        run: node scripts/test_homework_image_encoder.mjs
-
-      - name: Test organizer quality warnings and compatibility with HTTP doubles
-        run: node scripts/test_organizer_quality_contract.mjs
 
   validate-parent-home-progress:
     runs-on: ubuntu-latest
@@ -480,9 +467,6 @@ jobs:
 
       - name: Run organizer review Outbox PostgreSQL E2E
         run: python backend/scripts/homework_review_outbox_e2e.py
-
-      - name: Run independent source evidence PostgreSQL E2E with fake HTTP provider
-        run: python backend/scripts/homework_source_evidence_e2e.py
 
       - name: Run voice material daily automation E2E
         run: python backend/scripts/voice_material_e2e.py

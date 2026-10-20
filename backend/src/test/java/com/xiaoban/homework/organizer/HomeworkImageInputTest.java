@@ -47,7 +47,7 @@ class HomeworkImageInputTest {
         "数学", "口算20题", "完成口算20题", "", "今天", 10, "口算20题", .9,
         "", "", "", 0.0, "");
     when(model.organizeImage(eq(student), eq("图片"), startsWith("data:image/png;base64,"),
-        eq("数学口算20题"), anyString()))
+        eq("数学口算20题")))
         .thenReturn(Optional.of(new HomeworkOrganizerDtos.ImageResponse(
             List.of(todayCandidate), "AI_IMAGE", "图片文字")));
 
@@ -55,26 +55,7 @@ class HomeworkImageInputTest {
         new HomeworkOrganizerDtos.ImageRequest(png(), "image/png", "图片", "数学口算20题"));
 
     verify(model, times(1)).organizeImage(
-        eq(student), eq("图片"), startsWith("data:image/png;base64,"), eq("数学口算20题"), anyString());
-  }
-
-  @Test
-  void optionalOrientationWarningSurvivesSuccessfulModelAndSnapshotCapture() throws Exception {
-    var students=mock(StudentRepository.class); var model=mock(HomeworkOrganizerModelClient.class);
-    var snapshots=mock(HomeworkOrganizerAiSnapshotService.class); var evidence=mock(HomeworkSourceEvidenceService.class);
-    var family=UUID.randomUUID(); StudentEntity student=new ConfigurableHomeworkOrganizerModelClientTest.TestStudent(); student.familyId=family;
-    when(students.findById("student-1")).thenReturn(Optional.of(student)); when(model.imageAvailable()).thenReturn(true);
-    var task=new HomeworkOrganizerDtos.Candidate("数学","口算20题","口算20题","P1","今天",10,"口算20题",.9,"","","",0,"");
-    when(model.organizeImage(any(),any(),any(),any(),any())).thenReturn(Optional.of(new HomeworkOrganizerDtos.ImageResponse(List.of(task),"AI_IMAGE","口算20题")));
-    var service=new HomeworkOrganizerService(students,model,null,snapshots,evidence);
-    byte[] original=Base64.getDecoder().decode(png());
-    byte[] invalid=HomeworkImageOrientationTest.pngWithExif(original,new byte[0]);
-    var request=new HomeworkOrganizerDtos.ImageRequest(Base64.getEncoder().encodeToString(invalid),"image/png","图片",null,"","orientation-warning");
-    var actual=service.organizeImage(family,"student-1",request);
-    assertEquals(1,actual.assignments().size()); assertTrue(actual.needsReview());
-    assertTrue(actual.qualityFlags().stream().anyMatch(f->f.code().equals("IMAGE_ORIENTATION_UNCERTAIN")));
-    verify(model,times(1)).organizeImage(eq(student),any(),eq("data:image/png;base64,"+Base64.getEncoder().encodeToString(original)),isNull(),anyString());
-    verify(evidence).capture(eq(family),eq("student-1"),eq("orientation-warning"),eq(""),anyList(),isNull(),eq(actual.qualityFlags()),eq(true),any());
+        eq(student), eq("图片"), startsWith("data:image/png;base64,"), eq("数学口算20题"));
   }
 
   static String png() throws Exception {
@@ -99,18 +80,29 @@ class HomeworkImageInputTest {
   }
 
   @Test
-  void preservesOriginalLargeImagePixelsAndBytesForSmallPrintAndTables() throws Exception {
-    var large = new BufferedImage(3000, 2000, BufferedImage.TYPE_INT_RGB);
-    // Thin alternating strokes would be destroyed by the former 1536px JPEG conversion.
-    for (int x = 0; x < 3000; x++) large.setRGB(x, 100, x % 2 == 0 ? 0xffffff : 0);
+  void shrinksOversizedPhotoBeforeSendingItToTheVisionModel() throws Exception {
+    var oversized = new BufferedImage(3000, 2000, BufferedImage.TYPE_INT_RGB);
     var original = new ByteArrayOutputStream();
-    ImageIO.write(large, "PNG", original);
+    ImageIO.write(oversized, "JPEG", original);
     String base64 = Base64.getEncoder().encodeToString(original.toByteArray());
-    String url = HomeworkImageInput.dataUrl(new HomeworkOrganizerDtos.ImageRequest(base64, "image/png", "图片", null));
-    assertEquals("data:image/png;base64," + base64, url);
-    var decoded = ImageIO.read(new java.io.ByteArrayInputStream(Base64.getDecoder().decode(url.substring(url.indexOf(',') + 1))));
-    assertEquals(3000, decoded.getWidth()); assertEquals(2000, decoded.getHeight());
-    for (int x = 0; x < 3000; x++) assertEquals(large.getRGB(x,100), decoded.getRGB(x,100));
+
+    String dataUrl = HomeworkImageInput.dataUrl(
+        new HomeworkOrganizerDtos.ImageRequest(base64, "image/jpeg", "截图", null));
+
+    assertTrue(dataUrl.startsWith("data:image/jpeg;base64,"));
+    byte[] payload = Base64.getDecoder().decode(dataUrl.substring(dataUrl.indexOf(',') + 1));
+    assertTrue(payload.length < original.toByteArray().length,
+        "缩图后送给模型的字节数必须变小，否则等于没省到预填充时间");
+    var decoded = javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream(payload));
+    assertEquals(HomeworkImageInput.MAX_SIDE, Math.max(decoded.getWidth(), decoded.getHeight()));
+  }
+
+  @Test
+  void leavesImagesWithinTheSideBudgetAlone() {
+    assertNull(HomeworkImageInput.shrinkToMaxSide(
+        new BufferedImage(HomeworkImageInput.MAX_SIDE, 800, BufferedImage.TYPE_INT_RGB)));
+    assertNotNull(HomeworkImageInput.shrinkToMaxSide(
+        new BufferedImage(HomeworkImageInput.MAX_SIDE + 1, 800, BufferedImage.TYPE_INT_RGB)));
   }
 
   @Test
@@ -133,12 +125,12 @@ class HomeworkImageInputTest {
         "数学", "口算", "口算20题", "", "今天", 10, "口算", .9,
         "", "", "", 0.0, "");
     var expected = new HomeworkOrganizerDtos.ImageResponse(List.of(chinese, math), "AI_IMAGE", "语文朗读；数学口算");
-    when(model.organizeImage(eq(student), eq("图片"), startsWith("data:image/png;base64,"), isNull(), anyString()))
+    when(model.organizeImage(eq(student), eq("图片"), startsWith("data:image/png;base64,"), isNull()))
         .thenReturn(Optional.of(expected));
     var actual = service.organizeImage(family, "student-1", request);
     assertEquals(List.of("语文", "数学"), actual.assignments().stream().map(HomeworkOrganizerDtos.Candidate::subject).toList());
     assertEquals("AI_IMAGE", actual.mode());
-    when(model.organizeImage(any(), any(), any(), any(), any())).thenReturn(Optional.empty());
+    when(model.organizeImage(any(), any(), any(), any())).thenReturn(Optional.empty());
     assertThrows(ApiExceptions.ServiceUnavailable.class, () -> service.organizeImage(family, "student-1", request));
   }
 }

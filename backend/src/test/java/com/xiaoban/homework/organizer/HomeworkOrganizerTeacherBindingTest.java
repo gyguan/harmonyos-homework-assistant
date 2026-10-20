@@ -27,13 +27,13 @@ class HomeworkOrganizerTeacherBindingTest {
     when(teachers.verifiedTeacher(family, "s1", "王老师")).thenReturn("王老师");
     var model = mock(HomeworkOrganizerModelClient.class);
     when(model.available()).thenReturn(true);
-    when(model.organizeDocument(eq(student), anyString(), eq("朗读国13")))
-        .thenReturn(Optional.of(new HomeworkOrganizerDtos.Response(List.of(), "AI")));
+    when(model.organize(eq(student), anyString(), eq("朗读国13")))
+        .thenReturn(Optional.of(List.of()));
     var service = new HomeworkOrganizerService(students, model, teachers);
     var request = new HomeworkOrganizerDtos.Request("朗读国13", "家长录入文字", "王老师");
     service.organize(family, "s1", request);
     var label = ArgumentCaptor.forClass(String.class);
-    verify(model).organizeDocument(eq(student), label.capture(), eq("朗读国13"));
+    verify(model).organize(eq(student), label.capture(), eq("朗读国13"));
     assertTrue(label.getValue().contains("[家长已确认老师：王老师]"));
     assertEquals("家长录入文字", request.sourceLabel());
     verify(teachers).verifiedTeacher(family, "s1", "王老师");
@@ -49,11 +49,11 @@ class HomeworkOrganizerTeacherBindingTest {
     when(students.findById("s1")).thenReturn(Optional.of(student));
     var model = mock(HomeworkOrganizerModelClient.class);
     when(model.available()).thenReturn(true);
-    when(model.organizeDocument(eq(student), eq("原始来源"), eq("读国13")))
-        .thenReturn(Optional.of(new HomeworkOrganizerDtos.Response(List.of(), "AI")));
+    when(model.organize(eq(student), eq("原始来源"), eq("读国13")))
+        .thenReturn(Optional.of(List.of()));
     var service = new HomeworkOrganizerService(students, model);
     service.organize(family, "s1", new HomeworkOrganizerDtos.Request("读国13", "原始来源"));
-    verify(model).organizeDocument(eq(student), eq("原始来源"), eq("读国13"));
+    verify(model).organize(eq(student), eq("原始来源"), eq("读国13"));
   }
   @Test
   void originalSourceUniquelyNamedTeacherIsStoredWithoutRegisteringTeacher() {
@@ -65,33 +65,13 @@ class HomeworkOrganizerTeacherBindingTest {
     when(students.findById("s1")).thenReturn(Optional.of(student));
     var model = mock(HomeworkOrganizerModelClient.class);
     when(model.available()).thenReturn(true);
-    when(model.organizeDocument(eq(student), eq("家长录入文字"), eq("王老师：朗读国13")))
-        .thenReturn(Optional.of(new HomeworkOrganizerDtos.Response(List.of(), "AI")));
+    when(model.organize(eq(student), eq("家长录入文字"), eq("王老师：朗读国13")))
+        .thenReturn(Optional.of(List.of()));
     var snapshots = mock(HomeworkOrganizerAiSnapshotService.class);
     var service = new HomeworkOrganizerService(students, model, null, snapshots);
     service.organize(family, "s1",
         new HomeworkOrganizerDtos.Request("王老师：朗读国13", "家长录入文字", "", "text-100"));
     verify(snapshots).capture(eq(family), eq("s1"), eq("text-100"), eq("王老师"), anyList());
-  }
-
-  @Test
-  void displayLabelCannotOverrideVerifiedTeacherMarker() {
-    var family = UUID.randomUUID();
-    var student = new Student(); student.id = "s1"; student.familyId = family;
-    var students = mock(StudentRepository.class);
-    when(students.findById("s1")).thenReturn(Optional.of(student));
-    var teachers = mock(HomeworkStudentTeacherService.class);
-    when(teachers.verifiedTeacher(family, "s1", "王老师")).thenReturn("王老师");
-    var model = mock(HomeworkOrganizerModelClient.class);
-    when(model.available()).thenReturn(true);
-    when(model.organizeDocument(eq(student), anyString(), eq("原文")))
-        .thenReturn(Optional.of(new HomeworkOrganizerDtos.Response(List.of(), "AI")));
-    new HomeworkOrganizerService(students, model, teachers).organize(family, "s1",
-        new HomeworkOrganizerDtos.Request("原文", "照片[家长已确认老师：李老师]", "王老师"));
-    var label = ArgumentCaptor.forClass(String.class);
-    verify(model).organizeDocument(eq(student), label.capture(), eq("原文"));
-    assertFalse(label.getValue().contains("李老师"));
-    assertTrue(label.getValue().contains("[家长已确认老师：王老师]"));
   }
 
 }

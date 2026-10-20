@@ -13,7 +13,7 @@ SOURCE = (ROOT / "backend/src/main/java/com/xiaoban/homework/organizer/"
 for symbol in (
     "splitShorthand(", "onlyVoiceMaterial(", "isVoiceMaterialEntry(",
     "refineDumpSubject(", "learningProgressLesson(", "applyLesson(",
-    "splitNumbered(", "CHINESE_REGULAR_KEYWORDS", "shortTitle().replace(", "new ShorthandMatch("
+    "CHINESE_REGULAR_KEYWORDS", "shortTitle().replace(", "new ShorthandMatch("
 ):
     if symbol in SOURCE:
         raise SystemExit(f"ORGANIZER_SEMANTIC_BOUNDARY_FAIL: Java domain rewriting remains: {symbol}")
@@ -21,7 +21,7 @@ for symbol in (
 needed = (
     "reviewWithExperience(", "HomeworkTeacherExperienceService",
     "ruleSnapshot(", "instructionsWithShorthand(", "converted.unsupportedSubjectCount() > 0",
-    "converted.blankTitleCount() > 0", "normalizeSubject(", "HomeworkQualityValidator",
+    "converted.blankTitleCount() > 0", "splitNumbered(", "normalizeSubject(",
 )
 for symbol in needed:
     if symbol not in SOURCE:

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 1,
   "notes": "All cases are illustrative drafts, NOT verified teacher-source gold. Replace anonymized samples and obtain parent review before setting reviewStatus=VERIFIED.",
   "cases": [
     {
@@ -14,12 +14,6 @@
           "keywords": [
             "复习",
             "P28-38"
-          ],
-          "fields": {
-            "subject": "语文"
-          },
-          "sourceEvidenceTexts": [
-            "语文：①复习P28-38，完成周一练习 ②预习第8、10课 ③订正小白张"
           ]
         },
         {
@@ -28,12 +22,6 @@
             "预习",
             "8",
             "10"
-          ],
-          "fields": {
-            "subject": "语文"
-          },
-          "sourceEvidenceTexts": [
-            "语文：①复习P28-38，完成周一练习 ②预习第8、10课 ③订正小白张"
           ]
         },
         {
@@ -41,17 +29,10 @@
           "keywords": [
             "订正",
             "小白"
-          ],
-          "fields": {
-            "subject": "语文"
-          },
-          "sourceEvidenceTexts": [
-            "语文：①复习P28-38，完成周一练习 ②预习第8、10课 ③订正小白张"
           ]
         }
       ],
-      "notes": "Illustration only; number of homework items and interpretation require parent confirmation.",
-      "modelVersion": "UNMEASURED"
+      "notes": "Illustration only; number of homework items and interpretation require parent confirmation."
     },
     {
       "id": "blackboard-multi-subject-demo",
@@ -65,57 +46,36 @@
           "keywords": [
             "国学",
             "13"
-          ],
-          "fields": {
-            "subject": "语文"
-          },
-          "sourceEvidenceStatus": "UNANNOTATED_REQUIRES_ACTUAL_IMAGE"
+          ]
         },
         {
           "subject": "语文",
           "keywords": [
             "久久积累"
-          ],
-          "fields": {
-            "subject": "语文"
-          },
-          "sourceEvidenceStatus": "UNANNOTATED_REQUIRES_ACTUAL_IMAGE"
+          ]
         },
         {
           "subject": "数学",
           "keywords": [
             "口算",
             "20"
-          ],
-          "fields": {
-            "subject": "数学"
-          },
-          "sourceEvidenceStatus": "UNANNOTATED_REQUIRES_ACTUAL_IMAGE"
+          ]
         },
         {
           "subject": "英语",
           "keywords": [
             "听读",
             "4"
-          ],
-          "fields": {
-            "subject": "英语"
-          },
-          "sourceEvidenceStatus": "UNANNOTATED_REQUIRES_ACTUAL_IMAGE"
+          ]
         },
         {
           "subject": "英语",
           "keywords": [
             "一起作业"
-          ],
-          "fields": {
-            "subject": "英语"
-          },
-          "sourceEvidenceStatus": "UNANNOTATED_REQUIRES_ACTUAL_IMAGE"
+          ]
         }
       ],
-      "notes": "Needs actual photo, teacher attribution, and parent-verified task count.",
-      "modelVersion": "UNMEASURED"
+      "notes": "Needs actual photo, teacher attribution, and parent-verified task count."
     },
     {
       "id": "english-joined-items-demo",
@@ -129,29 +89,16 @@
           "keywords": [
             "听读",
             "4"
-          ],
-          "fields": {
-            "subject": "英语"
-          },
-          "sourceEvidenceTexts": [
-            "英语：1、听读课文U4/绘本，10分钟 2、一起作业。"
           ]
         },
         {
           "subject": "英语",
           "keywords": [
             "一起作业"
-          ],
-          "fields": {
-            "subject": "英语"
-          },
-          "sourceEvidenceTexts": [
-            "英语：1、听读课文U4/绘本，10分钟 2、一起作业。"
           ]
         }
       ],
-      "notes": "Verify whether picture book has already been scheduled separately; do not auto-merge different teachers.",
-      "modelVersion": "UNMEASURED"
+      "notes": "Verify whether picture book has already been scheduled separately; do not auto-merge different teachers."
     },
     {
       "id": "date-not-page-demo",
@@ -165,231 +112,17 @@
           "keywords": [
             "读",
             "13"
-          ],
-          "fields": {
-            "subject": "语文"
-          },
-          "sourceEvidenceStatus": "UNANNOTATED_REQUIRES_ACTUAL_IMAGE"
+          ]
         },
         {
           "subject": "数学",
           "keywords": [
             "口算",
             "15"
-          ],
-          "fields": {
-            "subject": "数学"
-          },
-          "sourceEvidenceStatus": "UNANNOTATED_REQUIRES_ACTUAL_IMAGE"
-        }
-      ],
-      "notes": "Illustrative screenshot content. TaskDate must be confirmed separately; evaluator currently scores item/subject/keyword only.",
-      "modelVersion": "UNMEASURED"
-    },
-    {
-      "id": "multi-actions-demo",
-      "reviewStatus": "DRAFT",
-      "teacherKey": "synthetic-multi-actions",
-      "sourceType": "TEXT",
-      "sourceText": "数学：1、口算20题；订正昨天错题。",
-      "expected": [
-        {
-          "subject": "数学",
-          "keywords": [
-            "口算",
-            "20"
-          ],
-          "fields": {
-            "subject": "数学"
-          },
-          "sourceEvidenceTexts": [
-            "数学：1、口算20题；订正昨天错题。"
-          ]
-        },
-        {
-          "subject": "数学",
-          "keywords": [
-            "订正"
-          ],
-          "fields": {
-            "subject": "数学"
-          },
-          "sourceEvidenceTexts": [
-            "数学：1、口算20题；订正昨天错题。"
           ]
         }
       ],
-      "notes": "Synthetic only; parent annotation and actual teacher attribution required.",
-      "modelVersion": "UNMEASURED"
-    },
-    {
-      "id": "excerpt-4-2-demo",
-      "reviewStatus": "DRAFT",
-      "teacherKey": "synthetic-excerpt-4-2",
-      "sourceType": "TEXT",
-      "sourceText": "语文：摘抄（4+2）",
-      "expected": [
-        {
-          "subject": "语文",
-          "keywords": [
-            "摘抄",
-            "4个好词",
-            "2个好句"
-          ],
-          "fields": {
-            "subject": "语文",
-            "title": "摘抄4个好词、2个好句"
-          },
-          "sourceEvidenceTexts": [
-            "语文：摘抄（4+2）"
-          ]
-        }
-      ],
-      "notes": "DRAFT with same-student confirmed experience prerequisite: first number is good-word count, second is good-sentence count. A literal 4+2 echo is not a passing task.",
-      "modelVersion": "UNMEASURED"
-    },
-    {
-      "id": "excerpt-3-2-demo",
-      "reviewStatus": "DRAFT",
-      "teacherKey": "synthetic-excerpt-3-2",
-      "sourceType": "TEXT",
-      "sourceText": "语文：摘抄（3+2）",
-      "expected": [
-        {
-          "subject": "语文",
-          "keywords": [
-            "摘抄",
-            "3个好词",
-            "2个好句"
-          ],
-          "fields": {
-            "subject": "语文",
-            "title": "摘抄3个好词、2个好句"
-          },
-          "sourceEvidenceTexts": [
-            "语文：摘抄（3+2）"
-          ]
-        }
-      ],
-      "notes": "DRAFT with same-student confirmed experience prerequisite; test current numbers instead of copying historical 4+2.",
-      "modelVersion": "UNMEASURED"
-    },
-    {
-      "id": "teacher-a-same-cue-demo",
-      "reviewStatus": "DRAFT",
-      "teacherKey": "synthetic-teacher-a-same-cue",
-      "sourceType": "TEXT",
-      "sourceText": "语文：小练P8",
-      "expected": [
-        {
-          "subject": "语文",
-          "keywords": [
-            "小练",
-            "8"
-          ],
-          "fields": {
-            "subject": "语文"
-          },
-          "sourceEvidenceTexts": [
-            "语文：小练P8"
-          ]
-        }
-      ],
-      "notes": "Synthetic only; parent annotation and actual teacher attribution required.",
-      "modelVersion": "UNMEASURED"
-    },
-    {
-      "id": "teacher-b-same-cue-demo",
-      "reviewStatus": "DRAFT",
-      "teacherKey": "synthetic-teacher-b-same-cue",
-      "sourceType": "TEXT",
-      "sourceText": "数学：小练P9",
-      "expected": [
-        {
-          "subject": "数学",
-          "keywords": [
-            "小练",
-            "9"
-          ],
-          "fields": {
-            "subject": "数学"
-          },
-          "sourceEvidenceTexts": [
-            "数学：小练P9"
-          ]
-        }
-      ],
-      "notes": "Synthetic only; parent annotation and actual teacher attribution required.",
-      "modelVersion": "UNMEASURED"
-    },
-    {
-      "id": "empty-demo",
-      "reviewStatus": "DRAFT",
-      "teacherKey": "synthetic-empty",
-      "sourceType": "TEXT",
-      "sourceText": "",
-      "expected": [],
-      "notes": "Synthetic only; parent annotation and actual teacher attribution required.",
-      "modelVersion": "UNMEASURED"
-    },
-    {
-      "id": "duplicate-demo",
-      "reviewStatus": "DRAFT",
-      "teacherKey": "synthetic-duplicate",
-      "sourceType": "TEXT",
-      "sourceText": "数学：口算20题\n数学：口算20题",
-      "expected": [
-        {
-          "subject": "数学",
-          "keywords": [
-            "口算",
-            "20"
-          ],
-          "fields": {
-            "subject": "数学"
-          },
-          "sourceEvidenceTexts": [
-            "数学：口算20题"
-          ]
-        }
-      ],
-      "notes": "Synthetic only; parent annotation and actual teacher attribution required.",
-      "modelVersion": "UNMEASURED"
-    },
-    {
-      "id": "long-text-demo",
-      "reviewStatus": "DRAFT",
-      "teacherKey": "synthetic-long-text",
-      "sourceType": "TEXT",
-      "sourceText": "通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n通知：下周亲子活动。\n语文：朗读第13页；数学：完成口算20题。",
-      "expected": [
-        {
-          "subject": "语文",
-          "keywords": [
-            "13"
-          ],
-          "fields": {
-            "subject": "语文"
-          },
-          "sourceEvidenceTexts": [
-            "语文：朗读第13页；数学：完成口算20题。"
-          ]
-        },
-        {
-          "subject": "数学",
-          "keywords": [
-            "20"
-          ],
-          "fields": {
-            "subject": "数学"
-          },
-          "sourceEvidenceTexts": [
-            "语文：朗读第13页；数学：完成口算20题。"
-          ]
-        }
-      ],
-      "notes": "Synthetic only; parent annotation and actual teacher attribution required.",
-      "modelVersion": "UNMEASURED"
+      "notes": "Illustrative screenshot content. TaskDate must be confirmed separately; evaluator currently scores item/subject/keyword only."
     }
   ]
 }

@@ -28,45 +28,31 @@ export class HomeworkImageEncoder {
       if (width <= 0 || height <= 0 || width * height > 40000000) {
         throw new Error('图片尺寸过大，请换一张截图重试');
       }
-      // Keep supported original files intact, including all pixels and orientation metadata.
-      // A global resize/JPEG pass can erase small print and cannot be assumed accuracy-neutral.
-      let originalSize = fileIo.statSync(file.fd).size;
+      // 长边收到 1536：视觉模型的等待时间几乎全花在图片预填充上（同一张黑板图实测
+      // 首 token 2048px≈22.6s、1536px≈5.3s），而作业照片在 1536px 下字迹依然清楚。
+      let ratio = Math.min(1, 1536 / Math.max(width, height));
+      let options: image.DecodingOptions = {
+        desiredSize: {
+          width: Math.max(1, Math.round(width * ratio)),
+          height: Math.max(1, Math.round(height * ratio))
+        }
+      };
+      pixelMap = await source.createPixelMap(options);
+      packer = image.createImagePacker();
+      let packing: image.PackingOption = { format: 'image/jpeg', quality: 84 };
       let encoded: ArrayBuffer;
-      let contentType: string = '';
-      if (originalSize > 0 && originalSize <= 4 * 1024 * 1024) {
-        let original = await HomeworkImageEncoder.readOriginal(file.fd, originalSize);
-        let bytes = new Uint8Array(original);
-        if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
-          contentType = 'image/jpeg';
-        } else if (bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 &&
-          bytes[2] === 0x4e && bytes[3] === 0x47 && bytes[4] === 0x0d && bytes[5] === 0x0a &&
-          bytes[6] === 0x1a && bytes[7] === 0x0a) {
-          contentType = 'image/png';
-        }
-        encoded = original;
-      } else {
-        throw new Error('图片超过4MB，请选择清晰截图或裁剪所需区域后重试');
-      }
-      if (contentType.length === 0) {
-        // Other SDK-readable formats are converted losslessly at their original dimensions.
-        // Do not silently lower resolution or JPEG quality to meet the upload limit.
-        pixelMap = await source.createPixelMap();
-        packer = image.createImagePacker();
-        let packing: image.PackingOption = { format: 'image/png', quality: 100 };
-        try {
-          encoded = await packer.packToData(pixelMap, packing);
-        } catch {
-          throw new Error('图片格式转换失败，请选择JPEG或PNG图片后重试');
-        }
-        contentType = 'image/png';
+      try {
+        encoded = await packer.packToData(pixelMap, packing);
+      } catch {
+        throw new Error('图片压缩失败，请重新选择后重试');
       }
       if (encoded.byteLength === 0 || encoded.byteLength > 4 * 1024 * 1024) {
-        throw new Error('图片处理后超过4MB，请裁剪所需区域后重试');
+        throw new Error('图片处理后超过4MB，请裁剪后重试');
       }
       let helper = new util.Base64Helper();
       return {
         imageBase64: await helper.encodeToString(new Uint8Array(encoded)),
-        contentType: contentType,
+        contentType: 'image/jpeg',
         encodedBytes: encoded.byteLength
       };
     } finally {
@@ -85,19 +71,4 @@ export class HomeworkImageEncoder {
       }
     }
   }
-
-  private static async readOriginal(fd: number, size: number): Promise<ArrayBuffer> {
-    let buffer = new ArrayBuffer(size);
-    let result = new Uint8Array(buffer);
-    let offset: number = 0;
-    while (offset < size) {
-      let chunk = new ArrayBuffer(Math.min(64 * 1024, size - offset));
-      let count = await fileIo.read(fd, chunk, { offset: offset, length: chunk.byteLength });
-      if (count <= 0 || count > chunk.byteLength) throw new Error('图片读取不完整，请重新选择后重试');
-      result.set(new Uint8Array(chunk, 0, count), offset);
-      offset += count;
-    }
-    return buffer;
-  }
-
 }

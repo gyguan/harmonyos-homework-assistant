@@ -230,7 +230,7 @@ def main() -> int:
     require("encoded = await packer.packToData(pixelMap, packing);" in image_encoder and
             "try {" in image_encoder and
             "catch {" in image_encoder and
-            "图片格式转换失败，请选择JPEG或PNG图片后重试" in image_encoder,
+            "图片压缩失败，请重新选择后重试" in image_encoder,
             "HomeworkImageEncoder.packToData must have explicit exception handling")
     require("let encoded = await packer.packToData(pixelMap, packing);" not in image_encoder,
             "HomeworkImageEncoder must not restore unhandled packToData assignment")

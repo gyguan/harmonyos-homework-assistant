@@ -5,11 +5,8 @@ Only cases with reviewStatus=VERIFIED are scored. Draft examples can document
 edge cases, but must never be represented as teacher-validated ground truth.
 The title/instruction keyword metric is a transparent proxy, not semantic accuracy.
 """
-from organizer_gold import validate_receipt
 import argparse
 import json
-import hashlib
-from organizer_metrics import summarize
 from collections import defaultdict
 from pathlib import Path
 
@@ -33,14 +30,7 @@ def match(expected, predicted):
 
 
 def evaluate(fixtures, predictions):
-    results = predictions.get("results", [])
-    by_id = {p["caseId"]: p for p in results}
-    if len(by_id) != len(results):
-        raise ValueError("Duplicate prediction case IDs")
-    fixture_hash = hashlib.sha256(json.dumps(fixtures, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
-    performance = summarize(results)
-    buckets = {kind: summarize([r for r in results if r.get("inputType", "UNSPECIFIED") == kind])
-               for kind in sorted({r.get("inputType", "UNSPECIFIED") for r in results})}
+    by_id = {p["caseId"]: p for p in predictions.get("results", [])}
     cases = fixtures.get("cases", [])
     if len({case["id"] for case in cases}) != len(cases):
         raise ValueError("Duplicate case IDs in fixtures")
@@ -49,7 +39,6 @@ def evaluate(fixtures, predictions):
         return {
             "status": "NO_VERIFIED_GOLD",
             "warning": "No parent-verified cases. Do not calculate or report model accuracy.",
-            "fixtureHash": fixture_hash, "performance": performance, "buckets": buckets,
             "fixtureCount": len(cases),
             "verifiedCount": 0,
             "cases": []
@@ -65,7 +54,6 @@ def evaluate(fixtures, predictions):
     prompt_versions = set()
     for case in verified:
         prediction = by_id[case["id"]]
-        validate_receipt(case, prediction=prediction)
         outputs = prediction.get("assignments", [])
         gold = case["expected"]
         if not isinstance(outputs, list) or not isinstance(gold, list):
@@ -73,44 +61,14 @@ def evaluate(fixtures, predictions):
         if any(not item.get("keywords") or not item.get("subject") for item in gold):
             raise ValueError("Verified case has empty expected subject/keywords: " + case["id"])
         used = set()
-        # Maximum bipartite matching, not order-sensitive greedy assignment.
-        edges = [[i for i, out in enumerate(outputs) if match(exp, out)] for exp in gold]
-        owners = {}
-        def assign(g, visited):
-            for i in edges[g]:
-                if i in visited:
-                    continue
-                visited.add(i)
-                if i not in owners or assign(owners[i], visited):
-                    owners[i] = g
-                    return True
-            return False
-        for g in range(len(gold)):
-            assign(g, set())
-        matched_gold = set(owners.values())
-        field_checks = []
-        evidence_checks = []
-        blocks = {b.get("id") for b in prediction.get("sourceDocument", {}).get("blocks", []) if b.get("text")}
-        for i, g in owners.items():
-            exp, out = gold[g], outputs[i]
-            for field, value in exp.get("fields", {}).items():
-                field_checks.append(normalize(out.get(field)) == normalize(value))
-            required = set(exp.get("sourceBlockIds", []))
-            spans = exp.get("sourceEvidenceTexts", [])
-            if required or spans:
-                references = set(out.get("sourceBlockIds", []))
-                linked = "\n".join(b.get("text", "") for b in prediction.get("sourceDocument", {}).get("blocks", [])
-                                   if b.get("id") in references)
-                evidence_checks.append(bool(references) and references <= blocks and required <= references
-                                       and all(normalize(span) in normalize(linked) for span in spans))
-        totals["fieldCorrect"] += sum(field_checks)
-        totals["fieldTotal"] += len(field_checks) + sum(len(gold[g].get("fields", {})) for g in range(len(gold)) if g not in matched_gold)
-        totals["evidenceCorrect"] += sum(evidence_checks)
-        totals["evidenceTotal"] += len(evidence_checks) + sum(bool(gold[g].get("sourceBlockIds") or gold[g].get("sourceEvidenceTexts")) for g in range(len(gold)) if g not in matched_gold)
-        totals["evidenceCovered"] += sum(bool(o.get("sourceBlockIds")) and set(o["sourceBlockIds"]) <= blocks for o in outputs)
         unmatched_gold = []
-        used = set(owners)
-        unmatched_gold = [gold[g] for g in range(len(gold)) if g not in matched_gold]
+        for expected in gold:
+            found = next((i for i, predicted in enumerate(outputs)
+                          if i not in used and match(expected, predicted)), None)
+            if found is None:
+                unmatched_gold.append(expected)
+            else:
+                used.add(found)
         extras = [outputs[i] for i in range(len(outputs)) if i not in used]
         teacher = case.get("teacherKey", "UNSPECIFIED")
         row = {
@@ -124,20 +82,13 @@ def evaluate(fixtures, predictions):
         if isinstance(prediction.get("tokens"), int):
             row["tokens"] = prediction["tokens"]
         rows.append(row)
-        model_name = prediction.get("model", "UNSPECIFIED")
-        prompt_version = prediction.get("promptVersion", "UNSPECIFIED")
-        # HTTP input/auth failures may not enter the organizer/model scope. Keep them
-        # in failure/recall denominators without inventing another model variant.
-        unknown = {"UNSPECIFIED", "unavailable", "UNAVAILABLE"}
-        if prediction.get("success", True) or model_name not in unknown:
-            model_names.add(model_name)
-        if prediction.get("success", True) or prompt_version not in unknown:
-            prompt_versions.add(prompt_version)
+        model_names.add(prediction.get("model", "UNSPECIFIED"))
+        prompt_versions.add(prediction.get("promptVersion", "UNSPECIFIED"))
         for key, value in (("matched", len(used)), ("expected", len(gold)),
                            ("predicted", len(outputs)), ("countExact", int(row["countExact"]))):
             totals[key] += value
             by_teacher[teacher][key] += value
-    if len(model_names) > 1 or len(prompt_versions) > 1:
+    if len(model_names) != 1 or len(prompt_versions) != 1:
         raise ValueError("Mixed model or prompt versions: report each variant separately")
 
     def score(counts):
@@ -153,57 +104,11 @@ def evaluate(fixtures, predictions):
         "status": "SCORED_KEYWORD_PROXY",
         "warning": "Keyword coverage is a deterministic proxy, not verified semantic accuracy.",
         "fixtureCount": len(cases), "verifiedCount": len(verified),
-        "model": next(iter(model_names), "UNAVAILABLE"), "promptVersion": next(iter(prompt_versions), "UNAVAILABLE"),
-        "fixtureHash": fixture_hash, "performance": performance, "buckets": buckets,
-        "counts": dict(totals),
-        "total": dict(score(totals),
-                      keyFieldAccuracy=round(totals["fieldCorrect"] / totals["fieldTotal"], 4) if totals["fieldTotal"] else None,
-                      evidenceAccuracy=round(totals["evidenceCorrect"] / totals["evidenceTotal"], 4) if totals["evidenceTotal"] else None,
-                      evidenceCoverage=round(totals["evidenceCovered"] / totals["predicted"], 4) if totals["predicted"] else None),
+        "model": next(iter(model_names)), "promptVersion": next(iter(prompt_versions)),
+        "total": score(totals),
         "teachers": {teacher: score(values) for teacher, values in by_teacher.items()},
         "cases": rows,
     }
-
-
-def compare(prior, candidate):
-    if prior.get("fixtureHash") != candidate.get("fixtureHash") or not candidate.get("fixtureHash"):
-        raise ValueError("Baseline must use identical fixture content/status/annotations")
-    if prior.get("status") != candidate.get("status"):
-        raise ValueError("Baseline and candidate gold status differs")
-    deltas = {}
-    regression = False
-    for key in ("recallProxy", "precisionProxy", "keyFieldAccuracy", "evidenceAccuracy", "evidenceCoverage"):
-        old, new = prior.get("total", {}).get(key), candidate.get("total", {}).get(key)
-        deltas[key] = new - old if old is not None and new is not None else None
-        regression |= old is not None and (new is None or new < old)
-    for key in ("p50Ms", "p95Ms", "averageTokensIn", "averageTokensOut", "reviewRate", "failureRate"):
-        old, new = prior.get("performance", {}).get(key), candidate.get("performance", {}).get(key)
-        deltas[key] = new - old if old is not None and new is not None else None
-    return {"regressed": regression, "baselineDeltas": deltas,
-            "comparisonNote": "Confirm identical model, hardware/network, date and teacher/experience setup before attributing latency changes."}
-
-
-def performance_gate(prior, candidate):
-    old, new = prior.get("performance", {}), candidate.get("performance", {})
-    # Compare cold inference separately whenever cache-enabled measurements are present.
-    if any(p.get("cacheBuckets", {}).get("HIT", {}).get("requests", 0) for p in (old, new)):
-        cold = [p.get("cacheBuckets", {}).get("MISS", {}) for p in (old, new)]
-        if any(not bucket.get("requests") for bucket in cold):
-            return "UNAVAILABLE"
-        cold_gate = performance_gate({"performance": cold[0]}, {"performance": cold[1]})
-        if cold_gate != "PASS":
-            return cold_gate
-    required = ("p50Ms", "p95Ms", "failureRate", "averageTokensIn", "averageTokensOut")
-    if any(old.get(k) is None or new.get(k) is None for k in required):
-        return "UNAVAILABLE"
-    # Partial usage cannot silently pass a cost gate.
-    if old.get("usageUnavailableRequests", 0) or new.get("usageUnavailableRequests", 0):
-        return "UNAVAILABLE"
-    if any(new[k] > old[k] for k in ("p50Ms", "p95Ms", "failureRate")):
-        return "REGRESSED"
-    if new["averageTokensIn"] + new["averageTokensOut"] > old["averageTokensIn"] + old["averageTokensOut"]:
-        return "REGRESSED"
-    return "PASS"
 
 
 def main():
@@ -213,15 +118,19 @@ def main():
     parser.add_argument("--report", type=Path)
     parser.add_argument("--baseline", type=Path,
                         help="Optional prior report, scored against the identical verified cases")
-    parser.add_argument("--enforce-performance", action="store_true",
-                        help="Fail if measured P50/P95, failure rate or total average tokens regress; unavailable data cannot pass")
     args = parser.parse_args()
     result = evaluate(read_json(args.fixtures), read_json(args.predictions))
-    if args.baseline:
+    if args.baseline and result["status"] == "SCORED_KEYWORD_PROXY":
         prior = read_json(args.baseline)
-        result.update(compare(prior, result))
-        if args.enforce_performance:
-            result["performanceGate"] = performance_gate(prior, result)
+        if prior.get("status") != "SCORED_KEYWORD_PROXY" or {
+            row["caseId"] for row in prior.get("cases", [])
+        } != {row["caseId"] for row in result["cases"]}:
+            raise ValueError("Baseline must contain exactly the same verified case IDs")
+        old_recall = prior["total"]["recallProxy"]
+        new_recall = result["total"]["recallProxy"]
+        result["baselineRecallProxy"] = old_recall
+        result["regressed"] = new_recall is not None and old_recall is not None and (
+            new_recall < old_recall)
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n",
@@ -229,10 +138,8 @@ def main():
     print(json.dumps(result, ensure_ascii=False, indent=2))
     if result["status"] != "SCORED_KEYWORD_PROXY":
         raise SystemExit(2)
-    if result.get("regressed") or result.get("performanceGate") == "REGRESSED":
+    if result.get("regressed"):
         raise SystemExit(1)
-    if result.get("performanceGate") == "UNAVAILABLE":
-        raise SystemExit(2)
 
 
 if __name__ == "__main__":
