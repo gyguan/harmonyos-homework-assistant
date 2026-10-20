@@ -87,7 +87,7 @@ public final class HomeworkQualityValidator {
         && b.text() != null && !b.text().isBlank() && "READABLE".equals(b.legibility())
         && List.of("TEXT", "IMAGE").contains(String.valueOf(b.inputKind()))
         && (b.imageIndex() == null || b.imageIndex() == 0)
-        && (b.region().isEmpty() || b.region().size() == 4 && b.region().stream().allMatch(v -> v != null && Double.isFinite(v) && v >= 0 && v <= 1));
+        && HomeworkSourceEvidence.validRegion(b.region());
   }
   static Set<String> numbers(String text) {
     var result = new HashSet<String>(); var matcher = NUMBER.matcher(text == null ? "" : text);

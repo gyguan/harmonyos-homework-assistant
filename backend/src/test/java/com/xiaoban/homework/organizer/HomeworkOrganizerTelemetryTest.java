@@ -31,4 +31,14 @@ class HomeworkOrganizerTelemetryTest {
     }
   }
 
+  @Test void imageAndCacheCountersAreActualAndPartialDetailsStayUnavailable() {
+    try(var trace=HomeworkOrganizerTelemetry.open("image-usage","IMAGE")) {
+      AiCallMetrics.record(new AiCallMetrics.Call("PRIMARY","mock",1,true,new AiCallMetrics.Usage(100L,20L,30L,40L)));
+      AiCallMetrics.record(new AiCallMetrics.Call("REVIEW","mock",1,true,new AiCallMetrics.Usage(50L,10L,0L,15L)));
+      assertEquals(55L,trace.measurement().get("imageTokensIn")); assertEquals(30L,trace.measurement().get("cachedTokensIn"));
+      AiCallMetrics.record(new AiCallMetrics.Call("REVIEW","mock",1,true,new AiCallMetrics.Usage(1L,1L,null)));
+      assertEquals("unavailable",trace.measurement().get("imageTokensIn"));
+    }
+  }
+
 }

@@ -34,6 +34,7 @@ def summarize(rows, prices=None, *, include_cache_buckets=True):
         'reviewRate': mean(bool(r.get('reviewTriggered')) for r in rows) if rows else None,
         'averageCalls': avg('callCount'),
         'averageTokensIn': avg('tokensIn'), 'averageTokensOut': avg('tokensOut'),
+        'averageCachedTokensIn': avg('cachedTokensIn'), 'averageImageTokensIn': avg('imageTokensIn'),
         'usageAvailableRequests': len(usage), 'usageUnavailableRequests': len(rows) - len(usage),
         'averageConfiguredCost': mean(costs) if costs else None,
         'costAvailableRequests': len(costs),

@@ -46,6 +46,8 @@ app:
   media-sync:
     worker-delay-ms: ${MEDIA_SYNC_WORKER_DELAY_MS:5000}
   organizer:
+    image:
+      visual-review-enabled: ${ORGANIZER_IMAGE_VISUAL_REVIEW_ENABLED:true}
     cache:
       enabled: ${ORGANIZER_CACHE_ENABLED:true}
       ttl-seconds: ${ORGANIZER_CACHE_TTL_SECONDS:300}

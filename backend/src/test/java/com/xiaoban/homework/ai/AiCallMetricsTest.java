@@ -28,4 +28,14 @@ class AiCallMetricsTest {
     assertFalse(AiCallMetrics.active());
     try (var second = AiCallMetrics.open()) { assertTrue(second.calls().isEmpty()); }
   }
+  @Test void readsActualImageAndCacheUsageOnlyWhenProviderSuppliesValidCounters() {
+    var json = tools.jackson.databind.json.JsonMapper.builder().build();
+    var chat=AiCallMetrics.usage(json.readTree("{\"usage\":{\"prompt_tokens\":100,\"completion_tokens\":20,\"prompt_tokens_details\":{\"cached_tokens\":30,\"image_tokens\":40}}}"));
+    assertEquals(30L,chat.cachedTokens()); assertEquals(40L,chat.imageTokens());
+    var responses=AiCallMetrics.usage(json.readTree("{\"usage\":{\"input_tokens_details\":{\"image_tokens\":15}}}"));
+    assertEquals(15L,responses.imageTokens()); assertNull(responses.cachedTokens());
+    for(String value:java.util.List.of("-1","1.5","true","\"12\"","null"))
+      assertNull(AiCallMetrics.usage(json.readTree("{\"usage\":{\"input_tokens_details\":{\"image_tokens\":"+value+"}}}")).imageTokens());
+  }
+
 }

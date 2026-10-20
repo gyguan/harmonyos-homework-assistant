@@ -96,3 +96,17 @@ JPEG APP1 / PNG eXIf 的 IFD0 Orientation 采用 CIPA DC-008 的 1–8 方向约
 内部模型适配增加可兼容的原始图片 Hash 参数。Service 校验家庭所有权后才准备图片，缓存键同时包含原始字节身份、校正后输入及处理版本；旧四参数适配仍可使用。测量增加 `imagePreparation` 的处理版本、宽高、方向和输入/输出字节数，不记录图片、元数据正文或原始 Hash。模型 usage 继续按实际 provider 返回统计，不能把像素数换算成“实际图片 Token”。
 
 单测逐像素验证 8 个方向、小端/大端、透明像素和 JPEG 解码后像素的保真；HTTP fake-provider + PostgreSQL E2E 验证 7×3 图片以 3×7 输入到 provider、低风险仍一次推理、错误方向不发请求。以上是几何/协议验证，不代表已完成真实小字/手写/表格语义金标评测。
+
+## P1：按风险触发一次局部视觉复核
+
+第一轮始终识别完整图片。只有独立来源文档中存在 `UNCLEAR`（或空文字）、`IMAGE/imageIndex=0`、有效 `[x,y,width,height]` 的 TASK/UNRESOLVED 片段，才考虑一次局部视觉复核；片段面积不得超过整图 50%，裁剪最多 4MP。来源 ID 重复、定位未知/越界/零宽高、跨不相关来源的候选不能用局部图片安全处理时不裁剪。仅选择一个可处理片段，其他不确定来源继续提示家长核对。
+
+按原像素向外取整裁剪，无插值、放大、锐化或对比度阈值处理，输出有界无损 PNG；只有本局部及引用它的候选进入第二轮，未涉及候选不再发送。不把已有任务的摘录当成完整图片文字。第二轮仍由同一个图片模型负责转录与业务解释，返回 reading、带理由的候选 corrections/additions。不能改来源 ID/定位、删除初稿、修改其他候选，或把已知 TASK 改为 NON_TASK。
+
+该分支与文字定向复核共用一次复核预算：视觉复核尝试后直接返回（成功或失败），不再执行第三次文字调用。无有效来源位置时保留原有可靠文字复核边界。失败、仍不清楚、越界修改、新增无依据数字或风险不下降均完整保留初稿，附 REVIEW_* 提示。准备局部图片失败也保留初稿，不抛整个整理批次错误。低风险保持一次模型调用。
+
+成功视觉复核返回 SourceDocument schemaVersion=3，增加可选 `revisions`：保存该来源校正前/后的独立文字、原定位、理由及候选差异。未校正的来源完全不动，补充文字原文不变；旧 schema=2/历史 JSON 缺 revisions 时默认空列表。沿用 V43 私有证据 JSON 与当前事务，不新建存储或迁移，不保存原图/局部像素。审计仍按 family/student/import 隔离。`ORGANIZER_IMAGE_VISUAL_REVIEW_ENABLED=false` 可关闭此分支，保留初稿风险提示；开关也参与缓存键。
+
+测量增加 `imageReviewPreparation`、局部宽高/字节数、实际第二轮 provider call；provider 若明确返回 `input_tokens_details.image_tokens` 或 `prompt_tokens_details.image_tokens` 才累计 `imageTokensIn`，缺失/部分缺失为 unavailable，不按像素估算。`cachedTokensIn` 同样取实际细分 usage。图片准备/裁剪本身不产生 AI Token。
+
+这些测试只证明几何、协议、调用上限、范围、风险和隔离。真实裁剪是否提高小字/手写/表格召回，必须在固定 VERIFIED 图片金标上对比，不据 fake-provider 通过而宣称准确率改善。

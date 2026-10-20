@@ -33,6 +33,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   private final HomeworkTeacherExperienceService teacherExperiences;
   private final HomeworkOrganizerRuleService rules;
   private final HomeworkOrganizerCache cache;
+  @org.springframework.beans.factory.annotation.Value("${app.organizer.image.visual-review-enabled:true}")
+  private boolean visualReviewEnabled = true;
 
   /**
    * 注意：expectedMinutes / confidence 必须用装箱类型。
@@ -119,7 +121,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         buildInput(student, label, text), properties.getProvider(), properties.getProtocol(),
         properties.getBaseUrl(), properties.getResponsesPath(), properties.getChatCompletionsPath(),
         "IMAGE".equals(kind) ? properties.getImageOrganizerModel() : properties.getOrganizerModel(),
-        properties.isStructuredOutput(), properties.isDisableThinking(),
+        properties.isStructuredOutput(), properties.isDisableThinking(), visualReviewEnabled,
         instructionsWithShorthand(active), evidenceInstructions("IMAGE".equals(kind)), structuredSchema(),
         active.encodedShorthand(), new java.util.TreeMap<>(active.templates()), active.version(), epoch)));
   }
@@ -239,7 +241,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       var matching = selection(student, sourceLabel, initial.sourceDocument().readableText(), false);
       if (!matching.selected().isEmpty()) retrieved = matching;
       var result = reviewWithExperience(properties.getImageOrganizerModel(), "AI_IMAGE",
-          initial.sourceDocument(), initial.assignments(), retrieved, readStructured(output.get()).appliedExperienceIds());
+          initial.sourceDocument(), initial.assignments(), retrieved, readStructured(output.get()).appliedExperienceIds(), imageDataUrl);
       cacheAccepted(key, epoch, student, sourceLabel, text, activeRules, result);
       return Optional.of(new HomeworkOrganizerDtos.ImageResponse(result.assignments(), "AI_IMAGE",
           result.sourceDocument().readableText(), result.sourceDocument(), result.qualityFlags(), result.needsReview(), result.experiences()));
@@ -443,12 +445,24 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   /** Exactly one optional targeted pass. Presence of history alone never triggers inference. */
   private HomeworkOrganizerDtos.Response reviewWithExperience(String model, String mode, HomeworkSourceDocument doc,
       List<HomeworkOrganizerDtos.Candidate> initial, HomeworkTeacherExperienceService.Retrieval selected, List<String> declared) {
+    return reviewWithExperience(model, mode, doc, initial, selected, declared, null);
+  }
+
+  private HomeworkOrganizerDtos.Response reviewWithExperience(String model, String mode, HomeworkSourceDocument doc,
+      List<HomeworkOrganizerDtos.Candidate> initial, HomeworkTeacherExperienceService.Retrieval selected,
+      List<String> declared, String imageDataUrl) {
     var usage = usage(selected, declared, doc, initial);
     var validator = new HomeworkQualityValidator();
     long qualityStarted = System.nanoTime();
     var before = validator.validate(doc, initial, usage);
     HomeworkOrganizerTelemetry.stage("qualityValidation", qualityStarted);
     HomeworkOrganizerTelemetry.quality(before.risk().name(), before.flags(), "NOT_NEEDED");
+    if (visualReviewEnabled && imageDataUrl != null) {
+      var visual = new HomeworkVisualReview(transport, jsonMapper)
+          .tryReview(model, mode, imageDataUrl, doc, initial, selected, usage, before);
+      // A visual second pass consumes the same one-review budget. Never follow it with text review.
+      if (visual.isPresent()) return visual.get();
+    }
     if (!before.reviewable()) return new HomeworkOrganizerDtos.Response(initial, mode, doc,
         before.flags(), !before.flags().isEmpty(), usage);
     var blocks = doc.blocks().stream().filter(b -> before.blockIds().contains(b.id())).toList();
@@ -521,7 +535,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     } finally { HomeworkOrganizerTelemetry.stage("review", reviewStarted); }
   }
 
-  private static HomeworkOrganizerDtos.Candidate reviewCandidate(StructuredCandidate item, Set<String> scope) {
+  static HomeworkOrganizerDtos.Candidate reviewCandidate(StructuredCandidate item, Set<String> scope) {
     if (item == null || item.sourceBlockIds() == null || item.sourceBlockIds().isEmpty()
         || !scope.containsAll(item.sourceBlockIds())) throw new IllegalArgumentException("Unsupported review evidence");
     var converted = toCandidates(new StructuredResult(List.of(item)));
@@ -530,7 +544,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     return converted.candidates().getFirst();
   }
 
-  private static HomeworkOrganizerDtos.Response reviewFailure(List<HomeworkOrganizerDtos.Candidate> initial,
+  static HomeworkOrganizerDtos.Response reviewFailure(List<HomeworkOrganizerDtos.Candidate> initial,
       String mode, HomeworkSourceDocument doc, HomeworkOrganizerDtos.ExperienceUsage usage,
       HomeworkQualityValidator.Assessment before, String code) {
     var flags = new ArrayList<>(before.flags());

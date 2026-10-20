@@ -28,6 +28,7 @@ IMAGE_SIZES = []
 REPLY = {}
 CALLS = 0
 REVIEW_REPLY = None
+VISUAL_REPLY = None
 
 
 class Provider(BaseHTTPRequestHandler):
@@ -59,9 +60,9 @@ class Provider(BaseHTTPRequestHandler):
                     raw_image = base64.b64decode(part['image_url']['url'].split(',',1)[1])
                     require(raw_image.startswith(b'\x89PNG'), 'expected a lossless PNG')
                     IMAGE_SIZES.append(struct.unpack('>II',raw_image[16:24]))
-        reply = REVIEW_REPLY if 'reviewVersion=1' in body['messages'][0]['content'] and REVIEW_REPLY is not None else REPLY
+        reply = VISUAL_REPLY if 'visualReviewVersion=1' in body['messages'][0]['content'] and VISUAL_REPLY is not None else REVIEW_REPLY if 'reviewVersion=1' in body['messages'][0]['content'] and REVIEW_REPLY is not None else REPLY
         data = json.dumps({'choices': [{'message': {'role': 'assistant', 'content': json.dumps(reply, ensure_ascii=False)}}],
-                           'usage': {'prompt_tokens': 120, 'completion_tokens': 80}}).encode()
+                           'usage': {'prompt_tokens': 120, 'completion_tokens': 80, 'prompt_tokens_details': {'cached_tokens': 0, 'image_tokens': 50 if isinstance(body['messages'][-1]['content'],list) else 0}}}).encode()
         self.send_response(200)
         self.send_header('Content-Type', 'application/json')
         self.end_headers()
@@ -100,7 +101,7 @@ def start_backend(log):
 
 
 def main():
-    global REPLY, REVIEW_REPLY
+    global REPLY, REVIEW_REPLY, VISUAL_REPLY
     provider = ThreadingHTTPServer(('127.0.0.1', 8765), Provider)
     threading.Thread(target=provider.serve_forever, daemon=True).start()
     proc = None
@@ -200,6 +201,26 @@ def main():
             REPLY = dict(assignments=[candidate('fake')])
             legacy = expect(http(base, 'POST', route + '/organize', token=token, payload={'text': '数学口算20题','sourceLabel':'旧接口兼容'}), (200,), 'legacy request/response compatibility').json()
             require(legacy['needsReview'] and len(legacy['assignments']) == 1, 'old API dropped candidate or concealed evidence gap')
+            # One located unreadable block may consume the shared second-pass budget.
+            unclear = dict(block('i2','看不清','UNRESOLVED',image=True),legibility='UNCLEAR',region=[.25,.25,.5,.5])
+            REPLY = dict(schemaVersion=2,sourceBlocks=[block('i1','数学口算20题',image=True),unclear],assignments=[candidate('i1')])
+            recovered = dict(candidate('i2'),subject='语文',title='朗读13页',instruction='朗读13页',sourceExcerpt='语文朗读13页')
+            VISUAL_REPLY = dict(visualReviewVersion=1,reading=dict(blockId='i2',text='语文朗读13页',legibility='READABLE',classification='TASK',reason='局部文字可辨认'),
+                                corrections=[],additions=[dict(assignment=recovered,reason='局部有遗漏任务')],appliedExperienceIds=[])
+            vision_batch='vision-review-'+run
+            calls_before=CALLS
+            visual = expect(http(base,'POST',route+'/organize-image',token=token,payload=dict(image_payload,sourceLabel='局部复核',importId=vision_batch)),(200,),'targeted image review').json()
+            require(CALLS-calls_before == 2 and IMAGE_SIZES[-2:] == [(8,8),(4,4)],'visual review did not use exactly one crop inference')
+            require(len(visual['assignments']) == 2 and not visual['needsReview'],'visual correction failed')
+            require(visual['sourceDocument']['schemaVersion'] == 3 and visual['sourceDocument']['revisions'][0]['before']['text'] == '看不清','original visual evidence lost')
+            visual_saved=expect(http(base,'GET',route+'/source-evidence/'+vision_batch,token=token),(200,),'visual audit persistence').json()
+            expect(http(base,'GET',f'/api/v1/students/{other}/homework/source-evidence/{vision_batch}',token=token),(404,),'visual audit student isolation')
+            VISUAL_REPLY={'invalid':'review'}
+            calls_before=CALLS
+            failed_visual=expect(http(base,'POST',route+'/organize-image',token=token,payload=dict(image_payload,sourceLabel='局部失败')),(200,),'visual review failure retains draft').json()
+            require(CALLS-calls_before == 2 and failed_visual['needsReview'] and len(failed_visual['assignments']) == 1,'visual failure retried or dropped draft')
+            require(failed_visual['sourceDocument']['blocks'][-1]['text'] == '看不清','failed visual pass changed original evidence')
+            VISUAL_REPLY=None
             # PNG eXIf uses the same TIFF orientation as JPEG APP1. Pixels reaching the
             # external provider are already upright; no second inference is needed.
             upright = valid_test_png(7,3)
@@ -224,6 +245,8 @@ def main():
             proc = start_backend(log)
             restored = expect(http(base, 'GET', route + '/source-evidence/' + batch, token=token), (200,), 'restart evidence').json()
             require(restored == saved, 'evidence changed across restart')
+            visual_restored=expect(http(base,'GET',route+'/source-evidence/'+vision_batch,token=token),(200,),'visual audit restart').json()
+            require(visual_restored == visual_saved,'visual evidence revision changed across restart')
         contents = log_path.read_text()
         require('[AI-PAYLOAD]' not in contents, 'organizer leaked provider payload in debug mode')
         require('语文朗读13页' not in contents and '数学口算20题' not in contents, 'source content leaked to logs')
@@ -236,6 +259,10 @@ def main():
         orientation_row = next(row for row in measurements if row['importId'] == 'orientation-'+run)
         require(orientation_row['imagePreparation']['orientation'] == 6 and orientation_row['imagePreparation']['outputWidth'] == 3,
                 'orientation measurement missing')
+        visual_row=next(row for row in measurements if row['importId'] == vision_batch)
+        require(visual_row['callCount'] == 2 and visual_row['reviewTriggered'] and visual_row['visualReview']['width'] == 4,
+                'visual review measurement missing')
+        require(visual_row['imageTokensIn'] == 100 and visual_row['cachedTokensIn'] == 0,'actual provider detail usage missing')
         print('HOMEWORK_SOURCE_EVIDENCE_E2E_PASS PostgreSQL/Flyway, HTTP fake-provider, isolation, compatibility, restart, privacy')
     finally:
         if proc and proc.poll() is None:
