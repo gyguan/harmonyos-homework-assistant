@@ -100,7 +100,7 @@ require("if (this.inputMode === HomeworkAssignmentInputMode.IMAGE)" in input_sec
         "manual image/text selection must clear the inactive source and never combine content implicitly")
 require("this.viewModel.parseImage(" in import_page and
         "this.sourceImageRef, this.selectedSubject, this.sourceImageLabel" in import_page and
-        "this.viewModel.parseText(text, this.selectedSubject)" in import_page and
+        "this.viewModel.parseText(text, this.selectedSubject, '', '', '', operation)" in import_page and
         "private TeacherSelector()" not in import_page and
         "saveTeacher()" not in import_page and
         "boundTeacherName" not in import_page,

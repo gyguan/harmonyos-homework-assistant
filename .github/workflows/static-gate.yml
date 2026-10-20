@@ -78,6 +78,9 @@ jobs:
       - name: Test OCR input and resource lifecycle with SDK doubles
         run: node scripts/test_core_vision_ocr.mjs
 
+      - name: Test organizer lifecycle cancellation and timeout with SDK doubles
+        run: node scripts/test_homework_import_lifecycle.mjs
+
       - name: Test organizer image fidelity and native resource cleanup
         run: node scripts/test_homework_image_encoder.mjs
 

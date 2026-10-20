@@ -1,3 +1,4 @@
+import { HomeworkImportOperation, HomeworkImportPhase } from './HomeworkImportOperation';
 import { common } from '@kit.AbilityKit';
 import { camera, cameraPicker } from '@kit.CameraKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
@@ -43,11 +44,14 @@ export class HomeworkImportService {
     return candidates;
   }
 
-  private async runSmart(input: RawHomeworkImport): Promise<HomeworkImportPipelineResult> {
+  private async runSmart(input: RawHomeworkImport, operation?: HomeworkImportOperation): Promise<HomeworkImportPipelineResult> {
     if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
+    operation?.report(HomeworkImportPhase.PREPARING_TEXT);
     let extracted: ExtractedHomeworkText = await this.pipeline.extract(input);
+    operation?.ensureActive();
     extracted.teacherName = input.teacherName === undefined ? '' : input.teacherName;
-    let remoteCandidates = await HomeworkOrganizerRemoteApi.instance.organize(extracted);
+    let remoteCandidates = await HomeworkOrganizerRemoteApi.instance.organize(extracted, operation);
+    operation?.ensureActive();
     if (remoteCandidates !== null) {
       return {
         extracted: extracted,
@@ -56,6 +60,7 @@ export class HomeworkImportService {
         aiFailed: false
       };
     }
+    operation?.report(HomeworkImportPhase.LOCAL_DRAFT);
     // organize() 返回 null 有两种可能：离线（正常走本地）或在线但 AI 整理失败。
     // 在线失败时必须让用户知道结果是本地规则出的，准确度有折扣。
     return {
@@ -71,7 +76,7 @@ export class HomeworkImportService {
   }
 
   async parseText(text: string, subject: Subject | null = null, imageRef: string = '',
-    imageSourceLabel: string = '', teacherName: string = ''): Promise<HomeworkTextImportResult> {
+    imageSourceLabel: string = '', teacherName: string = '', operation?: HomeworkImportOperation): Promise<HomeworkTextImportResult> {
     if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
     let normalized = text.trim();
     if (normalized.length === 0) return { candidateCount: 0, organizerMode: HomeworkOrganizerMode.LOCAL, aiFailed: false };
@@ -89,11 +94,12 @@ export class HomeworkImportService {
       rawText: normalized,
       teacherName: teacherName
     };
-    let output: HomeworkImportPipelineResult = await this.runSmart(rawImport);
+    let output: HomeworkImportPipelineResult = await this.runSmart(rawImport, operation);
     let candidates = this.applySelectedSubject(output.candidates, subject);
     if (candidates.length === 0 && output.organizerMode === HomeworkOrganizerMode.LOCAL) {
       candidates = [this.fallbackCandidate(studentId, normalized, rawImport.sourceLabel, subject === null ? Subject.OTHER : subject)];
     }
+    operation?.report(HomeworkImportPhase.SAVING_DRAFT);
     HomeworkImportInboxService.instance.commitParsedImport(
       rawImport,
       fromScreenshot ? HomeworkImportSourceType.SCREENSHOT : HomeworkImportSourceType.CLIPBOARD,
@@ -101,12 +107,13 @@ export class HomeworkImportService {
       candidates,
       fromScreenshot ? imageRef : '');
     this.ensureCurrentStudent(studentId);
+    operation?.report(HomeworkImportPhase.COMPLETE);
     return { candidateCount: candidates.length, organizerMode: output.organizerMode, aiFailed: output.aiFailed };
   }
 
   async parseImage(imageRef: string, subject: Subject | null = null,
     sourceLabel: string = '相册作业图片', text: string = '',
-    teacherName: string = ''): Promise<HomeworkTextImportResult> {
+    teacherName: string = '', operation?: HomeworkImportOperation): Promise<HomeworkTextImportResult> {
     let studentId = this.drafts.getActiveStudentId();
     if (imageRef.length === 0) throw new Error('请先拍照或选择图片');
     let rawImport: RawHomeworkImport = {
@@ -122,13 +129,16 @@ export class HomeworkImportService {
       importId: rawImport.id, studentId: studentId, sourceLabel: sourceLabel, text: text.trim(),
       teacherName: teacherName
     };
-    let output = await HomeworkOrganizerRemoteApi.instance.organizeImage(input, imageRef);
+    let output = await HomeworkOrganizerRemoteApi.instance.organizeImage(input, imageRef, operation);
+    operation?.ensureActive();
     let candidates = this.applySelectedSubject(this.normalizeCandidateDates(output.candidates), subject);
     let sourceText = output.recognizedText;
     if (text.trim().length > 0) sourceText += `\n\n补充文字：\n${text.trim()}`;
+    operation?.report(HomeworkImportPhase.SAVING_DRAFT);
     HomeworkImportInboxService.instance.commitParsedImport(
       rawImport, HomeworkImportSourceType.SCREENSHOT, sourceText, candidates, imageRef);
     this.ensureCurrentStudent(studentId);
+    operation?.report(HomeworkImportPhase.COMPLETE);
     // 图片整理失败会直接抛错（由页面提示），这里返回即代表 AI 成功。
     return { candidateCount: candidates.length, organizerMode: HomeworkOrganizerMode.AI, aiFailed: false };
   }

@@ -1,3 +1,4 @@
+import { HomeworkImportOperation, HomeworkImportPhase } from '../../../application/import/HomeworkImportOperation';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { HomeworkTextImportResult } from '../../../domain/model/ImportModels';
 import { Subject } from '../../../domain/model/HomeworkModels';
@@ -17,6 +18,8 @@ export struct HomeworkImportPage {
   @State private localRevision: number = 0;
   @State private parseBusy: boolean = false;
   @State private busyHint: string = '';
+  @State private canStopWaiting: boolean = false;
+  private activeOperation: HomeworkImportOperation | null = null;
   @State private parseMessage: string = '';
   @State private parseError: boolean = false;
   @State private textDraft: string = '';
@@ -40,6 +43,33 @@ export struct HomeworkImportPage {
 
   aboutToAppear(): void {
     this.resetInputDraft();
+  }
+
+  aboutToDisappear(): void {
+    this.activeOperation?.cancel();
+    this.activeOperation = null;
+    this.canStopWaiting = false;
+    this.parseBusy = false;
+  }
+
+  private showImportPhase(phase: HomeworkImportPhase): void {
+    if (phase === HomeworkImportPhase.PREPARING_TEXT) this.busyHint = '正在读取作业文字…';
+    if (phase === HomeworkImportPhase.PREPARING_IMAGE) this.busyHint = '正在准备清晰图片…';
+    if (phase === HomeworkImportPhase.WAITING_FOR_AI) this.busyHint = '已提交，正在等待AI整理结果…';
+    if (phase === HomeworkImportPhase.VALIDATING_RESPONSE) this.busyHint = '已收到结果，正在检查作业内容…';
+    if (phase === HomeworkImportPhase.LOCAL_DRAFT) this.busyHint = '正在生成供核对的本地草稿…';
+    if (phase === HomeworkImportPhase.SAVING_DRAFT) this.busyHint = '正在保存核对草稿…';
+    if (phase === HomeworkImportPhase.COMPLETE) this.busyHint = '整理完成，请核对作业';
+  }
+
+  private stopWaiting(): void {
+    this.activeOperation?.cancel();
+    this.activeOperation = null;
+    this.canStopWaiting = false;
+    this.parseBusy = false;
+    this.busyHint = '';
+    this.parseMessage = '已停止等待，未添加新草稿；可修改内容后重试';
+    this.parseError = false;
   }
 
   private touchRevision(): number {
@@ -84,18 +114,27 @@ export struct HomeworkImportPage {
       return;
     }
 
+    let operation = new HomeworkImportOperation((phase: HomeworkImportPhase) => { this.showImportPhase(phase); });
+    this.activeOperation = operation;
+    this.canStopWaiting = true;
     this.parseBusy = true;
-    this.busyHint = this.usesImageAiParse() ? '正在识别图片中的作业，约 3–8 秒，请稍候' : '正在整理作业内容…';
+    this.busyHint = '正在准备作业内容…';
     this.parseMessage = '';
     this.parseError = false;
     try {
       let result: HomeworkTextImportResult;
       if (this.inputMode === HomeworkAssignmentInputMode.IMAGE) {
         result = await this.viewModel.parseImage(
-          this.sourceImageRef, this.selectedSubject, this.sourceImageLabel);
+          this.sourceImageRef, this.selectedSubject, this.sourceImageLabel, this.textDraft, '', operation);
       } else {
-        result = await this.viewModel.parseText(text, this.selectedSubject);
+        result = await this.viewModel.parseText(text, this.selectedSubject, '', '', '', operation);
       }
+      operation.ensureActive();
+      if (this.activeOperation !== operation) return;
+      operation.finish();
+      this.activeOperation = null;
+      this.canStopWaiting = false;
+      this.parseBusy = false;
       if (studentId !== this.viewModel.activeStudentId()) return;
       if (result.candidateCount > 0) {
         if (result.aiFailed) {
@@ -114,10 +153,15 @@ export struct HomeworkImportPage {
           '没有整理出作业，请换一张图片后重试' : '没有整理出作业，请核对文字内容后重试');
       }
     } catch (error) {
-      if (studentId !== this.viewModel.activeStudentId()) return;
+      if (this.activeOperation !== operation || studentId !== this.viewModel.activeStudentId()) return;
       this.showParseError(error instanceof Error ? error.message : '作业整理失败，请稍后重试');
     } finally {
-      this.parseBusy = false;
+      operation.finish();
+      if (this.activeOperation === operation) {
+        this.activeOperation = null;
+        this.canStopWaiting = false;
+        this.parseBusy = false;
+      }
     }
   }
 
@@ -340,7 +384,7 @@ export struct HomeworkImportPage {
             .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('请保持页面停留，完成后可继续核对')
+          Text(this.canStopWaiting ? '可停止等待，已输入的文字和图片会保留' : '选择完成后可继续整理')
             .width('100%')
             .fontSize(AppTheme.CAPTION_SIZE)
             .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
@@ -584,6 +628,17 @@ export struct HomeworkImportPage {
   private ActionFooter() {
     Column({ space: 8 }) {
       this.BusyBanner();
+      if (this.canStopWaiting) {
+        Button('停止等待', { type: ButtonType.Normal })
+          .width('100%')
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .fontColor(AppTheme.PRIMARY)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .accessibilityText('停止等待整理结果，保留已输入的文字和图片')
+          .onClick(() => { this.stopWaiting(); });
+      }
       this.FeedbackBanner();
 
       Button(this.parseBusy ? (this.usesImageAiParse() ? '正在识别图片…' : '正在处理…') : '整理并继续',
