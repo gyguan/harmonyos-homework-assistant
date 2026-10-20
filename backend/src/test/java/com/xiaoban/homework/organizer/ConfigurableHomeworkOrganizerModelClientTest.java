@@ -635,8 +635,8 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     var student = new TestStudent();
     student.id = "student-a";
     student.familyId = java.util.UUID.randomUUID();
-    when(experiences.context(eq(student), eq("王老师：通知"), eq("朗读国13"), eq(false)))
-        .thenReturn("老师「王老师」：国13 指《国学》第13页。");
+    when(experiences.retrieve(eq(student), eq("王老师：通知"), eq("朗读国13"), eq(false)))
+        .thenReturn(new HomeworkTeacherExperienceService.Retrieval("老师「王老师」：国13 指《国学》第13页。", List.of()));
     when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
         .thenReturn(java.util.Optional.of("{}"));
     var client = new ConfigurableHomeworkOrganizerModelClient(
@@ -675,8 +675,8 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     student.familyId = java.util.UUID.randomUUID();
     String original = "语文：摘抄：（3+2）";
     String experience = "家长经验：摘抄中两个数字分别表示本次好词、好句数量。";
-    when(experiences.context(eq(student), eq("家长文字"), eq(original), eq(false)))
-        .thenReturn(experience);
+    when(experiences.retrieve(eq(student), eq("家长文字"), eq(original), eq(false)))
+        .thenReturn(new HomeworkTeacherExperienceService.Retrieval(experience, List.of()));
     when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
         .thenAnswer(inv -> {
           String scene = inv.getArgument(4);
@@ -713,8 +713,8 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     var student = new TestStudent();
     student.id = "student-review-fail";
     student.familyId = java.util.UUID.randomUUID();
-    when(experiences.context(eq(student), anyString(), anyString(), eq(false)))
-        .thenReturn("家长经验：需按原文解释");
+    when(experiences.retrieve(eq(student), anyString(), anyString(), eq(false)))
+        .thenReturn(new HomeworkTeacherExperienceService.Retrieval("家长经验：需按原文解释", List.of()));
     when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
         .thenAnswer(inv -> "homework_experience_review".equals(inv.getArgument(4))
             ? java.util.Optional.empty()

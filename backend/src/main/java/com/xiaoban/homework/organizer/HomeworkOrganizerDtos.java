@@ -46,10 +46,19 @@ public final class HomeworkOrganizerDtos {
     }
   }
 
+  public record ExperienceUsage(List<String> retrievedExperienceIds, List<String> appliedExperienceIds,
+      List<String> unsupportedAppliedExperienceIds) {
+    public static ExperienceUsage empty() { return new ExperienceUsage(List.of(), List.of(), List.of()); }
+  }
+
   public record QualityFlag(String code, List<String> sourceBlockIds, List<Integer> assignmentIndexes) {}
 
   public record Response(List<Candidate> assignments, String mode,
-      HomeworkSourceDocument sourceDocument, List<QualityFlag> qualityFlags, boolean needsReview) {
+      HomeworkSourceDocument sourceDocument, List<QualityFlag> qualityFlags, boolean needsReview, ExperienceUsage experiences) {
+    public Response(List<Candidate> assignments, String mode, HomeworkSourceDocument document,
+        List<QualityFlag> flags, boolean needsReview) {
+      this(assignments, mode, document, flags, needsReview, ExperienceUsage.empty());
+    }
     public Response(List<Candidate> assignments, String mode) {
       this(assignments, mode, null, List.of(), false);
     }
@@ -72,7 +81,11 @@ public final class HomeworkOrganizerDtos {
   }
 
   public record ImageResponse(List<Candidate> assignments, String mode, String recognizedText,
-      HomeworkSourceDocument sourceDocument, List<QualityFlag> qualityFlags, boolean needsReview) {
+      HomeworkSourceDocument sourceDocument, List<QualityFlag> qualityFlags, boolean needsReview, ExperienceUsage experiences) {
+    public ImageResponse(List<Candidate> assignments, String mode, String recognizedText, HomeworkSourceDocument document,
+        List<QualityFlag> flags, boolean needsReview) {
+      this(assignments, mode, recognizedText, document, flags, needsReview, ExperienceUsage.empty());
+    }
     public ImageResponse(List<Candidate> assignments, String mode, String recognizedText) {
       this(assignments, mode, recognizedText, null, List.of(), false);
     }

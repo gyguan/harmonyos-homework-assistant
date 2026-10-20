@@ -20,6 +20,7 @@ class HomeworkFeedbackExperiencePromptTest {
   private static HomeworkTeacherExperienceEntity learned(String student, UUID family,
       String origin, String cue) {
     var row = new HomeworkTeacherExperienceEntity();
+    row.id = UUID.randomUUID();
     row.familyId = family;
     row.studentId = student;
     row.teacherName = "学科归属:语文";
@@ -78,7 +79,7 @@ class HomeworkFeedbackExperiencePromptTest {
         .thenReturn(List.of(rule));
     var svc = new HomeworkTeacherExperienceService(repository, mock(StudentRepository.class));
     String imageHint = svc.context(student, "黑板图片", "", true);
-    assertTrue(imageHint.contains("图片里必须识别出符合的老师和线索"), imageHint);
-    assertTrue(imageHint.contains("好词的条数"), imageHint);
+    assertEquals("", imageHint);
+    assertTrue(svc.context(student, "黑板图片", "语文：摘抄（3+2）", false).contains("好词的条数"));
   }
 }

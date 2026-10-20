@@ -22,7 +22,13 @@ public class HomeworkSourceEvidenceService {
   }
   public record Mapping(String candidateId, List<String> sourceBlockIds) {}
   public record Evidence(HomeworkSourceDocument sourceDocument, List<Mapping> mappings,
-      List<HomeworkOrganizerDtos.QualityFlag> qualityFlags, boolean needsReview) {}
+      List<HomeworkOrganizerDtos.QualityFlag> qualityFlags, boolean needsReview,
+      HomeworkOrganizerDtos.ExperienceUsage experiences) {
+    public Evidence(HomeworkSourceDocument document, List<Mapping> mappings,
+        List<HomeworkOrganizerDtos.QualityFlag> flags, boolean needsReview) {
+      this(document, mappings, flags, needsReview, HomeworkOrganizerDtos.ExperienceUsage.empty());
+    }
+  }
   private void owned(UUID family, String student) {
     var found = students.findById(student).orElseThrow(() -> new ApiExceptions.NotFound("孩子不存在"));
     if (!family.equals(found.familyId)) throw new ApiExceptions.NotFound("孩子不存在");
@@ -38,12 +44,18 @@ public class HomeworkSourceEvidenceService {
   public void capture(UUID family, String student, String batch, String teacher,
       List<HomeworkOrganizerDtos.Candidate> items, HomeworkSourceDocument document,
       List<HomeworkOrganizerDtos.QualityFlag> flags, boolean needsReview) {
+    capture(family, student, batch, teacher, items, document, flags, needsReview, HomeworkOrganizerDtos.ExperienceUsage.empty());
+  }
+  @Transactional
+  public void capture(UUID family, String student, String batch, String teacher,
+      List<HomeworkOrganizerDtos.Candidate> items, HomeworkSourceDocument document,
+      List<HomeworkOrganizerDtos.QualityFlag> flags, boolean needsReview, HomeworkOrganizerDtos.ExperienceUsage usage) {
     if (batch == null || batch.isBlank()) return;
     owned(family, student);
     if (!batch.matches("[A-Za-z0-9_-]{1,140}")) throw new ApiExceptions.BadRequest("导入批次标识不合法");
     var mappings = IntStream.range(0, items.size()).mapToObj(i ->
         new Mapping("ai-" + batch + "-" + (i + 1), items.get(i).sourceBlockIds())).toList();
-    var evidence = new Evidence(document, mappings, flags, needsReview);
+    var evidence = new Evidence(document, mappings, flags, needsReview, usage);
     String encoded = json.writeValueAsString(evidence);
     var existing = repository.findByFamilyIdAndStudentIdAndBatchId(family, student, batch);
     if (existing.isPresent()) {

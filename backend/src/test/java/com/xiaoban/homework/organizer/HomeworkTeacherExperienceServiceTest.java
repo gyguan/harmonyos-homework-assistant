@@ -73,7 +73,7 @@ class HomeworkTeacherExperienceServiceTest {
         .thenReturn(List.of(sample(student.familyId, student.id)));
     String context = new HomeworkTeacherExperienceService(repository, mock(StudentRepository.class))
         .context(student, "作业照片", "", true);
-    assertTrue(context.contains("必须识别出符合的老师和线索"));
+    assertEquals("", context);
     assertFalse(context.contains("student-b"));
   }
 
