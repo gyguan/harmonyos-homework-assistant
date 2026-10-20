@@ -1,3 +1,4 @@
+import { HomeworkImportOperation, HomeworkImportPhase } from '../import/HomeworkImportOperation';
 import { http } from '@kit.NetworkKit';
 import { CandidateAssignment, Subject } from '../../domain/model/HomeworkModels';
 import { ExtractedHomeworkText } from '../../domain/model/ImportModels';
@@ -235,11 +236,13 @@ export class HomeworkOrganizerRemoteApi {
     }
   }
 
-  async organizeImage(input: ExtractedHomeworkText, imageRef: string): Promise<OrganizedHomeworkImage> {
+  async organizeImage(input: ExtractedHomeworkText, imageRef: string, operation?: HomeworkImportOperation): Promise<OrganizedHomeworkImage> {
     if (!BackendSession.instance.isConnected()) throw new Error('请先连接后端后再解析作业图片');
+    operation?.report(HomeworkImportPhase.PREPARING_IMAGE);
     let totalStarted = Date.now();
     let encodeStarted = Date.now();
     let encoded = await HomeworkImageEncoder.encode(imageRef);
+    operation?.ensureActive();
     let encodeMs = Date.now() - encodeStarted;
     let payload: ImageOrganizePayload = {
       importId: input.importId,
@@ -249,11 +252,13 @@ export class HomeworkOrganizerRemoteApi {
       text: input.text,
       teacherName: input.teacherName === undefined ? '' : input.teacherName
     };
+    operation?.report(HomeworkImportPhase.WAITING_FOR_AI);
     let requestStarted = Date.now();
     let response = await BackendHttpClient.instance.requestFor(
       'homework.organize.image',
       `/api/v1/students/${encodeURIComponent(input.studentId)}/homework/organize-image`,
-      http.RequestMethod.POST, payload, true, 120000);
+      http.RequestMethod.POST, payload, true, 300000, operation === undefined ? null : operation.requestControl);
+    operation?.report(HomeworkImportPhase.VALIDATING_RESPONSE);
     let requestMs = Date.now() - requestStarted;
     console.info(`[AI-PERF] homework_image encodeMs=${encodeMs} requestMs=${requestMs} totalMs=${Date.now() - totalStarted} imageBytes=${encoded.encodedBytes}`);
     if (response.statusCode === 401) throw new Error('登录已失效，请重新登录后重试');
@@ -280,7 +285,8 @@ export class HomeworkOrganizerRemoteApi {
     return { candidates: candidates, recognizedText: parsed.recognizedText.trim() };
   }
 
-  async organize(input: ExtractedHomeworkText): Promise<CandidateAssignment[] | null> {
+  async organize(input: ExtractedHomeworkText, operation?: HomeworkImportOperation): Promise<CandidateAssignment[] | null> {
+    operation?.ensureActive();
     if (!BackendSession.instance.isConnected()) {
       return null;
     }
@@ -291,18 +297,21 @@ export class HomeworkOrganizerRemoteApi {
         sourceLabel: input.sourceLabel,
         teacherName: input.teacherName === undefined ? '' : input.teacherName
       };
+      operation?.report(HomeworkImportPhase.WAITING_FOR_AI);
       let response = await BackendHttpClient.instance.requestFor(
         'homework.organize',
         `/api/v1/students/${encodeURIComponent(input.studentId)}/homework/organize`,
         http.RequestMethod.POST,
-        payload
+        payload, true, 300000, operation === undefined ? null : operation.requestControl
       );
+      operation?.report(HomeworkImportPhase.VALIDATING_RESPONSE);
       if (response.statusCode < 200 || response.statusCode >= 300) {
         return null;
       }
       let parsed = JSON.parse(response.body) as OrganizeResponse;
       return this.toCandidates(input, parsed.assignments, undefined, parsed.qualityFlags, parsed.sourceDocument, parsed.needsReview);
     } catch {
+      operation?.ensureActive();
       return null;
     }
   }
