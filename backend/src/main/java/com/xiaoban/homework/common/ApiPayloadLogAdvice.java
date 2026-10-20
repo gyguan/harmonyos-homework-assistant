@@ -2,6 +2,7 @@ package com.xiaoban.homework.common;
 
 import jakarta.servlet.http.HttpServletRequest;
 import com.xiaoban.homework.organizer.HomeworkOrganizerDtos;
+import com.xiaoban.homework.assignment.AssignmentDtos;
 import java.lang.reflect.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +44,7 @@ public class ApiPayloadLogAdvice extends RequestBodyAdviceAdapter implements Res
   public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter,
       Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
     if (!properties.isLogPayloads()) return body;
-    if (body instanceof HomeworkOrganizerDtos.ImageRequest || body instanceof HomeworkOrganizerDtos.Request) return body;
+    if (body instanceof HomeworkOrganizerDtos.ImageRequest || body instanceof HomeworkOrganizerDtos.Request || privateAssignmentPayload(body)) return body;
     HttpServletRequest request = currentRequest(inputMessage);
     if (privateHomework(request)) return body;
     log.info("[HTTP-REQUEST-BODY] requestId={} scene={} body={}",
@@ -63,10 +64,10 @@ public class ApiPayloadLogAdvice extends RequestBodyAdviceAdapter implements Res
       Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request,
       ServerHttpResponse response) {
     if (!properties.isLogPayloads()) return body;
-    if (body instanceof HomeworkOrganizerDtos.ImageResponse || body instanceof HomeworkOrganizerDtos.Response) return body;
+    if (body instanceof HomeworkOrganizerDtos.ImageResponse || body instanceof HomeworkOrganizerDtos.Response || privateAssignmentPayload(body)) return body;
     HttpServletRequest servletRequest = request instanceof ServletServerHttpRequest servlet
         ? servlet.getServletRequest() : null;
-    // Private source evidence / feedback / candidates must never enter diagnostic payload logs.
+    // Private sources, feedback, candidates and published tasks never enter payload logs.
     if (privateHomework(servletRequest)) return body;
     if (servletRequest != null && servletRequest.getRequestURI().endsWith("/homework/organize-image")) return body;
     log.info("[HTTP-RESPONSE] requestId={} scene={} status={} body={}",
@@ -78,7 +79,13 @@ public class ApiPayloadLogAdvice extends RequestBodyAdviceAdapter implements Res
   }
 
   private static boolean privateHomework(HttpServletRequest request) {
-    return request != null && request.getRequestURI().contains("/homework/");
+    if (request == null) return false;
+    String uri = request.getRequestURI();
+    return uri.contains("/homework/") || uri.matches(".*/assignments(?:/.*)?");
+  }
+
+  private static boolean privateAssignmentPayload(Object body) {
+    return body != null && body.getClass().getEnclosingClass() == AssignmentDtos.class;
   }
 
   private HttpServletRequest currentRequest(HttpInputMessage inputMessage) {

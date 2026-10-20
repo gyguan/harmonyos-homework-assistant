@@ -57,7 +57,7 @@ HomeworkQualityValidator 只生成风险标记，不改写标题/科目，不按
 
 LOW：无标记，保留一次调用，即使有相关经验。MEDIUM/HIGH：按原因决定是否可纠正，必须有可辨认的独立来源才执行至多一次第二轮。不可辨认、来源完全缺失或范围过大时直接提示家长，不把任务摘录当完整图片证据，不循环重试。首轮图片后可从其独立转录查询经验；不会再次提交整张图片。
 
-第二轮使用独立 reviewVersion=1 差异协议，仅提交风险块、明确风险候选、风险原因及相关经验；输出 corrections/additions/blockDecisions 和原因。只能修改给定候选、补充有来源的漏项、把 UNRESOLVED 分类；不能删初稿任务、改来源文字或把已知 TASK 改成 NON_TASK 隐藏遗漏。原有正确候选不会发给模型重写。任何修正必须通过完整转换、来源范围、覆盖不倒退和风险复验：风险必须减少且不能出现新风险类型。失败、矛盾、无改善均保留初稿，返回 REVIEW_* 标记及 needsReview。无法确定的重复任务也交家长确认，不通过字符串删除；没有增加任何基于“绘本”等词自动去重的策略。
+第二轮使用独立 reviewVersion=2 差异协议（当前格式，每个新增任务同样含 assignment/reason），仅提交风险块、明确风险候选、风险原因及相关经验；输出 corrections/additions/blockDecisions 和原因。只能修改给定候选、补充有来源的漏项、把 UNRESOLVED 分类；不能删初稿任务、改来源文字或把已知 TASK 改成 NON_TASK 隐藏遗漏。原有正确候选不会发给模型重写。任何修正必须通过完整转换、来源范围、覆盖不倒退和风险复验：风险必须减少且不能出现新风险类型。失败、矛盾、无改善均保留初稿，返回 REVIEW_* 标记及 needsReview。无法确定的重复任务也交家长确认，不通过字符串删除；没有增加任何基于“绘本”等词自动去重的策略。
 
 最终风险级别、触发原因、复核结果及最终质量标记进入请求 measurement。API qualityFlags 指向具体 sourceBlockIds / assignmentIndexes。ArkTS 确认卡与编辑页显示原文及待核对原因，保留编辑/发布入口；可选字段通过现有草稿克隆/持久化保留，旧响应可读取。新字段是可选兼容字段，不改变本地已存在必需字段与快照版本。单测/HTTP doubles 不替代实际 HAP 构建。
 
@@ -170,3 +170,5 @@ python scripts/prepare_homework_organizer_gold.py check --fixtures .organizer-ev
 ```
 
 输出文件同名时会拒绝覆盖。复核变更后换新文件名；verify 输出保持在 fixtures 同目录，避免相对图片路径变化。collect 需要已有实际发布响应；历史响应丢失时，不推断发布集合，改用现有人工语料格式逐项核对。差异没有记录不能视作家长已确认；一次发布也不会自动计入金标或“一次确认无实质修改率”。新增测试和真实 PostgreSQL E2E 只验证采集、边界和人工升级协议；仓库示例仍全部 DRAFT，没有增加虚构 VERIFIED 数量。
+
+金标采集的真实 E2E 在开启 HTTP payload 诊断时同时覆盖发布请求和已发布任务查询。`ApiPayloadLogAdvice` 对 `/assignments` 及其子路径（含学生列表、分页、批量发布和单任务）屏蔽正文，直接 AssignmentDtos 也在无 Servlet 上下文时受保护；保留 access log 的 requestId/status/耗时。不能为让采集测试通过而关闭诊断或删除正文泄露断言。
