@@ -4,6 +4,7 @@ import { FamilyCloudService } from '../../../application/remote/FamilyCloudServi
 import { ParentAccessRemoteApi } from '../../../application/remote/ParentAccessRemoteApi';
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { StudentProfileEditorDialog } from '../../../components/family/StudentProfileEditorDialog';
 import { SettingsToggleRow } from '../../../components/selection/SelectionControls';
@@ -47,6 +48,13 @@ export struct BackendConnectionPage {
   @State private parentAccessMessage: string = '';
   @State private deleteStudentConfirmId: string = '';
   onStoreChanged: () => void = () => {};
+  @Prop embeddedInDeepPage: boolean = false;
+  @Prop forceLogin: boolean = false;
+  onBack: () => void = () => {};
+  onConnectionResolved: () => void = () => {};
+  @State private connectionFeedback: string = '';
+  @State private connectionFeedbackSuccess: boolean = false;
+  @State private connectionFeedbackError: boolean = false;
 
   private phoneStudentEditorController: CustomDialogController = new CustomDialogController({
     builder: StudentProfileEditorDialog({
@@ -99,7 +107,7 @@ export struct BackendConnectionPage {
   aboutToAppear(): void {
     this.baseUrl = BackendSession.instance.getBaseUrl();
     this.syncLocalStudents();
-    if (BackendSession.instance.isConnected()) {
+    if (BackendSession.instance.isConnected() && !this.forceLogin) {
       void this.refreshStudents();
       void this.refreshParentAccess();
     }
@@ -208,29 +216,57 @@ export struct BackendConnectionPage {
 
   private async connect(): Promise<void> {
     if (this.baseUrl.trim().length === 0 || this.loginName.trim().length === 0 || this.password.length === 0) {
-      this.message = '请填写服务地址、账号和密码';
+      this.connectionFeedback = '连接失败：请填写服务地址、账号和密码。';
+      this.connectionFeedbackSuccess = false;
+      this.connectionFeedbackError = true;
+      this.message = '';
       return;
     }
     this.connecting = true;
-    this.message = '正在连接…';
+    this.connectionFeedback = '正在连接云服务器…';
+    this.connectionFeedbackSuccess = false;
+    this.connectionFeedbackError = false;
+    this.message = '';
     try {
       await BackendAuthService.instance.login(this.baseUrl, this.loginName, this.password);
+      this.connectionFeedback = '登录成功，正在同步云端数据…';
       let familySynced = await FamilyCloudService.instance.syncStudents();
       let parentAccessSynced = await FamilyCloudService.instance.syncParentAccess();
       let homeworkSynced = await DefaultAssignmentRepository.instance.refresh();
       let conflicts = DefaultAssignmentRepository.instance.takeSyncConflictCount();
       this.syncLocalStudents();
       this.pageRevision++;
+      this.onConnectionResolved();
+
       if (!familySynced || !parentAccessSynced || !homeworkSynced) {
-        this.message = '已登录，部分数据稍后再同步';
+        this.connectionFeedback = '已连接成功，但部分数据同步失败，请点击“立即同步”重试。';
+        this.connectionFeedbackSuccess = false;
+        this.connectionFeedbackError = true;
       } else if (conflicts > 0) {
-        this.message = `已登录，但有 ${conflicts} 项离线改动被云端新版本覆盖，请核对作业内容`;
+        this.connectionFeedback = `已连接成功，数据同步完成；有 ${conflicts} 项离线改动被云端新版本覆盖，请核对作业内容。`;
+        this.connectionFeedbackSuccess = true;
+        this.connectionFeedbackError = false;
       } else {
-        this.message = '';
+        this.connectionFeedback = '已连接成功，云服务器登录有效，数据同步完成。';
+        this.connectionFeedbackSuccess = true;
+        this.connectionFeedbackError = false;
       }
       this.onStoreChanged();
     } catch {
-      this.message = '连接失败，请检查电脑局域网地址、后端服务和账号密码';
+      let connected = BackendSession.instance.isConnected();
+      this.onConnectionResolved();
+      if (connected) {
+        this.syncLocalStudents();
+        this.pageRevision++;
+        this.onStoreChanged();
+        this.connectionFeedback = '已连接成功，但同步过程出现异常，请点击“立即同步”重试。';
+        this.connectionFeedbackSuccess = false;
+        this.connectionFeedbackError = true;
+      } else {
+        this.connectionFeedback = '连接失败：请检查服务地址、网络或账号密码后重试。';
+        this.connectionFeedbackSuccess = false;
+        this.connectionFeedbackError = true;
+      }
     } finally {
       this.connecting = false;
     }
@@ -245,10 +281,11 @@ export struct BackendConnectionPage {
   }
 
   private async syncCloudData(): Promise<void> {
-    // 没有忙锁时连点会并发发起 N 轮「学生列表 + 家长码 + 作业全量」请求；
-    // 没有 try/catch 时任一步 reject 都是静默失败，界面不报错、用户以为点了没反应。
     if (this.syncing) return;
     this.syncing = true;
+    this.connectionFeedback = '正在同步云端数据…';
+    this.connectionFeedbackSuccess = false;
+    this.connectionFeedbackError = false;
     this.message = '';
     try {
       let familySynced = await FamilyCloudService.instance.syncStudents();
@@ -258,16 +295,23 @@ export struct BackendConnectionPage {
       this.syncLocalStudents();
       this.pageRevision++;
       if (!familySynced || !parentAccessSynced || !homeworkSynced) {
-        this.message = '部分数据同步失败，请稍后重试';
+        this.connectionFeedback = '云端数据同步失败或不完整，请检查网络后重试。';
+        this.connectionFeedbackSuccess = false;
+        this.connectionFeedbackError = true;
       } else if (conflicts > 0) {
-        // 离线期间的本地改动被服务端新版本覆盖，明确告诉用户去核对，而不是假装同步成功。
-        this.message = `已同步，但有 ${conflicts} 项离线改动被云端新版本覆盖，请核对作业内容`;
+        this.connectionFeedback = `云端数据同步完成，但有 ${conflicts} 项离线改动被云端新版本覆盖，请核对作业内容。`;
+        this.connectionFeedbackSuccess = true;
+        this.connectionFeedbackError = false;
       } else {
-        this.message = '';
+        this.connectionFeedback = '云端数据同步成功。';
+        this.connectionFeedbackSuccess = true;
+        this.connectionFeedbackError = false;
       }
       this.onStoreChanged();
     } catch {
-      this.message = '同步失败，请检查网络或后端地址后重试';
+      this.connectionFeedback = '云端数据同步失败，请检查网络或后端地址后重试。';
+      this.connectionFeedbackSuccess = false;
+      this.connectionFeedbackError = true;
     } finally {
       this.syncing = false;
     }
@@ -398,8 +442,13 @@ export struct BackendConnectionPage {
 
   private async disconnect(): Promise<void> {
     await BackendAuthService.instance.logout();
+    this.connectionFeedback = '已断开云服务器连接，本地作业仍可使用。';
+    this.connectionFeedbackSuccess = false;
+    this.connectionFeedbackError = false;
     this.message = '';
     this.pageRevision++;
+    this.onConnectionResolved();
+    this.onStoreChanged();
   }
 
   @Builder
@@ -557,10 +606,14 @@ export struct BackendConnectionPage {
       Row() {
         Column({ space: 3 }) {
           Text('家庭云端').fontSize(AppTheme.CARD_TITLE_SIZE).lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text(BackendSession.instance.isConnected()
-            ? `已连接${BackendSession.instance.getDisplayName().length > 0 ? ' · ' + BackendSession.instance.getDisplayName() : ''}`
-            : '未连接 · 本地作业仍可使用')
-            .fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(BackendSession.instance.isConnected() ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
+          Text(this.forceLogin
+            ? '连接状态待确认 · 请重新连接'
+            : BackendSession.instance.isConnected()
+              ? `已连接成功${BackendSession.instance.getDisplayName().length > 0 ? ' · ' + BackendSession.instance.getDisplayName() : ''}`
+              : '未连接 · 本地作业仍可使用')
+            .fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT)
+            .fontColor(this.forceLogin ? AppTheme.DANGER :
+              BackendSession.instance.isConnected() ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
@@ -573,7 +626,7 @@ export struct BackendConnectionPage {
         .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE_SUBTLE)
         .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.baseUrl = value);
 
-      if (!BackendSession.instance.isConnected()) {
+      if (!BackendSession.instance.isConnected() || this.forceLogin) {
         TextInput({ placeholder: '家长账号', text: this.loginName }).width('100%').height(AppTheme.INPUT_HEIGHT)
           .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
           .onChange((value: string) => this.loginName = value);
@@ -596,6 +649,19 @@ export struct BackendConnectionPage {
             .onClick(() => { void this.disconnect(); });
         }
         .width('100%');
+      }
+
+      if (this.connectionFeedback.length > 0) {
+        Text(this.connectionFeedback)
+          .width('100%')
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(this.connectionFeedbackError ? AppTheme.DANGER :
+            this.connectionFeedbackSuccess ? AppTheme.SUCCESS : AppTheme.SUBTEXT)
+          .padding(12)
+          .backgroundColor(this.connectionFeedbackError ? AppTheme.DANGER_SOFT :
+            this.connectionFeedbackSuccess ? AppTheme.SUCCESS_SOFT : AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
       }
     }
     .width('100%');
@@ -759,6 +825,16 @@ export struct BackendConnectionPage {
 
   build() {
     Column() {
+      if (this.embeddedInDeepPage) {
+        DeepPageHeader({
+          title: '连接云服务器',
+          subtitle: '连接家庭云端并同步作业数据',
+          backAccessibilityText: '返回上一页',
+          onBack: () => this.onBack()
+        })
+          .padding({ left: AppTheme.PAGE_PADDING_COMPACT, right: AppTheme.PAGE_PADDING_COMPACT,
+            top: 10, bottom: 8 });
+      }
       Scroll() {
         Column() {
           Column({ space: 18 }) {
@@ -788,7 +864,7 @@ export struct BackendConnectionPage {
         .alignItems(HorizontalAlign.Center);
       }
       .width('100%')
-      .height('100%')
+      .layoutWeight(1)
       .align(Alignment.Top)
       .scrollBar(BarState.Off);
     }

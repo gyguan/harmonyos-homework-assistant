@@ -5,6 +5,8 @@ import { FamilyCloudService } from '../application/remote/FamilyCloudService';
 import { ParentAccessRemoteApi } from '../application/remote/ParentAccessRemoteApi';
 import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
 import { ParentAccessDialog } from '../components/family/ParentAccessDialog';
+import { CloudConnectionReminder } from '../components/family/CloudConnectionReminder';
+import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
 import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
 import { ParentIdentity } from '../domain/model/ParentIdentity';
 import { FamilyContextRepository } from '../domain/port/FamilyContextRepository';
@@ -22,6 +24,9 @@ struct Index {
   private shareImportForceParent: boolean = false;
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private cloudRevision: number = 0;
+  @State private showCloudConnectionReminder: boolean = false;
+  @State private showCloudConnectionPage: boolean = false;
+  @State private cloudSessionInvalid: boolean = false;
   // Student identity changes are independent of the role: STUDENT -> STUDENT
   // must invalidate the existing shell just as PARENT -> STUDENT does.
   @State private studentContextRevision: number = 0;
@@ -43,8 +48,32 @@ struct Index {
 
   aboutToAppear(): void {
     this.selectedStudentId = this.familyContext.getActiveStudentId();
+    let shareImportActive = this.shareImportForceParent;
+    if (BackendSession.instance.isConnected()) {
+      void this.restoreCloud();
+    } else if (!shareImportActive) {
+      this.showCloudConnectionReminder = true;
+    }
     this.applyShareImportParentRole();
-    if (BackendSession.instance.isConnected()) void this.restoreCloud();
+  }
+
+  private openCloudConnectionPage(): void {
+    this.showCloudConnectionReminder = false;
+    this.showCloudConnectionPage = true;
+  }
+
+  private closeCloudConnectionPage(): void {
+    this.showCloudConnectionPage = false;
+  }
+
+  private onCloudConnectionResolved(): void {
+    this.cloudSessionInvalid = false;
+  }
+
+  private onCloudStoreChanged(): void {
+    this.selectedStudentId = this.familyContext.getActiveStudentId();
+    this.cloudRevision++;
+    this.studentContextRevision++;
   }
 
   private onShareImportForceParentChanged(): void {
@@ -64,7 +93,12 @@ struct Index {
 
   private async restoreCloud(): Promise<void> {
     let valid = await BackendAuthService.instance.validateSession();
-    if (!valid) return;
+    if (!valid) {
+      this.cloudSessionInvalid = true;
+      this.showCloudConnectionReminder = true;
+      return;
+    }
+    this.cloudSessionInvalid = false;
     let studentsSynced = await FamilyCloudService.instance.syncStudents();
     let parentAccessSynced = await FamilyCloudService.instance.syncParentAccess();
     if (studentsSynced) {
@@ -161,7 +195,15 @@ struct Index {
 
   build() {
     Stack() {
-      if (this.selectedRole === AppRole.NONE) {
+      if (this.showCloudConnectionPage) {
+        BackendConnectionPage({
+          embeddedInDeepPage: true,
+          forceLogin: this.cloudSessionInvalid,
+          onBack: () => this.closeCloudConnectionPage(),
+          onStoreChanged: () => this.onCloudStoreChanged(),
+          onConnectionResolved: () => this.onCloudConnectionResolved()
+        });
+      } else if (this.selectedRole === AppRole.NONE) {
         PersonEntryPage({
           revision: this.cloudRevision,
           onSelectParent: (identity: ParentIdentity) => { void this.requestParentAccess(identity); },
@@ -177,6 +219,14 @@ struct Index {
           onSwitchStudent: (studentId: string) => this.enterStudent(studentId),
           onRegisterBackHandler: (handler: () => boolean) => this.shellBackHandler = handler
         });
+      }
+      if (this.showCloudConnectionReminder && !this.showCloudConnectionPage) {
+        CloudConnectionReminder({
+          onConnect: () => this.openCloudConnectionPage(),
+          onDismiss: () => this.showCloudConnectionReminder = false
+        })
+          .width('100%')
+          .height('100%');
       }
     }.width('100%').height('100%');
   }
