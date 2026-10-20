@@ -182,6 +182,12 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   @Override
   public Optional<HomeworkOrganizerDtos.ImageResponse> organizeImage(StudentEntity student,
       String sourceLabel, String imageDataUrl, String text) {
+    return organizeImage(student, sourceLabel, imageDataUrl, text, HomeworkOrganizerTelemetry.fingerprint(imageDataUrl));
+  }
+
+  @Override
+  public Optional<HomeworkOrganizerDtos.ImageResponse> organizeImage(StudentEntity student,
+      String sourceLabel, String imageDataUrl, String text, String originalImageHash) {
     long retrievalStarted = System.nanoTime();
     HomeworkOrganizerRuleService.Snapshot activeRules = ruleSnapshot(student, sourceLabel, text);
     var retrieved = selection(student, sourceLabel, text, true);
@@ -191,7 +197,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         instructionsWithShorthand(activeRules) + evidenceInstructions(true) + activeRules.template("BLACKBOARD"),
         activeRules.version() + activeRules.encodedShorthand() + new java.util.TreeMap<>(activeRules.templates()), experienceContext);
     String epoch = cache == null || !cache.enabled() ? null : experienceEpoch(student);
-    String key = cacheKey(student, "IMAGE", sourceLabel, text, imageDataUrl, activeRules, epoch);
+    String key = cacheKey(student, "IMAGE", sourceLabel, text,
+        HomeworkImageInput.PROCESSING_VERSION + ":" + originalImageHash + ":" + imageDataUrl, activeRules, epoch);
     var hit = cached(key, properties.getImageOrganizerModel());
     if (hit.isPresent()) {
       var value = hit.get();

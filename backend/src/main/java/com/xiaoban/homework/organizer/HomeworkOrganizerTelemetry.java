@@ -78,6 +78,13 @@ final class HomeworkOrganizerTelemetry implements AutoCloseable {
       t.data.put("reviewOutcome", "CACHE_HIT");
     }
   }
+  static void image(HomeworkImageInput.Prepared image) {
+    var t = CURRENT.get();
+    if (t != null) t.data.put("imagePreparation", Map.of("version", HomeworkImageInput.PROCESSING_VERSION,
+        "width", image.width(), "height", image.height(), "outputWidth", image.outputWidth(),
+        "outputHeight", image.outputHeight(), "orientation", image.orientation(),
+        "inputBytes", image.inputBytes(), "outputBytes", image.outputBytes()));
+  }
   static void flag(String code) { var t = CURRENT.get(); if (t != null) t.flags.add(code); }
   static void review(String reason) {
     var t = CURRENT.get();
