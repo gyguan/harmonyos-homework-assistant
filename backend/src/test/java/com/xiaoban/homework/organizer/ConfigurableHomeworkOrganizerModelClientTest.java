@@ -730,5 +730,37 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertEquals("完成摘抄（3+2）", result.getFirst().title());
   }
 
+  @Test
+  void escapesBareQuotesInsideJsonStrings() {
+    String broken = "{\"instruction\":\"在\"一起作业\"APP上完成老师布置的作业\"}";
+    String repaired = ConfigurableHomeworkOrganizerModelClient.escapeStrayQuotes(broken);
+    assertEquals("{\"instruction\":\"在\\\"一起作业\\\"APP上完成老师布置的作业\"}", repaired);
+  }
 
+  @Test
+  void leavesWellFormedJsonUntouched() {
+    String valid = "{\"assignments\":[{\"title\":\"口算20题\",\"sourceExcerpt\":\"指读P25\"}]}";
+    assertEquals(valid, ConfigurableHomeworkOrganizerModelClient.escapeStrayQuotes(valid));
+  }
+
+  @Test
+  void recoveryParsesOutputWithBareQuotesInsteadOfFailing() {
+    var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
+    when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
+        .thenReturn(java.util.Optional.of("""
+            ```json
+            {"assignments":[{"subject":"英语","title":"完成一起作业APP上的作业",
+            "instruction":"在"一起作业"APP上完成老师布置的作业","textbookRef":"沪教版",
+            "taskDate":"2026-11-07","expectedMinutes":15,
+            "sourceExcerpt":"一起作业","confidence":0.95}]}
+            ```
+            """));
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), transport, JsonMapper.builder().build());
+
+    var result = client.organize(new TestStudent(), "家长文字", "英语：一起作业 绘本 听读U3").orElseThrow();
+
+    assertEquals(1, result.size());
+    assertEquals("在\"一起作业\"APP上完成老师布置的作业", result.getFirst().instruction());
+  }
 }

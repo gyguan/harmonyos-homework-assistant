@@ -240,6 +240,8 @@ hvigorw.bat assembleHap --mode module -p product=default -p buildMode=release --
 
 服务端 `app.ai.*` 走标准 **OpenAI 兼容协议**，换厂商只改环境变量，**不用改一行 Java**。两个使用点：AI 答疑（`tutor`，自由问答 700 tokens）与作业整理（`organizer`，结构化输出 1400 tokens）。
 
+> ⚠️ 下面 9.1 的例子是 2026-09-19 的取值，**当前推荐配置以 §9.11（2026-11-07 复测）为准**。
+
 ### 9.1 配置（写进 `.env` 后 `docker compose up -d`）
 
 ```bash
@@ -416,6 +418,30 @@ AI_ORGANIZER_MODEL=glm-4-flashx
 **仍未处理**：`AI_TUTOR_MODEL` 还是 `glm-4-flash`（同一条免费档）。AI 答疑是对话式交互，
 20 s 以上基本不可用，建议一并切到 `glm-4-flashx`，但改模型会影响答疑话术风格，需单独回归。
 
+### 9.11 模型升级复测：按链路分别选型（2026-11-07 实测）
+
+**前提变化**：9.10 的结论「glm-5.x 不能用」是在**思考未关闭**时得出的。现在结构化请求默认发
+`thinking={"type":"disabled"}`（`app.ai.disable-thinking`），`max_tokens` 也已提到 2000，
+glm-5.x 可以正常输出——所以按 2026-11-07 重新测了一遍，结论是**不同链路要用不同模型**。
+
+基准方法：`build/verify_online_models.py`（文本三段式 / 英语 / 黑板图）、`build/tmp/compare_variants.py`
+（挤在一行的序号、圈码混排、电报体、简写体、长通知、连贯叙述，各跑 2 次）、
+`build/tmp/stress.py`（同一用例连跑 N 次看稳定性）、`build/tmp/bench_tutor.py` / `bench_practice.py`。
+
+| 链路 | 选用 | 实测 | 落选原因 |
+|---|---|---|---|
+| 文本整理 `AI_ORGANIZER_MODEL` | **`glm-5.2`** | 英语 8/8 成功，中位 **3.0 s**；三段式 10 条（含心情日记独立成条）；难例 5/5 命中 | `glm-4.5-air` 简写体多拆 2 条且 2 次解析失败；`glm-4.5` 更准但慢 3 倍（中位 11.4 s）；`glm-5`/`glm-5.1` 无优势 |
+| 图片整理 `AI_IMAGE_ORGANIZER_MODEL` | **`glm-4.5v`** | 3 连测均 7/7，8.1/8.3/11.1 s | `glm-5v-turbo` 同样 7/7 但要 10.7~12.1 s；`glm-4.6v` 与 `glm-4.6v-flashx` 无提升 |
+| 答疑 `AI_TUTOR_MODEL` | **`glm-5.2`** | 5.1 s，讲解分步骤、给具体算式 | `glm-4-flash` 3.9 s 但只给一句；`glm-4.5-air` 6.2 s 且没有更清楚 |
+| 练习生成 `AI_PRACTICE_MODEL` | **`glm-4.5-air`** | 3/3 通过，7~8 s，8 题答案校验全过 | `glm-5.2` 字段漂移（`$.questions[0].stem is required`）且 35~48 s，2/3 失败；`glm-4-flashx` 算错题（期望 88 实际 69）导致整卷被答案校验拦下 |
+
+**顺带修的解析缺陷**：多个模型会把中文里的引号写成裸 ASCII 双引号
+（`"instruction":"在"一起作业"APP上完成作业"`），标准 JSON 解析必然失败 → 整次整理 503。
+`ConfigurableHomeworkOrganizerModelClient.escapeStrayQuotes()` 会在解析失败时把字符串内部的裸引号
+转义后重试一次，线上实测触发 5 次、`organizer parse failed` 降到 0。
+
+**踩坑记录**：`AI_STRUCTURED_OUTPUT=true`（发 `response_format: json_object`）**不能**解决上述转义问题，
+只有 `json_schema` 由厂商真正执行才有效，而智谱会忽略它——所以这个开关保持 `false`。
 
 ---
 

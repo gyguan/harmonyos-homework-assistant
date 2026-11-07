@@ -197,12 +197,73 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
    */
   StructuredResult readStructured(String output) {
     String text = jsonBody(stripComments(stripCodeFence(output)));
+    try {
+      return readStructuredStrict(text);
+    } catch (RuntimeException failure) {
+      // 模型把中文里的引号写成了裸 ASCII 双引号（线上实测：instruction 写成
+      // "在"一起作业"APP上完成作业"），标准 JSON 解析必然失败。
+      // 这类输出内容其实是完好的，修一刀比让整次整理退回本地规则划算。
+      String repaired = escapeStrayQuotes(text);
+      if (repaired.equals(text)) throw failure;
+      try {
+        StructuredResult result = readStructuredStrict(repaired);
+        log.warn("[AI] organizer json repaired quotes={} chars={}",
+            repaired.length() - text.length(), text.length());
+        return result;
+      } catch (RuntimeException stillFailing) {
+        throw failure;
+      }
+    }
+  }
+
+  private StructuredResult readStructuredStrict(String text) {
     if (text.startsWith("[")) {
       List<StructuredCandidate> items =
           jsonMapper.readValue(text, new TypeReference<List<StructuredCandidate>>() {});
       return new StructuredResult(items);
     }
     return jsonMapper.readValue(text, StructuredResult.class);
+  }
+
+  /**
+   * 把字符串字面量里裸写的 {@code "} 转义成 {@code \"}。
+   *
+   * <p>判定规则：只有在字符串内部、且这个引号后面（跳过空白）跟的不是
+   * {@code , } ] :} 之一时，才认为它是正文里的引号而不是结束引号。
+   * 例如 {@code "instruction": "在"一起作业"APP上…",} 会修成
+   * {@code "instruction": "在\"一起作业\"APP上…",}。
+   */
+  static String escapeStrayQuotes(String text) {
+    if (text == null || text.isEmpty()) return text;
+    StringBuilder out = new StringBuilder(text.length() + 16);
+    boolean inString = false;
+    for (int i = 0; i < text.length(); i++) {
+      char current = text.charAt(i);
+      if (current == '\\' && inString && i + 1 < text.length()) {
+        out.append(current).append(text.charAt(i + 1));
+        i++;
+        continue;
+      }
+      if (current != '"') {
+        out.append(current);
+        continue;
+      }
+      if (!inString) {
+        inString = true;
+        out.append(current);
+        continue;
+      }
+      int next = i + 1;
+      while (next < text.length() && Character.isWhitespace(text.charAt(next))) next++;
+      char follower = next < text.length() ? text.charAt(next) : '\0';
+      if (follower == ',' || follower == '}' || follower == ']' || follower == ':') {
+        inString = false;
+        out.append(current);
+      } else {
+        out.append("\\\"");
+      }
+    }
+    return out.toString();
   }
 
   /** 截取正文里的 JSON 主体：跳过 ```json 围栏和"好的，结果如下"之类的寒暄，截到最后一个括号为止。 */
