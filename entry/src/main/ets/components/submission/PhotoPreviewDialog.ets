@@ -4,6 +4,15 @@ const PHOTO_MIN_SCALE: number = 1;
 const PHOTO_MAX_SCALE: number = 4;
 const PHOTO_DOUBLE_TAP_SCALE: number = 2.5;
 const PHOTO_SCALE_EPSILON: number = 0.001;
+// 双指灵敏度：手势累计倍率的增量乘这个系数，轻微捏合不会一上手就跳一大截
+const PHOTO_PINCH_GAIN: number = 0.9;
+// 松手时低于这个倍率吸附回 1x，避免停在 1.04 这种「半放大」的尴尬状态
+const PHOTO_SNAP_SCALE: number = 1.08;
+// 捏合超过上限时允许的视觉溢出比例，松手再动画收回上限（软限制，不是硬砍）
+const PHOTO_OVERSCALE_RATIO: number = 0.12;
+// 拖动越界时最多能拖出图片边缘的比例（橡皮筋阻力）
+const PHOTO_PAN_OVERSHOOT: number = 0.45;
+const PHOTO_TRANSITION_MS: number = 220;
 
 @CustomDialog
 export struct PhotoPreviewDialog {
@@ -13,10 +22,11 @@ export struct PhotoPreviewDialog {
   @State private zoomScale: number = PHOTO_MIN_SCALE;
   @State private panX: number = 0;
   @State private panY: number = 0;
-  // 手势开始时的手势基准值：捏合按「起始倍率 × 本次手势倍率」算，拖动按「起始位移 + 本次位移」算
-  private baseScale: number = PHOTO_MIN_SCALE;
-  private basePanX: number = 0;
-  private basePanY: number = 0;
+  // 手势开始那一刻的基准值。只在 onActionStart 记录，手势过程中绝不能被覆盖：
+  // event.scale / event.offsetX 都是「本次手势的累计值」，一旦每帧回写基准就会连乘。
+  private gestureStartScale: number = PHOTO_MIN_SCALE;
+  private gestureStartPanX: number = 0;
+  private gestureStartPanY: number = 0;
   // 视口尺寸（vp）与图片原始尺寸（换算成 vp），用来算放大后能拖到多远
   private viewWidth: number = 0;
   private viewHeight: number = 0;
@@ -35,9 +45,9 @@ export struct PhotoPreviewDialog {
     this.zoomScale = PHOTO_MIN_SCALE;
     this.panX = 0;
     this.panY = 0;
-    this.baseScale = PHOTO_MIN_SCALE;
-    this.basePanX = 0;
-    this.basePanY = 0;
+    this.gestureStartScale = PHOTO_MIN_SCALE;
+    this.gestureStartPanX = 0;
+    this.gestureStartPanY = 0;
     this.sourceWidth = 0;
     this.sourceHeight = 0;
   }
@@ -70,49 +80,91 @@ export struct PhotoPreviewDialog {
     return Math.max(0, (this.fittedSize(scale)[1] - this.viewHeight) / 2);
   }
 
-  private applyScale(next: number): void {
-    this.zoomScale = this.clamp(next, PHOTO_MIN_SCALE, PHOTO_MAX_SCALE);
-    if (this.isZoomed()) {
-      let limitX = this.maxOffsetX(this.zoomScale);
-      let limitY = this.maxOffsetY(this.zoomScale);
-      this.panX = this.clamp(this.panX, -limitX, limitX);
-      this.panY = this.clamp(this.panY, -limitY, limitY);
-    } else {
-      // 回到原始倍率时把位移归零，否则图片会停在偏移位置
+  /** 超过上限后的软限制：越捏越沉，最多只溢出 PHOTO_OVERSCALE_RATIO，松手再收回。 */
+  private softUpperLimit(raw: number): number {
+    if (raw <= PHOTO_MAX_SCALE) return raw;
+    let over = raw - PHOTO_MAX_SCALE;
+    let cap = PHOTO_MAX_SCALE * PHOTO_OVERSCALE_RATIO;
+    return PHOTO_MAX_SCALE + cap * (1 - 1 / (over / cap + 1));
+  }
+
+  /** 越界阻尼：范围内 1:1 跟手，越界后按双曲线衰减，拖不飞也拖不僵。 */
+  private rubberBand(value: number, limit: number): number {
+    if (limit <= 0) return 0;
+    let distance = Math.abs(value);
+    if (distance <= limit) return value;
+    let over = distance - limit;
+    let room = limit * PHOTO_PAN_OVERSHOOT;
+    let damped = limit + room * (1 - 1 / (over / room + 1));
+    return value > 0 ? damped : -damped;
+  }
+
+  private clampPanToBounds(): void {
+    if (!this.isZoomed()) {
       this.panX = 0;
       this.panY = 0;
+      return;
     }
-    this.baseScale = this.zoomScale;
-    this.basePanX = this.panX;
-    this.basePanY = this.panY;
+    let limitX = this.maxOffsetX(this.zoomScale);
+    let limitY = this.maxOffsetY(this.zoomScale);
+    this.panX = this.clamp(this.panX, -limitX, limitX);
+    this.panY = this.clamp(this.panY, -limitY, limitY);
+  }
+
+  /** 只在双击、还原、松手回弹时用：带过渡，避免画面瞬间跳变。 */
+  private animateTransform(action: () => void): void {
+    this.getUIContext().animateTo({ duration: PHOTO_TRANSITION_MS, curve: Curve.FastOutSlowIn }, action);
+  }
+
+  private handlePinchStart(): void {
+    this.gestureStartScale = this.zoomScale;
   }
 
   private handlePinchUpdate(event: GestureEvent): void {
-    if (event.scale <= 0) return;
-    this.applyScale(this.baseScale * event.scale);
+    if (!event || event.scale <= 0) return;
+    let gained = 1 + (event.scale - 1) * PHOTO_PINCH_GAIN;
+    let raw = this.gestureStartScale * gained;
+    this.zoomScale = Math.max(PHOTO_MIN_SCALE, this.softUpperLimit(raw));
+    // 缩放途中位移只做柔性收敛，别每帧硬砍（硬砍会顿挫）
+    this.panX = this.rubberBand(this.panX, this.maxOffsetX(this.zoomScale));
+    this.panY = this.rubberBand(this.panY, this.maxOffsetY(this.zoomScale));
   }
 
   private handlePinchEnd(): void {
-    this.baseScale = this.zoomScale;
-    this.basePanX = this.panX;
-    this.basePanY = this.panY;
+    let target = this.zoomScale;
+    if (target > PHOTO_MAX_SCALE) {
+      target = PHOTO_MAX_SCALE;
+    } else if (target < PHOTO_SNAP_SCALE) {
+      target = PHOTO_MIN_SCALE;
+    }
+    this.animateTransform(() => {
+      this.zoomScale = target;
+      this.clampPanToBounds();
+    });
+  }
+
+  private handlePanStart(): void {
+    this.gestureStartPanX = this.panX;
+    this.gestureStartPanY = this.panY;
   }
 
   private handlePanUpdate(event: GestureEvent): void {
     if (!this.isZoomed()) return;
-    let limitX = this.maxOffsetX(this.zoomScale);
-    let limitY = this.maxOffsetY(this.zoomScale);
-    this.panX = this.clamp(this.basePanX + event.offsetX, -limitX, limitX);
-    this.panY = this.clamp(this.basePanY + event.offsetY, -limitY, limitY);
+    this.panX = this.rubberBand(this.gestureStartPanX + event.offsetX, this.maxOffsetX(this.zoomScale));
+    this.panY = this.rubberBand(this.gestureStartPanY + event.offsetY, this.maxOffsetY(this.zoomScale));
   }
 
   private handlePanEnd(): void {
-    this.basePanX = this.panX;
-    this.basePanY = this.panY;
+    // 松手把越界部分弹回合法范围
+    this.animateTransform(() => this.clampPanToBounds());
   }
 
   private handleDoubleTap(): void {
-    this.applyScale(this.isZoomed() ? PHOTO_MIN_SCALE : PHOTO_DOUBLE_TAP_SCALE);
+    let target = this.isZoomed() ? PHOTO_MIN_SCALE : PHOTO_DOUBLE_TAP_SCALE;
+    this.animateTransform(() => {
+      this.zoomScale = target;
+      this.clampPanToBounds();
+    });
   }
 
   build() {
@@ -132,7 +184,7 @@ export struct PhotoPreviewDialog {
             .padding({ left: 12, right: 8 })
             .accessibilityRole(AccessibilityRoleType.BUTTON)
             .accessibilityText('还原图片大小')
-            .onClick(() => this.applyScale(PHOTO_MIN_SCALE));
+            .onClick(() => this.handleDoubleTap());
         }
         Text('关闭')
           .fontSize(14)
@@ -167,12 +219,16 @@ export struct PhotoPreviewDialog {
             })
             .gesture(
               GestureGroup(GestureMode.Parallel,
-                PinchGesture({ fingers: 2 })
+                PinchGesture({ fingers: 2, distance: 8 })
+                  .onActionStart(() => this.handlePinchStart())
                   .onActionUpdate((event: GestureEvent) => this.handlePinchUpdate(event))
-                  .onActionEnd(() => this.handlePinchEnd()),
-                PanGesture({ fingers: 1 })
+                  .onActionEnd(() => this.handlePinchEnd())
+                  .onActionCancel(() => this.handlePinchEnd()),
+                PanGesture({ fingers: 1, distance: 10 })
+                  .onActionStart(() => this.handlePanStart())
                   .onActionUpdate((event: GestureEvent) => this.handlePanUpdate(event))
-                  .onActionEnd(() => this.handlePanEnd()),
+                  .onActionEnd(() => this.handlePanEnd())
+                  .onActionCancel(() => this.handlePanEnd()),
                 TapGesture({ count: 2 })
                   .onAction(() => this.handleDoubleTap())
               )
