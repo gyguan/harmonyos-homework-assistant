@@ -4,22 +4,33 @@ const PHOTO_MIN_SCALE: number = 1;
 const PHOTO_MAX_SCALE: number = 4;
 const PHOTO_DOUBLE_TAP_SCALE: number = 2.5;
 const PHOTO_SCALE_EPSILON: number = 0.001;
-// 双指灵敏度：手势累计倍率的增量乘这个系数，轻微捏合不会一上手就跳一大截
-const PHOTO_PINCH_GAIN: number = 0.9;
+// 双指缩放灵敏度：1 = 完全按手指张开的真实比例
+const PHOTO_PINCH_GAIN: number = 1;
 // 双指缩放死区：两指间距变化在这个比例内一律不缩放。
-// 双指平移时两指间距必然有 ±2~4% 抖动，没有死区就会边拖边慢慢缩小。
-const PHOTO_PINCH_DEAD_ZONE: number = 0.05;
-// 单指拖动识别阈值，越小越跟手（旧值 10 起步有明显「拖不动」的迟滞）
-const PHOTO_PAN_DISTANCE: number = 1;
-const PHOTO_PINCH_DISTANCE: number = 8;
+// 双指平移时看到两指间距必然有 ±2~4% 抖动，没有死区就会边拖边慢慢变小。
+const PHOTO_PINCH_DEAD_ZONE: number = 0.06;
 // 松手时低于这个倍率吸附回 1x，避免停在 1.04 这种「半放大」的尴尬状态
 const PHOTO_SNAP_SCALE: number = 1.08;
-// 捏合超过上限时允许的视觉溢出比例，松手再动画收回上限（软限制，不是硬砍）
-const PHOTO_OVERSCALE_RATIO: number = 0.12;
 // 拖动越界时最多能拖出图片边缘的比例（橡皮筋阻力）
 const PHOTO_PAN_OVERSHOOT: number = 0.45;
+// 单指起手容差：轻点画面不会让图片抖动
+const PHOTO_TOUCH_SLOP: number = 2;
 const PHOTO_TRANSITION_MS: number = 220;
 
+/**
+ * 图片大图预览，支持双指缩放、单指拖动、双击放大/还原。
+ *
+ * 手势没有使用系统的 PinchGesture / PanGesture，改为自己处理 TouchEvent，原因是：
+ * 1. 组件一旦带 scale 变换，系统给 PanGesture 的 offset 会按缩放比例被压缩，
+ *    放大后拖动只有手指位移的 1/scale——表现出来就是「放大后越拖越慢」；
+ * 2. PinchGesture 一旦两指落屏就持续工作，双指平移时两指间距的自然抖动会被当成缩放，
+ *    表现出来就是「左右移动时莫名变小」。
+ * 自己算就绕开这两点：位移取触摸点坐标差（视口坐标系、不受 scale 影响），
+ * 缩放只在两指间距变化超过死区时才生效，单指永远不会改变倍率。
+ *
+ * 变换分两层：外层只做 translate（自身无 scale，位移是真实 vp），
+ * 内层 Image 只做 scale，避免 translate 与 scale 的坐标系耦合。
+ */
 @CustomDialog
 export struct PhotoPreviewDialog {
   controller: CustomDialogController;
@@ -28,16 +39,19 @@ export struct PhotoPreviewDialog {
   @State private zoomScale: number = PHOTO_MIN_SCALE;
   @State private panX: number = 0;
   @State private panY: number = 0;
-  // 手势开始那一刻的基准值。只在 onActionStart 记录，手势过程中绝不能被覆盖：
-  // event.scale / event.offsetX 都是「本次手势的累计值」，一旦每帧回写基准就会连乘。
-  private gestureStartScale: number = PHOTO_MIN_SCALE;
-  private gestureStartPanX: number = 0;
-  private gestureStartPanY: number = 0;
-  // 手势被识别那一刻事件里已有的累计量（distance 阈值吃掉的起步位移/倍率），
-  // 后面每帧减掉它，才能让图片从手指按下的位置开始跟手，而不是先跳一下。
-  private pinchStartFactor: number = 1;
-  private panStartOffsetX: number = 0;
-  private panStartOffsetY: number = 0;
+
+  // 当前手势类型：0=无 1=单指拖动 2=双指缩放
+  private gestureMode: number = 0;
+  // 单指拖动的基准：起手坐标与起手位移
+  private startTouchX: number = 0;
+  private startTouchY: number = 0;
+  private startPanX: number = 0;
+  private startPanY: number = 0;
+  // 双指缩放的基准：起手倍率、起手两指间距，以及上一帧的两指中点（相对视口中心）
+  private pinchStartScale: number = PHOTO_MIN_SCALE;
+  private pinchStartDistance: number = 0;
+  private lastAnchorX: number = 0;
+  private lastAnchorY: number = 0;
   // 视口尺寸（vp）与图片原始尺寸（换算成 vp），用来算放大后能拖到多远
   private viewWidth: number = 0;
   private viewHeight: number = 0;
@@ -56,12 +70,13 @@ export struct PhotoPreviewDialog {
     this.zoomScale = PHOTO_MIN_SCALE;
     this.panX = 0;
     this.panY = 0;
-    this.gestureStartScale = PHOTO_MIN_SCALE;
-    this.gestureStartPanX = 0;
-    this.gestureStartPanY = 0;
-    this.pinchStartFactor = 1;
-    this.panStartOffsetX = 0;
-    this.panStartOffsetY = 0;
+    this.gestureMode = 0;
+    this.startPanX = 0;
+    this.startPanY = 0;
+    this.pinchStartScale = PHOTO_MIN_SCALE;
+    this.pinchStartDistance = 0;
+    this.lastAnchorX = 0;
+    this.lastAnchorY = 0;
     this.sourceWidth = 0;
     this.sourceHeight = 0;
   }
@@ -94,14 +109,6 @@ export struct PhotoPreviewDialog {
     return Math.max(0, (this.fittedSize(scale)[1] - this.viewHeight) / 2);
   }
 
-  /** 超过上限后的软限制：越捏越沉，最多只溢出 PHOTO_OVERSCALE_RATIO，松手再收回。 */
-  private softUpperLimit(raw: number): number {
-    if (raw <= PHOTO_MAX_SCALE) return raw;
-    let over = raw - PHOTO_MAX_SCALE;
-    let cap = PHOTO_MAX_SCALE * PHOTO_OVERSCALE_RATIO;
-    return PHOTO_MAX_SCALE + cap * (1 - 1 / (over / cap + 1));
-  }
-
   /** 越界阻尼：范围内 1:1 跟手，越界后按双曲线衰减，拖不飞也拖不僵。 */
   private rubberBand(value: number, limit: number): number {
     if (limit <= 0) return 0;
@@ -109,8 +116,9 @@ export struct PhotoPreviewDialog {
     if (distance <= limit) return value;
     let over = distance - limit;
     let room = limit * PHOTO_PAN_OVERSHOOT;
-    let damped = limit + room * (1 - 1 / (over / room + 1));
-    return value > 0 ? damped : -damped;
+    return value > 0
+      ? limit + room * (1 - 1 / (over / room + 1))
+      : -(limit + room * (1 - 1 / (over / room + 1)));
   }
 
   private clampPanToBounds(): void {
@@ -130,64 +138,101 @@ export struct PhotoPreviewDialog {
     this.getUIContext().animateTo({ duration: PHOTO_TRANSITION_MS, curve: Curve.FastOutSlowIn }, action);
   }
 
-  private handlePinchStart(event: GestureEvent): void {
-    this.gestureStartScale = this.zoomScale;
-    // 手势识别时 event.scale 可能已经不是 1（PinchGesture 有 distance 阈值），
-    // 用它做起点，后续按相对比例算，起步就不会突然缩/放一下。
-    this.pinchStartFactor = (event && event.scale > 0) ? event.scale : 1;
+  /** 单指起手容差：扣掉容差而不是直接丢弃，越过容差后位移仍然连续。 */
+  private trackingOffset(raw: number): number {
+    if (Math.abs(raw) <= PHOTO_TOUCH_SLOP) return 0;
+    return raw > 0 ? raw - PHOTO_TOUCH_SLOP : raw + PHOTO_TOUCH_SLOP;
   }
 
-  private handlePinchUpdate(event: GestureEvent): void {
-    if (!event || event.scale <= 0) return;
-    let relative = event.scale / this.pinchStartFactor;
-    let delta = relative - 1;
-    // 死区：双指平移时两指间距的轻微抖动落在这里，图片不会跟着一缩一放
-    let magnitude = Math.abs(delta) - PHOTO_PINCH_DEAD_ZONE;
-    if (magnitude <= 0) return;
-    let gained = 1 + (delta > 0 ? magnitude : -magnitude) * PHOTO_PINCH_GAIN;
-    let raw = this.gestureStartScale * gained;
-    this.zoomScale = Math.max(PHOTO_MIN_SCALE, this.softUpperLimit(raw));
-    // 缩放途中位移只做柔性收敛，别每帧硬砍（硬砍会顿挫）
-    this.panX = this.rubberBand(this.panX, this.maxOffsetX(this.zoomScale));
-    this.panY = this.rubberBand(this.panY, this.maxOffsetY(this.zoomScale));
-  }
-
-  private handlePinchEnd(): void {
-    let target = this.zoomScale;
-    if (target > PHOTO_MAX_SCALE) {
-      target = PHOTO_MAX_SCALE;
-    } else if (target < PHOTO_SNAP_SCALE) {
-      target = PHOTO_MIN_SCALE;
+  private handleTouch(event: TouchEvent): void {
+    if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+      this.finishGesture();
+      return;
     }
-    this.animateTransform(() => {
-      this.zoomScale = target;
-      this.clampPanToBounds();
-    });
+    let touches = event.touches;
+    if (touches.length >= 2) {
+      this.updatePinch(touches[0], touches[1]);
+    } else if (touches.length === 1) {
+      this.updatePan(touches[0]);
+    }
   }
 
-  private handlePanStart(event: GestureEvent): void {
-    this.gestureStartPanX = this.panX;
-    this.gestureStartPanY = this.panY;
-    this.panStartOffsetX = event ? event.offsetX : 0;
-    this.panStartOffsetY = event ? event.offsetY : 0;
-  }
-
-  private handlePanUpdate(event: GestureEvent): void {
+  private updatePan(touch: TouchObject): void {
+    if (this.gestureMode !== 1) {
+      // 起手（或从双指退回单指）：只记基准，本帧不移动
+      this.gestureMode = 1;
+      this.startTouchX = touch.x;
+      this.startTouchY = touch.y;
+      this.startPanX = this.panX;
+      this.startPanY = this.panY;
+      return;
+    }
     if (!this.isZoomed()) return;
-    // 双指落屏时交给 PinchGesture，别让两指的平均位移也来抢拖动（会和缩放互相拉扯）
-    if (event.fingerList !== undefined && event.fingerList.length > 1) return;
-    // 减掉手势识别前被 distance 阈值吃掉的位移，图片才从手指按下的位置开始跟手
-    let dx = event.offsetX - this.panStartOffsetX;
-    let dy = event.offsetY - this.panStartOffsetY;
-    this.panX = this.rubberBand(this.gestureStartPanX + dx, this.maxOffsetX(this.zoomScale));
-    this.panY = this.rubberBand(this.gestureStartPanY + dy, this.maxOffsetY(this.zoomScale));
+    let dx = this.trackingOffset(touch.x - this.startTouchX);
+    let dy = this.trackingOffset(touch.y - this.startTouchY);
+    // 视口坐标系下的真实位移，1:1 跟手，不经过任何缩放换算
+    this.panX = this.rubberBand(this.startPanX + dx, this.maxOffsetX(this.zoomScale));
+    this.panY = this.rubberBand(this.startPanY + dy, this.maxOffsetY(this.zoomScale));
   }
 
-  private handlePanEnd(): void {
-    // 只有真的越界才播回弹，范围内松手不该有附加动画（会显得拖不动、黏手）
-    if (Math.abs(this.panX) > this.maxOffsetX(this.zoomScale) ||
-      Math.abs(this.panY) > this.maxOffsetY(this.zoomScale)) {
-      this.animateTransform(() => this.clampPanToBounds());
+  private updatePinch(first: TouchObject, second: TouchObject): void {
+    let spanX = first.x - second.x;
+    let spanY = first.y - second.y;
+    let distance = Math.sqrt(spanX * spanX + spanY * spanY);
+    let anchorX = (first.x + second.x) / 2 - this.viewWidth / 2;
+    let anchorY = (first.y + second.y) / 2 - this.viewHeight / 2;
+
+    if (this.gestureMode !== 2 || this.pinchStartDistance <= 0) {
+      // 起手（或从单指变双指）：只记基准，本帧不缩放
+      this.gestureMode = 2;
+      this.pinchStartScale = this.zoomScale;
+      this.pinchStartDistance = distance > 0 ? distance : 1;
+      this.lastAnchorX = anchorX;
+      this.lastAnchorY = anchorY;
+      return;
+    }
+
+    // 1) 目标倍率：两指间距变化必须超过死区才动，抖动全部落进死区被吃掉
+    let target = this.pinchStartScale;
+    let factor = distance / this.pinchStartDistance;
+    let delta = factor - 1;
+    let magnitude = Math.abs(delta) - PHOTO_PINCH_DEAD_ZONE;
+    if (magnitude > 0) {
+      let gained = 1 + (delta > 0 ? magnitude : -magnitude) * PHOTO_PINCH_GAIN;
+      target = this.clamp(this.pinchStartScale * gained, PHOTO_MIN_SCALE, PHOTO_MAX_SCALE);
+    }
+
+    // 2) 以两指中点为锚点缩放：放大时手指下的内容不会跑开，同时中点位移直接当作平移
+    let ratio = this.zoomScale > 0 ? target / this.zoomScale : 1;
+    let nextPanX = this.panX * ratio + this.lastAnchorX * (1 - ratio) + (anchorX - this.lastAnchorX);
+    let nextPanY = this.panY * ratio + this.lastAnchorY * (1 - ratio) + (anchorY - this.lastAnchorY);
+    this.zoomScale = target;
+    this.lastAnchorX = anchorX;
+    this.lastAnchorY = anchorY;
+
+    if (!this.isZoomed()) {
+      this.panX = 0;
+      this.panY = 0;
+      return;
+    }
+    this.panX = this.rubberBand(nextPanX, this.maxOffsetX(target));
+    this.panY = this.rubberBand(nextPanY, this.maxOffsetY(target));
+  }
+
+  private finishGesture(): void {
+    let wasPinching = this.gestureMode === 2;
+    this.gestureMode = 0;
+    this.pinchStartDistance = 0;
+    let target = this.zoomScale;
+    if (target < PHOTO_SNAP_SCALE) target = PHOTO_MIN_SCALE;
+    let overflow = Math.abs(this.panX) > this.maxOffsetX(this.zoomScale) + PHOTO_SCALE_EPSILON ||
+      Math.abs(this.panY) > this.maxOffsetY(this.zoomScale) + PHOTO_SCALE_EPSILON ||
+      target !== this.zoomScale;
+    if (wasPinching || overflow) {
+      this.animateTransform(() => {
+        this.zoomScale = target;
+        this.clampPanToBounds();
+      });
     }
   }
 
@@ -233,43 +278,40 @@ export struct PhotoPreviewDialog {
       .padding({ left: 16, right: 8 });
 
       if (this.uri.length > 0) {
+        // 视口层：只负责裁剪、接收触摸、取尺寸。它自身永远不带 scale/translate，
+        // 所以触摸点坐标与 viewWidth/viewHeight 始终是同一个（稳定）坐标系。
         Stack() {
-          Image(this.uri)
-            .width('100%')
-            .height('100%')
-            .objectFit(ImageFit.Contain)
-            .scale({ x: this.zoomScale, y: this.zoomScale })
-            .translate({ x: this.panX, y: this.panY })
-            .accessibilityRole(AccessibilityRoleType.IMAGE)
-            .accessibilityText('作业照片大图，可双指缩放、双击放大或还原')
-            .onComplete((event) => {
-              // 拿到图片原始像素尺寸后换算成 vp，用于精确限制拖动边界
-              if (event && event.width > 0 && event.height > 0) {
-                this.sourceWidth = this.getUIContext().px2vp(event.width);
-                this.sourceHeight = this.getUIContext().px2vp(event.height);
-              }
-            })
-            .gesture(
-              GestureGroup(GestureMode.Parallel,
-                PinchGesture({ fingers: 2, distance: PHOTO_PINCH_DISTANCE })
-                  .onActionStart((event: GestureEvent) => this.handlePinchStart(event))
-                  .onActionUpdate((event: GestureEvent) => this.handlePinchUpdate(event))
-                  .onActionEnd(() => this.handlePinchEnd())
-                  .onActionCancel(() => this.handlePinchEnd()),
-                PanGesture({ fingers: 1, distance: PHOTO_PAN_DISTANCE })
-                  .onActionStart((event: GestureEvent) => this.handlePanStart(event))
-                  .onActionUpdate((event: GestureEvent) => this.handlePanUpdate(event))
-                  .onActionEnd(() => this.handlePanEnd())
-                  .onActionCancel(() => this.handlePanEnd()),
-                TapGesture({ count: 2 })
-                  .onAction(() => this.handleDoubleTap())
-              )
-            );
+          // 平移层：自身没有 scale，translate 就是真实屏幕 vp
+          Stack() {
+            // 缩放层
+            Image(this.uri)
+              .width('100%')
+              .height('100%')
+              .objectFit(ImageFit.Contain)
+              .scale({ x: this.zoomScale, y: this.zoomScale })
+              .accessibilityRole(AccessibilityRoleType.IMAGE)
+              .accessibilityText('作业照片大图，可双指缩放、双击放大或还原')
+              .onComplete((event) => {
+                // 拿到图片原始像素尺寸后换算成 vp，用于精确限制拖动边界
+                if (event && event.width > 0 && event.height > 0) {
+                  this.sourceWidth = this.getUIContext().px2vp(event.width);
+                  this.sourceHeight = this.getUIContext().px2vp(event.height);
+                }
+              });
+          }
+          .width('100%')
+          .height('100%')
+          .translate({ x: this.panX, y: this.panY });
         }
         .width('100%')
         .layoutWeight(1)
         .backgroundColor(Color.Black)
         .clip(true)
+        .onTouch((event: TouchEvent) => this.handleTouch(event))
+        .gesture(
+          TapGesture({ count: 2 })
+            .onAction(() => this.handleDoubleTap())
+        )
         .onAreaChange((oldValue: Area, newValue: Area) => {
           this.viewWidth = newValue.width as number;
           this.viewHeight = newValue.height as number;
