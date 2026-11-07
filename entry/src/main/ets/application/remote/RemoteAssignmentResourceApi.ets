@@ -10,6 +10,7 @@ import {
 import { BackendHttpClient } from './BackendHttpClient';
 import { BackendSession } from './BackendSession';
 import { RemoteAssignment } from './RemoteModels';
+import { ImageUploadCompressor } from '../../infrastructure/media/ImageUploadCompressor';
 
 interface RemoteAssignmentResource {
   id: string;
@@ -41,6 +42,8 @@ const MAX_VOICE_AUDIO_BYTES: number = 20 * 1024 * 1024;
 const MAX_VOICE_IMAGE_BYTES: number = 5 * 1024 * 1024;
 // 下载的作业资料缓存上限：超过后按最旧优先清理，避免 cacheDir 只增不减。
 const MAX_RESOURCE_CACHE_ENTRIES: number = 12;
+// 情景图等只在屏幕上显示的图片，按 1600px 长边下载（服务端现场生成并缓存）。
+const DISPLAY_IMAGE_MAX_SIDE: number = 1600;
 
 interface VoiceAssignmentMetadata {
   id: string;
@@ -66,6 +69,8 @@ export class RemoteAssignmentResourceApi {
   static readonly instance: RemoteAssignmentResourceApi = new RemoteAssignmentResourceApi();
   private context: common.UIAbilityContext | null = null;
   private cache: Map<string, string> = new Map<string, string>();
+  /** `${resourceId}#${width}` → 说明用缩略图（只用于给屏幕显示） */
+  private displayCache: Map<string, string> = new Map<string, string>();
   private cachePaths: Map<string, string> = new Map<string, string>();
   private cacheOrder: string[] = [];
   private pendingDownloads: Map<string, Promise<string>> = new Map<string, Promise<string>>();
@@ -101,6 +106,31 @@ export class RemoteAssignmentResourceApi {
       await this.validateSourceSize(imageUris[i], MAX_VOICE_IMAGE_BYTES, '情景图片不能超过 5MB，请压缩后重试');
     }
 
+    let context = this.context;
+    let token = this.uniqueToken();
+    let uploadImages: string[] = [];
+    let temporaryImages: string[] = [];
+    // 情景图通常是课本截图 PNG（实测 2164×850 / 1.8MB，一本 9 张 ≈ 11MB）。
+    // 转成 1600px JPEG 后约 140KB（1/13），老师上传和学生下载都快 10 倍以上。
+    for (let i = 0; i < imageUris.length; i++) {
+      let compressed = await ImageUploadCompressor.compressPage(context, imageUris[i], `${token}-${i + 1}`);
+      if (compressed.length > 0) {
+        temporaryImages.push(compressed);
+        uploadImages.push(fileUri.getUriFromPath(compressed));
+      } else {
+        uploadImages.push(imageUris[i]);
+      }
+    }
+
+    try {
+      return await this.sendVoiceAssignment(assignment, audioUri, uploadImages);
+    } finally {
+      for (let path of temporaryImages) ImageUploadCompressor.discard(path);
+    }
+  }
+
+  private async sendVoiceAssignment(assignment: Assignment, audioUri: string,
+    imageUris: string[]): Promise<RemoteVoiceAssignmentCreateResponse> {
     let payload = await this.buildMultipartPayload(assignment, audioUri, imageUris);
     let client = http.createHttp();
     try {
@@ -218,6 +248,11 @@ export class RemoteAssignmentResourceApi {
   invalidate(resourceId: string): void {
     this.cache.delete(resourceId);
     this.cachePaths.delete(resourceId);
+    let staleDisplayKeys: string[] = [];
+    for (let key of this.displayCache.keys()) {
+      if (key.startsWith(`${resourceId}#`)) staleDisplayKeys.push(key);
+    }
+    for (let key of staleDisplayKeys) this.displayCache.delete(key);
     let remaining: string[] = [];
     for (let id of this.cacheOrder) {
       if (id !== resourceId) remaining.push(id);
@@ -314,6 +349,92 @@ export class RemoteAssignmentResourceApi {
       this.cachePaths.set(resource.id, cachePath);
       this.cacheOrder.push(resource.id);
       this.evictOverflowCache();
+      return uri;
+    } catch {
+      return '';
+    } finally {
+      try { client.destroy(); } catch {}
+    }
+  }
+
+  /**
+   * 情景图/课本页只用来在屏幕上显示，取服务端的 1600px 版本：
+   * 历史素材是 2164×850 的 PNG（1.8MB/张，一本 9 张 ≈ 11MB，3Mbps 下 30 秒），
+   * 1600px JPEG 约 140KB，一本约 1.3MB。
+   */
+  async downloadDisplayImage(resource: AssignmentResource): Promise<string> {
+    if (resource.resourceType !== AssignmentResourceType.IMAGE) return await this.download(resource);
+    return await this.downloadScaled(resource, DISPLAY_IMAGE_MAX_SIDE);
+  }
+
+  async preloadDisplayImage(resource: AssignmentResource): Promise<string> {
+    return await this.downloadDisplayImage(resource);
+  }
+
+  private async downloadScaled(resource: AssignmentResource, width: number): Promise<string> {
+    if (this.context === null || !BackendSession.instance.isConnected()) return '';
+    let key = `${resource.id}#${width}`;
+    let cached = this.displayCache.get(key);
+    if (cached !== undefined && cached.length > 0) return cached;
+    let pending = this.pendingDownloads.get(key);
+    if (pending !== undefined) return await pending;
+
+    let task = this.downloadScaledUncached(resource, width, key);
+    this.pendingDownloads.set(key, task);
+    try {
+      return await task;
+    } finally {
+      this.pendingDownloads.delete(key);
+    }
+  }
+
+  private async downloadScaledUncached(resource: AssignmentResource, width: number,
+    key: string): Promise<string> {
+    let context = this.context;
+    if (context === null) return '';
+    // 缩略图由服务端统一重编码为 JPEG，扩展名固定。
+    let cachePath = `${context.cacheDir}/assignment-resource-${resource.id}-w${width}.jpg`;
+    if (this.reuseExisting(cachePath)) {
+      let existing = fileUri.getUriFromPath(cachePath);
+      this.displayCache.set(key, existing);
+      return existing;
+    }
+
+    let client = http.createHttp();
+    try {
+      let basePath = resource.downloadPath.length > 0 ?
+        resource.downloadPath : `/api/v1/assignment-resources/${encodeURIComponent(resource.id)}`;
+      let path = `${basePath}?w=${width}`;
+      let headers = BackendHttpClient.instance.traceHeaders(
+        path, http.RequestMethod.GET, 'assignment.resource.display');
+      headers['Authorization'] = `Bearer ${BackendSession.instance.getToken()}`;
+      let response = await client.request(
+        `${BackendSession.instance.getBaseUrl()}${path}`,
+        {
+          method: http.RequestMethod.GET,
+          header: headers,
+          connectTimeout: 10000,
+          readTimeout: 60000,
+          maxLimit: 25 * 1024 * 1024,
+          expectDataType: http.HttpDataType.ARRAY_BUFFER
+        });
+      if (response.responseCode === 401) {
+        BackendSession.instance.disconnect();
+        return '';
+      }
+      if (response.responseCode !== http.ResponseCode.OK) return '';
+
+      let data = response.result as ArrayBuffer;
+      if (data.byteLength === 0) return '';
+      let file = await fileIo.open(cachePath,
+        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      try {
+        await fileIo.write(file.fd, data);
+      } finally {
+        try { await fileIo.close(file); } catch {}
+      }
+      let uri = fileUri.getUriFromPath(cachePath);
+      this.displayCache.set(key, uri);
       return uri;
     } catch {
       return '';

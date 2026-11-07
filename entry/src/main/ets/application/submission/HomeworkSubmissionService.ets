@@ -8,7 +8,7 @@ import { DefaultAssignmentRepository } from '../../data/repository/DefaultAssign
 import { Assignment, AssignmentStatus, Submission } from '../../domain/model/HomeworkModels';
 import { RemoteAssignmentMapper } from '../remote/RemoteModels';
 import { RemoteSubmissionApi } from '../remote/RemoteSubmissionApi';
-import { SubmissionPhotoCompressor } from '../../infrastructure/media/SubmissionPhotoCompressor';
+import { ImageUploadCompressor } from '../../infrastructure/media/ImageUploadCompressor';
 
 const MAX_SUBMISSION_PHOTOS: number = 6;
 const MIN_SUBMISSION_PHOTO_EDGE: number = 640;
@@ -48,7 +48,7 @@ export class HomeworkSubmissionService {
       await this.deleteOrphanFiles(this.context.filesDir, 'homework-submission-', referenced);
       await this.deleteOrphanFiles(this.context.cacheDir, 'homework-submission-camera-', referenced);
       // 上传用的压缩件用完即删；能留到下次启动的都是上次中断的残留。
-      await this.deleteOrphanFiles(this.context.cacheDir, 'submission-upload-', new Set<string>());
+      await this.deleteOrphanFiles(this.context.cacheDir, 'image-upload-', new Set<string>());
     } catch {
       // 清理失败不影响提交主流程。
     }
@@ -227,7 +227,7 @@ export class HomeworkSubmissionService {
     let temporaryPhotos: string[] = [];
     for (let i = 0; i < durableUris.length; i++) {
       let compressedPath =
-        await SubmissionPhotoCompressor.compressToCache(context, durableUris[i], `${groupId}-${i + 1}`);
+        await ImageUploadCompressor.compressPhoto(context, durableUris[i], `${groupId}-${i + 1}`);
       if (compressedPath.length > 0) {
         temporaryPhotos.push(compressedPath);
         uploadUris.push(fileUri.getUriFromPath(compressedPath));
@@ -256,7 +256,7 @@ export class HomeworkSubmissionService {
       return refreshed !== null && refreshed.status === AssignmentStatus.SUBMITTED;
     } finally {
       // 上传成功或失败都不再需要这些压缩件（重试会重新压）。
-      for (let path of temporaryPhotos) SubmissionPhotoCompressor.discard(path);
+      for (let path of temporaryPhotos) ImageUploadCompressor.discard(path);
     }
   }
 
