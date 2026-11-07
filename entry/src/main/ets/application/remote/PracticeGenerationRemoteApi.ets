@@ -19,7 +19,7 @@ import {
   PracticeSubject,
   PracticeTrack
 } from '../../domain/model/practice/PracticeModels';
-import { BackendHttpClient } from './BackendHttpClient';
+import { BackendHttpClient, AI_READ_TIMEOUT_MS } from './BackendHttpClient';
 
 interface RemoteOption { key: string; label: string; }
 interface RemoteDraftQuestion {
@@ -115,7 +115,9 @@ export class PracticeGenerationRemoteApi {
       'practice.generation.create',
       `/api/v1/students/${encodeURIComponent(studentId)}/practice/generations`,
       http.RequestMethod.POST,
-      body);
+      body,
+      true,
+      AI_READ_TIMEOUT_MS);
     if (response.statusCode === 400) throw new Error(this.message(response.body, '生成条件不完整'));
     if (response.statusCode === 503) throw new Error(this.message(response.body, 'AI出题暂时不可用'));
     if (response.statusCode < 200 || response.statusCode >= 300) {

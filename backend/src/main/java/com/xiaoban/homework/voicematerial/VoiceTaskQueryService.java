@@ -23,6 +23,8 @@ public class VoiceTaskQueryService {
       Set.of("READY", "INVALID", "PROCESSING", "ARCHIVED");
   private static final Set<String> USAGE_FILTERS =
       Set.of("UNUSED", "USED", "ALL");
+  /** 页码上限，配合 long offset 防止 int 乘法溢出后被 PostgreSQL 判为非法 OFFSET。 */
+  private static final int MAX_PAGE = 10_000;
 
   private final NamedParameterJdbcTemplate jdbc;
   private final VoiceMaterialPackageRepository packages;
@@ -43,7 +45,7 @@ public class VoiceTaskQueryService {
   public VoiceMaterialDtos.VoiceTaskPageResponse queryTasks(UUID familyId, String studentId,
       String status, String subjectCode, String keyword, String createdFrom, String createdTo,
       String packageId, int page, int size, String sort) {
-    int safePage = Math.max(0, page);
+    int safePage = Math.min(MAX_PAGE, Math.max(0, page));
     int safeSize = Math.min(100, Math.max(1, size));
     String normalizedStudent = trim(studentId);
     String normalizedStatus = trim(status).toUpperCase(Locale.ROOT);
@@ -120,7 +122,7 @@ public class VoiceTaskQueryService {
     long total = totalValue == null ? 0L : totalValue.longValue();
 
     params.addValue("limit", safeSize);
-    params.addValue("offset", safePage * safeSize);
+    params.addValue("offset", (long) safePage * safeSize);
     String sql = """
         select
           a.id as assignment_id,
@@ -194,7 +196,7 @@ public class VoiceTaskQueryService {
   public VoiceMaterialDtos.VoiceFolderPageResponse queryFolders(UUID familyId, String studentId,
       String status, String subjectCode, String keyword, String importedFrom, String importedTo,
       String usage, int page, int size, String sort) {
-    int safePage = Math.max(0, page);
+    int safePage = Math.min(MAX_PAGE, Math.max(0, page));
     int safeSize = Math.min(100, Math.max(1, size));
     String normalizedStudent = trim(studentId);
     String normalizedStatus = trim(status).toUpperCase(Locale.ROOT);
@@ -270,7 +272,7 @@ public class VoiceTaskQueryService {
     long total = totalValue == null ? 0L : totalValue.longValue();
 
     params.addValue("limit", safeSize);
-    params.addValue("offset", safePage * safeSize);
+    params.addValue("offset", (long) safePage * safeSize);
     String sql = """
         select
           p.id as package_id,

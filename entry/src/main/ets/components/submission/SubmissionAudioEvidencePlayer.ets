@@ -31,6 +31,9 @@ export struct SubmissionAudioEvidencePlayer {
 
   private onSourceChanged(): void {
     this.loadSequence++;
+    // 旧序列的 finally 因代次失配不会复位 loading；这里必须显式清零，
+    // 否则换源后的新 prepareSource 被 loading 早退挡住，播放按钮永久置灰。
+    this.loading = false;
     void this.player.release();
     this.sourceUri = '';
     this.prepared = false;
@@ -43,7 +46,8 @@ export struct SubmissionAudioEvidencePlayer {
   }
 
   private async prepareSource(): Promise<void> {
-    if (this.loading) return;
+    // 不用 loading 做早退门：换源场景下 loading 仍为 true 会让新序列永远不启动。
+    // 代次令牌 loadSequence 已经保证只有最新一次加载能写状态。
     let sequence = ++this.loadSequence;
     this.loading = true;
     this.notice = '';

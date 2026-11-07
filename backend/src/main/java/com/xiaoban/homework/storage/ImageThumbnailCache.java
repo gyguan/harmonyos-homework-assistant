@@ -12,7 +12,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
@@ -45,8 +47,9 @@ public class ImageThumbnailCache {
   /** 单张图解码像素上限，超过就不做缩略图（防解码炸弹）。 */
   private static final long MAX_SOURCE_PIXELS = 120_000_000L;
   private static final float QUALITY = 0.8f;
-  /** 同一张图同一尺寸只让一个线程解码，其余线程等它写好直接读。 */
-  private static final Map<String, Object> IN_FLIGHT = new ConcurrentHashMap<>();
+  /** 同一张图同一尺寸只让一个线程解码，其余线程等同一个 Future 的结果。 */
+  private static final Map<String, CompletableFuture<Optional<Path>>> IN_FLIGHT = new ConcurrentHashMap<>();
+  private static final long RENDER_WAIT_SECONDS = 30L;
 
   /**
    * @param maxSide 缩略图长边像素上限
@@ -60,16 +63,39 @@ public class ImageThumbnailCache {
     if (isFresh(target, source)) return Optional.of(target);
 
     String key = target.toAbsolutePath().toString();
-    Object lock = IN_FLIGHT.computeIfAbsent(key, ignored -> new Object());
-    try {
-      synchronized (lock) {
-        // 等锁期间可能已被别的线程生成好。
-        if (isFresh(target, source)) return Optional.of(target);
-        return render(source, target, maxSide);
+    // 用同一个 Future 代表「这一轮生成」，所有并发请求等它完成。
+    // 旧实现在 finally 里移除锁对象，等待中的线程仍持有旧锁、后到的线程拿到新锁，
+    // 于是同图被并发解码两次，去重设计落空。
+    CompletableFuture<Optional<Path>> mine = new CompletableFuture<>();
+    CompletableFuture<Optional<Path>> owner = IN_FLIGHT.putIfAbsent(key, mine);
+    if (owner != null) {
+      try {
+        return owner.get(RENDER_WAIT_SECONDS, TimeUnit.SECONDS);
+      } catch (InterruptedException interrupted) {
+        Thread.currentThread().interrupt();
+        return Optional.empty();
+      } catch (Exception waiting) {
+        return isFresh(target, source) ? Optional.of(target) : Optional.empty();
       }
-    } finally {
-      IN_FLIGHT.remove(key, lock);
     }
+    try {
+      Optional<Path> result = isFresh(target, source) ? Optional.of(target) : render(source, target, maxSide);
+      mine.complete(result);
+      return result;
+    } catch (RuntimeException failure) {
+      mine.complete(Optional.empty());
+      throw failure;
+    } finally {
+      IN_FLIGHT.remove(key, mine);
+    }
+  }
+
+  /**
+   * 越界的 {@code w} 不该回退下发 3MB 原图（等于把出口带宽放大交给客户端决定），
+   * 一律夹到合法档位；非法类型由 ApiExceptionHandler 统一映射为 400。
+   */
+  public static int clampSide(int requested) {
+    return Math.max(MIN_SIDE, Math.min(MAX_SIDE, requested));
   }
 
   /** 缩略图固定为 JPEG，调用方据此设置 Content-Type。 */
@@ -85,7 +111,9 @@ public class ImageThumbnailCache {
       BufferedImage scaled = scaleToMaxSide(decoded, maxSide);
       return writeJpeg(scaled, target) ? Optional.of(target) : Optional.empty();
     } catch (IOException | RuntimeException failure) {
-      log.debug("thumbnail generation skipped for {}: {}", source.getFileName(), failure.toString());
+      // 日志规范：不记录源文件/原始文件名，也不输出可能含路径的异常 message。
+      log.debug("thumbnail generation skipped reason=DECODE_FAILED exceptionType={}",
+          failure.getClass().getSimpleName());
       return Optional.empty();
     } finally {
       if (decoded != null) decoded.flush();
@@ -182,6 +210,11 @@ public class ImageThumbnailCache {
     }
   }
 
+  /**
+   * 缩略图比源图新（或同时间戳）就命中。源图被覆盖写时不能只靠 mtime 判断——
+   * 秒级精度文件系统上新旧文件可能落在同一时间戳，所以 {@code LocalFileStorage.save}
+   * 会在覆盖前主动删除该源图的所有派生物。
+   */
   private boolean isFresh(Path thumbnail, Path source) {
     try {
       if (!Files.isRegularFile(thumbnail) || Files.size(thumbnail) <= 0) return false;

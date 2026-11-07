@@ -246,18 +246,51 @@ export class RemoteAssignmentResourceApi {
   }
 
   invalidate(resourceId: string): void {
+    // 只清内存不够：downloadScaledUncached 会 reuseExisting() 把残留的
+    // `-w1600.jpg` 重新塞回 displayCache，服务端已删除的资源又显示出来。
+    let cachedPath = this.cachePaths.get(resourceId);
     this.cache.delete(resourceId);
     this.cachePaths.delete(resourceId);
-    let staleDisplayKeys: string[] = [];
-    for (let key of this.displayCache.keys()) {
-      if (key.startsWith(`${resourceId}#`)) staleDisplayKeys.push(key);
+    this.clearDisplayCacheFor(resourceId);
+    if (cachedPath !== undefined) this.discardCacheFile(cachedPath);
+    if (this.context !== null) {
+      let prefix = `assignment-resource-${resourceId}-w`;
+      try {
+        for (let name of fileIo.listFileSync(this.context.cacheDir)) {
+          if (name.indexOf(prefix) === 0) this.discardCacheFile(`${this.context.cacheDir}/${name}`);
+        }
+      } catch {
+        // cacheDir 不可读时保持内存失效语义即可。
+      }
     }
-    for (let key of staleDisplayKeys) this.displayCache.delete(key);
     let remaining: string[] = [];
     for (let id of this.cacheOrder) {
       if (id !== resourceId) remaining.push(id);
     }
     this.cacheOrder = remaining;
+  }
+
+  /** 只清内存中的显示版缓存，不删磁盘：用于「刚从磁盘复用/刚下载完」的场景。 */
+  private clearDisplayCacheFor(resourceId: string): void {
+    let staleDisplayKeys: string[] = [];
+    for (let key of this.displayCache.keys()) {
+      if (key.startsWith(`${resourceId}#`)) staleDisplayKeys.push(key);
+    }
+    for (let key of staleDisplayKeys) this.displayCache.delete(key);
+  }
+
+  private discardCacheFile(path: string): void {
+    try { fileIo.unlinkSync(path); } catch {}
+    try { fileIo.unlinkSync(`${path}.ok`); } catch {}
+  }
+
+  /** 写盘完成后打标记，供 reuseExisting 排除「崩溃时写了一半」的残缺文件。 */
+  private async markComplete(path: string): Promise<void> {
+    try {
+      let file = await fileIo.open(`${path}.ok`,
+        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      try { await fileIo.close(file); } catch {}
+    } catch {}
   }
 
   private evictOverflowCache(): void {
@@ -267,11 +300,7 @@ export class RemoteAssignmentResourceApi {
       this.cache.delete(oldest);
       let path = this.cachePaths.get(oldest);
       this.cachePaths.delete(oldest);
-      if (path !== undefined) {
-        try { fileIo.unlinkSync(path); } catch {
-          // 清理失败不影响本次下载结果；残留文件在下次驱逐时再试。
-        }
-      }
+      if (path !== undefined) this.discardCacheFile(path);
     }
   }
 
@@ -301,9 +330,9 @@ export class RemoteAssignmentResourceApi {
     // 先看上一次会话留在 cacheDir 里的文件：语音素材动辄几十 MB，
     // 以前只在内存 Map 里记着，App 重启就全部重下。
     let cachePath = `${this.context.cacheDir}/assignment-resource-${resource.id}.${this.extension(resource)}`;
-    if (this.reuseExisting(cachePath)) {
+    if (this.reuseExisting(cachePath, resource.sizeBytes)) {
       let existing = fileUri.getUriFromPath(cachePath);
-      this.invalidate(resource.id);
+      this.clearDisplayCacheFor(resource.id);
       this.cache.set(resource.id, existing);
       this.cachePaths.set(resource.id, cachePath);
       this.cacheOrder.push(resource.id);
@@ -313,8 +342,7 @@ export class RemoteAssignmentResourceApi {
 
     let client = http.createHttp();
     try {
-      let path = resource.downloadPath.length > 0 ?
-        resource.downloadPath : `/api/v1/assignment-resources/${encodeURIComponent(resource.id)}`;
+      let path = this.resourcePath(resource);
       let headers = BackendHttpClient.instance.traceHeaders(
         path, http.RequestMethod.GET, 'assignment.resource.download');
       headers['Authorization'] = `Bearer ${BackendSession.instance.getToken()}`;
@@ -343,8 +371,9 @@ export class RemoteAssignmentResourceApi {
       } finally {
         try { await fileIo.close(file); } catch {}
       }
+      await this.markComplete(cachePath);
       let uri = fileUri.getUriFromPath(cachePath);
-      this.invalidate(resource.id);
+      this.clearDisplayCacheFor(resource.id);
       this.cache.set(resource.id, uri);
       this.cachePaths.set(resource.id, cachePath);
       this.cacheOrder.push(resource.id);
@@ -402,9 +431,9 @@ export class RemoteAssignmentResourceApi {
 
     let client = http.createHttp();
     try {
-      let basePath = resource.downloadPath.length > 0 ?
-        resource.downloadPath : `/api/v1/assignment-resources/${encodeURIComponent(resource.id)}`;
-      let path = `${basePath}?w=${width}`;
+      let basePath = this.resourcePath(resource);
+      let path = basePath.indexOf('?') >= 0 ?
+        `${basePath}&w=${width}` : `${basePath}?w=${width}`;
       let headers = BackendHttpClient.instance.traceHeaders(
         path, http.RequestMethod.GET, 'assignment.resource.display');
       headers['Authorization'] = `Bearer ${BackendSession.instance.getToken()}`;
@@ -433,6 +462,7 @@ export class RemoteAssignmentResourceApi {
       } finally {
         try { await fileIo.close(file); } catch {}
       }
+      await this.markComplete(cachePath);
       let uri = fileUri.getUriFromPath(cachePath);
       this.displayCache.set(key, uri);
       return uri;
@@ -443,12 +473,34 @@ export class RemoteAssignmentResourceApi {
     }
   }
 
-  private reuseExisting(path: string): boolean {
+  /**
+   * 有服务端 sizeBytes 时用它校验完整性（资源被替换/上次写了一半都能自愈）；
+   * 缩略图没有期望大小，就靠写入完成标记 .ok 排除半截文件。
+   */
+  private reuseExisting(path: string, expectedBytes: number = 0): boolean {
     try {
-      return fileIo.statSync(path).size > 0;
+      let stat = fileIo.statSync(path);
+      if (stat.size <= 0) return false;
+      if (expectedBytes > 0) {
+        if (stat.size !== expectedBytes) {
+          this.discardCacheFile(path);
+          return false;
+        }
+        return true;
+      }
+      fileIo.statSync(`${path}.ok`);
+      return true;
     } catch {
       return false;
     }
+  }
+
+  /** 服务端下发的 downloadPath 只接受站内 /api/ 相对路径，杜绝把 token 发到别的主机。 */
+  private resourcePath(resource: AssignmentResource): string {
+    let fallback = `/api/v1/assignment-resources/${encodeURIComponent(resource.id)}`;
+    let path = resource.downloadPath.length > 0 ? resource.downloadPath : fallback;
+    if (path.indexOf('/api/') !== 0 || path.indexOf('://') >= 0 || path.indexOf('..') >= 0) return fallback;
+    return path;
   }
 
   private toDomain(item: RemoteAssignmentResource): AssignmentResource {

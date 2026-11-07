@@ -1,7 +1,7 @@
 import { http } from '@kit.NetworkKit';
 import { CandidateAssignment, Subject } from '../../domain/model/HomeworkModels';
 import { ExtractedHomeworkText } from '../../domain/model/ImportModels';
-import { BackendHttpClient } from './BackendHttpClient';
+import { BackendHttpClient, AI_READ_TIMEOUT_MS } from './BackendHttpClient';
 import { BackendSession } from './BackendSession';
 import { HomeworkImageEncoder } from '../../infrastructure/ai/HomeworkImageEncoder';
 import { AssignmentTaskDate } from '../../domain/service/AssignmentTaskDate';
@@ -228,7 +228,7 @@ export class HomeworkOrganizerRemoteApi {
     let response = await BackendHttpClient.instance.requestFor(
       'homework.organize.image',
       `/api/v1/students/${encodeURIComponent(input.studentId)}/homework/organize-image`,
-      http.RequestMethod.POST, payload, true, 120000);
+      http.RequestMethod.POST, payload, true, AI_READ_TIMEOUT_MS);
     let requestMs = Date.now() - requestStarted;
     console.info(`[AI-PERF] homework_image encodeMs=${encodeMs} requestMs=${requestMs} totalMs=${Date.now() - totalStarted} imageBytes=${encoded.encodedBytes}`);
     if (response.statusCode === 401) throw new Error('登录已失效，请重新登录后重试');
@@ -270,7 +270,9 @@ export class HomeworkOrganizerRemoteApi {
         'homework.organize',
         `/api/v1/students/${encodeURIComponent(input.studentId)}/homework/organize`,
         http.RequestMethod.POST,
-        payload
+        payload,
+        true,
+        AI_READ_TIMEOUT_MS
       );
       if (response.statusCode < 200 || response.statusCode >= 300) {
         return null;

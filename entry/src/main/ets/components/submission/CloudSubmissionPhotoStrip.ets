@@ -12,6 +12,8 @@ export struct CloudSubmissionPhotoStrip {
   @State private loadingCount: number = 0;
   @State private previewUri: string = '';
   private previewPhotoId: string = '';
+  private loadGeneration: number = 0;
+  private disposed: boolean = false;
 
   private previewController: CustomDialogController = new CustomDialogController({
     builder: PhotoPreviewDialog({
@@ -25,11 +27,19 @@ export struct CloudSubmissionPhotoStrip {
   });
 
   aboutToAppear(): void {
-    void this.loadMissingPhotos();
+    this.disposed = false;
+    this.loadGeneration++;
+    void this.loadMissingPhotos(this.loadGeneration);
+  }
+
+  aboutToDisappear(): void {
+    this.disposed = true;
+    this.loadGeneration++;
   }
 
   onPhotosChanged(): void {
-    void this.loadMissingPhotos();
+    this.loadGeneration++;
+    void this.loadMissingPhotos(this.loadGeneration);
   }
 
   private thumbnailUri(photoId: string): string {
@@ -43,22 +53,27 @@ export struct CloudSubmissionPhotoStrip {
    * 服务器出口约 3Mbps，原图一张就要 8 秒，缩略图几十毫秒。
    * 缩略图之间互不依赖，并发拉取，谁先到谁先显示。
    */
-  private async loadMissingPhotos(): Promise<void> {
+  private async loadMissingPhotos(generation: number): Promise<void> {
     let tasks: Promise<void>[] = [];
     for (let photo of this.photos) {
+      if (this.disposed || generation !== this.loadGeneration) return;
       if (this.thumbnailUri(photo.id).length > 0) continue;
-      tasks.push(this.loadThumbnail(photo));
+      tasks.push(this.loadThumbnail(photo, generation));
     }
     if (tasks.length === 0) return;
     await Promise.all(tasks);
   }
 
-  private async loadThumbnail(photo: RemoteSubmissionResource): Promise<void> {
+  private async loadThumbnail(photo: RemoteSubmissionResource, generation: number): Promise<void> {
+    if (this.disposed || generation !== this.loadGeneration) return;
     this.loadingCount++;
     try {
       let uri = await RemoteSubmissionApi.instance.downloadThumbnail(photo, THUMBNAIL_WIDTH);
+      // 切换了提交批次或组件已销毁：这一轮的结果不能再写 @State。
+      if (this.disposed || generation !== this.loadGeneration) return;
       if (uri.length > 0) this.cacheRevision++;
     } finally {
+      // 计数必须无条件回退：本任务加过一次，代次变化也不能把它永久留在计数里。
       this.loadingCount = Math.max(0, this.loadingCount - 1);
     }
   }

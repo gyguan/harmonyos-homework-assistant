@@ -73,6 +73,16 @@ export class RemoteSubmissionApi {
     }
     for (let name of names) {
       if (name.indexOf(RemoteSubmissionApi.CACHE_PREFIX) !== 0) continue;
+      if (name.endsWith('.ok')) continue;
+      let fullPath = `${this.context.cacheDir}/${name}`;
+      // 旧实现只按文件名登记，连 size>0 都不查：下载大图时被杀进程留下的半截文件
+      // 会被永久复用且无法自愈。写完才打 .ok 标记，升级后无标记的旧文件重下一次。
+      try {
+        if (fileIo.statSync(fullPath).size <= 0) continue;
+        fileIo.statSync(`${fullPath}.ok`);
+      } catch {
+        continue;
+      }
       let rest = name.substring(RemoteSubmissionApi.CACHE_PREFIX.length);
       let dot = rest.lastIndexOf('.');
       if (dot <= 0) continue;
@@ -166,9 +176,13 @@ export class RemoteSubmissionApi {
 
     let client = http.createHttp();
     try {
-      let basePath = resource.downloadPath.length > 0 ?
-        resource.downloadPath : `/api/v1/submission-resources/${encodeURIComponent(resource.id)}`;
-      let path = thumb ? `${basePath}?w=${width}` : basePath;
+      let fallback = `/api/v1/submission-resources/${encodeURIComponent(resource.id)}`;
+      let given = resource.downloadPath.length > 0 ? resource.downloadPath : fallback;
+      // 只接受站内相对路径：绝对 URL 会把 Bearer token 发到别的主机。
+      let basePath = given.indexOf('/api/') === 0 && given.indexOf('://') < 0 &&
+        given.indexOf('..') < 0 ? given : fallback;
+      let path = thumb ? (basePath.indexOf('?') >= 0 ?
+        `${basePath}&w=${width}` : `${basePath}?w=${width}`) : basePath;
       let headers = BackendHttpClient.instance.traceHeaders(
         path, http.RequestMethod.GET, 'submission.resource.download');
       headers['Authorization'] = `Bearer ${BackendSession.instance.getToken()}`;
@@ -201,6 +215,12 @@ export class RemoteSubmissionApi {
       } finally {
         try { await fileIo.close(file); } catch {}
       }
+      // 写完再打标记，冷启动登记时据此排除半截文件。
+      try {
+        let marker = await fileIo.open(`${cachePath}.ok`,
+          fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+        try { await fileIo.close(marker); } catch {}
+      } catch {}
       let uri = fileUri.getUriFromPath(cachePath);
       if (thumb) {
         this.thumbnailCache.set(`${resource.id}#${width}`, uri);

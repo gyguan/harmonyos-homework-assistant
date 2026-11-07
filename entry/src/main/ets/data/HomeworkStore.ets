@@ -40,23 +40,34 @@ export class HomeworkStore {
   private persistence: HomeworkPersistence | null = null;
   private persistRequested: boolean = false;
   private persistRunning: boolean = false;
+  private persistRetries: number = 0;
+  /** 快照加载/迁移失败时为 true：只读降级，禁止把 MockData 反写覆盖真实主快照。 */
+  private readOnly: boolean = false;
 
   private constructor() {
     this.seedFromMockData();
   }
 
   async initialize(persistence: HomeworkPersistence): Promise<void> {
-    this.persistence = persistence;
+    // 加载/迁移失败时内存仍是构造函数里的 MockData。必须先进入只读降级，
+    // 否则此后任何一次业务改动都会把 MockData 写回，覆盖真实主快照
+    // （CONTEXT.md V2 迁移默认值 5/6：迁移失败不得覆盖原主快照）。
+    this.persistence = null;
+    this.readOnly = true;
     let snapshot = await persistence.load();
     if (snapshot === null) {
+      this.persistence = persistence;
+      this.readOnly = false;
       this.seedFromMockData();
       await persistence.save(this.createSnapshot());
       return;
     }
-
     let originalVersion = snapshot.schemaVersion;
+    // migrate 抛异常时不会走到下面两行，readOnly 保持 true。
     let migrated = HomeworkSnapshotMigrator.migrate(snapshot);
     this.restoreSnapshot(migrated);
+    this.persistence = persistence;
+    this.readOnly = false;
     if (originalVersion !== migrated.schemaVersion) {
       await persistence.save(this.createSnapshot());
     }
@@ -117,7 +128,7 @@ export class HomeworkStore {
   }
 
   private requestPersist(): void {
-    if (this.persistence === null) return;
+    if (this.persistence === null || this.readOnly) return;
     this.persistRequested = true;
     if (!this.persistRunning) void this.flushPersistQueue();
   }
@@ -130,12 +141,21 @@ export class HomeworkStore {
       while (this.persistRequested) {
         this.persistRequested = false;
         await persistence.save(this.createSnapshot());
+        this.persistRetries = 0;
       }
     } catch {
       // 落盘失败绝不能让持久化队列停摆：persistRunning 一旦卡在 true，
       // 之后每次作业改动都只是改内存、永不写盘，重启后全部丢失，而界面毫无异常。
-      // 内存态仍然可用，把请求挂起等下一次改动重试。
+      // 只挂起不够：用户看完就退出时没有下一次改动，这批数据仍然丢。
       this.persistRequested = true;
+      if (this.persistRetries < 5) {
+        this.persistRetries++;
+        setTimeout(() => {
+          if (this.persistence !== null && !this.readOnly && this.persistRequested && !this.persistRunning) {
+            void this.flushPersistQueue();
+          }
+        }, 3000);
+      }
     } finally {
       this.persistRunning = false;
     }
@@ -576,6 +596,11 @@ export class HomeworkStore {
     let result: Submission[] = [];
     for (let submission of this.submissions) if (submission.assignmentId === assignmentId) result.push(submission);
     return result;
+  }
+
+  /** 供沙盒副本孤儿清理使用：必须覆盖所有学生、所有提交，不能只遍历当前 activeStudent。 */
+  listAllSubmissions(): Submission[] {
+    return this.submissions.slice();
   }
 
   getTodaySummary(): TodaySummary {

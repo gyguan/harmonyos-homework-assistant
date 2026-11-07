@@ -32,7 +32,13 @@ export class HomeworkSubmissionService {
 
   configure(context: common.UIAbilityContext): void {
     this.context = context;
-    void this.cleanupStaleSandboxCopies();
+    // 不能在这里清理孤儿副本：bootstrap 此时还没加载本地快照，引用集必然是空的，
+    // 会把全部已提交照片副本当孤儿删光。由 EntryAbility 在快照就绪后显式调用。
+  }
+
+  /** 本地快照加载成功后才允许执行，且只对「无引用 + 非近期创建」的文件下手。 */
+  async cleanupAfterBootstrap(): Promise<void> {
+    await this.cleanupStaleSandboxCopies();
   }
 
   /**
@@ -56,18 +62,26 @@ export class HomeworkSubmissionService {
 
   private referencedSandboxPaths(): Set<string> {
     let result = new Set<string>();
-    let assignments = DefaultAssignmentRepository.instance.listCached();
-    for (let assignment of assignments) {
-      for (let submission of this.local.listSubmissions(assignment.id)) {
-        for (let uri of submission.photoUris) {
-          if (uri.length > 0) result.add(uri);
-        }
-        if (submission.audioUri !== undefined && submission.audioUri.length > 0) {
-          result.add(submission.audioUri);
-        }
+    // 覆盖所有学生、所有提交：只遍历当前 activeStudent（或只遍历仍在缓存里的作业）
+    // 会误删其他孩子 / 作业已从缓存移除的本地照片副本。
+    for (let submission of this.local.listAllSubmissions()) {
+      for (let uri of submission.photoUris) {
+        if (uri.length > 0) result.add(uri);
+      }
+      if (submission.audioUri !== undefined && submission.audioUri.length > 0) {
+        result.add(submission.audioUri);
       }
     }
     return result;
+  }
+
+  private isRecentlyCreated(path: string): boolean {
+    try {
+      let stat = fileIo.statSync(path);
+      return Date.now() / 1000 - stat.mtime < 24 * 60 * 60;
+    } catch {
+      return false;
+    }
   }
 
   private async deleteOrphanFiles(directory: string, prefix: string, referenced: Set<string>): Promise<void> {
@@ -82,6 +96,9 @@ export class HomeworkSubmissionService {
       let path = `${directory}/${name}`;
       let uri = fileUri.getUriFromPath(path);
       if (referenced.has(path) || referenced.has(uri)) continue;
+      // 双保险：24 小时内新建的文件不删，避免「副本写完、提交记录还没落盘」的
+      // 时序窗口再次造成误删。image-upload- 是明确的临时件，不适用这条保护。
+      if (prefix !== 'image-upload-' && this.isRecentlyCreated(path)) continue;
       try {
         fileIo.unlinkSync(path);
       } catch {

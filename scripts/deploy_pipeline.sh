@@ -85,13 +85,15 @@ stage_backend() {
     --exclude='./.git' --exclude='node_modules' --exclude='oh_modules' \
     --exclude='./entry/build' --exclude='./backend/target' \
     --exclude='.idea' --exclude='.workbuddy' --exclude='./signature' \
+    --exclude='./backend/.env' --exclude='*.log' --exclude='./build' \
     -czf "$TARBALL" .) || fail "打包失败"
   "$GIT_TOOLS/scp.exe" -i "$SSH_KEY" -o BatchMode=yes "$TARBALL" "$SERVER:$REMOTE_DIR/" || fail "上传失败"
 
   info "步骤 3.3 服务器解压替换 src（保留 .env）..."
   ssh_server "cd $REMOTE_DIR && rm -rf src.old && mv src src.old && mkdir src \
     && tar -xzf homework-deploy.tar.gz -C src \
-    && cp src.old/backend/.env src/backend/.env && chmod 600 src/backend/.env; \
+    && cp src.old/backend/.env src/backend/.env && chmod 600 src/backend/.env \
+    && rm -f homework-deploy.tar.gz; \
     test -f src/backend/DEPLOY.md && echo EXTRACT_OK" || fail "解压/恢复失败"
   rm -f "$TARBALL"
 

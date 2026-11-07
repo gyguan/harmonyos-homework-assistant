@@ -97,8 +97,10 @@ export struct StudyWorkspacePage {
   }
 
   private submissionBusy(): boolean {
+    // 录音暂停也算「进行中」：否则「继续作业」按钮可点，会走 resumeFromSubmission()
+    // 直接 resetSubmissionRecording() 清掉已录的音频，且没有任何确认提示。
     return this.selectingPhotos || this.capturingPhoto || this.submittingPhotos ||
-      this.submittingAudio || this.submissionAudioState === 'RECORDING';
+      this.submittingAudio || this.isRecordingInProgress();
   }
 
   private applyVoiceMediaState(

@@ -80,7 +80,7 @@ public class AssignmentResourceController {
       @PathVariable UUID resourceId,
       @RequestParam(name = "w", required = false) Integer width) throws MalformedURLException {
     AssignmentResourceService.ResourceDownload file = service.download(familyId, resourceId);
-    Path thumbnail = width == null ? null : thumbnails.thumbnail(file.path(), width).orElse(null);
+    Path thumbnail = width == null ? null : thumbnails.thumbnail(file.path(), ImageThumbnailCache.clampSide(width)).orElse(null);
     boolean thumb = thumbnail != null;
     MediaType type;
     if (thumb) {

@@ -43,8 +43,8 @@ services:
       # AI 能力（可选；不配则 Tutor 降级，作业主流程不受影响）
       # 注意：国内厂商（智谱/百炼/硅基流动/火山/混元/千帆）都必须用 chat-completions 协议，
       # 默认的 responses 协议只有 OpenAI 支持，照默认值配国内地址会拿到 404 并静默降级。
-      # 注意：这里的键必须与 application.yml 的 app.ai.* 一一对应，
-      # 漏配的键不会报错，只会静默沿用镜像默认值（AI_IMAGE_ORGANIZER_MODEL 曾因此失效）。
+      # 这里只列生产可覆盖项，漏配的键不会报错，只会静默沿用镜像默认值
+      # （AI_IMAGE_ORGANIZER_MODEL 曾因此失效；用 docker exec env 可核对实际值）。
       AI_PROTOCOL: ${AI_PROTOCOL:-responses}
       AI_API_KEY: ${AI_API_KEY:-}
       AI_BASE_URL: ${AI_BASE_URL:-https://api.openai.com}
@@ -76,6 +76,11 @@ services:
       AI_MEDIA_SYNC_ALIGNMENT_MODEL: ${AI_MEDIA_SYNC_ALIGNMENT_MODEL:-}
       AI_MEDIA_SYNC_MAX_AI_IMAGES: ${AI_MEDIA_SYNC_MAX_AI_IMAGES:-12}
       MEDIA_SYNC_WORKER_DELAY_MS: ${MEDIA_SYNC_WORKER_DELAY_MS:-5000}
+      AI_PROVIDER: ${AI_PROVIDER:-AUTO}
+      HOMEWORK_REVIEW_WORKER_DELAY_MS: ${HOMEWORK_REVIEW_WORKER_DELAY_MS:-30000}
+      HTTP_MAX_PAYLOAD_CHARS: ${HTTP_MAX_PAYLOAD_CHARS:-20000}
+      BOOTSTRAP_FAMILY_NAME: ${BOOTSTRAP_FAMILY_NAME:-我的家庭}
+      SERVER_PORT: ${SERVER_PORT:-8080}
       TZ: Asia/Shanghai
     ports:
       - "${APP_PORT:-8080}:8080"

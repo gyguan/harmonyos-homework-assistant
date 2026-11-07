@@ -182,8 +182,9 @@ export struct VoiceAssignmentPane {
     this.audioUri = '';
     this.notifyMediaState();
 
-    let audioUri = await RemoteAssignmentResourceApi.instance.download(resource);
-    if (lifecycleVersion !== this.lifecycleVersion) return;
+    try {
+      let audioUri = await RemoteAssignmentResourceApi.instance.download(resource);
+      if (lifecycleVersion !== this.lifecycleVersion) return;
     if (audioUri.length === 0) {
       this.audioLoading = false;
       this.audioLoadMessage = '语音加载失败，请检查网络后重试';
@@ -219,7 +220,15 @@ export struct VoiceAssignmentPane {
         this.notifyMediaState();
       }
     };
-    await this.player.prepare(this.audioUri, callbacks);
+      await this.player.prepare(this.audioUri, callbacks);
+    } catch {
+      if (lifecycleVersion !== this.lifecycleVersion) return;
+      this.audioLoadMessage = '语音加载失败，请检查网络后重试';
+    } finally {
+      // download 抛错、组件被复用、prepare 失败都会走到这里；不复位的话
+      // retryAudio() 与 load() 的 audioLoading 早退会让语音和重试入口同时失效。
+      if (lifecycleVersion === this.lifecycleVersion) this.audioLoading = false;
+    }
   }
 
   private async loadMediaSync(lifecycleVersion: number): Promise<void> {

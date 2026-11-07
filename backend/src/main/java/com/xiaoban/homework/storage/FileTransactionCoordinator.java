@@ -45,8 +45,9 @@ public class FileTransactionCoordinator {
     try {
       storage.delete(storagePath);
     } catch (RuntimeException error) {
-      log.warn("file_transaction cleanup_failed phase={} storagePath={} errorType={} message={}",
-          phase, storagePath, error.getClass().getSimpleName(), error.getMessage());
+      // 日志规范禁止记录存储路径；只保留阶段与异常类型，不输出 message（可能含路径/文件名）。
+      log.warn("file_transaction cleanup_failed phase={} errorType={}",
+          phase, error.getClass().getSimpleName());
     }
   }
 }

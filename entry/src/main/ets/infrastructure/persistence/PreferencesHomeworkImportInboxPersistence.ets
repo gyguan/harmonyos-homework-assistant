@@ -60,7 +60,9 @@ export class PreferencesHomeworkImportInboxPersistence implements HomeworkImport
       await store.put(SNAPSHOT_KEY, JSON.stringify(snapshot));
       await store.flush();
     } catch {
+      // 同上：必须让上层知道写盘失败，否则收件箱改动会静默丢失。
       console.error('Homework import inbox save failed; in-memory state remains available');
+      throw new Error('作业导入收件箱写入失败');
     }
   }
 }

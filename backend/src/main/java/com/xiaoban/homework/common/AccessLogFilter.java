@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -26,7 +28,9 @@ public class AccessLogFilter extends OncePerRequestFilter {
   private static final long DUPLICATE_WINDOW_MS = 1500L;
   private static final long RECENT_RETENTION_MS = 60000L;
   private static final int MAX_RECENT_KEYS = 2048;
-  private final Map<String, Long> recentRequests = new ConcurrentHashMap<>();
+  private volatile Map<String, Long> recentRequests = new ConcurrentHashMap<>();
+  private final AtomicLong windowStartedAt = new AtomicLong(0L);
+  private final AtomicBoolean rollingWindow = new AtomicBoolean(false);
   private final HttpLogProperties httpLogProperties;
 
   public AccessLogFilter(HttpLogProperties httpLogProperties) {
@@ -78,13 +82,34 @@ public class AccessLogFilter extends OncePerRequestFilter {
     if (requestKey == null || requestKey.isBlank()) return false;
     String boundedKey = requestKey.length() > 512 ? requestKey.substring(0, 512) : requestKey;
     String key = client + "|" + boundedKey;
-    Long previous = recentRequests.put(key, nowMs);
-    if (recentRequests.size() > MAX_RECENT_KEYS) cleanupRecent(nowMs);
+    rollWindow(nowMs);
+    Map<String, Long> current = recentRequests;
+    // 硬上限：客户端可以随意编造 requestKey，且 /health 也经过这个过滤器。
+    // 达到上限后不再登记新 key，只对已登记的 key 做重复判断，避免无凭据打爆内存。
+    Long previous = current.size() >= MAX_RECENT_KEYS ? current.get(key) : current.put(key, nowMs);
     return previous != null && nowMs - previous >= 0 && nowMs - previous <= DUPLICATE_WINDOW_MS;
   }
 
-  private void cleanupRecent(long nowMs) {
-    recentRequests.entrySet().removeIf(entry -> nowMs - entry.getValue() > RECENT_RETENTION_MS);
+  /**
+   * 按固定窗口整表滚动，O(1)，不再每请求全表扫描。
+   * 原来的 removeIf 只能淘汰「满 60 秒」的条目，攻击者不断变化 requestKey 时一条也删不掉，
+   * 反而让去重表无限增长。丢弃整个窗口只影响边界处 1.5 秒的重复判定，可接受。
+   */
+  private void rollWindow(long nowMs) {
+    long started = windowStartedAt.get();
+    if (started == 0L) {
+      windowStartedAt.compareAndSet(0L, nowMs);
+      return;
+    }
+    if (nowMs - started < RECENT_RETENTION_MS) return;
+    if (!rollingWindow.compareAndSet(false, true)) return;
+    try {
+      if (windowStartedAt.compareAndSet(started, nowMs)) {
+        recentRequests = new ConcurrentHashMap<>();
+      }
+    } finally {
+      rollingWindow.set(false);
+    }
   }
 
   String safeHeader(String value, int maxLength) {

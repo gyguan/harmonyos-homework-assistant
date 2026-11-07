@@ -1,6 +1,12 @@
 import { http } from '@kit.NetworkKit';
 import { BackendSession } from './BackendSession';
 
+/**
+ * AI 整理 / Tutor / 练习生成的读超时。后端 AI 上游 readTimeout 是 120s，
+ * 客户端若只用默认 60s 会先断开并把超时吞成「无结果」，家长重试又会重复消耗额度。
+ */
+export const AI_READ_TIMEOUT_MS: number = 150000;
+
 export interface BackendResponse {
   statusCode: number;
   body: string;

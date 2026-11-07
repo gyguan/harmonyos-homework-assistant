@@ -19,13 +19,19 @@ export class HomeworkImportInboxStore {
   private persistence: HomeworkImportInboxPersistence | null = null;
   private persistRequested: boolean = false;
   private persistRunning: boolean = false;
+  private persistRetries: number = 0;
+  private readOnly: boolean = false;
 
   private constructor() {}
 
   async initialize(persistence: HomeworkImportInboxPersistence): Promise<void> {
-    this.persistence = persistence;
+    // 加载/版本校验失败时内存是空收件箱，必须先只读，防止反过来覆盖磁盘上的真实批次。
+    this.persistence = null;
+    this.readOnly = true;
     let snapshot = await persistence.load();
     if (snapshot === null) {
+      this.persistence = persistence;
+      this.readOnly = false;
       await persistence.save(this.createSnapshot());
       return;
     }
@@ -33,6 +39,8 @@ export class HomeworkImportInboxStore {
       throw new Error(`不支持的作业导入收件箱版本: ${snapshot.schemaVersion}`);
     }
     this.restore(snapshot);
+    this.persistence = persistence;
+    this.readOnly = false;
   }
 
   private restore(snapshot: HomeworkImportInboxSnapshot): void {
@@ -62,7 +70,7 @@ export class HomeworkImportInboxStore {
   }
 
   private requestPersist(): void {
-    if (this.persistence === null) return;
+    if (this.persistence === null || this.readOnly) return;
     this.persistRequested = true;
     if (!this.persistRunning) void this.flushPersistQueue();
   }
@@ -75,10 +83,19 @@ export class HomeworkImportInboxStore {
       while (this.persistRequested) {
         this.persistRequested = false;
         await persistence.save(this.createSnapshot());
+        this.persistRetries = 0;
       }
     } catch {
       // 同 HomeworkStore：落盘失败不能让队列永久停摆，否则收件箱改动静默丢失。
       this.persistRequested = true;
+      if (this.persistRetries < 5) {
+        this.persistRetries++;
+        setTimeout(() => {
+          if (this.persistence !== null && !this.readOnly && this.persistRequested && !this.persistRunning) {
+            void this.flushPersistQueue();
+          }
+        }, 3000);
+      }
     } finally {
       this.persistRunning = false;
     }

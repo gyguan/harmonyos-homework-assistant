@@ -41,15 +41,17 @@ class ApiPayloadLogAdviceTest {
   }
 
   @Test
-  void credentialFieldsAreRedactedWithoutHidingBusinessPayload() {
+  void credentialAndHomeworkBodyFieldsAreRedacted() {
     HttpLogProperties properties = new HttpLogProperties();
     ApiPayloadLogAdvice advice = new ApiPayloadLogAdvice(properties, JsonMapper.builder().build());
 
     String sanitized = advice.sanitizeAndTruncate(
         "{\"studentId\":\"s1\",\"text\":\"数学第12页\",\"password\":\"parent123\",\"token\":\"abc123\"}");
 
+    // 结构字段保留，排障仍能看到请求到了哪个学生；作业正文按 AGENTS.md 第 46 行禁止入日志。
     assertTrue(sanitized.contains("\"studentId\":\"s1\""));
-    assertTrue(sanitized.contains("\"text\":\"数学第12页\""));
+    assertFalse(sanitized.contains("数学第12页"));
+    assertTrue(sanitized.contains("\"text\":\"***\""));
     assertTrue(sanitized.contains("\"password\":\"***\""));
     assertTrue(sanitized.contains("\"token\":\"***\""));
     assertFalse(sanitized.contains("parent123"));

@@ -275,8 +275,8 @@ public class VoiceMaterialAssignmentService {
    * 迁移前的历史任务（LEGACY）语义不明，两者都不能被系统悄悄挪走——所以它们既不参与顺延，
    * 也不会挡住今天的自动创建。素材目录被删除后 link 会随外键级联消失，那条遗留任务同样不再参与。
    *
-   * <p>link 按创建时间倒序扫描，因此命中的是最新那条；孩子已经交出去的历史任务会被跳过，
-   * 不会把早该翻篇的作业又拉回今天。
+   * <p>link 按创建时间倒序扫描，因此只看最新那条 AUTO：如果它已经被孩子交出去，
+   * 当天就应该发新的一份，直接返回 null，不再往前翻出更早的旧作业。
    */
   private CarryOver findCarryOver(UUID familyId, String studentId, LocalDate businessDate) {
     for (VoiceMaterialTaskLinkEntity link :
@@ -287,7 +287,9 @@ public class VoiceMaterialAssignmentService {
       if (item == null || !familyId.equals(item.familyId)) continue;
       if (!"AUDIO_IMAGE".equals(item.contentType)) continue;
       if (item.taskDate == null || !item.taskDate.isBefore(businessDate)) continue;
-      if (isSettled(item.status)) continue;
+      // CONTEXT.md:32 — 最新一条 AUTO 已经交出去时，当天应发新的一份。继续往前扫描会把
+      // 更早一条「待订正/进行中」的旧作业拉回今天，并占掉当天的自动创建额度。
+      if (isSettled(item.status)) return null;
       String materialTitle = packages.findById(link.packageId)
           .map(folder -> folder.title).orElse(null);
       return new CarryOver(item.id, link.packageId, item.taskDate, item.status, materialTitle);

@@ -49,6 +49,8 @@ export struct PhotoPreviewDialog {
   /** 已下载好、等待空闲时替换上去的原图。 */
   private pendingFullUri: string = '';
   private disposed: boolean = false;
+  /** 换图代次：弹窗存活期间 uri 可能变化，旧请求的结果绝不能覆盖新图。 */
+  private imageGeneration: number = 0;
 
   // 当前手势类型：0=无 1=单指拖动 2=双指缩放
   private gestureMode: number = 0;
@@ -62,6 +64,9 @@ export struct PhotoPreviewDialog {
   private pinchStartDistance: number = 0;
   private lastAnchorX: number = 0;
   private lastAnchorY: number = 0;
+  // 双指按 id 绑定，避免第三指落下/抬起时 touches 下标漂移导致倍率突变
+  private pinchFirstId: number = -1;
+  private pinchSecondId: number = -1;
   // 视口尺寸（vp）与图片原始尺寸（换算成 vp），用来算放大后能拖到多远
   private viewWidth: number = 0;
   private viewHeight: number = 0;
@@ -69,9 +74,13 @@ export struct PhotoPreviewDialog {
   private sourceHeight: number = 0;
 
   aboutToAppear(): void {
+    // 弹窗实例可能被复用（关闭再打开），必须复位销毁标志，否则原图加载会被永久丢弃。
+    this.disposed = false;
+    this.imageGeneration++;
     this.displayUri = this.uri;
+    this.pendingFullUri = '';
     this.resetTransform();
-    void this.prefetchFullImage();
+    void this.prefetchFullImage(this.imageGeneration);
   }
 
   aboutToDisappear(): void {
@@ -79,29 +88,32 @@ export struct PhotoPreviewDialog {
   }
 
   onUriChanged(): void {
+    this.imageGeneration++;
     this.displayUri = this.uri;
     this.pendingFullUri = '';
     this.resetTransform();
-    void this.prefetchFullImage();
+    void this.prefetchFullImage(this.imageGeneration);
   }
 
-  private async prefetchFullImage(): Promise<void> {
+  private async prefetchFullImage(generation: number): Promise<void> {
     if (this.loadFullImage === null) return;
     let full = await this.loadFullImage();
-    if (this.disposed || full.length === 0) return;
+    // 换过图 / 弹窗已销毁：这张原图是上一代的，丢掉。
+    if (this.disposed || generation !== this.imageGeneration || full.length === 0) return;
     if (full === this.displayUri) return;
     this.pendingFullUri = full;
     this.swapToFullImageIfIdle();
   }
 
   /**
-   * 只有「静止且未放大」时才把缩略图换成原图：换图会让 Image 重新解码，
-   * 正在缩放时替换会打断手势，反而更糟。
+   * 只避开「手势进行中」：换 displayUri 只是让 Image 重新解码，zoomScale / panX / panY
+   * 是独立的 @State，不会被重置，所以放大状态下换原图并不会打断缩放结果。
+   * 旧实现额外挡了 isZoomed()，导致用户一放大就再也等不到原图，全程看马赛克。
    */
   private swapToFullImageIfIdle(): void {
     if (this.disposed || this.pendingFullUri.length === 0) return;
     if (this.displayUri === this.pendingFullUri) return;
-    if (this.gestureMode !== 0 || this.isZoomed()) return;
+    if (this.gestureMode !== 0) return;
     this.displayUri = this.pendingFullUri;
   }
 
@@ -116,6 +128,8 @@ export struct PhotoPreviewDialog {
     this.pinchStartDistance = 0;
     this.lastAnchorX = 0;
     this.lastAnchorY = 0;
+    this.pinchFirstId = -1;
+    this.pinchSecondId = -1;
     this.sourceWidth = 0;
     this.sourceHeight = 0;
   }
@@ -189,16 +203,60 @@ export struct PhotoPreviewDialog {
   }
 
   private handleTouch(event: TouchEvent): void {
-    if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+    let active: TouchObject[] = [];
+    for (let touch of event.touches) {
+      // Up/Cancel 帧里刚抬起的手指可能仍留在 touches 中，按 changedTouches 的 id 排除。
+      // 旧实现只要收到 Up 就 finishGesture()：双指放大后抬起一根继续拖，会被提前结算、
+      // 倍率吸附回 1x，剩下那根手指的拖动也被吞掉。
+      if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+        let lifted = false;
+        for (let changed of event.changedTouches) {
+          if (changed.id === touch.id) lifted = true;
+        }
+        if (lifted) continue;
+      }
+      active.push(touch);
+    }
+
+    if (active.length === 0) {
+      this.pinchFirstId = -1;
+      this.pinchSecondId = -1;
       this.finishGesture();
       return;
     }
-    let touches = event.touches;
-    if (touches.length >= 2) {
-      this.updatePinch(touches[0], touches[1]);
-    } else if (touches.length === 1) {
-      this.updatePan(touches[0]);
+    if (active.length === 1) {
+      // 从双指退回单指：解除缩放绑定，updatePan 会重新记基准，不结算手势。
+      this.pinchFirstId = -1;
+      this.pinchSecondId = -1;
+      this.updatePan(active[0]);
+      return;
     }
+
+    // 双指按 id 绑定：第三指落下/抬起导致 touches 下标漂移时，仍用原来那两根算倍率；
+    // 若原来的手指确实离场，则重新起手，避免 pinchStartDistance 与新手指不配对而跳变。
+    let first: TouchObject = active[0];
+    let second: TouchObject = active[1];
+    if (this.pinchFirstId >= 0) {
+      let foundFirst = false;
+      let foundSecond = false;
+      for (let touch of active) {
+        if (touch.id === this.pinchFirstId) {
+          first = touch;
+          foundFirst = true;
+        }
+        if (touch.id === this.pinchSecondId) {
+          second = touch;
+          foundSecond = true;
+        }
+      }
+      if (!foundFirst || !foundSecond) {
+        this.gestureMode = 0;
+        this.pinchStartDistance = 0;
+      }
+    }
+    this.pinchFirstId = first.id;
+    this.pinchSecondId = second.id;
+    this.updatePinch(first, second);
   }
 
   private updatePan(touch: TouchObject): void {

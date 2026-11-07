@@ -44,7 +44,10 @@ require("作业照片" in strip and "暂不可用" in strip,
 require("PhotoPreviewDialog" in strip and "previewController.open()" in strip and
         "查看作业照片大图" in strip,
         "cloud submission thumbnails must open a large photo preview")
-require("@CustomDialog" in preview and "Image(this.uri)" in preview and
+# 预览现在先显示缩略图、原图到货后换上，渲染源改为 displayUri；
+# 仍要求初始渲染值来自 uri，并保留显式关闭入口。
+require("@CustomDialog" in preview and "Image(this.displayUri)" in preview and
+        "this.displayUri = this.uri" in preview and
         "ImageFit.Contain" in preview and
         ".accessibilityText('关闭图片全屏预览')" in preview and
         ".onClick(() => this.controller.close())" in preview,

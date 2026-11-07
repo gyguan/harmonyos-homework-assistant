@@ -1,7 +1,7 @@
 import { http } from '@kit.NetworkKit';
 import { DefaultFamilyContextRepository } from '../../data/repository/DefaultFamilyContextRepository';
 import { FamilyContextRepository } from '../../domain/port/FamilyContextRepository';
-import { BackendHttpClient } from './BackendHttpClient';
+import { BackendHttpClient, AI_READ_TIMEOUT_MS } from './BackendHttpClient';
 import { BackendSession } from './BackendSession';
 
 export interface TutorChatMessage {
@@ -58,7 +58,7 @@ export class TutorRemoteApi {
       let response = await BackendHttpClient.instance.requestFor(
         'tutor.ask',
         `/api/v1/assignments/${encodeURIComponent(assignmentId)}/tutor/messages`,
-        http.RequestMethod.POST, payload);
+        http.RequestMethod.POST, payload, true, AI_READ_TIMEOUT_MS);
       if (response.statusCode !== 200) return this.unavailable('AI Tutor 暂时不可用');
       return JSON.parse(response.body) as TutorConversation;
     } catch {

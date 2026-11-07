@@ -122,8 +122,10 @@ export class PreferencesHomeworkPersistence implements HomeworkPersistence {
       await store.put(SNAPSHOT_KEY, JSON.stringify(snapshot));
       await store.flush();
     } catch {
-      // Normal persistence remains best-effort so transient disk errors do not break in-memory use.
+      // 必须抛给 flushPersistQueue：它依赖异常把 persistRequested 重新挂起并排重试。
+      // 吞掉会把「写盘失败」伪装成成功，界面无提示、数据静默丢失。
       console.error('Homework snapshot save failed; in-memory state remains available');
+      throw new Error('本地作业快照写入失败');
     }
   }
 }

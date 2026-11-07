@@ -70,9 +70,12 @@ export default class EntryAbility extends UIAbility {
       console.error('Backend session restore failed; continuing offline');
     }
 
+    let localSnapshotReady = false;
     try {
       await HomeworkLocalBootstrap.instance.initialize(new PreferencesHomeworkPersistence(this.context));
+      localSnapshotReady = true;
     } catch {
+      // Store 会进入只读降级态（禁止反写覆盖真实快照），这里不再继续做文件清理。
       console.error('Homework store initialization failed; continuing with in-memory state');
     }
 
@@ -89,6 +92,9 @@ export default class EntryAbility extends UIAbility {
       console.error('TOEIC progress initialization failed; continuing with in-memory state');
     }
 
+    // 只有快照成功加载，引用集才是完整的，此时清理孤儿副本才不会误删提交证据。
+    if (localSnapshotReady) void HomeworkSubmissionService.instance.cleanupAfterBootstrap();
+
     this.loadMainPage(windowStage);
   }
 
@@ -101,5 +107,8 @@ export default class EntryAbility extends UIAbility {
     void DefaultAssignmentRepository.instance.refresh();
   }
 
-  onDestroy(): void {}
+  onDestroy(): void {
+    // 正在录音时 Ability 被销毁，AVRecorder 与麦克风占用必须主动释放。
+    void SubmissionAudioRecorderService.instance.release();
+  }
 }

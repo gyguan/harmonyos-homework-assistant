@@ -124,6 +124,11 @@ public class AssignmentResourceService {
       throw new ApiExceptions.NotFound("作业附件不存在");
     }
     // Asset content is deduplicated and may be referenced by other assignments.
+    // But legacy rows own their storagePath exclusively; deleting only the DB row leaves the
+    // child's photo on disk forever (deleteInternal already handles this case correctly).
+    if (resource.assetId == null && resource.storagePath != null && !resource.storagePath.isBlank()) {
+      fileTransactions.deleteAfterCommit(resource.storagePath);
+    }
     resources.delete(resource);
   }
 

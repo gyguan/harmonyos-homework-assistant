@@ -90,7 +90,7 @@ public class SubmissionController {
 
   private ResponseEntity<Resource> deliver(SubmissionService.ResourceDownload file, Integer width)
       throws MalformedURLException {
-    Path thumbnail = width == null ? null : thumbnails.thumbnail(file.path(), width).orElse(null);
+    Path thumbnail = width == null ? null : thumbnails.thumbnail(file.path(), ImageThumbnailCache.clampSide(width)).orElse(null);
     boolean thumb = thumbnail != null;
     String contentType = thumb ? ImageThumbnailCache.contentType() : file.contentType();
     return ResponseEntity.ok()

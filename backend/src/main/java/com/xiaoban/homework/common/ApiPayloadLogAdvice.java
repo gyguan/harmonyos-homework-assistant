@@ -99,14 +99,15 @@ public class ApiPayloadLogAdvice extends RequestBodyAdviceAdapter implements Res
     if (value == null) return "<empty>";
     if (value instanceof Resource resource) {
       try {
-        return "<binary-resource filename=" + resource.getFilename() + " length=" + resource.contentLength() + ">";
+        // 日志规范禁止记录原始文件名，只保留字节数等结构信息。
+        return "<binary-resource length=" + resource.contentLength() + ">";
       } catch (Exception ignored) {
         return "<binary-resource>";
       }
     }
     if (value instanceof MultipartFile file) {
-      return "<multipart name=" + file.getOriginalFilename() + " contentType=" + file.getContentType()
-          + " size=" + file.getSize() + ">";
+      // 同上：multipart 的原始文件名属于禁止记录的内容。
+      return "<multipart contentType=" + file.getContentType() + " size=" + file.getSize() + ">";
     }
     if (value instanceof byte[] bytes) return "<binary bytes=" + bytes.length + ">";
     if (value instanceof String text) return sanitizeAndTruncate(text);
@@ -119,8 +120,13 @@ public class ApiPayloadLogAdvice extends RequestBodyAdviceAdapter implements Res
 
   String sanitizeAndTruncate(String value) {
     String compact = compact(value);
+    // 除凭据外，儿童姓名 / 作业正文 / 题干答案 / 家长码 / 文件路径也都属于禁止记录项。
+    // payload 诊断日志默认关闭；开启时这里按字段名做字符串值脱敏。
     compact = compact.replaceAll(
-        "(?i)(\\\"(?:password|token|api[-_]?key|authorization)\\\"\\s*:\\s*\\\")[^\\\"]*(\\\")",
+        "(?i)(\\\"(?:password|token|api[-_]?key|authorization|name|title|instruction|"
+            + "sourceExcerpt|content|contentText|text|note|reviewNote|answer|stem|question|"
+            + "explanation|transcript|prompt|response|code|filename|originalName|storagePath)\\\""
+            + "\\s*:\\s*\\\")[^\\\"]*(\\\")",
         "$1***$2");
     compact = compact.replaceAll("(?i)Bearer\\s+[A-Za-z0-9._~+\\-/=]+", "Bearer ***");
     compact = compact.replaceAll("(?i)sk-[A-Za-z0-9_-]{6,}", "sk-***");
