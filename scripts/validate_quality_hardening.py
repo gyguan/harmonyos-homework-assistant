@@ -38,8 +38,12 @@ assignment_entity = read("backend/src/main/java/com/xiaoban/homework/assignment/
 tutor_service = read("backend/src/main/java/com/xiaoban/homework/tutor/TutorService.java")
 harmony_workflow = read(".github/workflows/harmony-client-build.yml")
 
-require("BACKEND_BASE_URL: string = ''" in app_config and "http://" not in app_config,
-        "release client config must not ship a hardcoded plaintext backend address")
+# 2026-11-07 产品决定：家庭自用单服务器，客户端内置唯一云端地址，登录用默认家长账号。
+# 原「release 客户端不得内置明文后端地址」断言按此决定放宽为「地址与账号必须集中在 AppConfig」。
+require("BACKEND_BASE_URL: string = 'http://192.144.143.141:8080'" in app_config and
+        "PARENT_LOGIN: string = 'parent'" in app_config and
+        "PARENT_PASSWORD: string = 'parent123'" in app_config,
+        "release client must keep its default backend address and parent credential in AppConfig")
 require("enabled: ${BOOTSTRAP_ENABLED:false}" in application_yml and
         "login-name: ${BOOTSTRAP_LOGIN:}" in application_yml and
         "password: ${BOOTSTRAP_PASSWORD:}" in application_yml,

@@ -20,8 +20,6 @@ export struct BackendConnectionPage {
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private availableWidthVp: number = 390;
   @State private baseUrl: string = '';
-  @State private loginName: string = 'parent';
-  @State private password: string = '';
   @State private message: string = '';
   @State private connecting: boolean = false;
   @State private syncing: boolean = false;
@@ -110,6 +108,9 @@ export struct BackendConnectionPage {
     if (BackendSession.instance.isConnected() && !this.forceLogin) {
       void this.refreshStudents();
       void this.refreshParentAccess();
+    } else if (this.forceLogin && !BackendSession.instance.isConnected()) {
+      // 登录态失效时进页面即用默认账号重连一次，家长不用再点一次
+      void this.connect();
     }
   }
 
@@ -215,8 +216,8 @@ export struct BackendConnectionPage {
   }
 
   private async connect(): Promise<void> {
-    if (this.baseUrl.trim().length === 0 || this.loginName.trim().length === 0 || this.password.length === 0) {
-      this.connectionFeedback = '连接失败：请填写服务地址、账号和密码。';
+    if (this.baseUrl.trim().length === 0) {
+      this.connectionFeedback = '连接失败：请填写服务地址。';
       this.connectionFeedbackSuccess = false;
       this.connectionFeedbackError = true;
       this.message = '';
@@ -228,7 +229,7 @@ export struct BackendConnectionPage {
     this.connectionFeedbackError = false;
     this.message = '';
     try {
-      await BackendAuthService.instance.login(this.baseUrl, this.loginName, this.password);
+      await BackendAuthService.instance.loginWithDefaults(this.baseUrl);
       this.connectionFeedback = '登录成功，正在同步云端数据…';
       let familySynced = await FamilyCloudService.instance.syncStudents();
       let parentAccessSynced = await FamilyCloudService.instance.syncParentAccess();
@@ -263,7 +264,7 @@ export struct BackendConnectionPage {
         this.connectionFeedbackSuccess = false;
         this.connectionFeedbackError = true;
       } else {
-        this.connectionFeedback = '连接失败：请检查服务地址、网络或账号密码后重试。';
+        this.connectionFeedback = '连接失败：请检查服务地址和网络后重试。';
         this.connectionFeedbackSuccess = false;
         this.connectionFeedbackError = true;
       }
@@ -627,12 +628,11 @@ export struct BackendConnectionPage {
         .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.baseUrl = value);
 
       if (!BackendSession.instance.isConnected() || this.forceLogin) {
-        TextInput({ placeholder: '家长账号', text: this.loginName }).width('100%').height(AppTheme.INPUT_HEIGHT)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
-          .onChange((value: string) => this.loginName = value);
-        TextInput({ placeholder: '密码', text: this.password }).width('100%').height(AppTheme.INPUT_HEIGHT)
-          .type(InputType.Password).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
-          .onChange((value: string) => this.password = value);
+        Text('使用内置家长账号自动登录，无需输入账号密码。')
+          .width('100%')
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT);
         Button(this.connecting ? '正在连接…' : '连接并同步', { type: ButtonType.Normal }).width('100%')
           .height(AppTheme.BUTTON_HEIGHT).borderRadius(AppTheme.CONTROL_RADIUS).enabled(!this.connecting)
           .backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)

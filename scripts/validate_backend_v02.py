@@ -39,6 +39,7 @@ local_example = read("backend/config/application-local.example.yml")
 gitignore = read(".gitignore")
 app_config = read("entry/src/main/ets/common/config/AppConfig.ets")
 backend_session = read("entry/src/main/ets/application/remote/BackendSession.ets")
+index_page = read("entry/src/main/ets/pages/Index.ets")
 session_storage = read("entry/src/main/ets/infrastructure/persistence/PreferencesBackendSessionStorage.ets")
 family_cloud = read("entry/src/main/ets/application/remote/FamilyCloudService.ets")
 settings_page = read("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
@@ -174,9 +175,15 @@ require('@ConfigurationProperties(prefix = "app.http")' in http_log_properties a
         "HTTP request/response payload logging must remain bounded and explicitly opt-in")
 require("PreferencesBackendSessionStorage" in session_storage and "initialize(storage" in backend_session,
         "HarmonyOS must restore its backend session from app-private storage")
+# 2026-11-07 产品决定：家庭自用单服务器，客户端内置唯一云端地址与默认家长账号，
+# 家长不再手工输入账号密码（原「不得内置明文地址」断言按此决定放宽）。
 require("AppConfig.BACKEND_BASE_URL" in backend_session and
-        "BACKEND_BASE_URL: string = ''" in app_config and "http://" not in app_config,
-        "HarmonyOS backend default must be centralized in AppConfig without shipping a plaintext LAN endpoint")
+        "BACKEND_BASE_URL: string = 'http://192.144.143.141:8080'" in app_config and
+        "PARENT_LOGIN: string = 'parent'" in app_config and
+        "PARENT_PASSWORD: string = 'parent123'" in app_config,
+        "HarmonyOS backend default and parent credential must stay centralized in AppConfig")
+require("loginWithDefaults" in index_page,
+        "HarmonyOS must auto-login with the default parent account instead of asking for credentials")
 require("FamilyCloudService" in settings_page and "StudentRemoteApi" in family_cloud,
         "parent settings must manage cloud-backed family members")
 require("/tutor/messages" in tutor_remote,

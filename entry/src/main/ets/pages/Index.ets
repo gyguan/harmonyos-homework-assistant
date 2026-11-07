@@ -1,5 +1,5 @@
 import { VoiceMaterialAutoCreateService } from '../application/assignment/VoiceMaterialAutoCreateService';
-import { BackendAuthService } from '../application/remote/BackendAuthService';
+import { BackendAuthService, SessionState } from '../application/remote/BackendAuthService';
 import { BackendSession } from '../application/remote/BackendSession';
 import { FamilyCloudService } from '../application/remote/FamilyCloudService';
 import { ParentAccessRemoteApi } from '../application/remote/ParentAccessRemoteApi';
@@ -34,6 +34,7 @@ struct Index {
   @State private parentAccessCodeInput: string = '';
   @State private parentAccessMessage: string = '';
   private shellBackHandler: () => boolean = () => false;
+  private autoLoginInFlight: boolean = false;
 
   private parentAccessController: CustomDialogController = new CustomDialogController({
     builder: ParentAccessDialog({
@@ -52,9 +53,24 @@ struct Index {
     if (BackendSession.instance.isConnected()) {
       void this.restoreCloud();
     } else if (!shareImportActive) {
-      this.showCloudConnectionReminder = true;
+      // 默认登录：先用内置家长账号静默连一次，成功就不再让家长手动输账号密码
+      void this.autoLogin();
     }
     this.applyShareImportParentRole();
+  }
+
+  private async autoLogin(): Promise<void> {
+    if (this.autoLoginInFlight) return;
+    this.autoLoginInFlight = true;
+    try {
+      await BackendAuthService.instance.loginWithDefaults(BackendSession.instance.getBaseUrl());
+      await this.restoreCloud();
+    } catch {
+      // 离线或服务器未启动时不阻塞本地使用，只保留连接提醒
+      this.showCloudConnectionReminder = true;
+    } finally {
+      this.autoLoginInFlight = false;
+    }
   }
 
   private openCloudConnectionPage(): void {
@@ -96,10 +112,20 @@ struct Index {
   }
 
   private async restoreCloud(): Promise<void> {
-    let valid = await BackendAuthService.instance.validateSession();
-    if (!valid) {
-      this.cloudSessionInvalid = true;
-      this.showCloudConnectionReminder = true;
+    let state = await BackendAuthService.instance.sessionState();
+    if (state === SessionState.UNAUTHORIZED) {
+      // 令牌过期：用默认账号静默重登一次，不要求家长重新输密码
+      try {
+        await BackendAuthService.instance.loginWithDefaults(BackendSession.instance.getBaseUrl());
+        state = SessionState.OK;
+      } catch {
+        this.cloudSessionInvalid = true;
+        this.showCloudConnectionReminder = true;
+        return;
+      }
+    }
+    if (state === SessionState.UNREACHABLE) {
+      // 网络不可达时保留本地登录态，离线继续可用，不弹「请重新连接」
       return;
     }
     this.cloudSessionInvalid = false;

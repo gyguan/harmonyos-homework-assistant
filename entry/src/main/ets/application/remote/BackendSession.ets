@@ -14,7 +14,9 @@ export class BackendSession {
     this.storage = storage;
     let saved = await storage.load();
     if (saved === null) return;
-    this.baseUrl = this.normalize(saved.baseUrl);
+    // 保存的地址可能是空串（旧版本清空过），空值时保留 AppConfig 的内置默认地址，
+    // 否则默认登录会拿到空地址直接失败。
+    if (saved.baseUrl.trim().length > 0) this.baseUrl = this.normalize(saved.baseUrl);
     this.token = saved.token;
     this.displayName = saved.displayName;
   }
