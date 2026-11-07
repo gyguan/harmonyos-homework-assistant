@@ -42,13 +42,52 @@ interface MultipartSource {
 
 export class RemoteSubmissionApi {
   static readonly instance: RemoteSubmissionApi = new RemoteSubmissionApi();
+  private static readonly CACHE_PREFIX: string = 'submission-resource-';
   private context: common.UIAbilityContext | null = null;
+  /** resourceId → 本地文件 URI（原图） */
   private resourceCache: Map<string, string> = new Map<string, string>();
+  /** `${resourceId}#${width}` → 本地文件 URI（缩略图） */
+  private thumbnailCache: Map<string, string> = new Map<string, string>();
+  private pending: Map<string, Promise<string>> = new Map<string, Promise<string>>();
 
   private constructor() {}
 
   configure(context: common.UIAbilityContext): void {
     this.context = context;
+    this.registerDiskCache();
+  }
+
+  /**
+   * 冷启动时把 cacheDir 里已经下过的图片重新登记进内存索引。
+   *
+   * 这些文件本来就一直在，但以前只在内存 Map 里记着，App 一重启就全丢了，
+   * 于是每张 2~3MB 的原图都会被重新下一遍（3Mbps 出口，一张要 8 秒）。
+   */
+  private registerDiskCache(): void {
+    if (this.context === null) return;
+    let names: string[] = [];
+    try {
+      names = fileIo.listFileSync(this.context.cacheDir);
+    } catch {
+      return;
+    }
+    for (let name of names) {
+      if (name.indexOf(RemoteSubmissionApi.CACHE_PREFIX) !== 0) continue;
+      let rest = name.substring(RemoteSubmissionApi.CACHE_PREFIX.length);
+      let dot = rest.lastIndexOf('.');
+      if (dot <= 0) continue;
+      let base = rest.substring(0, dot);
+      let uri = fileUri.getUriFromPath(`${this.context.cacheDir}/${name}`);
+      let thumbAt = base.lastIndexOf('-w');
+      if (thumbAt > 0) {
+        let width = Number.parseInt(base.substring(thumbAt + 2), 10);
+        if (!Number.isNaN(width) && width > 0) {
+          this.thumbnailCache.set(`${base.substring(0, thumbAt)}#${width}`, uri);
+          continue;
+        }
+      }
+      this.resourceCache.set(base, uri);
+    }
   }
 
   async list(assignmentId: string): Promise<RemoteSubmission[]> {
@@ -81,15 +120,55 @@ export class RemoteSubmissionApi {
     return this.cachedResourceUri(resourceId);
   }
 
+  cachedThumbnailUri(resourceId: string, width: number): string {
+    let cached = this.thumbnailCache.get(`${resourceId}#${width}`);
+    return cached === undefined ? '' : cached;
+  }
+
   async downloadResource(resource: RemoteSubmissionResource): Promise<string> {
-    let cached = this.cachedResourceUri(resource.id);
-    if (cached.length > 0) return cached;
+    return await this.downloadInternal(resource, 0);
+  }
+
+  async downloadPhoto(resource: RemoteSubmissionResource): Promise<string> {
+    return await this.downloadInternal(resource, 0);
+  }
+
+  /**
+   * 列表/缩略图用的小图。
+   *
+   * 原图一张 2~3MB、服务器出口约 3Mbps，直接拿原图渲染 86vp 的小格子要等 8 秒；
+   * 服务端支持 `?w=` 现场生成缩略图（约 20KB），首屏能瞬间出图。
+   */
+  async downloadThumbnail(resource: RemoteSubmissionResource, width: number = 320): Promise<string> {
+    return await this.downloadInternal(resource, Math.max(1, Math.floor(width)));
+  }
+
+  private async downloadInternal(resource: RemoteSubmissionResource, width: number): Promise<string> {
+    let thumb = width > 0;
+    let key = thumb ? `${resource.id}#${width}` : resource.id;
+    let cached = thumb ? this.thumbnailCache.get(key) : this.resourceCache.get(key);
+    if (cached !== undefined && cached.length > 0) return cached;
+    let inFlight = this.pending.get(key);
+    if (inFlight !== undefined) return await inFlight;
+
+    let task = this.downloadUncached(resource, width);
+    this.pending.set(key, task);
+    try {
+      return await task;
+    } finally {
+      this.pending.delete(key);
+    }
+  }
+
+  private async downloadUncached(resource: RemoteSubmissionResource, width: number): Promise<string> {
     if (this.context === null || !BackendSession.instance.isConnected()) return '';
+    let thumb = width > 0;
 
     let client = http.createHttp();
     try {
-      let path = resource.downloadPath.length > 0 ?
+      let basePath = resource.downloadPath.length > 0 ?
         resource.downloadPath : `/api/v1/submission-resources/${encodeURIComponent(resource.id)}`;
+      let path = thumb ? `${basePath}?w=${width}` : basePath;
       let headers = BackendHttpClient.instance.traceHeaders(
         path, http.RequestMethod.GET, 'submission.resource.download');
       headers['Authorization'] = `Bearer ${BackendSession.instance.getToken()}`;
@@ -111,7 +190,10 @@ export class RemoteSubmissionApi {
 
       let data = response.result as ArrayBuffer;
       if (data.byteLength === 0) return '';
-      let cachePath = `${this.context.cacheDir}/submission-resource-${resource.id}.${this.extension(resource)}`;
+      // 缩略图服务端统一重编码为 JPEG；原图沿用资源本身的扩展名。
+      let extension = thumb ? 'jpg' : this.extension(resource);
+      let suffix = thumb ? `-w${width}` : '';
+      let cachePath = `${this.context.cacheDir}/${RemoteSubmissionApi.CACHE_PREFIX}${resource.id}${suffix}.${extension}`;
       let file = await fileIo.open(cachePath,
         fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
       try {
@@ -120,17 +202,17 @@ export class RemoteSubmissionApi {
         try { await fileIo.close(file); } catch {}
       }
       let uri = fileUri.getUriFromPath(cachePath);
-      this.resourceCache.set(resource.id, uri);
+      if (thumb) {
+        this.thumbnailCache.set(`${resource.id}#${width}`, uri);
+      } else {
+        this.resourceCache.set(resource.id, uri);
+      }
       return uri;
     } catch {
       return '';
     } finally {
       try { client.destroy(); } catch {}
     }
-  }
-
-  async downloadPhoto(resource: RemoteSubmissionResource): Promise<string> {
-    return await this.downloadResource(resource);
   }
 
   async uploadPhotos(

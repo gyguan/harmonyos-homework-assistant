@@ -263,6 +263,19 @@ export class RemoteAssignmentResourceApi {
   private async downloadUncached(resource: AssignmentResource): Promise<string> {
     if (this.context === null || !BackendSession.instance.isConnected()) return '';
 
+    // 先看上一次会话留在 cacheDir 里的文件：语音素材动辄几十 MB，
+    // 以前只在内存 Map 里记着，App 重启就全部重下。
+    let cachePath = `${this.context.cacheDir}/assignment-resource-${resource.id}.${this.extension(resource)}`;
+    if (this.reuseExisting(cachePath)) {
+      let existing = fileUri.getUriFromPath(cachePath);
+      this.invalidate(resource.id);
+      this.cache.set(resource.id, existing);
+      this.cachePaths.set(resource.id, cachePath);
+      this.cacheOrder.push(resource.id);
+      this.evictOverflowCache();
+      return existing;
+    }
+
     let client = http.createHttp();
     try {
       let path = resource.downloadPath.length > 0 ?
@@ -288,7 +301,6 @@ export class RemoteAssignmentResourceApi {
 
       let data = response.result as ArrayBuffer;
       if (data.byteLength === 0) return '';
-      let cachePath = `${this.context.cacheDir}/assignment-resource-${resource.id}.${this.extension(resource)}`;
       let file = await fileIo.open(cachePath,
         fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
       try {
@@ -307,6 +319,14 @@ export class RemoteAssignmentResourceApi {
       return '';
     } finally {
       try { client.destroy(); } catch {}
+    }
+  }
+
+  private reuseExisting(path: string): boolean {
+    try {
+      return fileIo.statSync(path).size > 0;
+    } catch {
+      return false;
     }
   }
 

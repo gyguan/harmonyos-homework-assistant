@@ -1,12 +1,16 @@
 package com.xiaoban.homework.assignment;
 
 import com.xiaoban.homework.auth.AuthInterceptor;
+import com.xiaoban.homework.storage.ImageThumbnailCache;
 import jakarta.validation.Valid;
 import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,10 +29,16 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/v1")
 public class AssignmentResourceController {
-  private final AssignmentResourceService service;
+  /** 作业附件可以被删除后重传，缓存别放太久。 */
+  private static final Duration RESOURCE_MAX_AGE = Duration.ofHours(12);
 
-  public AssignmentResourceController(AssignmentResourceService service) {
+  private final AssignmentResourceService service;
+  private final ImageThumbnailCache thumbnails;
+
+  public AssignmentResourceController(AssignmentResourceService service,
+      ImageThumbnailCache thumbnails) {
     this.service = service;
+    this.thumbnails = thumbnails;
   }
 
   @PostMapping(value = "/students/{studentId}/assignments/voice",
@@ -62,22 +73,30 @@ public class AssignmentResourceController {
     return service.list(familyId, assignmentId);
   }
 
+  /** @param width 可选，缩略图长边像素上限；列表/轮播只要小图，别拉原图。 */
   @GetMapping("/assignment-resources/{resourceId}")
   public ResponseEntity<Resource> download(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable UUID resourceId) throws MalformedURLException {
+      @PathVariable UUID resourceId,
+      @RequestParam(name = "w", required = false) Integer width) throws MalformedURLException {
     AssignmentResourceService.ResourceDownload file = service.download(familyId, resourceId);
-    Resource resource = new UrlResource(file.path().toUri());
+    Path thumbnail = width == null ? null : thumbnails.thumbnail(file.path(), width).orElse(null);
+    boolean thumb = thumbnail != null;
     MediaType type;
-    try {
-      type = MediaType.parseMediaType(file.contentType());
-    } catch (IllegalArgumentException error) {
-      type = MediaType.APPLICATION_OCTET_STREAM;
+    if (thumb) {
+      type = MediaType.IMAGE_JPEG;
+    } else {
+      try {
+        type = MediaType.parseMediaType(file.contentType());
+      } catch (IllegalArgumentException error) {
+        type = MediaType.APPLICATION_OCTET_STREAM;
+      }
     }
     return ResponseEntity.ok()
         .contentType(type)
         .header(HttpHeaders.CONTENT_DISPOSITION,
             ContentDisposition.inline().filename(file.originalName()).build().toString())
-        .body(resource);
+        .cacheControl(CacheControl.maxAge(RESOURCE_MAX_AGE).cachePrivate())
+        .body(new UrlResource((thumb ? thumbnail : file.path()).toUri()));
   }
 }

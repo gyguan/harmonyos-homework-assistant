@@ -35,10 +35,20 @@ const PHOTO_TRANSITION_MS: number = 220;
 export struct PhotoPreviewDialog {
   controller: CustomDialogController;
   @Link @Watch('onUriChanged') uri: string;
+  /**
+   * 可选：取原图的回调。网络图片先用缩略图把画面打开（几十毫秒），
+   * 原图下载完、且用户没有正在缩放/拖动时再无缝换上。本地图片不传即保持原行为。
+   */
+  loadFullImage: (() => Promise<string>) | null = null;
 
   @State private zoomScale: number = PHOTO_MIN_SCALE;
   @State private panX: number = 0;
   @State private panY: number = 0;
+  /** 当前实际渲染的图：可能还是缩略图，原图到货后在空闲时替换。 */
+  @State private displayUri: string = '';
+  /** 已下载好、等待空闲时替换上去的原图。 */
+  private pendingFullUri: string = '';
+  private disposed: boolean = false;
 
   // 当前手势类型：0=无 1=单指拖动 2=双指缩放
   private gestureMode: number = 0;
@@ -59,11 +69,40 @@ export struct PhotoPreviewDialog {
   private sourceHeight: number = 0;
 
   aboutToAppear(): void {
+    this.displayUri = this.uri;
     this.resetTransform();
+    void this.prefetchFullImage();
+  }
+
+  aboutToDisappear(): void {
+    this.disposed = true;
   }
 
   onUriChanged(): void {
+    this.displayUri = this.uri;
+    this.pendingFullUri = '';
     this.resetTransform();
+    void this.prefetchFullImage();
+  }
+
+  private async prefetchFullImage(): Promise<void> {
+    if (this.loadFullImage === null) return;
+    let full = await this.loadFullImage();
+    if (this.disposed || full.length === 0) return;
+    if (full === this.displayUri) return;
+    this.pendingFullUri = full;
+    this.swapToFullImageIfIdle();
+  }
+
+  /**
+   * 只有「静止且未放大」时才把缩略图换成原图：换图会让 Image 重新解码，
+   * 正在缩放时替换会打断手势，反而更糟。
+   */
+  private swapToFullImageIfIdle(): void {
+    if (this.disposed || this.pendingFullUri.length === 0) return;
+    if (this.displayUri === this.pendingFullUri) return;
+    if (this.gestureMode !== 0 || this.isZoomed()) return;
+    this.displayUri = this.pendingFullUri;
   }
 
   private resetTransform(): void {
@@ -135,7 +174,12 @@ export struct PhotoPreviewDialog {
 
   /** 只在双击、还原、松手回弹时用：带过渡，避免画面瞬间跳变。 */
   private animateTransform(action: () => void): void {
-    this.getUIContext().animateTo({ duration: PHOTO_TRANSITION_MS, curve: Curve.FastOutSlowIn }, action);
+    this.getUIContext().animateTo({
+      duration: PHOTO_TRANSITION_MS,
+      curve: Curve.FastOutSlowIn,
+      // 动画结束后再判断能不能换上原图（此时已经回到 1x，换图不会打断手势）
+      onFinish: () => this.swapToFullImageIfIdle()
+    }, action);
   }
 
   /** 单指起手容差：扣掉容差而不是直接丢弃，越过容差后位移仍然连续。 */
@@ -233,6 +277,8 @@ export struct PhotoPreviewDialog {
         this.zoomScale = target;
         this.clampPanToBounds();
       });
+    } else {
+      this.swapToFullImageIfIdle();
     }
   }
 
@@ -277,14 +323,14 @@ export struct PhotoPreviewDialog {
       .height(56)
       .padding({ left: 16, right: 8 });
 
-      if (this.uri.length > 0) {
+      if (this.displayUri.length > 0) {
         // 视口层：只负责裁剪、接收触摸、取尺寸。它自身永远不带 scale/translate，
         // 所以触摸点坐标与 viewWidth/viewHeight 始终是同一个（稳定）坐标系。
         Stack() {
           // 平移层：自身没有 scale，translate 就是真实屏幕 vp
           Stack() {
             // 缩放层
-            Image(this.uri)
+            Image(this.displayUri)
               .width('100%')
               .height('100%')
               .objectFit(ImageFit.Contain)
