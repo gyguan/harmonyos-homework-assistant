@@ -215,13 +215,23 @@ export class RemoteSubmissionApi {
     }
   }
 
+  /**
+   * 提交作业资源：照片（0-6 张）+ 可选录音。
+   *
+   * 普通作业也能交录音，所以照片允许为 0；照片和录音不能同时为空。
+   */
   async uploadPhotos(
     assignmentId: string,
     version: number,
-    sourceUris: string[]
+    sourceUris: string[],
+    audioUri: string = '',
+    audioDurationMs: number = 0
   ): Promise<RemoteSubmissionCreateResponse> {
-    if (sourceUris.length === 0 || sourceUris.length > 6) {
+    if (sourceUris.length > 6) {
       throw new Error('SUBMISSION_PHOTO_COUNT');
+    }
+    if (sourceUris.length === 0 && audioUri.length === 0) {
+      throw new Error('SUBMISSION_RESOURCE_MISSING');
     }
     let sources: MultipartSource[] = [];
     for (let i = 0; i < sourceUris.length; i++) {
@@ -232,7 +242,15 @@ export class RemoteSubmissionApi {
         contentType: this.imageContentType(sourceUris[i])
       });
     }
-    return await this.uploadMultipart(assignmentId, version, sources, 0);
+    if (audioUri.length > 0) {
+      sources.push({
+        fieldName: 'audio',
+        uri: audioUri,
+        fileName: 'student-submission.m4a',
+        contentType: 'audio/mp4'
+      });
+    }
+    return await this.uploadMultipart(assignmentId, version, sources, audioDurationMs);
   }
 
   async uploadAudio(
@@ -287,7 +305,8 @@ export class RemoteSubmissionApi {
             header: headers,
             extraData: payload.body,
             connectTimeout: 15000,
-            readTimeout: 90000
+            // 带录音的提交可能到十几 MB，按 3Mbps 上行要 30 秒以上，给小超时会被误判成失败。
+            readTimeout: payload.body.byteLength > 4 * 1024 * 1024 ? 240000 : 90000
           });
       } catch {
         throw new Error('SUBMISSION_NETWORK_ERROR');

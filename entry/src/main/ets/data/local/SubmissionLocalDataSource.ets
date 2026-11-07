@@ -5,6 +5,8 @@ export interface SubmissionLocalDataSource {
   listSubmissions(assignmentId: string): Submission[];
   submitImages(assignmentId: string, photoUris: string[], submittedAtText: string): boolean;
   submitAudio(assignmentId: string, audioUri: string, durationMs: number, submittedAtText: string): boolean;
+  submitMixed(assignmentId: string, photoUris: string[], audioUri: string, durationMs: number,
+    submittedAtText: string): boolean;
 }
 
 export class DefaultSubmissionLocalDataSource implements SubmissionLocalDataSource {
@@ -23,5 +25,10 @@ export class DefaultSubmissionLocalDataSource implements SubmissionLocalDataSour
 
   submitAudio(assignmentId: string, audioUri: string, durationMs: number, submittedAtText: string): boolean {
     return HomeworkStore.instance.submitAudio(assignmentId, audioUri, durationMs, submittedAtText);
+  }
+
+  submitMixed(assignmentId: string, photoUris: string[], audioUri: string, durationMs: number,
+    submittedAtText: string): boolean {
+    return HomeworkStore.instance.submitMixed(assignmentId, photoUris, audioUri, durationMs, submittedAtText);
   }
 }

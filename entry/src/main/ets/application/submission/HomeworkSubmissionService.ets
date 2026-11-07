@@ -198,9 +198,22 @@ export class HomeworkSubmissionService {
     return { passed: true, message: '' };
   }
 
-  async submit(assignmentId: string, photoUris: string[]): Promise<boolean> {
-    if (this.context === null || photoUris.length === 0 || photoUris.length > MAX_SUBMISSION_PHOTOS) {
+  /**
+   * 提交作业。
+   *
+   * @param photoUris 作业照片（0-6 张）
+   * @param audioUri  可选录音；普通作业可以只交录音，也可以照片+录音一起交
+   */
+  async submit(assignmentId: string, photoUris: string[], audioUri: string = '',
+    audioDurationMs: number = 0): Promise<boolean> {
+    let hasAudio = audioUri.length > 0;
+    if (this.context === null || photoUris.length > MAX_SUBMISSION_PHOTOS) {
       return false;
+    }
+    if (photoUris.length === 0 && !hasAudio) return false;
+    if (hasAudio) {
+      let audioCheck = await this.preflightAudio(audioUri, audioDurationMs);
+      if (!audioCheck.passed) return false;
     }
 
     let assignment = DefaultAssignmentRepository.instance.getCached(assignmentId);
@@ -217,7 +230,8 @@ export class HomeworkSubmissionService {
     // Seed/demo assignments deliberately remain local. Any published/synced assignment must
     // wait for the backend transaction before local state is allowed to become SUBMITTED.
     if (assignment.remoteVersion <= 0 && assignment.candidateId.length === 0) {
-      return this.local.submitImages(assignmentId, durableUris, this.nowText());
+      return this.local.submitMixed(
+        assignmentId, durableUris, audioUri, audioDurationMs, this.nowText());
     }
     if (assignment.remoteVersion <= 0) return false;
 
@@ -238,12 +252,13 @@ export class HomeworkSubmissionService {
 
     try {
       let result = await RemoteSubmissionApi.instance.uploadPhotos(
-        assignmentId, assignment.remoteVersion, uploadUris);
+        assignmentId, assignment.remoteVersion, uploadUris, audioUri, audioDurationMs);
 
       // Record the durable local photo copies only after the server accepted the submission.
       // This local transition is immediately replaced by the authoritative server snapshot.
-      this.local.submitImages(
-        assignmentId, durableUris, this.submittedAtText(result.submission.submittedAt));
+      this.local.submitMixed(
+        assignmentId, durableUris, audioUri, audioDurationMs,
+        this.submittedAtText(result.submission.submittedAt));
       let authoritative = RemoteAssignmentMapper.toLocal(result.assignment, assignment);
       DefaultAssignmentRepository.instance.applyAuthoritative(authoritative);
       return true;

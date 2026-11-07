@@ -540,6 +540,29 @@ export class HomeworkStore {
     return true;
   }
 
+  /**
+   * 普通作业的提交：照片和录音都可以有，两者至少一项。
+   * 语音作业仍然走 submitAudio（只交录音）。
+   */
+  submitMixed(assignmentId: string, photoUris: string[], audioUri: string, durationMs: number,
+    submittedAtText: string): boolean {
+    let hasAudio = audioUri.length > 0;
+    if (photoUris.length > 6) return false;
+    if (photoUris.length === 0 && !hasAudio) return false;
+    if (hasAudio && (durationMs < 3000 || durationMs > 10 * 60 * 1000)) return false;
+    if (!this.transitionAssignment(assignmentId, AssignmentStatus.SUBMITTED)) return false;
+    let label = photoUris.length === 0 ? '学生录音' :
+      (hasAudio ? `${photoUris.length} 张作业照片 + 录音` : `${photoUris.length} 张作业照片`);
+    let submission: Submission = { id: `submission-${this.submissionSequence}`, assignmentId: assignmentId,
+      type: photoUris.length === 0 ? SubmissionType.AUDIO : SubmissionType.IMAGE,
+      photoUris: photoUris.slice(), audioUri: hasAudio ? audioUri : '', durationMs: hasAudio ? durationMs : 0,
+      fileLabel: label, submittedAtText: submittedAtText };
+    this.submissionSequence++;
+    this.submissions.push(submission);
+    this.requestPersist();
+    return true;
+  }
+
   reviewAssignment(assignmentId: string, completed: boolean, note: string): boolean {
     let assignment = this.getAssignment(assignmentId);
     if (assignment === null || assignment.status !== AssignmentStatus.SUBMITTED) return false;

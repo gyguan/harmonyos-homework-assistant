@@ -111,6 +111,13 @@ export struct ParentReviewPane {
     return null;
   }
 
+  private hasEvidenceContent(): boolean {
+    let evidence = this.evidence();
+    if (evidence === null) return false;
+    return this.remoteAudioResource() !== null || this.remotePhotoResources().length > 0 ||
+      evidence.localAudioUri.length > 0 || evidence.localPhotoUris.length > 0;
+  }
+
   private openPreview(uri: string): void {
     if (uri.length === 0) return;
     this.previewUri = uri;
@@ -328,22 +335,26 @@ export struct ParentReviewPane {
       if (this.evidence() === null) {
         Text('暂未找到提交内容').width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
           .padding({ top: 12, bottom: 12 });
-      } else if (this.remoteAudioResource() !== null) {
-        SubmissionAudioEvidencePlayer({
-          resource: this.remoteAudioResource(),
-          fallbackDurationMs: this.remoteAudioResource()!.durationMs
-        });
-      } else if (this.evidence()!.localAudioUri.length > 0) {
-        SubmissionAudioEvidencePlayer({
-          localUri: this.evidence()!.localAudioUri,
-          fallbackDurationMs: this.evidence()!.localAudioDurationMs
-        });
-      } else if (this.remotePhotoResources().length > 0) {
-        CloudSubmissionPhotoStrip({ photos: this.remotePhotoResources() });
-      } else if (this.evidence()!.localPhotoUris.length > 0) {
-        this.LocalPhotos(this.evidence()!.localPhotoUris);
-      } else {
+      } else if (!this.hasEvidenceContent()) {
         Text('本次提交没有可展示的内容').width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+      } else {
+        // 普通作业也可以附录音，所以照片和录音要一起展示，不能再二选一。
+        if (this.remoteAudioResource() !== null) {
+          SubmissionAudioEvidencePlayer({
+            resource: this.remoteAudioResource(),
+            fallbackDurationMs: this.remoteAudioResource()!.durationMs
+          });
+        } else if (this.evidence()!.localAudioUri.length > 0) {
+          SubmissionAudioEvidencePlayer({
+            localUri: this.evidence()!.localAudioUri,
+            fallbackDurationMs: this.evidence()!.localAudioDurationMs
+          });
+        }
+        if (this.remotePhotoResources().length > 0) {
+          CloudSubmissionPhotoStrip({ photos: this.remotePhotoResources() });
+        } else if (this.evidence()!.localPhotoUris.length > 0) {
+          this.LocalPhotos(this.evidence()!.localPhotoUris);
+        }
       }
     }
     .width('100%')

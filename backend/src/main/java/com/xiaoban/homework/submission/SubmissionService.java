@@ -69,6 +69,7 @@ public class SubmissionService {
 
     List<MultipartFile> safePhotos = photoFiles == null ? Collections.emptyList() : photoFiles;
     boolean voiceAssignment = "AUDIO_IMAGE".equals(assignment.contentType);
+    boolean hasAudio = audio != null && !audio.isEmpty();
     if (voiceAssignment) {
       if (!safePhotos.isEmpty()) {
         throw new ApiExceptions.BadRequest("语音作业请提交学生录音，不需要提交照片");
@@ -78,13 +79,21 @@ public class SubmissionService {
         throw new ApiExceptions.BadRequest("录音时长需为 3 秒到 10 分钟");
       }
     } else {
-      if (audio != null && !audio.isEmpty()) {
-        throw new ApiExceptions.BadRequest("普通作业请提交照片");
+      // 普通作业以照片为主证据，但朗读、背诵、口头讲解这类作业用录音更合适，
+      // 所以照片和录音都允许：可以只交照片、只交录音，也可以两者一起交。
+      if (safePhotos.isEmpty() && !hasAudio) {
+        throw new ApiExceptions.BadRequest("请提交作业照片或录音");
       }
-      if (safePhotos.isEmpty() || safePhotos.size() > 6) {
+      if (safePhotos.size() > 6) {
         throw new ApiExceptions.BadRequest("作业照片数量必须为 1-6 张");
       }
       for (MultipartFile file : safePhotos) mediaPolicy.validateImage(file);
+      if (hasAudio) {
+        mediaPolicy.validateAudio(audio);
+        if (audioDurationMs < MIN_AUDIO_DURATION_MS || audioDurationMs > MAX_AUDIO_DURATION_MS) {
+          throw new ApiExceptions.BadRequest("录音时长需为 3 秒到 10 分钟");
+        }
+      }
     }
 
     Instant now = Instant.now();
@@ -111,6 +120,12 @@ public class SubmissionService {
         totalBytes += stored.sizeBytes;
         result.add(toDto(stored));
       }
+      if (hasAudio) {
+        SubmissionResourceEntity stored = saveResource(
+            submissionId, familyId, assignmentId, audio, "AUDIO", audioDurationMs, safePhotos.size(), now);
+        totalBytes += stored.sizeBytes;
+        result.add(toDto(stored));
+      }
     }
 
     assignment.status = "SUBMITTED";
@@ -126,7 +141,7 @@ public class SubmissionService {
         assignmentId,
         assignment.studentId,
         submissionId,
-        voiceAssignment ? "AUDIO" : "IMAGE",
+        voiceAssignment ? "AUDIO" : (hasAudio ? "IMAGE+AUDIO" : "IMAGE"),
         result.size(),
         totalBytes);
     return new SubmissionDtos.CreateResponse(created, authoritative);
