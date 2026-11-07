@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "notes": "All cases are illustrative drafts, NOT verified teacher-source gold. Replace anonymized samples and obtain parent review before setting reviewStatus=VERIFIED.",
+  "cases": [
+    {
+      "id": "cn-three-part-demo",
+      "reviewStatus": "DRAFT",
+      "teacherKey": "sample-chinese-teacher",
+      "sourceType": "TEXT",
+      "sourceText": "语文：①复习P28-38，完成周一练习 ②预习第8、10课 ③订正小白张",
+      "expected": [
+        {
+          "subject": "语文",
+          "keywords": [
+            "复习",
+            "P28-38"
+          ]
+        },
+        {
+          "subject": "语文",
+          "keywords": [
+            "预习",
+            "8",
+            "10"
+          ]
+        },
+        {
+          "subject": "语文",
+          "keywords": [
+            "订正",
+            "小白"
+          ]
+        }
+      ],
+      "notes": "Illustration only; number of homework items and interpretation require parent confirmation."
+    },
+    {
+      "id": "blackboard-multi-subject-demo",
+      "reviewStatus": "DRAFT",
+      "teacherKey": "sample-blackboard-teacher",
+      "sourceType": "IMAGE",
+      "sourceText": "作业公示栏：语文｜国13、久久积累｜15分；数学｜口算20题｜10分；英语｜听读U4、一起作业｜15分",
+      "expected": [
+        {
+          "subject": "语文",
+          "keywords": [
+            "国学",
+            "13"
+          ]
+        },
+        {
+          "subject": "语文",
+          "keywords": [
+            "久久积累"
+          ]
+        },
+        {
+          "subject": "数学",
+          "keywords": [
+            "口算",
+            "20"
+          ]
+        },
+        {
+          "subject": "英语",
+          "keywords": [
+            "听读",
+            "4"
+          ]
+        },
+        {
+          "subject": "英语",
+          "keywords": [
+            "一起作业"
+          ]
+        }
+      ],
+      "notes": "Needs actual photo, teacher attribution, and parent-verified task count."
+    },
+    {
+      "id": "english-joined-items-demo",
+      "reviewStatus": "DRAFT",
+      "teacherKey": "sample-english-teacher",
+      "sourceType": "TEXT",
+      "sourceText": "英语：1、听读课文U4/绘本，10分钟 2、一起作业。",
+      "expected": [
+        {
+          "subject": "英语",
+          "keywords": [
+            "听读",
+            "4"
+          ]
+        },
+        {
+          "subject": "英语",
+          "keywords": [
+            "一起作业"
+          ]
+        }
+      ],
+      "notes": "Verify whether picture book has already been scheduled separately; do not auto-merge different teachers."
+    },
+    {
+      "id": "date-not-page-demo",
+      "reviewStatus": "DRAFT",
+      "teacherKey": "sample-anonymous-teacher",
+      "sourceType": "IMAGE",
+      "sourceText": "黑板顶部10月19日，语文：读第13页；数学：口算15题",
+      "expected": [
+        {
+          "subject": "语文",
+          "keywords": [
+            "读",
+            "13"
+          ]
+        },
+        {
+          "subject": "数学",
+          "keywords": [
+            "口算",
+            "15"
+          ]
+        }
+      ],
+      "notes": "Illustrative screenshot content. TaskDate must be confirmed separately; evaluator currently scores item/subject/keyword only."
+    }
+  ]
+}

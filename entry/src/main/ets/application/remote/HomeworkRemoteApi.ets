@@ -41,6 +41,7 @@ interface BatchPublishItemBody {
 }
 interface BatchPublishBody {
   items: BatchPublishItemBody[];
+  batchId: string;
 }
 interface RemoteAssignmentPage {
   items: RemoteAssignment[];
@@ -139,13 +140,14 @@ export class HomeworkRemoteApi {
     return JSON.parse(response.body) as RemoteAssignment;
   }
 
-  async batchPublish(studentId: string, entries: BatchPublishEntry[]): Promise<RemoteBatchPublishResponse> {
+  async batchPublish(studentId: string, entries: BatchPublishEntry[],
+    batchId: string = ''): Promise<RemoteBatchPublishResponse> {
     let items: BatchPublishItemBody[] = [];
     for (let entry of entries) {
       items.push({ candidateId: entry.candidateId,
         assignment: this.createBody(entry.assignment, entry.sourceLabel, entry.sourceExcerpt) });
     }
-    let body: BatchPublishBody = { items: items };
+    let body: BatchPublishBody = { items: items, batchId: batchId };
     let response = await BackendHttpClient.instance.requestFor(
       'assignment.batchPublish',
       `/api/v1/students/${encodeURIComponent(studentId)}/assignments/batch`, http.RequestMethod.POST, body);

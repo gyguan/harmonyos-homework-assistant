@@ -35,7 +35,11 @@ public final class AssignmentDtos {
 
   public record BatchPublishItem(@NotBlank String candidateId, @Valid @NotNull Create assignment) {}
 
-  public record BatchPublishRequest(@NotNull @Size(min = 1, max = 50) List<@Valid BatchPublishItem> items) {}
+  public record BatchPublishRequest(
+      @NotNull @Size(min = 1, max = 50) List<@Valid BatchPublishItem> items,
+      @Size(max = 140) String batchId) {
+    public BatchPublishRequest(List<BatchPublishItem> items) { this(items, ""); }
+  }
 
   public record BatchPublishResult(String candidateId, Response assignment) {}
 

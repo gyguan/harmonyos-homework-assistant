@@ -92,7 +92,7 @@ export struct HomeworkImportPage {
       let result: HomeworkTextImportResult;
       if (this.inputMode === HomeworkAssignmentInputMode.IMAGE) {
         result = await this.viewModel.parseImage(
-          this.sourceImageRef, this.selectedSubject, this.sourceImageLabel, '');
+          this.sourceImageRef, this.selectedSubject, this.sourceImageLabel);
       } else {
         result = await this.viewModel.parseText(text, this.selectedSubject);
       }

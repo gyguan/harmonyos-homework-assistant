@@ -107,7 +107,7 @@ for status in [
     require(f"'{status}'" in migration, f"database status constraint missing {status}")
 
 require("createFingerprint" in assignment_entity and
-        "createFingerprint(studentId, input)" in assignment and
+        "createFingerprint(studentId, input, effectiveTaskDate)" in assignment and
         "创建内容与原请求不一致" in assignment,
         "assignment create retries must be protected by a stable creation fingerprint")
 require("create_fingerprint varchar(64)" in idempotency_migration,

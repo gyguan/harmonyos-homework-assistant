@@ -93,11 +93,13 @@ export interface RawHomeworkImport {
   sourceLabel: string;
   resourceUri: string;
   rawText: string;
+  teacherName?: string;
 }
 
 export interface SourceEvidence {
   sourceLabel: string;
   excerpt: string;
+  teacherName?: string;
   batchId?: string;
   sourceType?: string;
   sourceMessageIds?: string[];

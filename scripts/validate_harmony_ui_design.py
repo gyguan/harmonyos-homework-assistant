@@ -388,10 +388,17 @@ for card_path, card_source in [
             f"{card_path} must use the shared ordinary card surface")
 require("backgroundColor(AppTheme.PRIMARY_FAINT)" not in parent_dashboard,
         "Parent dashboard action cards must not use a different fill for 布置作业")
-require(parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT") == 4 and
-        parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_ICON_SIZE") >= 8 and
-        parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_CARD_PADDING") == 4,
-        "Parent dashboard action cards must share one size specification")
+parent_action_sections = [
+    between(parent_dashboard, "private CreateAssignmentAction()", "private CreateVoiceAction()"),
+    between(parent_dashboard, "private CreateVoiceAction()", "private ScheduledAssignmentAction()"),
+    between(parent_dashboard, "private ScheduledAssignmentAction()", "private AiPracticeAction()"),
+    between(parent_dashboard, "private AiPracticeAction()", "private PhoneHome()"),
+]
+require(all(".constraintSize({ minHeight: AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT })" in section and
+            section.count("AppTheme.PARENT_HOME_ACTION_ICON_SIZE") >= 2 and
+            ".padding(AppTheme.PARENT_HOME_ACTION_CARD_PADDING)" in section
+            for section in parent_action_sections),
+        "Parent dashboard's four action cards must share one size specification")
 require(parent_dashboard.count(".fontSize(AppTheme.CARD_TITLE_SIZE)") >= 4 and
         parent_dashboard.count(".lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)") >= 4 and
         parent_dashboard.count(".maxLines(AppTheme.CARD_TITLE_MAX_LINES)") >= 4 and
@@ -440,15 +447,20 @@ require("Text('作业内容')" in homework_import and
         "Text('科目（可选）')" in homework_import and
         "AppTheme.LABEL_TITLE_SIZE" in between(homework_import, "private SubjectOptions()", "private FeedbackBanner()"),
         "Homework import content must lead with a section heading and optional subject must use a subordinate form label")
-clear_text = between(homework_import, "private clearAssignmentText(): void", "private removeSourceImage(): void")
+# Current parent creation flow selects exactly one source, unlike the retired OCR
+# workflow which accepted image and text simultaneously.
+clear_text = between(homework_import, "private clearAssignmentText(): void", "private openImagePreview(")
 remove_image = between(homework_import, "private removeSourceImage(): void", "private SubjectSelector()")
-require(".accessibilityText('清空作业文字，保留图片')" in homework_import and
-        ".accessibilityText('移除作业图片，保留文字')" in homework_import and
+mode_change = between(homework_import, "private selectInputMode(", "private selectSubject(")
+require(".accessibilityText('清空作业文字')" in homework_import and
+        ".accessibilityText('移除作业图片')" in homework_import and
         "this.clearAssignmentText()" in homework_import and "this.removeSourceImage()" in homework_import and
         "this.textDraft = '';" in clear_text and "this.sourceImageRef = '';" not in clear_text and
         "this.sourceImageRef = '';" in remove_image and "this.sourceImageLabel = '';" in remove_image and
-        "this.textDraft = '';" not in remove_image,
-        "Homework import must independently clear text and image without erasing the other input")
+        "this.textDraft = '';" not in remove_image and
+        "this.sourceImageRef = '';" in mode_change and "this.textDraft = '';" in mode_change and
+        "private InputModeSelector()" in homework_import,
+        "Homework import source controls must clear only their own value while mode switching clears the inactive value")
 require("AppTheme.PHONE_PAGE_PADDING" not in homework_confirmation and
         "left: AppTheme.PAGE_PADDING" in homework_confirmation and
         "right: AppTheme.PAGE_PADDING" in homework_confirmation,

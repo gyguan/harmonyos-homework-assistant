@@ -201,9 +201,11 @@ require("createRequestId" in voice_page and "createFromFolder" in voice_vm,
         "server-folder creation must use an idempotent request id")
 require("queryFolders(" in voice_vm,
         "voice assignment ViewModel must use the reusable-folder query boundary")
-require("private generatedTitle(): string" in voice_page and " · 语音练习" in voice_page and
+require("private generatedTitle(): string" in voice_page and
+        "return `绘本-${folder.directoryName}`;" in voice_page and
+        "this.title = this.generatedTitle();" in voice_page and
         "this.title = item.directoryName" not in voice_page,
-        "folder reuse must auto-generate task naming independently from the folder name")
+        "folder reuse must use the current generated 绘本-目录 naming contract, never raw folder name")
 require("Select([" in voice_page and "subjectFromIndex" in voice_page and
         "syncGeneratedTaskCopy()" in voice_page,
         "voice assignment subject must use a single selector and regenerate task copy")
@@ -266,7 +268,7 @@ for token in [
     "carry over must keep the same Assignment instance",
     "carried task must be dated today",
     "carry over must not create a second voice task",
-    "carry over must regenerate the task name from the new business date",
+    "carry over must regenerate the canonical folder-based title",
     "carry over must not suffix the renamed task with a sequence number",
     "a carried over task must already consume the current business day quota",
     # 孩子已经交出去的（待提交/已提交）不再顺延。

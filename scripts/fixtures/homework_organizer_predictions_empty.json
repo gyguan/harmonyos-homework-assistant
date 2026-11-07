@@ -1,0 +1,5 @@
+{
+  "schemaVersion": 1,
+  "notes": "No real model output. A baseline cannot be computed until parent-verified samples and model predictions exist.",
+  "results": []
+}

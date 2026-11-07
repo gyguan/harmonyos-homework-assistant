@@ -21,9 +21,12 @@ function fixture(failure = '', code = 401, text = ' 数学作业 ') {
   };
   const pixelMap = { release: async () => step('pixel.release') };
   const imageSource = {
+    getImageInfo: async () => step('image.info', { size: { width: 4000, height: 3000 } }),
     createPixelMap: async options => {
       assert.equal(options?.desiredPixelFormat, 3, 'OCR must receive RGBA_8888');
       assert.equal(options?.desiredDynamicRange, 1, 'HDR photos must decode to SDR');
+      assert.equal(options?.desiredSize?.width, 2048, 'Large gallery images must be downscaled');
+      assert.equal(options?.desiredSize?.height, 1536, 'Image aspect ratio must be preserved');
       return step('decode', pixelMap);
     },
     release: async () => step('source.release')

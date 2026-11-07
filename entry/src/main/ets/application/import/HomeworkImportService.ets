@@ -46,6 +46,7 @@ export class HomeworkImportService {
   private async runSmart(input: RawHomeworkImport): Promise<HomeworkImportPipelineResult> {
     if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
     let extracted: ExtractedHomeworkText = await this.pipeline.extract(input);
+    extracted.teacherName = input.teacherName === undefined ? '' : input.teacherName;
     let remoteCandidates = await HomeworkOrganizerRemoteApi.instance.organize(extracted);
     if (remoteCandidates !== null) {
       return {
@@ -70,7 +71,7 @@ export class HomeworkImportService {
   }
 
   async parseText(text: string, subject: Subject | null = null, imageRef: string = '',
-    imageSourceLabel: string = ''): Promise<HomeworkTextImportResult> {
+    imageSourceLabel: string = '', teacherName: string = ''): Promise<HomeworkTextImportResult> {
     if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
     let normalized = text.trim();
     if (normalized.length === 0) return { candidateCount: 0, organizerMode: HomeworkOrganizerMode.LOCAL, aiFailed: false };
@@ -85,7 +86,8 @@ export class HomeworkImportService {
         (imageSourceLabel.trim().length > 0 ? imageSourceLabel.trim() : '相册作业截图') :
         '家长录入文字',
       resourceUri: fromScreenshot ? imageRef : '',
-      rawText: normalized
+      rawText: normalized,
+      teacherName: teacherName
     };
     let output: HomeworkImportPipelineResult = await this.runSmart(rawImport);
     let candidates = this.applySelectedSubject(output.candidates, subject);
@@ -103,7 +105,8 @@ export class HomeworkImportService {
   }
 
   async parseImage(imageRef: string, subject: Subject | null = null,
-    sourceLabel: string = '相册作业图片', text: string = ''): Promise<HomeworkTextImportResult> {
+    sourceLabel: string = '相册作业图片', text: string = '',
+    teacherName: string = ''): Promise<HomeworkTextImportResult> {
     let studentId = this.drafts.getActiveStudentId();
     if (imageRef.length === 0) throw new Error('请先拍照或选择图片');
     let rawImport: RawHomeworkImport = {
@@ -112,10 +115,12 @@ export class HomeworkImportService {
       sourceKind: HomeworkImportSourceKind.IMAGE,
       sourceLabel: sourceLabel,
       resourceUri: imageRef,
-      rawText: text.trim()
+      rawText: text.trim(),
+      teacherName: teacherName
     };
     let input: ExtractedHomeworkText = {
-      importId: rawImport.id, studentId: studentId, sourceLabel: sourceLabel, text: text.trim()
+      importId: rawImport.id, studentId: studentId, sourceLabel: sourceLabel, text: text.trim(),
+      teacherName: teacherName
     };
     let output = await HomeworkOrganizerRemoteApi.instance.organizeImage(input, imageRef);
     let candidates = this.applySelectedSubject(this.normalizeCandidateDates(output.candidates), subject);

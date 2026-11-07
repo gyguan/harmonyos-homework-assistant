@@ -45,9 +45,11 @@ require("TextInput" not in card and "maxLines(1)" in card,
 require("private BottomActionBar()" in page and "this.BottomActionBar();" in page and
         ".layoutWeight(1)" in page,
         "confirmation publish/batch actions must stay in a fixed bottom action bar")
-require(page.find("DeepPageHeader({") < page.find("Scroll() {") and
-        page.find("this.CandidateListHeader();") < page.find("Scroll() {") and
-        page.find("this.CandidateList();") > page.find("Scroll() {"),
+# Inspect the page's build method, not the earlier independent CoverageSheet popup scroll.
+page_layout = page.rsplit("\n  build() {", 1)[-1]
+require(page_layout.find("DeepPageHeader({") < page_layout.find("Scroll() {") and
+        page_layout.find("this.CandidateListHeader();") < page_layout.find("Scroll() {") and
+        page_layout.find("this.CandidateList();") > page_layout.find("Scroll() {"),
         "confirmation title and final-review header must stay fixed above the scrolling task list")
 candidate_editor = components.split("export struct ConfirmationCandidateEditor", 1)[1]
 candidate_actions = candidate_editor.split("private BottomActions()", 1)[1].split("build()", 1)[0]
@@ -111,9 +113,10 @@ require("this.manualCandidateDraft = null;" in page and
 require("createManualCandidateDraft(): CandidateAssignment" in confirmation_vm and
         "addCandidate(candidate: CandidateAssignment): boolean" in confirmation_vm,
         "confirmation ViewModel must separate draft creation from candidate persistence")
-require("onSave: (candidate: CandidateAssignment) => boolean" in components and
-        "if (!this.onSave(this.buildCandidate())) return;" in components,
-        "candidate editor must remain open if Save fails")
+require("onSave: (candidate: CandidateAssignment, attachments: PendingAssignmentAttachment[]) => boolean" in components and
+        "if (!this.onSave(this.buildCandidate(), this.attachmentDraft.slice())) return;" in components and
+        "this.onClose();" in candidate_editor.split("private saveAndClose(): void", 1)[-1].split("@Builder", 1)[0],
+        "candidate editor must remain open if Save fails, including attachment persistence")
 
 remove_candidate = page.split("private removeCandidate(candidateId: string): void", 1)[1].split(
     "private commitCandidateRemoval", 1)[0]
