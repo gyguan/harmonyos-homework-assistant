@@ -6,6 +6,12 @@ const PHOTO_DOUBLE_TAP_SCALE: number = 2.5;
 const PHOTO_SCALE_EPSILON: number = 0.001;
 // 双指灵敏度：手势累计倍率的增量乘这个系数，轻微捏合不会一上手就跳一大截
 const PHOTO_PINCH_GAIN: number = 0.9;
+// 双指缩放死区：两指间距变化在这个比例内一律不缩放。
+// 双指平移时两指间距必然有 ±2~4% 抖动，没有死区就会边拖边慢慢缩小。
+const PHOTO_PINCH_DEAD_ZONE: number = 0.05;
+// 单指拖动识别阈值，越小越跟手（旧值 10 起步有明显「拖不动」的迟滞）
+const PHOTO_PAN_DISTANCE: number = 1;
+const PHOTO_PINCH_DISTANCE: number = 8;
 // 松手时低于这个倍率吸附回 1x，避免停在 1.04 这种「半放大」的尴尬状态
 const PHOTO_SNAP_SCALE: number = 1.08;
 // 捏合超过上限时允许的视觉溢出比例，松手再动画收回上限（软限制，不是硬砍）
@@ -27,6 +33,11 @@ export struct PhotoPreviewDialog {
   private gestureStartScale: number = PHOTO_MIN_SCALE;
   private gestureStartPanX: number = 0;
   private gestureStartPanY: number = 0;
+  // 手势被识别那一刻事件里已有的累计量（distance 阈值吃掉的起步位移/倍率），
+  // 后面每帧减掉它，才能让图片从手指按下的位置开始跟手，而不是先跳一下。
+  private pinchStartFactor: number = 1;
+  private panStartOffsetX: number = 0;
+  private panStartOffsetY: number = 0;
   // 视口尺寸（vp）与图片原始尺寸（换算成 vp），用来算放大后能拖到多远
   private viewWidth: number = 0;
   private viewHeight: number = 0;
@@ -48,6 +59,9 @@ export struct PhotoPreviewDialog {
     this.gestureStartScale = PHOTO_MIN_SCALE;
     this.gestureStartPanX = 0;
     this.gestureStartPanY = 0;
+    this.pinchStartFactor = 1;
+    this.panStartOffsetX = 0;
+    this.panStartOffsetY = 0;
     this.sourceWidth = 0;
     this.sourceHeight = 0;
   }
@@ -116,13 +130,21 @@ export struct PhotoPreviewDialog {
     this.getUIContext().animateTo({ duration: PHOTO_TRANSITION_MS, curve: Curve.FastOutSlowIn }, action);
   }
 
-  private handlePinchStart(): void {
+  private handlePinchStart(event: GestureEvent): void {
     this.gestureStartScale = this.zoomScale;
+    // 手势识别时 event.scale 可能已经不是 1（PinchGesture 有 distance 阈值），
+    // 用它做起点，后续按相对比例算，起步就不会突然缩/放一下。
+    this.pinchStartFactor = (event && event.scale > 0) ? event.scale : 1;
   }
 
   private handlePinchUpdate(event: GestureEvent): void {
     if (!event || event.scale <= 0) return;
-    let gained = 1 + (event.scale - 1) * PHOTO_PINCH_GAIN;
+    let relative = event.scale / this.pinchStartFactor;
+    let delta = relative - 1;
+    // 死区：双指平移时两指间距的轻微抖动落在这里，图片不会跟着一缩一放
+    let magnitude = Math.abs(delta) - PHOTO_PINCH_DEAD_ZONE;
+    if (magnitude <= 0) return;
+    let gained = 1 + (delta > 0 ? magnitude : -magnitude) * PHOTO_PINCH_GAIN;
     let raw = this.gestureStartScale * gained;
     this.zoomScale = Math.max(PHOTO_MIN_SCALE, this.softUpperLimit(raw));
     // 缩放途中位移只做柔性收敛，别每帧硬砍（硬砍会顿挫）
@@ -143,20 +165,30 @@ export struct PhotoPreviewDialog {
     });
   }
 
-  private handlePanStart(): void {
+  private handlePanStart(event: GestureEvent): void {
     this.gestureStartPanX = this.panX;
     this.gestureStartPanY = this.panY;
+    this.panStartOffsetX = event ? event.offsetX : 0;
+    this.panStartOffsetY = event ? event.offsetY : 0;
   }
 
   private handlePanUpdate(event: GestureEvent): void {
     if (!this.isZoomed()) return;
-    this.panX = this.rubberBand(this.gestureStartPanX + event.offsetX, this.maxOffsetX(this.zoomScale));
-    this.panY = this.rubberBand(this.gestureStartPanY + event.offsetY, this.maxOffsetY(this.zoomScale));
+    // 双指落屏时交给 PinchGesture，别让两指的平均位移也来抢拖动（会和缩放互相拉扯）
+    if (event.fingerList !== undefined && event.fingerList.length > 1) return;
+    // 减掉手势识别前被 distance 阈值吃掉的位移，图片才从手指按下的位置开始跟手
+    let dx = event.offsetX - this.panStartOffsetX;
+    let dy = event.offsetY - this.panStartOffsetY;
+    this.panX = this.rubberBand(this.gestureStartPanX + dx, this.maxOffsetX(this.zoomScale));
+    this.panY = this.rubberBand(this.gestureStartPanY + dy, this.maxOffsetY(this.zoomScale));
   }
 
   private handlePanEnd(): void {
-    // 松手把越界部分弹回合法范围
-    this.animateTransform(() => this.clampPanToBounds());
+    // 只有真的越界才播回弹，范围内松手不该有附加动画（会显得拖不动、黏手）
+    if (Math.abs(this.panX) > this.maxOffsetX(this.zoomScale) ||
+      Math.abs(this.panY) > this.maxOffsetY(this.zoomScale)) {
+      this.animateTransform(() => this.clampPanToBounds());
+    }
   }
 
   private handleDoubleTap(): void {
@@ -219,13 +251,13 @@ export struct PhotoPreviewDialog {
             })
             .gesture(
               GestureGroup(GestureMode.Parallel,
-                PinchGesture({ fingers: 2, distance: 8 })
-                  .onActionStart(() => this.handlePinchStart())
+                PinchGesture({ fingers: 2, distance: PHOTO_PINCH_DISTANCE })
+                  .onActionStart((event: GestureEvent) => this.handlePinchStart(event))
                   .onActionUpdate((event: GestureEvent) => this.handlePinchUpdate(event))
                   .onActionEnd(() => this.handlePinchEnd())
                   .onActionCancel(() => this.handlePinchEnd()),
-                PanGesture({ fingers: 1, distance: 10 })
-                  .onActionStart(() => this.handlePanStart())
+                PanGesture({ fingers: 1, distance: PHOTO_PAN_DISTANCE })
+                  .onActionStart((event: GestureEvent) => this.handlePanStart(event))
                   .onActionUpdate((event: GestureEvent) => this.handlePanUpdate(event))
                   .onActionEnd(() => this.handlePanEnd())
                   .onActionCancel(() => this.handlePanEnd()),
