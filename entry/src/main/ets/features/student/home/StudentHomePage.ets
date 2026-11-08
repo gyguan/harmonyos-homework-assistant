@@ -1,6 +1,7 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { SubjectPalette } from '../../../common/theme/SubjectPalette';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
@@ -19,26 +20,6 @@ struct StudentPendingTaskCard {
   @Prop assignment: Assignment;
   @Prop busy: boolean = false;
   onAction: (assignmentId: string) => void = (_assignmentId: string) => {};
-
-  private subjectColor(): string {
-    if (this.assignment.subject === Subject.CHINESE) return AppTheme.DANGER;
-    if (this.assignment.subject === Subject.MATH) return AppTheme.PRIMARY;
-    if (this.assignment.subject === Subject.ENGLISH) return '#7A3EF0';
-    if (this.assignment.subject === Subject.SPORTS || this.assignment.subject === Subject.PRACTICE) {
-      return AppTheme.SUCCESS;
-    }
-    return AppTheme.WARNING;
-  }
-
-  private subjectBackground(): string {
-    if (this.assignment.subject === Subject.CHINESE) return AppTheme.DANGER_SOFT;
-    if (this.assignment.subject === Subject.MATH) return AppTheme.PRIMARY_SOFT;
-    if (this.assignment.subject === Subject.ENGLISH) return '#F1EBFF';
-    if (this.assignment.subject === Subject.SPORTS || this.assignment.subject === Subject.PRACTICE) {
-      return AppTheme.SUCCESS_SOFT;
-    }
-    return AppTheme.WARNING_SOFT;
-  }
 
   private statusLabel(): string {
     if (this.assignment.status === AssignmentStatus.IN_PROGRESS) return '正在做';
@@ -70,14 +51,14 @@ struct StudentPendingTaskCard {
   build() {
     Row({ space: 10 }) {
       CenteredTextBadge({
-        badgeText: this.assignment.subject.substring(0, 1),
+        badgeText: SubjectPalette.initial(this.assignment.subject),
         badgeWidth: 40,
         badgeHeight: 40,
         badgeFontSize: 16,
         badgeRadius: 12,
         badgeBold: true,
-        badgeForeground: this.subjectColor(),
-        badgeBackground: this.subjectBackground()
+        badgeForeground: SubjectPalette.accent(this.assignment.subject),
+        badgeBackground: SubjectPalette.soft(this.assignment.subject)
       });
 
       Column({ space: 5 }) {
@@ -468,6 +449,7 @@ export struct StudentHomePage {
       .alignItems(HorizontalAlign.Center)
       .onAreaChange((_oldValue, newValue) => {
         this.availableWidthVp = ResponsiveContext.areaLengthToVp(newValue.width, this.availableWidthVp);
+        console.info(`[UI-LAYOUT] student-home raw=${newValue.width}x${newValue.height} availableWidthVp=${this.availableWidthVp}`);
       });
     }
     .width('100%')

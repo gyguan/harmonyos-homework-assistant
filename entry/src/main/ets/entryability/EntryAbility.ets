@@ -98,7 +98,27 @@ export default class EntryAbility extends UIAbility {
     this.loadMainPage(windowStage);
   }
 
-  onWindowStageCreate(windowStage: window.WindowStage): void { void this.bootstrap(windowStage); }
+  onWindowStageCreate(windowStage: window.WindowStage): void {
+    void this.bootstrap(windowStage);
+    void this.watchWindowSize(windowStage);
+  }
+
+  /**
+   * Publish the real window width so AppShell can pick the right navigation skeleton.
+   * The shell's own onAreaChange under-reports on large screens, which kept Pad on the
+   * phone bottom-tab layout; windowSizeChange also covers rotation and split-screen.
+   */
+  private async watchWindowSize(windowStage: window.WindowStage): Promise<void> {
+    try {
+      const win = await windowStage.getMainWindow();
+      AppStorage.setOrCreate<number>('shellWindowWidthPx', win.getWindowProperties().windowRect.width);
+      win.on('windowSizeChange', (size: window.Size) => {
+        AppStorage.set<number>('shellWindowWidthPx', size.width);
+      });
+    } catch (error) {
+      console.error(`Window size watch failed: ${error}`);
+    }
+  }
 
   onForeground(): void {
     // 回到前台时重新取一次数。App 在后台挂很久再切回来，页面上还是上次打开时的

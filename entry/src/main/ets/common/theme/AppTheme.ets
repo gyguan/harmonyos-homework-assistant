@@ -23,6 +23,17 @@ export class AppTheme {
   static readonly DANGER_SOFT: string = '#FDECEF';
   static readonly DISABLED: string = '#7D818A';
 
+  // Subject accents. Children locate a task by subject faster than by title, so every list row,
+  // badge and section header shares this one mapping instead of defaulting to PRIMARY blue.
+  static readonly SUBJECT_CHINESE: string = '#C2504D';
+  static readonly SUBJECT_CHINESE_SOFT: string = '#FBEFEE';
+  static readonly SUBJECT_MATH: string = '#2E7DD1';
+  static readonly SUBJECT_MATH_SOFT: string = '#EAF3FC';
+  static readonly SUBJECT_ENGLISH: string = '#6B5BD2';
+  static readonly SUBJECT_ENGLISH_SOFT: string = '#F0EEFB';
+  static readonly SUBJECT_OTHER: string = '#5F6268';
+  static readonly SUBJECT_OTHER_SOFT: string = '#F0F1F4';
+
   // Shared layout scale. Feature pages should consume semantic tokens instead of device-specific values.
   static readonly PAGE_PADDING_COMPACT: number = 16;
   static readonly PAGE_PADDING_MEDIUM: number = 24;

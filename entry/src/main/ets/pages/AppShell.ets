@@ -1,3 +1,5 @@
+import { display } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import {
   AppRoute,
   AssignmentRouteParam,
@@ -86,6 +88,12 @@ export struct AppShell {
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private widthVp: number = 390;
   @State private heightVp: number = 844;
+  // Published by EntryAbility.watchWindowSize; more reliable than shell-local onAreaChange on Pad.
+  @StorageProp('shellWindowWidthPx') @Watch('onViewportSourcesChanged') shellWindowWidthPx: number = 0;
+  // The branch inside ShellContent must re-render when the class flips. A plain getter used here did
+  // not propagate on Pad (all inputs were correct yet the bottom tab kept rendering), so the resolved
+  // class is materialised into @State instead.
+  @State private shellSizeClass: WindowSizeClass = WindowSizeClass.COMPACT;
   @State private studentRoute: StudentRoute = StudentRoute.HOME;
   @State private parentRoute: ParentRoute = ParentRoute.DASHBOARD;
   @State private studentAttentionKind: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
@@ -159,11 +167,33 @@ export struct AppShell {
   });
 
   aboutToAppear(): void {
+    this.syncViewportFromDisplay();
+    this.onViewportSourcesChanged();
     DefaultAssignmentRepository.instance.setChangeListener(() => this.notifyUiChanged());
     this.syncFamilyContext();
     this.onRegisterBackHandler(() => this.handleSystemBack());
     void this.refreshActiveStudent();
     this.startPolling();
+  }
+
+  /**
+   * The shell's own onAreaChange only reports the placeholder width on large screens, which left Pad
+   * stuck on the phone skeleton (bottom tabs) and cost 68vp of vertical space on a 736vp-tall window.
+   * Seed the real viewport from the display before first layout; onAreaChange still corrects it later.
+   */
+  private syncViewportFromDisplay(): void {    try {
+      const screen = display.getDefaultDisplaySync();
+      const widthVp: number = this.getUIContext().px2vp(screen.width);
+      const heightVp: number = this.getUIContext().px2vp(screen.height);
+      if (Number.isFinite(widthVp) && widthVp > 0 && Number.isFinite(heightVp) && heightVp > 0) {
+        this.widthVp = widthVp;
+        this.heightVp = heightVp;
+      }
+      hilog.info(0x0000, 'UI-LAYOUT', `seed displayPx=${screen.width}x${screen.height} vp=${this.widthVp}x${this.heightVp}`);
+    } catch (error) {
+      // Fall back to onAreaChange; a wrong seed only affects the first frame.
+      hilog.warn(0x0000, 'UI-LAYOUT', `seed skipped: ${error}`);
+    }
   }
 
   aboutToDisappear(): void {
@@ -194,7 +224,24 @@ export struct AppShell {
   }
 
   private get sizeClass(): WindowSizeClass {
-    return ResponsiveContext.resolve(this.widthVp);
+    return this.shellSizeClass;
+  }
+
+  /** Best-effort viewport width: window broadcast first, then the measured vp from onAreaChange. */
+  private effectiveWidthVp(): number {
+    if (this.shellWindowWidthPx > 0) {
+      try {
+        const widthVp: number = this.getUIContext().px2vp(this.shellWindowWidthPx);
+        if (Number.isFinite(widthVp) && widthVp > 0) return widthVp;
+      } catch (error) {
+        // UI context not ready; fall back to the measured vp below.
+      }
+    }
+    return this.widthVp;
+  }
+
+  private onViewportSourcesChanged(): void {
+    this.shellSizeClass = ResponsiveContext.resolve(this.effectiveWidthVp());
   }
 
   private handleSystemBack(): boolean {
@@ -1004,10 +1051,13 @@ export struct AppShell {
         .padding(AppTheme.PAGE_PADDING)
         .justifyContent(FlexAlign.Center)
         .alignItems(HorizontalAlign.Center);
-      } else if (this.sizeClass === WindowSizeClass.EXPANDED) {
-        this.SideNavShell();
       } else {
-        this.BottomNavShell();
+        // Read the @State directly: @Builder conditionals did not re-evaluate through the getter.
+        if (this.shellSizeClass === WindowSizeClass.EXPANDED) {
+          this.SideNavShell();
+        } else {
+          this.BottomNavShell();
+        }
       }
     }
     .width('100%')
@@ -1017,6 +1067,7 @@ export struct AppShell {
     .onAreaChange((_oldValue, newValue) => {
       this.widthVp = ResponsiveContext.areaLengthToVp(newValue.width, this.widthVp);
       this.heightVp = ResponsiveContext.areaLengthToVp(newValue.height, this.heightVp);
+      this.onViewportSourcesChanged();
     });
   }
 

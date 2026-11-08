@@ -1,4 +1,5 @@
 import { AppTheme } from '../../common/theme/AppTheme';
+import { SubjectPalette } from '../../common/theme/SubjectPalette';
 import { Assignment, AssignmentStatus } from '../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../domain/service/AssignmentStateMachine';
 import { AssignmentTaskDate } from '../../domain/service/AssignmentTaskDate';
@@ -31,7 +32,7 @@ export struct AssignmentListItem {
   }
 
   private subjectInitial(): string {
-    return this.assignment.subject.length > 0 ? this.assignment.subject.substring(0, 1) : '作';
+    return SubjectPalette.initial(this.assignment.subject);
   }
 
   private timingText(): string {
@@ -82,8 +83,8 @@ export struct AssignmentListItem {
         .textAlign(TextAlign.Center)
         .fontSize(15)
         .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.PRIMARY)
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .fontColor(SubjectPalette.accent(this.assignment.subject))
+        .backgroundColor(SubjectPalette.soft(this.assignment.subject))
         .borderRadius(12);
     }
   }
