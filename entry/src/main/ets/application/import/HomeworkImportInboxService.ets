@@ -203,14 +203,22 @@ export class HomeworkImportInboxService {
     let abandoned = this.inbox.abandon(batchId);
     if (!abandoned) return false;
     if (active === batchId && batch !== null) {
-      let activeStudentId = this.drafts.getActiveStudentId();
-      if (batch.studentId === activeStudentId) this.drafts.clearCandidates();
+      this.drafts.clearCandidatesForStudent(batch.studentId, batchId);
     }
     return true;
   }
 
   getActiveBatchId(): string {
     return this.inbox.getActiveBatchId();
+  }
+
+  /** 只返回确实属于该学生的 active 批次；异步回调里用它做 student-scoped 决策。 */
+  getActiveBatchIdForStudent(studentId: string): string {
+    let batchId = this.inbox.getActiveBatchId();
+    if (batchId.length === 0 || studentId.length === 0) return '';
+    let batch = this.inbox.getBatch(batchId);
+    if (batch === null || batch.studentId !== studentId) return '';
+    return batchId;
   }
 
   markBatchPublished(batchId: string): void {

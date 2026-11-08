@@ -66,6 +66,42 @@ class ImageThumbnailCacheTest {
   }
 
   @Test
+  void clampSideOnlyProducesWhitelistedSizes() {
+    assertEquals(160, ImageThumbnailCache.clampSide(ImageThumbnailCache.MIN_SIDE));
+    assertEquals(320, ImageThumbnailCache.clampSide(200));
+    assertEquals(2048, ImageThumbnailCache.clampSide(ImageThumbnailCache.MAX_SIDE + 1));
+    for (int side : ImageThumbnailCache.ALLOWED_SIDES) {
+      assertEquals(side, ImageThumbnailCache.clampSide(side));
+    }
+  }
+
+  @Test
+  void arbitraryWidthsShareOneCachedFile(@TempDir Path dir) throws Exception {
+    Path source = writeJpeg(dir.resolve("photo.jpg"), 800, 600);
+
+    Path via200 = cache.thumbnail(source, 200).orElseThrow();
+    Path via320 = cache.thumbnail(source, 320).orElseThrow();
+
+    assertEquals(via200, via320);
+    assertTrue(via320.getFileName().toString().endsWith("-w320.jpg"));
+  }
+
+  @Test
+  void evictsOldestThumbnailWhenDirectoryExceedsBudget(@TempDir Path dir) throws Exception {
+    Path thumbs = Files.createDirectories(dir.resolve(".thumbs"));
+    Path oldest = Files.write(thumbs.resolve("old-w320.jpg"), new byte[600]);
+    Path newest = Files.write(thumbs.resolve("new-w320.jpg"), new byte[600]);
+    Files.setLastModifiedTime(oldest, FileTime.from(Instant.now().minusSeconds(3600)));
+    Files.setLastModifiedTime(newest, FileTime.from(Instant.now()));
+
+    // 总量 1200 > 预算 1000，低水位 800：淘汰最旧的一个后剩 600，不必再删第二个。
+    ImageThumbnailCache.evictToBudget(thumbs, 1000);
+
+    assertFalse(Files.exists(oldest));
+    assertTrue(Files.exists(newest));
+  }
+
+  @Test
   void returnsEmptyForOutOfRangeSide(@TempDir Path dir) throws Exception {
     Path source = writeJpeg(dir.resolve("photo.jpg"), 400, 300);
 

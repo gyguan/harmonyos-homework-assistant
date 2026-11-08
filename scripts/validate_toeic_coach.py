@@ -540,10 +540,12 @@ def main() -> None:
     require("private static syncInFlight:" in view_model and
             "lastSuccessfulSyncAtMs" in view_model and
             "return localChanged;" in view_model and
-            "if (!changed) return;" in ui and
+            "private disposed:boolean=false;" in ui and
+            "if (!changed || this.disposed) return;" in ui and
+            "this.disposed=true;" in ui and
             "local.streak===incoming.streak" in progress_store and
             "if (changed) await this.save();" in progress_store,
-            "TOEIC cloud recall sync must avoid redundant requests, writes and renders")
+            "TOEIC cloud recall sync must avoid redundant requests, writes and renders, and never write after the page is disposed")
     require("标记重点" not in ui and
             "取消重点" not in ui and
             "toggleVocabularyImportant" not in ui and

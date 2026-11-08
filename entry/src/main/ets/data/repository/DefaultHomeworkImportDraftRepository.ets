@@ -39,6 +39,17 @@ export class DefaultHomeworkImportDraftRepository implements HomeworkImportDraft
   // erase the batch candidate snapshot that provides audit/source traceability.
   clearCandidates(): void { this.local.replaceCandidates([]); }
 
+  clearCandidatesForStudent(studentId: string, batchId: string): void {
+    if (studentId.length === 0 || batchId.length === 0) return;
+    if (this.local.getActiveStudentId() !== studentId) return;
+    let inbox = DefaultHomeworkImportInboxRepository.instance;
+    let activeBatchId = inbox.getActiveBatchId();
+    if (activeBatchId !== batchId) return;
+    let batch = inbox.getBatch(batchId);
+    if (batch === null || batch.studentId !== studentId) return;
+    this.clearCandidates();
+  }
+
   private syncInboxCandidates(): void {
     let inbox = DefaultHomeworkImportInboxRepository.instance;
     let batchId = inbox.getActiveBatchId();

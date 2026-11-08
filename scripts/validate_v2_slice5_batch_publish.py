@@ -63,16 +63,20 @@ require("HomeworkImportDraftRepository" in client_service and "DefaultHomeworkIm
         "batch publish must access Candidate drafts through the draft repository boundary")
 require("HomeworkStore" not in client_service,
         "batch publish application service must not access HomeworkStore directly")
-require("this.drafts.clearCandidates()" in client_service,
-        "Candidate drafts may be cleared only through the repository after validated atomic success")
-if "this.drafts.clearCandidates()" in client_service and "if (!response.atomic" in client_service:
-    require(client_service.index("this.drafts.clearCandidates()") > client_service.index("if (!response.atomic"),
+require("this.drafts.clearCandidatesForStudent(studentId, batchId)" in client_service,
+        "Candidate drafts may be cleared only through the student-scoped repository after validated atomic success")
+if "this.drafts.clearCandidatesForStudent(studentId, batchId)" in client_service and "if (!response.atomic" in client_service:
+    require(client_service.index("this.drafts.clearCandidatesForStudent(studentId, batchId)") > client_service.index("if (!response.atomic"),
             "Candidate drafts must not be cleared before atomic response validation")
-require("clearCandidates(): void" in draft_port,
-        "draft repository port must expose explicit Candidate cleanup")
+require("clearCandidates(): void" in draft_port and
+        "clearCandidatesForStudent(studentId: string, batchId: string): void" in draft_port,
+        "draft repository port must expose explicit Candidate cleanup and a student-scoped variant")
 require("HomeworkStore" not in draft_repo and "HomeworkImportLocalDataSource" in draft_repo and
-        "clearCandidates(): void { this.local.replaceCandidates([]); }" in draft_repo,
-        "draft repository must isolate legacy Candidate cleanup behind HomeworkImportLocalDataSource")
+        "clearCandidates(): void { this.local.replaceCandidates([]); }" in draft_repo and
+        "clearCandidatesForStudent(studentId: string, batchId: string): void" in draft_repo and
+        "this.local.getActiveStudentId() !== studentId" in draft_repo and
+        "batch.studentId !== studentId" in draft_repo,
+        "draft repository must isolate legacy Candidate cleanup and verify student/batch scope before clearing")
 require("HomeworkStore.instance.replaceCandidates(candidates)" in draft_local,
         "legacy import local adapter must preserve Candidate persistence")
 

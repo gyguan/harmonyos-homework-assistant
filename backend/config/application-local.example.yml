@@ -39,8 +39,10 @@ app:
     chat-completions-path: /v1/chat/completions
 
     # Tutor and homework organizer may use different models on the same provider.
-    tutor-model: gpt-5.6-luna
-    organizer-model: gpt-5.6-luna
+    # 必须填当前 provider 真实存在的模型名：没有通用默认值，留空会禁用全部 AI 链路并打启动 WARN。
+    # 换成兼容厂商（如智谱）时同步改 base-url 与这里的模型名（例如 glm-5.2）。
+    tutor-model: gpt-4o-mini
+    organizer-model: gpt-4o-mini
     # Must support image input. Blank reuses organizer-model; same provider/base URL/key.
     image-organizer-model: ''
 

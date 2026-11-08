@@ -30,6 +30,15 @@ public class ApiExceptionHandler {
   @ExceptionHandler(ApiExceptions.BadRequest.class)
   ResponseEntity<Map<String, String>> badRequest(RuntimeException e) { return error(HttpStatus.BAD_REQUEST, e); }
 
+  /** 登录失败限流：4xx，不能记 ERROR 堆栈，也不能让客户端把它当服务故障无限重试。 */
+  @ExceptionHandler(ApiExceptions.TooManyRequests.class)
+  ResponseEntity<Map<String, String>> tooManyRequests(RuntimeException e) {
+    log.debug("api rate_limited exception={}", e.getClass().getSimpleName());
+    return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+        .header("Retry-After", "300")
+        .body(Map.of("message", e.getMessage()));
+  }
+
   @ExceptionHandler(ApiExceptions.ServiceUnavailable.class)
   ResponseEntity<Map<String, String>> serviceUnavailable(RuntimeException e) {
     log.warn("api service_unavailable exception={} message={}",

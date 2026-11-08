@@ -501,6 +501,38 @@ class VoiceMaterialAssignmentServiceTest {
 
 
   @Test
+  void deletedAssignmentWithSameRequestIdIsRecreated() {
+    UUID familyId = UUID.randomUUID();
+    UUID packageId = UUID.randomUUID();
+    VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "001-语文", "READY");
+    VoiceMaterialTaskLinkEntity stale = link(packageId, "a-voice-deleted", "student-1");
+    stale.requestId = "req-retry";
+    AssignmentDtos.Response created = response("a-voice-recreated", "语文 · 重新创建的语音作业");
+
+    when(packages.findOwnedStudentId(familyId, packageId)).thenReturn(Optional.of("student-1"));
+    when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
+    when(links.findByFamilyIdAndRequestId(familyId, "req-retry")).thenReturn(Optional.of(stale));
+    when(assignments.get(familyId, stale.assignmentId))
+        .thenThrow(new ApiExceptions.NotFound("作业不存在"));
+    when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
+        .thenReturn(created);
+    when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
+        familyId, packageId)).thenReturn(List.of());
+
+    VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
+        familyId, packageId,
+        new VoiceMaterialDtos.CreateAssignmentRequest(
+            "student-1", null, 15, "2026-09-28", "", "", "req-retry"));
+
+    assertTrue(result.created());
+    assertEquals(created.id(), result.assignmentId());
+    // 失效 link 必须先删且 flush，之后 saveAndFlush 才不会撞 requestId 唯一约束。
+    verify(links).delete(stale);
+    verify(links).flush();
+    verify(links).saveAndFlush(any(VoiceMaterialTaskLinkEntity.class));
+  }
+
+  @Test
   void manualCreationDefaultsMissingTaskDateToBusinessToday() {
     UUID familyId = UUID.randomUUID();
     UUID packageId = UUID.randomUUID();

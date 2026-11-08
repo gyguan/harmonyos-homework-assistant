@@ -37,6 +37,8 @@ export struct ToeicHomePage {
   @State private contentValidationReady:boolean=false;
   @State private contentValidationErrors:string[]=[];
   private contentValidationTimer:number=-1;
+  /** 组件销毁后作废在途的云端同步，防止它回来时写已销毁组件的 @State。 */
+  private disposed:boolean=false;
   private homeEnterAtMs:number=0;
   @State private pronunciationMessage:string='';
   @State private selectedStudyDay:number=0;
@@ -142,6 +144,7 @@ export struct ToeicHomePage {
   private currentOptionOrder:number[]=[0,1,2,3];
 
   aboutToAppear():void {
+    this.disposed=false;
     this.homeEnterAtMs=Date.now();
     let cached=this.viewModel.cachedErrors();
     if (cached===null) {
@@ -193,7 +196,7 @@ export struct ToeicHomePage {
     let changed=await this.viewModel.syncVocabularyRecalls();
     console.info('[TOEIC-PERF] vocabulary.sync costMs='+String(Date.now()-startedAtMs)+
       ' localChanged='+String(changed));
-    if (!changed) return;
+    if (!changed || this.disposed) return;
     this.loadProgressSnapshot();
     this.refreshVocabularyItems();
     this.loadStudyDay(this.selectedStudyDay);
@@ -201,6 +204,7 @@ export struct ToeicHomePage {
   }
 
   aboutToDisappear():void {
+    this.disposed=true;
     if (this.contentValidationTimer>=0) {
       clearTimeout(this.contentValidationTimer);
       this.contentValidationTimer=-1;

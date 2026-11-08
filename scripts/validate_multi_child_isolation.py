@@ -107,10 +107,11 @@ require("this.activeStudentId === student.id" in switcher and "当前孩子" in 
 require("remoteSummaryStudentId" in assignment_repository and
         "this.remoteSummaryStudentId === activeStudentId" in assignment_repository,
         "Today summary cache must be scoped to the active child")
-require("syncStudentAssignments(studentId: string)" in assignment_repository and
+require("syncStudentAssignments(studentId: string, epoch: number)" in assignment_repository and
         "replaceAssignmentsForStudent(studentId, merged)" in assignment_repository and
-        "getAssignmentForStudent(studentId" in assignment_repository,
-        "assignment sync must retain the initiating child identity across awaits")
+        "getAssignmentForStudent(studentId" in assignment_repository and
+        "if (epoch !== this.refreshEpoch) return false;" in assignment_repository,
+        "assignment sync must retain the initiating child identity across awaits and discard stale snapshots")
 require("replaceAssignmentsForActiveStudent(merged)" not in assignment_repository,
         "async remote assignment sync must never write through active-child indirection")
 require("this.queryCache = [];" in assignment_repository and

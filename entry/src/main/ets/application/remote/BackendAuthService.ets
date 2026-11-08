@@ -10,7 +10,10 @@ interface SessionResult { displayName: string; }
 export enum SessionState {
   OK = 'OK',
   UNAUTHORIZED = 'UNAUTHORIZED',
-  UNREACHABLE = 'UNREACHABLE'
+  UNREACHABLE = 'UNREACHABLE',
+  // 服务返回了 200 但内容不是合法 JSON：多半是网关/错误页。既不能当成"网络不可达"
+  // 继续静默保留旧登录态，也不能当成 401 去无限重登。
+  INVALID_RESPONSE = 'INVALID_RESPONSE'
 }
 
 export class BackendAuthService {
@@ -62,7 +65,13 @@ export class BackendAuthService {
         'auth.session', '/api/v1/auth/session', http.RequestMethod.GET);
       if (response.statusCode === 401 || response.statusCode === 403) return SessionState.UNAUTHORIZED;
       if (response.statusCode < 200 || response.statusCode >= 300) return SessionState.UNREACHABLE;
-      let parsed: SessionResult = JSON.parse(response.body) as SessionResult;
+      let parsed: SessionResult;
+      try {
+        parsed = JSON.parse(response.body) as SessionResult;
+      } catch {
+        return SessionState.INVALID_RESPONSE;
+      }
+      if (typeof parsed.displayName !== 'string') return SessionState.INVALID_RESPONSE;
       BackendSession.instance.connect(BackendSession.instance.getBaseUrl(), BackendSession.instance.getToken(), parsed.displayName);
       return SessionState.OK;
     } catch {

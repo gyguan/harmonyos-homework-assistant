@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -177,10 +178,12 @@ require("PreferencesBackendSessionStorage" in session_storage and "initialize(st
         "HarmonyOS must restore its backend session from app-private storage")
 # 2026-11-07 产品决定：家庭自用单服务器，客户端内置唯一云端地址与默认家长账号，
 # 家长不再手工输入账号密码（原「不得内置明文地址」断言按此决定放宽）。
+# 校验脚本不再写死生产 IP / 口令字面值：只保证三个常量集中且非空，避免"为了过 Gate
+# 而不敢改密码"的反向锁定。凭据本身的安全治理见 backend/DEPLOY.md 三、网络与安全。
 require("AppConfig.BACKEND_BASE_URL" in backend_session and
-        "BACKEND_BASE_URL: string = 'http://192.144.143.141:8080'" in app_config and
-        "PARENT_LOGIN: string = 'parent'" in app_config and
-        "PARENT_PASSWORD: string = 'parent123'" in app_config,
+        re.search(r"BACKEND_BASE_URL:\s*string\s*=\s*'https?://[^']+'", app_config) is not None and
+        re.search(r"PARENT_LOGIN:\s*string\s*=\s*'[^']+'", app_config) is not None and
+        re.search(r"PARENT_PASSWORD:\s*string\s*=\s*'[^']+'", app_config) is not None,
         "HarmonyOS backend default and parent credential must stay centralized in AppConfig")
 require("loginWithDefaults" in index_page,
         "HarmonyOS must auto-login with the default parent account instead of asking for credentials")

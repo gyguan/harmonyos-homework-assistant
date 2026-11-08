@@ -13,17 +13,23 @@ public class AuthService {
   private final AccountRepository accounts;
   private final PasswordEncoder passwordEncoder;
   private final AuthTokenService tokens;
+  private final LoginRateLimiter rateLimiter;
 
-  public AuthService(AccountRepository accounts, PasswordEncoder passwordEncoder, AuthTokenService tokens) {
+  public AuthService(AccountRepository accounts, PasswordEncoder passwordEncoder,
+      AuthTokenService tokens, LoginRateLimiter rateLimiter) {
     this.accounts = accounts; this.passwordEncoder = passwordEncoder; this.tokens = tokens;
+    this.rateLimiter = rateLimiter;
   }
 
   public LoginResponse login(LoginRequest request) {
+    rateLimiter.check(request.loginName());
     AccountEntity account = accounts.findByLoginName(request.loginName()).orElse(null);
     if (account == null || !passwordEncoder.matches(request.password(), account.passwordHash)) {
+      rateLimiter.recordFailure(request.loginName());
       log.warn("auth login_failed reason=INVALID_CREDENTIALS");
       throw new ApiExceptions.Unauthorized("账号或密码错误");
     }
+    rateLimiter.clear(request.loginName());
     String token = tokens.issue(account.id, account.familyId);
     log.info("auth login_success accountId={} familyId={}", account.id, account.familyId);
     return new LoginResponse(token, account.displayName, account.familyId.toString());

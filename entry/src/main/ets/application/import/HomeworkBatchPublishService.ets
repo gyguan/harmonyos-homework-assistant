@@ -56,6 +56,13 @@ export class HomeworkBatchPublishService {
       localByCandidateId.set(candidate.id, assignment);
     }
 
+    // CONTEXT.md 规则 17：判断"发布完成后要不要清草稿"所需的状态必须在 await 之前
+    // 按发起请求的 studentId 取快照。响应回来时家长可能已经切到另一个孩子，
+    // 那时再读当前 activeStudent / activeBatch 会清掉别人未发布的候选作业。
+    let inbox = HomeworkImportInboxService.instance;
+    let clearCurrentDraft = batchId.length > 0 &&
+      inbox.getActiveBatchIdForStudent(studentId) === batchId;
+
     let response: RemoteBatchPublishResponse = await HomeworkRemoteApi.instance.batchPublish(studentId, entries, batchId);
     if (!response.atomic || response.publishedCount !== candidates.length || response.results.length !== candidates.length) {
       throw new Error('云端未确认整批发布完成，请刷新后重试');
@@ -73,18 +80,11 @@ export class HomeworkBatchPublishService {
     }
     if (seen.size !== candidates.length) throw new Error('云端批量发布响应不完整');
 
-    let inbox = HomeworkImportInboxService.instance;
-    let clearCurrentDraft = false;
-    let activeStudentId = this.drafts.getActiveStudentId();
-    if (activeStudentId === studentId) {
-      let activeBatchId = inbox.getActiveBatchId();
-      if (activeBatchId === batchId) clearCurrentDraft = true;
-    }
     DefaultAssignmentRepository.instance.applyAuthoritativeBatch(mapped);
     inbox.markBatchPublished(batchId);
     // 纠错差异已在本次批量发布事务内持久排队，服务端自动重试。
     // 不再依赖客户端发布后的第二次请求。
-    if (clearCurrentDraft) this.drafts.clearCandidates();
+    if (clearCurrentDraft) this.drafts.clearCandidatesForStudent(studentId, batchId);
     return { publishedCount: mapped.length, assignments: mapped.slice() };
   }
 

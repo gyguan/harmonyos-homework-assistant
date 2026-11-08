@@ -251,6 +251,9 @@ public class PracticeAttemptService {
 
   private PracticeAttemptEntity newAttempt(UUID familyId, String studentId, String paperId,
       int paperVersion, String questionIdsJson, UUID sourceAttemptId, String mode) {
+    // start / repeat / wrongOnly 三个入口都在这里算 attemptNo = count + 1。并发时它们会读到
+    // 相同的 count 并写出重复编号；学生行锁把同一孩子的所有开练请求串行化，锁保持到事务提交。
+    students.requireOwnedForUpdate(familyId, studentId);
     PracticeAttemptEntity attempt = new PracticeAttemptEntity();
     attempt.id = UUID.randomUUID();
     attempt.familyId = familyId;
@@ -388,7 +391,11 @@ public class PracticeAttemptService {
   }
 
   private PracticeAttemptEntity requireEditable(UUID familyId, UUID attemptId) {
-    PracticeAttemptEntity attempt = requireOwned(familyId, attemptId);
+    // 见 PracticeAttemptRepository.lockByIdForUpdate：不加这把行锁，同题连点/多设备同时保存
+    // 会同时 INSERT 并撞唯一约束，客户端只看到 409。
+    PracticeAttemptEntity attempt = attempts.lockByIdForUpdate(attemptId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("练习实例不存在"));
+    if (!familyId.equals(attempt.familyId)) throw new ApiExceptions.NotFound("练习实例不存在");
     if (!"IN_PROGRESS".equals(attempt.status)) throw new ApiExceptions.Conflict("本次练习已经交卷");
     return attempt;
   }

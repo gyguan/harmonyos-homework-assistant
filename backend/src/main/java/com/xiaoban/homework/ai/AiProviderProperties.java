@@ -12,7 +12,12 @@ public class AiProviderProperties {
   private String baseUrl = "https://api.openai.com";
   private String responsesPath = "/v1/responses";
   private String chatCompletionsPath = "/v1/chat/completions";
-  private String tutorModel = "gpt-5.6-luna";
+  /**
+   * 没有安全的通用默认模型：不同厂商的模型名不通用，写死一个虚构名字只会让「只配了 key、
+   * 没配模型」的部署在运行时静默失败。留空时 available() 返回 false，各链路明确降级，
+   * 启动日志会 WARN 提示必须显式配置 AI_TUTOR_MODEL。
+   */
+  private String tutorModel = "";
   private String organizerModel = "";
   private String imageOrganizerModel = "";
   private String practiceModel = "";
@@ -47,7 +52,7 @@ public class AiProviderProperties {
   public String getChatCompletionsPath() { return chatCompletionsPath; }
   public void setChatCompletionsPath(String chatCompletionsPath) { this.chatCompletionsPath = path(chatCompletionsPath, "/v1/chat/completions"); }
   public String getTutorModel() { return tutorModel; }
-  public void setTutorModel(String tutorModel) { this.tutorModel = value(tutorModel, "gpt-5.6-luna"); }
+  public void setTutorModel(String tutorModel) { this.tutorModel = value(tutorModel, ""); }
   public String getOrganizerModel() { return blank(organizerModel) ? tutorModel : organizerModel; }
   public void setOrganizerModel(String organizerModel) {
     this.organizerModel = organizerModel == null ? "" : organizerModel.trim();

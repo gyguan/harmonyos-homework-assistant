@@ -9,7 +9,10 @@ import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -43,7 +46,17 @@ public class ImageThumbnailCache {
   /** 缩略图长边下限/上限，超出范围视为非法参数（直接回退原图）。 */
   public static final int MIN_SIDE = 32;
   public static final int MAX_SIDE = 2048;
+  /**
+   * 允许落盘的固定档位。请求任意 w 都吸附到最近的档，否则客户端只要循环 w=33,34,35...
+   * 就能让服务端为同一张照片生成上千个 JPEG，直接把磁盘写满。
+   */
+  public static final int[] ALLOWED_SIDES = {160, 320, 640, 1024, 1600, 2048};
   static final String THUMB_DIRECTORY = ".thumbs";
+  /** 单个 .thumbs 目录的软上限（达到后按最旧优先淘汰到 80%）。 */
+  static final long MAX_THUMB_DIRECTORY_BYTES = 256L * 1024 * 1024;
+  private static final int EVICT_EVERY_N_RENDERS = 16;
+  private static final java.util.concurrent.atomic.AtomicInteger RENDER_COUNT =
+      new java.util.concurrent.atomic.AtomicInteger();
   /** 单张图解码像素上限，超过就不做缩略图（防解码炸弹）。 */
   private static final long MAX_SOURCE_PIXELS = 120_000_000L;
   private static final float QUALITY = 0.8f;
@@ -58,8 +71,10 @@ public class ImageThumbnailCache {
   public Optional<Path> thumbnail(Path source, int maxSide) {
     if (maxSide < MIN_SIDE || maxSide > MAX_SIDE) return Optional.empty();
     if (source == null || !Files.isRegularFile(source)) return Optional.empty();
+    // 无论从 controller 还是内部调用，磁盘上只会出现固定档位的文件。
+    int side = clampSide(maxSide);
 
-    Path target = thumbnailPath(source, maxSide);
+    Path target = thumbnailPath(source, side);
     if (isFresh(target, source)) return Optional.of(target);
 
     String key = target.toAbsolutePath().toString();
@@ -79,7 +94,7 @@ public class ImageThumbnailCache {
       }
     }
     try {
-      Optional<Path> result = isFresh(target, source) ? Optional.of(target) : render(source, target, maxSide);
+      Optional<Path> result = isFresh(target, source) ? Optional.of(target) : render(source, target, side);
       mine.complete(result);
       return result;
     } catch (RuntimeException failure) {
@@ -93,14 +108,56 @@ public class ImageThumbnailCache {
   /**
    * 越界的 {@code w} 不该回退下发 3MB 原图（等于把出口带宽放大交给客户端决定），
    * 一律夹到合法档位；非法类型由 ApiExceptionHandler 统一映射为 400。
+   * 同时把任意整数收敛到 {@link #ALLOWED_SIDES}，保证磁盘上的派生文件数量有界。
    */
   public static int clampSide(int requested) {
-    return Math.max(MIN_SIDE, Math.min(MAX_SIDE, requested));
+    for (int side : ALLOWED_SIDES) {
+      if (side >= requested) return side;
+    }
+    return ALLOWED_SIDES[ALLOWED_SIDES.length - 1];
   }
 
   /** 缩略图固定为 JPEG，调用方据此设置 Content-Type。 */
   public static String contentType() {
     return "image/jpeg";
+  }
+
+  /**
+   * 每次生成都扫目录太贵，按生成次数节流；档位白名单已经让文件数天然有界，
+   * 这里只是防止长年累月的作业照片把 .thumbs 撑到几百 MB。
+   */
+  private static void maybeEvictOldThumbnails(Path directory) {
+    if (directory == null || RENDER_COUNT.incrementAndGet() % EVICT_EVERY_N_RENDERS != 0) return;
+    evictToBudget(directory, MAX_THUMB_DIRECTORY_BYTES);
+  }
+
+  /** 包可见：单测用小预算验证淘汰逻辑。只动 .thumbs 里的派生 JPEG，绝不碰源图。 */
+  static synchronized void evictToBudget(Path directory, long maxBytes) {
+    try (java.util.stream.Stream<Path> stream = Files.list(directory)) {
+      List<Path> files = stream.filter(Files::isRegularFile)
+          .filter(path -> path.getFileName().toString().endsWith(".jpg"))
+          .toList();
+      long total = 0;
+      for (Path file : files) total += Files.size(file);
+      if (total <= maxBytes) return;
+
+      long lowWater = maxBytes * 4 / 5;
+      List<Map.Entry<Path, Long>> byAge = new ArrayList<>();
+      for (Path file : files) {
+        byAge.add(Map.entry(file, Files.getLastModifiedTime(file).toMillis()));
+      }
+      byAge.sort(Comparator.comparingLong((Map.Entry<Path, Long> entry) -> entry.getValue()));
+      for (Map.Entry<Path, Long> entry : byAge) {
+        if (total <= lowWater) break;
+        long size = Files.size(entry.getKey());
+        if (Files.deleteIfExists(entry.getKey())) total -= size;
+      }
+      log.info("thumbnail cache evicted reason=DIRECTORY_BUDGET_EXCEEDED remainingBytes={}",
+          Math.max(0, total));
+    } catch (IOException failure) {
+      log.debug("thumbnail eviction skipped reason=IO_ERROR exceptionType={}",
+          failure.getClass().getSimpleName());
+    }
   }
 
   private Optional<Path> render(Path source, Path target, int maxSide) {
@@ -109,7 +166,9 @@ public class ImageThumbnailCache {
       decoded = readSubsampled(source, maxSide);
       if (decoded == null) return Optional.empty();
       BufferedImage scaled = scaleToMaxSide(decoded, maxSide);
-      return writeJpeg(scaled, target) ? Optional.of(target) : Optional.empty();
+      if (!writeJpeg(scaled, target)) return Optional.empty();
+      maybeEvictOldThumbnails(target.getParent());
+      return Optional.of(target);
     } catch (IOException | RuntimeException failure) {
       // 日志规范：不记录源文件/原始文件名，也不输出可能含路径的异常 message。
       log.debug("thumbnail generation skipped reason=DECODE_FAILED exceptionType={}",

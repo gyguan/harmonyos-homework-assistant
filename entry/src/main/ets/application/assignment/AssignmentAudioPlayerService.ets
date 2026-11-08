@@ -17,36 +17,52 @@ export class AssignmentAudioPlayerService {
   private player: media.AVPlayer | null = null;
   private sourceFile: fileIo.File | null = null;
   private callbacks: AssignmentAudioPlayerCallbacks | null = null;
+  /** 每次 prepare 自增：快速换源时旧请求的 catch 不能误释放新请求的 player。 */
+  private prepareSeq: number = 0;
 
   async prepare(sourceUri: string, callbacks: AssignmentAudioPlayerCallbacks): Promise<void> {
+    let seq = ++this.prepareSeq;
     await this.release();
+    // release() 期间又有一次 prepare 进来：本次已经过时，连 callbacks 都不要挂。
+    if (seq !== this.prepareSeq) return;
     this.callbacks = callbacks;
+    let player: media.AVPlayer | null = null;
+    let source: fileIo.File | null = null;
     try {
       if (canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
         if (canIUse('SystemCapability.Multimedia.Media.Core')) {
           // Runtime SysCap guards above are intentional; API 26 compiler cannot narrow canIUse() for MediaKit.
           // @SuppressWarnings syscap
-          let player = await media.createAVPlayer();
+          player = await media.createAVPlayer();
+          if (seq !== this.prepareSeq) {
+            await this.discardUnused(player, source);
+            return;
+          }
           this.player = player;
+          let owned = player;
           player.on('stateChange', (state: media.AVPlayerState) => {
-            if (this.player !== player) return;
+            if (this.player !== owned || seq !== this.prepareSeq) return;
             callbacks.onState(state);
             if (state === 'initialized') {
-              void player.prepare();
+              void owned.prepare();
             } else if (state === 'prepared') {
-              callbacks.onPrepared(player.duration > 0 ? player.duration : 0);
+              callbacks.onPrepared(owned.duration > 0 ? owned.duration : 0);
             } else if (state === 'completed') {
-              callbacks.onTime(player.duration > 0 ? player.duration : 0);
+              callbacks.onTime(owned.duration > 0 ? owned.duration : 0);
             }
           });
           player.on('timeUpdate', (timeMs: number) => {
-            if (this.player === player) callbacks.onTime(timeMs);
+            if (this.player === owned && seq === this.prepareSeq) callbacks.onTime(timeMs);
           });
           player.on('error', (error: BusinessError) => {
-            if (this.player === player) callbacks.onError(error.message);
+            if (this.player === owned && seq === this.prepareSeq) callbacks.onError(error.message);
           });
 
-          let source = await fileIo.open(sourceUri, fileIo.OpenMode.READ_ONLY);
+          source = await fileIo.open(sourceUri, fileIo.OpenMode.READ_ONLY);
+          if (seq !== this.prepareSeq) {
+            await this.discardUnused(player, source);
+            return;
+          }
           this.sourceFile = source;
           let descriptor: media.AVFileDescriptor = { fd: source.fd, offset: 0, length: -1 };
           player.fdSrc = descriptor;
@@ -54,12 +70,38 @@ export class AssignmentAudioPlayerService {
         }
       }
     } catch {
+      if (seq !== this.prepareSeq) {
+        // A 的失败只清理 A 自己创建的资源；绝不能调 release() 把 B 的 player 一起带走。
+        await this.discardUnused(player, source);
+        return;
+      }
       callbacks.onError('语音准备失败');
       await this.release();
       return;
     }
+    if (seq !== this.prepareSeq) return;
     callbacks.onError('当前设备不支持语音播放');
     this.callbacks = null;
+  }
+
+  /** 释放「还没挂到实例上」或已被更新请求取代的资源。 */
+  private async discardUnused(player: media.AVPlayer | null, source: fileIo.File | null): Promise<void> {
+    if (player !== null) {
+      if (this.player === player) this.player = null;
+      try {
+        if (player.state !== 'released') await player.release();
+      } catch {
+        // 更新的一次 prepare 可能已经释放过，重复释放忽略即可。
+      }
+    }
+    if (source !== null) {
+      if (this.sourceFile === source) this.sourceFile = null;
+      try {
+        await fileIo.close(source);
+      } catch {
+        // 同上，fd 可能已被关闭。
+      }
+    }
   }
 
   async play(): Promise<void> {

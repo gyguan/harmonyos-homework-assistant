@@ -187,8 +187,11 @@ def main() -> int:
             "optional Media.Core SeekMode must not leak into the AVPlayer seek path")
     require("当前设备不支持语音播放" in audio,
             "audio capability fallback must provide a user-facing error")
-    require("let player = await media.createAVPlayer();" in audio,
-            "AVPlayer must use the known-good static MediaKit creation path")
+    require("let player: media.AVPlayer | null = null;" in audio and
+            "player = await media.createAVPlayer();" in audio and
+            "private prepareSeq: number = 0;" in audio and
+            "await media.createAVPlayer()" in audio,
+            "AVPlayer must use the static MediaKit creation path and guard concurrent prepare with a sequence token")
     require("await import('@kit.MediaKit')" not in audio,
             "AVPlayer must not restore the runtime-regressing dynamic MediaKit import")
     require("let descriptor: media.AVFileDescriptor = { fd: source.fd, offset: 0, length: -1 };" in audio,

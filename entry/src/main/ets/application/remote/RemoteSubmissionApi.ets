@@ -21,6 +21,9 @@ export interface RemoteSubmission {
   assignmentId: string;
   submittedAt: string;
   resources: RemoteSubmissionResource[];
+  // 服务端 legacy 照片路由仍在响应里回传这个数组。客户端只用 resources，
+  // 但显式声明它，避免前后端契约里长期存在一个"谁都没接"的空转字段。
+  photos?: RemoteSubmissionResource[];
 }
 
 export interface RemoteSubmissionCreateResponse {
@@ -40,6 +43,12 @@ interface MultipartSource {
   contentType: string;
 }
 
+/**
+ * 提交证据磁盘缓存的条目上限（原图 + 各档缩略图都算一条）。
+ * 只增不减会让几年的作业照片把 Pad 存储空间吃光；淘汰最旧条目时连数据和 .ok 一起删。
+ */
+const MAX_SUBMISSION_CACHE_ENTRIES: number = 240;
+
 export class RemoteSubmissionApi {
   static readonly instance: RemoteSubmissionApi = new RemoteSubmissionApi();
   private static readonly CACHE_PREFIX: string = 'submission-resource-';
@@ -49,6 +58,9 @@ export class RemoteSubmissionApi {
   /** `${resourceId}#${width}` → 本地文件 URI（缩略图） */
   private thumbnailCache: Map<string, string> = new Map<string, string>();
   private pending: Map<string, Promise<string>> = new Map<string, Promise<string>>();
+  /** LRU 顺序（最旧在前）与 key → 磁盘路径，用于淘汰时连文件一起删。 */
+  private cacheOrder: string[] = [];
+  private cachePaths: Map<string, string> = new Map<string, string>();
 
   private constructor() {}
 
@@ -92,11 +104,43 @@ export class RemoteSubmissionApi {
       if (thumbAt > 0) {
         let width = Number.parseInt(base.substring(thumbAt + 2), 10);
         if (!Number.isNaN(width) && width > 0) {
-          this.thumbnailCache.set(`${base.substring(0, thumbAt)}#${width}`, uri);
+          this.noteCacheEntry(`${base.substring(0, thumbAt)}#${width}`, fullPath, uri, true);
           continue;
         }
       }
-      this.resourceCache.set(base, uri);
+      this.noteCacheEntry(base, fullPath, uri, false);
+    }
+    this.evictOverflowCache();
+  }
+
+  /** 登记一条缓存：命中过的条目重新排到队尾，避免"常用图"被先淘汰。 */
+  private noteCacheEntry(key: string, path: string, uri: string, thumb: boolean): void {
+    let remaining: string[] = [];
+    for (let existing of this.cacheOrder) {
+      if (existing !== key) remaining.push(existing);
+    }
+    remaining.push(key);
+    this.cacheOrder = remaining;
+    this.cachePaths.set(key, path);
+    if (thumb) {
+      this.thumbnailCache.set(key, uri);
+    } else {
+      this.resourceCache.set(key, uri);
+    }
+  }
+
+  private evictOverflowCache(): void {
+    while (this.cacheOrder.length > MAX_SUBMISSION_CACHE_ENTRIES) {
+      let oldest = this.cacheOrder.shift();
+      if (oldest === undefined) break;
+      this.resourceCache.delete(oldest);
+      this.thumbnailCache.delete(oldest);
+      let path = this.cachePaths.get(oldest);
+      this.cachePaths.delete(oldest);
+      if (path !== undefined) {
+        try { fileIo.unlinkSync(path); } catch {}
+        try { fileIo.unlinkSync(`${path}.ok`); } catch {}
+      }
     }
   }
 
@@ -223,10 +267,11 @@ export class RemoteSubmissionApi {
       } catch {}
       let uri = fileUri.getUriFromPath(cachePath);
       if (thumb) {
-        this.thumbnailCache.set(`${resource.id}#${width}`, uri);
+        this.noteCacheEntry(`${resource.id}#${width}`, cachePath, uri, true);
       } else {
-        this.resourceCache.set(resource.id, uri);
+        this.noteCacheEntry(resource.id, cachePath, uri, false);
       }
+      this.evictOverflowCache();
       return uri;
     } catch {
       return '';

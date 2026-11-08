@@ -1,7 +1,7 @@
 # 服务端云端部署指南
 
 小伴作业后端 = 一个 Spring Boot 4.1 单体 + 一个 PostgreSQL 17，无 Redis / MQ / 网关。
-部署形态：Docker Compose 两个容器（`db` + `app`），数据落在两个 named volume 里。
+部署形态：Docker Compose 三个服务（`db` + `app` + `caddy`，其中 `caddy` 仅在配好已备案域名时启用），数据落在 named volume 里。当前生产实际只跑 `db` + `app` 两个容器，对外走明文 HTTP 8080（原因见第三节）。
 
 ## 一、前置要求
 
@@ -40,10 +40,10 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 # 4. 验证
 curl http://localhost:8080/api/v1/health
-docker compose -f docker-compose.prod.yml ps   # 两个容器都应为 healthy
+docker compose -f docker-compose.prod.yml ps   # app 与 db 应为 healthy（启用 caddy 时再多一个）
 ```
 
-首次启动时 Flyway 会自动执行 V1~V8 迁移建表，并按 `.env` 创建初始家长账号。
+首次启动时 Flyway 会自动执行全部迁移（当前到 V43）建表，并按 `.env` 创建初始家长账号。
 
 ## 三、网络与安全（重要）
 
@@ -85,16 +85,28 @@ docker compose -f docker-compose.prod.yml ps   # 两个容器都应为 healthy
    ```
 
    密码采用 BCrypt 编码（Spring Security `BCryptPasswordEncoder`），所以用 PostgreSQL 的 `pgcrypto` 生成同格式哈希。改完 `.env` 的 `BOOTSTRAP_PASSWORD` 也要同步改，防止将来重建数据库时再次 mismatch。
+
+   > ⚠️ **与客户端默认登录的耦合（2026-11-07 起）**：App 已改为免输账号密码，
+   > `entry/src/main/ets/common/config/AppConfig.ets` 内置了 `PARENT_LOGIN` / `PARENT_PASSWORD`，
+   > 必须与服务器 `.env` 的 `BOOTSTRAP_LOGIN` / `BOOTSTRAP_PASSWORD` 一致。
+   > **只改服务端密码会让所有已装机 App 的静默重登全部失败**，必须同步改 `AppConfig` 并重装 HAP。
+   > 服务端 `/api/v1/auth/login` 已有失败次数限流（5 次 / 5 分钟），客户端 401 重登失败后
+   > 退避 5 分钟，避免旧口令反复重试把账号锁死。
+   > 这是"家庭自用单服务器"的已知折中：仓库里不放 `.env`，但客户端常量是明文，
+   > **不要把它当作对外服务的安全边界**；若将来启用已备案域名，应改为首次启动配对码 +
+   > HTTPS + 加密存储，再删除这两个常量。
 4. 生产 compose 已默认 `HTTP_LOG_PAYLOADS=false`，业务报文不会写日志。
 
 ## 四、App 端连接
 
-App 不需要重新编译：家长端 → 设置 → **后端连接**页，填入后端地址和账号密码即可。
+App 采用**默认登录**：内置唯一云端地址与家长账号，启动后自动连接，家长不需要在设置页手工输入。
 
-- 当前云端地址：**`http://192.144.143.141:8080`**（已放行，可用）
-- 当前家长账号：**`parent`**（密码见服务器 `backend/.env`，不在仓库里）
-- 若将来域名完成 ICP 备案/换海外节点，可改用 `https://你的域名`；届时只需在 App 内设置页切换，无需重编
-  `AppConfig.BACKEND_BASE_URL` 里的局域网地址只是开发默认值，运行时会被设置页覆盖。
+- 唯一来源：`entry/src/main/ets/common/config/AppConfig.ets` 的
+  `BACKEND_BASE_URL` / `PARENT_LOGIN` / `PARENT_PASSWORD`（改这三个常量需要重新构建并安装 HAP）。
+- 当前生产地址 `http://192.144.143.141:8080`；HTTPS 域名在当前大陆节点上因 SNI 重置不可用，详见第三节。
+- 服务端 `.env` 的 `BOOTSTRAP_LOGIN` / `BOOTSTRAP_PASSWORD` 必须与上面一致；只改一边会导致 401 静默重登失败。
+- 设置页 → **后端连接**仍保留，用于排查连接状态、查看失败原因；不再承担首次配置账号密码的职责。
+- 若将来域名完成 ICP 备案/换海外节点，可改用 `https://你的域名`：需同步更新 `AppConfig` 与 compose 的 caddy 配置。
 
 连接失败时先看服务器日志：
 
@@ -374,7 +386,9 @@ AI_IMAGE_ORGANIZER_MODEL=glm-4.6v-flashx
 **20–31 秒**（`glm-4-flash`），而同样复杂的**图片**整理只用 **7 秒**（`glm-4.6v-flashx`）。
 
 **基准方法**：把线上提示词原样喂给各家模型，同一段 4 类混合作业文本、`max_tokens=1400`，各跑 2–4 次。
-脚本见 `build/bench_organizer.py`（从 Java 源码正则还原提示词，避免手抄走样）。
+脚本见本地 `build/bench_organizer.py`（从 Java 源码正则还原提示词，避免手抄走样）。
+⚠️ 本节与 §9.11 引用的 `build/*.py` 都是**一次性诊断工具，位于 gitignored 的 `build/` 目录、不随仓库分发**；
+新机器上没有这些文件，复现时按各节给出的用例与参数自行重建即可，不要按文档路径去找脚本。
 
 | 模型 | 均值延迟 | 可用性 | 输出 | 备注 |
 |---|---|---|---|---|

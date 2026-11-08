@@ -1,6 +1,7 @@
-# Next Session Handoff — 2026-09-20
+# Next Session Handoff — 2026-09-20（历史归档）
 
-> 先阅读根目录 `CONTEXT.md`。本文件记录最新已合入状态；不要根据旧会话重新创建已经完成的分支或补丁。
+> 先阅读根目录 `CONTEXT.md`。本文件是 2026-09-20 的历史交接快照，**不代表当前实现状态**；
+> 版本、模型、部署形态等以代码与 `backend/DEPLOY.md` 为准，不要根据旧会话重新创建已经完成的分支或补丁。
 
 ## 1. 当前仓库状态
 
@@ -25,13 +26,14 @@
 - edit/action/review/delete 不再使用 `remoteVersion/candidateId` 猜任务身份。
 - `ensureRemoteCurrent + reloadRemote` 统一真实云端任务 hydration。
 
-### Snapshot V8
+### Snapshot 版本（历史记录，当前为 V11）
 
-- Snapshot 当前 schema 为 **V8**。
-- 保留 V4→V5→V6→V7→V8 显式迁移链。
+- 本节写于 V8 时期；当前 `HOMEWORK_SNAPSHOT_SCHEMA_VERSION` 已是 **V11**
+  （`entry/src/main/ets/domain/service/HomeworkSnapshotMigrator.ets`），迁移链由该文件维护。
+- 保留 V4→V5→…→V11 显式迁移链。
 - 历史身份推断仅允许存在于 migration 边界。
 - V8 之后 `HomeworkStore` 直接保留显式 backing，不再“REMOTE 否则 LOCAL_SEED”。
-- V8 backing 缺失或非法时直接拒绝加载，不静默伪装成本地示例任务。
+- 任一版本 backing 缺失或非法时直接拒绝加载，不静默伪装成本地示例任务。
 
 ### 日期与查询统一
 

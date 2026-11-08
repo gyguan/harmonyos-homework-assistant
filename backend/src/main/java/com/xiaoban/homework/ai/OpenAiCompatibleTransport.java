@@ -56,7 +56,8 @@ public class OpenAiCompatibleTransport {
     requestFactory.setReadTimeout(java.time.Duration.ofSeconds(120));
     this.client = RestClient.builder()
         .baseUrl(properties.getBaseUrl())
-        .requestFactory(requestFactory)
+        // 上游异常大响应会在 body(String.class) 处把整个内容读进堆内存，必须限界。
+        .requestFactory(new SizeLimitingClientHttpRequestFactory(requestFactory))
         .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
         .build();
 
@@ -66,6 +67,11 @@ public class OpenAiCompatibleTransport {
         properties.getChatCompletionsPath(), properties.getTutorModel(), properties.getOrganizerModel(), properties.getImageOrganizerModel(),
         properties.getPracticeModel(), properties.isStructuredOutput(), properties.isLogPayloads(), keyConfigured(),
         properties.isAllowUnauthenticated());
+    // 没有显式模型名时不再拿占位名去请求上游：所有 AI 链路都会走「不可用」降级，
+    // 启动日志必须说清楚是配置缺失，否则排查时会以为是厂商故障。
+    if (properties.getTutorModel().isBlank()) {
+      log.warn("[AI] config tutorModel is empty; AI_TUTOR_MODEL must be set explicitly, all AI features are disabled");
+    }
   }
 
   public boolean available(String model) {

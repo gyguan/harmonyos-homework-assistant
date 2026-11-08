@@ -18,6 +18,10 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
   // 每次发起查询/刷新自增。并发的慢响应回来时若序号已过期就不再写缓存，
   // 否则先发的慢响应会盖掉后发的快响应结果，界面出现"闪回旧数据"。
   private queryEpoch: number = 0;
+  // 刷新代次 + 串行链：前台刷新与 30s 轮询并发时，先发的慢响应不能拿旧全量快照
+  // 覆盖后发的命令响应（applyAuthoritativeBatch）写进来的 authoritative 状态。
+  private refreshEpoch: number = 0;
+  private refreshChain: Promise<boolean> | null = null;
   // 离线改动与服务端版本冲突被覆盖的次数，供设置页提示用户核对。
   private syncConflictCount: number = 0;
   private readonly local: AssignmentLocalDataSource = DefaultAssignmentLocalDataSource.instance;
@@ -289,6 +293,8 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
 
   applyAuthoritativeBatch(updatedItems: Assignment[]): void {
     if (updatedItems.length === 0) return;
+    // 命令已带回权威状态：任何还在飞行的全量刷新都成了旧快照，写回时必须放弃。
+    this.refreshEpoch++;
     let activeChanged = false;
     for (let updated of updatedItems) {
       let assignments = this.local.listAssignmentsForStudent(updated.studentId);
@@ -311,6 +317,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
   }
 
   async refresh(): Promise<boolean> {
+    let epoch = ++this.refreshEpoch;
     // Capture identity before the first await. Async responses are always written back to the
     // student that started the request, never to whoever happens to be active when it returns.
     let studentId = this.local.getActiveStudentId();
@@ -320,10 +327,32 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     this.queryCacheStudentId = studentId;
     this.remoteSummary = null;
     this.remoteSummaryStudentId = '';
-    if (!BackendSession.instance.isConnected()) return false;
-    let synced = await this.syncStudentAssignments(studentId);
-    if (!synced) return false;
 
+    // 刷新串行执行：两个 refresh 同时拉全量时，不存在「旧响应后写」的窗口。
+    let previous = this.refreshChain;
+    if (previous !== null) {
+      try {
+        await previous;
+      } catch {
+        // 上一轮的失败不影响本轮重新拉一次。
+      }
+      // 排队期间又发起了更新的刷新，本轮已经过时，直接复用最新一轮的结果。
+      if (epoch !== this.refreshEpoch) return true;
+    }
+    let task = this.runRefresh(epoch, studentId);
+    this.refreshChain = task;
+    try {
+      return await task;
+    } finally {
+      if (this.refreshChain === task) this.refreshChain = null;
+    }
+  }
+
+  private async runRefresh(epoch: number, studentId: string): Promise<boolean> {
+    if (!BackendSession.instance.isConnected()) return false;
+    let synced = await this.syncStudentAssignments(studentId, epoch);
+    // 期间有权威写入/更新的刷新发起，本轮结果一律作废，绝不写回本地与 UI。
+    if (epoch !== this.refreshEpoch || !synced) return false;
     if (this.local.getActiveStudentId() !== studentId) return true;
     this.remoteSummary = this.local.getTodaySummary();
     this.remoteSummaryStudentId = studentId;
@@ -331,12 +360,13 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     return true;
   }
 
-  private async syncStudentAssignments(studentId: string): Promise<boolean> {
+  private async syncStudentAssignments(studentId: string, epoch: number): Promise<boolean> {
     if (!BackendSession.instance.isConnected()) return false;
     try {
       // Fetch the server snapshot exactly once. Mutating commands below already return the
       // authoritative Assignment, so there is no reason to GET the same list a second time.
       let remote = await HomeworkRemoteApi.instance.list(studentId);
+      if (epoch !== this.refreshEpoch) return false;
       let remoteById: Map<string, RemoteAssignment> = new Map<string, RemoteAssignment>();
       let remoteOrder: string[] = [];
       for (let item of remote) {
@@ -395,6 +425,8 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
         merged.push(RemoteAssignmentMapper.toLocal(
           item, this.local.getAssignmentForStudent(studentId, item.id)));
       }
+      // 写本地前的最后一道闸门：期间若有命令带回权威状态，旧快照绝不能落地。
+      if (epoch !== this.refreshEpoch) return false;
       this.local.replaceAssignmentsForStudent(studentId, merged);
       return true;
     } catch {

@@ -35,6 +35,8 @@ struct Index {
   @State private parentAccessMessage: string = '';
   private shellBackHandler: () => boolean = () => false;
   private autoLoginInFlight: boolean = false;
+  /** 401 重登失败后的退避截止时间戳，避免每 30s 轮询都拿旧口令重试把账号锁死。 */
+  private autoLoginRetryAfterEpochMs: number = 0;
 
   private parentAccessController: CustomDialogController = new CustomDialogController({
     builder: ParentAccessDialog({
@@ -115,14 +117,30 @@ struct Index {
     let state = await BackendAuthService.instance.sessionState();
     if (state === SessionState.UNAUTHORIZED) {
       // 令牌过期：用默认账号静默重登一次，不要求家长重新输密码
-      try {
-        await BackendAuthService.instance.loginWithDefaults(BackendSession.instance.getBaseUrl());
-        state = SessionState.OK;
-      } catch {
+      let now = Date.now();
+      if (now < this.autoLoginRetryAfterEpochMs) {
+        // 退避窗口内只提示，不再打登录接口（服务端有失败次数限流）。
         this.cloudSessionInvalid = true;
         this.showCloudConnectionReminder = true;
         return;
       }
+      try {
+        await BackendAuthService.instance.loginWithDefaults(BackendSession.instance.getBaseUrl());
+        this.autoLoginRetryAfterEpochMs = 0;
+        state = SessionState.OK;
+      } catch {
+        // 服务端改过默认口令时，旧口令会一直 401；5 分钟内只允许重试一次。
+        this.autoLoginRetryAfterEpochMs = now + 5 * 60 * 1000;
+        this.cloudSessionInvalid = true;
+        this.showCloudConnectionReminder = true;
+        return;
+      }
+    }
+    if (state === SessionState.INVALID_RESPONSE) {
+      // 200 但内容不是服务端的会话数据：保留离线可用的本地登录态，同时明确提示核对地址。
+      this.cloudSessionInvalid = true;
+      this.showCloudConnectionReminder = true;
+      return;
     }
     if (state === SessionState.UNREACHABLE) {
       // 网络不可达时保留本地登录态，离线继续可用，不弹「请重新连接」

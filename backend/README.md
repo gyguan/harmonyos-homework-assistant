@@ -96,7 +96,7 @@ python backend/scripts/e2e_smoke.py --token-file D:\temp\xiaoban-e2e-session.jso
 - `AUTH_TOKEN_TTL_HOURS`：登录会话有效期，默认 168 小时。随机 Bearer token 保存于 PostgreSQL，后端重启后仍有效。
 - `APP_STORAGE_ROOT`：作业照片目录，默认 `./data/uploads`。
 - `OPENAI_API_KEY`：可选。未配置时 Tutor 明确降级，作业主流程不受影响。
-- `OPENAI_MODEL`：Tutor 模型，默认 `gpt-5.6-luna`。
+- `OPENAI_MODEL` / `AI_TUTOR_MODEL`：Tutor 模型，**无默认值，必须显式填当前厂商真实存在的模型名**。留空时整理 / 讲解 / 出题 / 语音对齐全部走「AI 不可用」降级，启动日志会 WARN；不会再拿虚构占位名去请求上游。
 - `OPENAI_BASE_URL`：默认 `https://api.openai.com`。
 
 ## 数据与 API 边界

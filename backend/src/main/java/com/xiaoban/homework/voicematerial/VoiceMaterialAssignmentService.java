@@ -158,10 +158,19 @@ public class VoiceMaterialAssignmentService {
         }
         AssignmentDtos.Response existing = loadAssignmentIfPresent(
             familyId, previous.assignmentId);
-        log.info("voice_material manual_create_reused studentId={} packageId={} assignmentId={} requestIdPresent=true",
-            targetStudentId, packageId, previous.assignmentId);
-        return new VoiceMaterialDtos.CreateAssignmentResponse(
-            false, previous.assignmentId, existing);
+        if (existing != null) {
+          log.info("voice_material manual_create_reused studentId={} packageId={} assignmentId={} requestIdPresent=true",
+              targetStudentId, packageId, previous.assignmentId);
+          return new VoiceMaterialDtos.CreateAssignmentResponse(
+              false, previous.assignmentId, existing);
+        }
+        // 任务被删掉后 link 仍占着 requestId：旧实现会永远返回 assignment=null，
+        // 同一个请求重试多少次都建不出新任务。回收失效 link，让本次按正常流程重建。
+        // 必须先 flush 删除，否则下面的 saveAndFlush 会撞 requestId 唯一约束。
+        links.delete(previous);
+        links.flush();
+        log.info("voice_material manual_create_link_recycled studentId={} packageId={} requestIdPresent=true",
+            targetStudentId, packageId);
       }
     }
 

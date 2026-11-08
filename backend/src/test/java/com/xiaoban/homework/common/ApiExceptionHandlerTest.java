@@ -39,6 +39,14 @@ class ApiExceptionHandlerTest {
   }
 
   @Test
+  void rateLimitedLoginReturns429WithRetryAfter() {
+    ResponseEntity<Map<String, String>> response =
+        handler.tooManyRequests(new ApiExceptions.TooManyRequests("登录失败次数过多"));
+    assertEquals(HttpStatus.TOO_MANY_REQUESTS, response.getStatusCode());
+    assertEquals("300", response.getHeaders().getFirst("Retry-After"));
+  }
+
+  @Test
   void unexpectedFailureStillReturnsServerError() {
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR,
         handler.unexpected(new IllegalStateException("boom")).getStatusCode());

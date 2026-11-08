@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,9 +41,11 @@ harmony_workflow = read(".github/workflows/harmony-client-build.yml")
 
 # 2026-11-07 产品决定：家庭自用单服务器，客户端内置唯一云端地址，登录用默认家长账号。
 # 原「release 客户端不得内置明文后端地址」断言按此决定放宽为「地址与账号必须集中在 AppConfig」。
-require("BACKEND_BASE_URL: string = 'http://192.144.143.141:8080'" in app_config and
-        "PARENT_LOGIN: string = 'parent'" in app_config and
-        "PARENT_PASSWORD: string = 'parent123'" in app_config,
+# 只校验"三个常量集中在 AppConfig 且非空"，不把生产 IP / 口令写进断言：
+# 否则静态 Gate 会和凭据轮换互相锁死（改密码就必须改测试）。
+require(re.search(r"BACKEND_BASE_URL:\s*string\s*=\s*'https?://[^']+'", app_config) is not None and
+        re.search(r"PARENT_LOGIN:\s*string\s*=\s*'[^']+'", app_config) is not None and
+        re.search(r"PARENT_PASSWORD:\s*string\s*=\s*'[^']+'", app_config) is not None,
         "release client must keep its default backend address and parent credential in AppConfig")
 require("enabled: ${BOOTSTRAP_ENABLED:false}" in application_yml and
         "login-name: ${BOOTSTRAP_LOGIN:}" in application_yml and
