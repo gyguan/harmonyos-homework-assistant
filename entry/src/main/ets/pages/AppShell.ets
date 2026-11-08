@@ -55,6 +55,7 @@ import { PracticeHistoryPage } from '../features/student/practice/PracticeHistor
 import { PracticeAttemptPage } from '../features/student/practice/PracticeAttemptPage';
 import { PracticePaperDetailPage } from '../features/student/practice/PracticePaperDetailPage';
 import { PracticeResultPage } from '../features/student/practice/PracticeResultPage';
+import { VoiceFullscreenHub, VoiceFullscreenLayer } from '../features/student/study/VoiceFullscreenLayer';
 
 export enum AppRole {
   NONE = 'NONE',
@@ -245,6 +246,8 @@ export struct AppShell {
   }
 
   private handleSystemBack(): boolean {
+    // 全屏层挂在根 Stack，比导航栈更上层：返回键必须先退出全屏再处理路由。
+    if (VoiceFullscreenHub.instance.requestCloseIfOpen()) return true;
     if (this.navPathStack.size() > 0) {
       this.popBack();
       return true;
@@ -1072,12 +1075,20 @@ export struct AppShell {
   }
 
   build() {
-    Navigation(this.navPathStack) {
-      this.ShellContent();
+    // 语音作业全屏层挂在根 Stack（窗口级）：盖住侧边导航、NavDestination
+    // 标题栏和底部操作条，打开期间由层自身隐藏系统栏实现真全屏。
+    Stack({ alignContent: Alignment.TopStart }) {
+      Navigation(this.navPathStack) {
+        this.ShellContent();
+      }
+      .mode(NavigationMode.Stack)
+      .hideTitleBar(true)
+      .navDestination(this.AppNavDestination)
+      .width('100%')
+      .height('100%');
+
+      VoiceFullscreenLayer();
     }
-    .mode(NavigationMode.Stack)
-    .hideTitleBar(true)
-    .navDestination(this.AppNavDestination)
     .width('100%')
     .height('100%');
   }

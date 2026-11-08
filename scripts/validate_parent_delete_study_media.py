@@ -35,6 +35,7 @@ import_page = read("entry/src/main/ets/features/parent/import/HomeworkImportPage
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 voice = read("entry/src/main/ets/components/assignment/VoiceAssignmentPane.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
+fullscreen_layer = read("entry/src/main/ets/features/student/study/VoiceFullscreenLayer.ets")
 submission = read("entry/src/main/ets/application/submission/HomeworkSubmissionService.ets")
 module = read("entry/src/main/module.json5")
 workflow = read(".github/workflows/static-gate.yml")
@@ -105,7 +106,9 @@ require("Swiper()" in voice and (
         ".onChange((index: number) => { void this.showImage(index); })" in voice or
         ".onChange((index: number) => this.selectImage(index))" in voice),
         "inline assignment images must support swipe paging")
-require("Swiper()" in study and "this.voiceSelectImage(index)" in study,
+# 全屏层已上收到窗口级 VoiceFullscreenLayer，翻页与选择都经 hub 委托回仍然挂载的 pane。
+require("Swiper()" in fullscreen_layer and
+        "VoiceFullscreenHub.instance.selectImage(index)" in fullscreen_layer,
         "fullscreen assignment images must support swipe paging")
 
 # Homework submission supports both gallery and system camera without persistent CAMERA permission.

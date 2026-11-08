@@ -20,6 +20,7 @@ import { Assignment, AssignmentContentType, AssignmentStatus, Submission } from 
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
 import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { StudyWorkspaceViewModel } from './StudyWorkspaceViewModel';
+import { VoiceFullscreenHub, VoiceFullscreenMedia } from './VoiceFullscreenLayer';
 
 @Component
 export struct StudyWorkspacePage {
@@ -45,14 +46,8 @@ export struct StudyWorkspacePage {
   @State private submissionAudioCurrentMs: number = 0;
   @State private previewUri: string = '';
   @State private resumePhotoCount: number = 0;
-  @State private voiceFullscreenOpen: boolean = false;
-  @State private voiceImageUris: string[] = [];
-  @State private voiceImageIndex: number = 0;
-  @State private voicePlaying: boolean = false;
-  @State private voiceCurrentTimeMs: number = 0;
-  @State private voiceDurationMs: number = 0;
-  @State private voicePlaybackEnabled: boolean = false;
-  @State private voicePrepared: boolean = false;
+  /** 最近一次播放器媒体状态，供全屏请求时初始化窗口级 VoiceFullscreenLayer。 */
+  private voiceMedia: VoiceFullscreenMedia = new VoiceFullscreenMedia();
   onStoreChanged: () => void = () => {};
 
   private previewController: CustomDialogController = new CustomDialogController({
@@ -87,10 +82,17 @@ export struct StudyWorkspacePage {
   private voiceSelectImage: (index: number) => void = (_index: number) => {};
 
   aboutToAppear(): void {
+    VoiceFullscreenHub.instance.toggleAudio = () => this.voiceToggleAudio();
+    VoiceFullscreenHub.instance.seek = (value: number) => this.voiceSeek(value);
+    VoiceFullscreenHub.instance.previousImage = () => this.voicePreviousImage();
+    VoiceFullscreenHub.instance.nextImage = () => this.voiceNextImage();
+    VoiceFullscreenHub.instance.selectImage = (index: number) => this.voiceSelectImage(index);
     void this.syncSubmittedEvidence(false);
   }
 
   aboutToDisappear(): void {
+    VoiceFullscreenHub.instance.close();
+    VoiceFullscreenHub.instance.resetControls();
     this.evidenceSequence++;
     this.stopSubmissionRecordingTimer();
     void SubmissionAudioRecorderService.instance.release();
@@ -103,6 +105,8 @@ export struct StudyWorkspacePage {
 
   /** Pad 主从布局下页面实例会被复用，换作业时必须重置证据读取状态。 */
   private onAssignmentChanged(): void {
+    // 换作业时旧绘本的图片和进度全部作废，全屏层必须一并退出。
+    VoiceFullscreenHub.instance.close();
     this.evidenceSequence++;
     this.evidenceKey = '';
     this.evidenceLoading = false;
@@ -257,24 +261,16 @@ export struct StudyWorkspacePage {
     playbackEnabled: boolean,
     prepared: boolean
   ): void {
-    this.voiceImageUris = imageUris.slice();
-    this.voiceImageIndex = imageIndex;
-    this.voicePlaying = playing;
-    this.voiceCurrentTimeMs = currentTimeMs;
-    this.voiceDurationMs = durationMs;
-    this.voicePlaybackEnabled = playbackEnabled;
-    this.voicePrepared = prepared;
-  }
-
-  private closeVoiceFullscreen(): void {
-    this.voiceFullscreenOpen = false;
-  }
-
-  private formatVoiceTime(ms: number): string {
-    let totalSeconds = Math.max(0, Math.floor(ms / 1000));
-    let minutes = Math.floor(totalSeconds / 60);
-    let seconds = totalSeconds % 60;
-    return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    let media: VoiceFullscreenMedia = new VoiceFullscreenMedia();
+    media.imageUris = imageUris;
+    media.imageIndex = imageIndex;
+    media.playing = playing;
+    media.currentTimeMs = currentTimeMs;
+    media.durationMs = durationMs;
+    media.playbackEnabled = playbackEnabled;
+    media.prepared = prepared;
+    this.voiceMedia = media;
+    VoiceFullscreenHub.instance.update(media);
   }
 
   private assignment(): Assignment | null {
@@ -1083,8 +1079,8 @@ export struct StudyWorkspacePage {
       playbackEnabled: playbackEnabled,
       imageOnlyMode: imageOnlyMode,
       onPauseReady: (pause: () => void) => this.pauseEmbeddedMedia = pause,
-      onFullscreenRequest: () => this.voiceFullscreenOpen = true,
-      onFullscreenDismissed: () => this.voiceFullscreenOpen = false,
+      onFullscreenRequest: () => VoiceFullscreenHub.instance.open(this.voiceMedia),
+      onFullscreenDismissed: () => VoiceFullscreenHub.instance.close(),
       onMediaStateChanged: (
         imageUris: string[],
         imageIndex: number,
@@ -1319,188 +1315,6 @@ export struct StudyWorkspacePage {
   }
 
   @Builder
-  private VoiceFullscreenImage() {
-    Stack({ alignContent: Alignment.Center }) {
-      Swiper() {
-        ForEach(this.voiceImageUris, (uri: string, index: number) => {
-          Stack({ alignContent: Alignment.Center }) {
-            if (uri.length > 0) {
-              Image(uri)
-                .width('100%')
-                .height('100%')
-                .objectFit(ImageFit.Contain);
-            } else {
-              LoadingProgress()
-                .width(32)
-                .height(32)
-                .color(AppTheme.PRIMARY);
-            }
-          }
-          .width('100%')
-          .height('100%')
-          .backgroundColor('#111111');
-        }, (uri: string, index: number) => `${index}-${uri}`);
-      }
-      .width('100%')
-      .height('100%')
-      .index(this.voiceImageIndex)
-      .indicator(false)
-      .loop(true)
-      .onChange((index: number) => {
-        this.voiceImageIndex = index;
-        this.voiceSelectImage(index);
-      });
-
-      if (this.voiceImageUris.length > 1) {
-        Row() {
-          Button('←', { type: ButtonType.Circle })
-            .width(48)
-            .height(48)
-            .fontSize(22)
-            .fontWeight(FontWeight.Medium)
-            .backgroundColor('#E6FFFFFF')
-            .fontColor(AppTheme.TEXT)
-            .accessibilityText('上一张情景图片')
-            .onClick(() => this.voicePreviousImage());
-          Blank();
-          Button('→', { type: ButtonType.Circle })
-            .width(48)
-            .height(48)
-            .fontSize(22)
-            .fontWeight(FontWeight.Medium)
-            .backgroundColor('#E6FFFFFF')
-            .fontColor(AppTheme.TEXT)
-            .accessibilityText('下一张情景图片')
-            .onClick(() => this.voiceNextImage());
-        }
-        .width('100%')
-        .alignItems(VerticalAlign.Center)
-        .padding({ left: 12, right: 12 });
-      }
-    }
-    .width('100%')
-    .layoutWeight(1);
-  }
-
-  @Builder
-  private VoiceFullscreenThumbnails() {
-    if (this.voiceImageUris.length > 1) {
-      Scroll() {
-        Row({ space: 8 }) {
-          ForEach(this.voiceImageUris, (uri: string, index: number) => {
-            Stack({ alignContent: Alignment.Center }) {
-              if (uri.length > 0) {
-                Image(uri)
-                  .width(68)
-                  .height(56)
-                  .objectFit(ImageFit.Cover);
-              } else {
-                Text(`${index + 1}`)
-                  .fontSize(13)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor('#D8D8D8');
-              }
-            }
-            .width(68)
-            .height(56)
-            .border({
-              width: index === this.voiceImageIndex ? 2 : 1,
-              color: index === this.voiceImageIndex ? AppTheme.PRIMARY : '#666666'
-            })
-            .borderRadius(10)
-            .backgroundColor('#242424')
-            .accessibilityRole(AccessibilityRoleType.BUTTON)
-            .accessibilityText(`查看第 ${index + 1} 张情景图片`)
-            .onClick(() => this.voiceSelectImage(index));
-          }, (uri: string, index: number) => `${index}-${uri}`);
-        }
-      }
-      .width('100%')
-      .scrollable(ScrollDirection.Horizontal)
-      .scrollBar(BarState.Off);
-    }
-  }
-
-  @Builder
-  private VoiceFullscreenAudio() {
-    Row({ space: 12 }) {
-      Button(this.voicePlaying ? 'Ⅱ' : '▶', { type: ButtonType.Circle })
-        .width(52)
-        .height(52)
-        .fontSize(this.voicePlaying ? 19 : 17)
-        .enabled(this.voicePlaybackEnabled && this.voicePrepared)
-        .backgroundColor(this.voicePlaybackEnabled && this.voicePrepared ? AppTheme.PRIMARY : AppTheme.DISABLED)
-        .fontColor(AppTheme.TEXT_ON_PRIMARY)
-        .accessibilityText(this.voicePlaying ? '暂停语音' : '播放语音')
-        .onClick(() => this.voiceToggleAudio());
-
-      Column({ space: 2 }) {
-        Slider({
-          value: this.voiceCurrentTimeMs,
-          min: 0,
-          max: this.voiceDurationMs > 0 ? this.voiceDurationMs : 1,
-          step: 1000,
-          style: SliderStyle.InSet
-        })
-          .width('100%')
-          .selectedColor(AppTheme.PRIMARY)
-          .trackColor('#4A4A4A')
-          .enabled(this.voicePlaybackEnabled && this.voicePrepared)
-          .onChange((value: number, mode: SliderChangeMode) => {
-            this.voiceCurrentTimeMs = value;
-            if (mode === SliderChangeMode.End || mode === SliderChangeMode.Click) {
-              this.voiceSeek(value);
-            }
-          });
-
-        Row() {
-          Text(this.formatVoiceTime(this.voiceCurrentTimeMs)).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor('#D8D8D8');
-          Blank();
-          Text(this.formatVoiceTime(this.voiceDurationMs)).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor('#D8D8D8');
-        }
-        .width('100%');
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start);
-    }
-    .width('100%')
-    .padding({ top: 8, bottom: 4 });
-  }
-
-  @Builder
-  private VoiceFullscreenOverlay() {
-    Column({ space: 10 }) {
-      Row({ space: 12 }) {
-        Text(`${this.voiceImageIndex + 1} / ${this.voiceImageUris.length}`)
-          .fontSize(13)
-          .fontWeight(FontWeight.Medium)
-          .fontColor('#FFFFFF');
-        Blank();
-        Button('关闭', { type: ButtonType.Normal })
-          .width(72)
-          .height(40)
-          .fontSize(14)
-          .fontWeight(FontWeight.Medium)
-          .fontColor('#FFFFFF')
-          .backgroundColor('#3A3A3A')
-          .borderRadius(20)
-          .accessibilityText('退出全屏')
-          .onClick(() => this.closeVoiceFullscreen());
-      }
-      .width('100%')
-      .alignItems(VerticalAlign.Center);
-
-      this.VoiceFullscreenImage();
-      this.VoiceFullscreenThumbnails();
-      this.VoiceFullscreenAudio();
-    }
-    .width('100%')
-    .height('100%')
-    .padding({ left: 14, right: 14, top: 14, bottom: 14 })
-    .backgroundColor('#111111');
-  }
-
-  @Builder
   private UnifiedWorkspace() {
     Column({ space: 10 }) {
       Column() {
@@ -1520,12 +1334,10 @@ export struct StudyWorkspacePage {
   }
 
   build() {
-    Stack({ alignContent: Alignment.TopStart }) {
+    // 全屏查看已上收到 AppShell 根 Stack 的 VoiceFullscreenLayer（窗口级），
+    // 这里只负责普通工作区；页面内层级无法盖住侧边导航和标题栏。
+    Column() {
       this.UnifiedWorkspace();
-
-      if (this.voiceFullscreenOpen && this.voiceImageUris.length > 0) {
-        this.VoiceFullscreenOverlay();
-      }
     }
     .width('100%')
     .height('100%')
