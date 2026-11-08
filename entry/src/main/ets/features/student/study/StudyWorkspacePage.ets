@@ -1,10 +1,16 @@
 import { AssignmentAudioPlayerService } from '../../../application/assignment/AssignmentAudioPlayerService';
 import { HomeworkSubmissionService } from '../../../application/submission/HomeworkSubmissionService';
+import {
+  ParentSubmissionEvidence,
+  ParentSubmissionEvidenceService
+} from '../../../application/submission/ParentSubmissionEvidenceService';
 import { SubmissionAudioRecorderService } from '../../../application/submission/SubmissionAudioRecorderService';
+import { RemoteSubmissionResource } from '../../../application/remote/RemoteSubmissionApi';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
 import { AssignmentAttachmentViewer } from '../../../components/assignment/AssignmentAttachmentViewer';
 import { VoiceAssignmentPane } from '../../../components/assignment/VoiceAssignmentPane';
+import { CloudSubmissionPhotoStrip } from '../../../components/submission/CloudSubmissionPhotoStrip';
 import { PhotoPreviewDialog } from '../../../components/submission/PhotoPreviewDialog';
 import { SubmissionAudioEvidencePlayer } from '../../../components/submission/SubmissionAudioEvidencePlayer';
 import { SubmissionResumeConfirmDialog } from '../../../components/submission/SubmissionResumeConfirmDialog';
@@ -17,9 +23,11 @@ import { StudyWorkspaceViewModel } from './StudyWorkspaceViewModel';
 
 @Component
 export struct StudyWorkspacePage {
-  @Prop assignmentId: string = 'a-math-001';
-  @Prop revision: number = 0;
+  @Prop @Watch('onAssignmentChanged') assignmentId: string = 'a-math-001';
+  @Prop @Watch('onRevisionChanged') revision: number = 0;
   @State private actionRevision: number = 0;
+  @State private evidenceRevision: number = 0;
+  @State private evidenceLoading: boolean = false;
   @State private actionRunning: boolean = false;
   @State private actionMessage: string = '';
   @State private submissionPhotoUris: string[] = [];
@@ -69,6 +77,8 @@ export struct StudyWorkspacePage {
   private readonly submissionAudioPlayer: AssignmentAudioPlayerService =
     new AssignmentAudioPlayerService();
   private submissionRecordingTimer: number = -1;
+  private evidenceSequence: number = 0;
+  private evidenceKey: string = '';
   private pauseEmbeddedMedia: () => void = () => {};
   private voiceToggleAudio: () => void = () => {};
   private voiceSeek: (value: number) => void = (_value: number) => {};
@@ -76,10 +86,145 @@ export struct StudyWorkspacePage {
   private voiceNextImage: () => void = () => {};
   private voiceSelectImage: (index: number) => void = (_index: number) => {};
 
+  aboutToAppear(): void {
+    void this.syncSubmittedEvidence(false);
+  }
+
   aboutToDisappear(): void {
+    this.evidenceSequence++;
     this.stopSubmissionRecordingTimer();
     void SubmissionAudioRecorderService.instance.release();
     void this.submissionAudioPlayer.release();
+  }
+
+  private onRevisionChanged(): void {
+    void this.syncSubmittedEvidence(false);
+  }
+
+  /** Pad 主从布局下页面实例会被复用，换作业时必须重置证据读取状态。 */
+  private onAssignmentChanged(): void {
+    this.evidenceSequence++;
+    this.evidenceKey = '';
+    this.evidenceLoading = false;
+    void this.syncSubmittedEvidence(false);
+  }
+
+  /**
+   * 已提交 / 已完成作业的提交证据。
+   *
+   * 本机有这次提交的副本就直接读本地（原图、离线可用），只有本机完全没有记录时
+   * 才向云端要最新一次——换设备、重装、清过缓存都会落到后者。
+   */
+  private async syncSubmittedEvidence(force: boolean): Promise<void> {
+    let item = this.assignment();
+    if (item === null) return;
+    if (item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED) return;
+    let key = `${this.assignmentId}|${item.status}`;
+    if (!force && key === this.evidenceKey) return;
+    this.evidenceKey = key;
+    if (ParentSubmissionEvidenceService.instance.cachedPreferLocal(this.assignmentId) !== null) return;
+    let sequence = ++this.evidenceSequence;
+    this.evidenceLoading = true;
+    try {
+      await ParentSubmissionEvidenceService.instance.refreshLatest(this.assignmentId);
+    } finally {
+      if (sequence === this.evidenceSequence) {
+        this.evidenceLoading = false;
+        this.evidenceRevision++;
+      }
+    }
+  }
+
+  private evidence(): ParentSubmissionEvidence | null {
+    let currentRevision = this.evidenceRevision;
+    if (currentRevision < 0) return null;
+    return ParentSubmissionEvidenceService.instance.cachedPreferLocal(this.assignmentId);
+  }
+
+  private localEvidencePhotoUris(): string[] {
+    let evidence = this.evidence();
+    return evidence === null ? [] : evidence.localPhotoUris;
+  }
+
+  private localEvidenceAudioUri(): string {
+    let evidence = this.evidence();
+    return evidence === null ? '' : evidence.localAudioUri;
+  }
+
+  private localEvidenceAudioDurationMs(): number {
+    let evidence = this.evidence();
+    return evidence === null ? 0 : evidence.localAudioDurationMs;
+  }
+
+  private remoteEvidencePhotos(): RemoteSubmissionResource[] {
+    let evidence = this.evidence();
+    if (evidence === null) return [];
+    let result: RemoteSubmissionResource[] = [];
+    for (let resource of evidence.remoteResources) {
+      if (resource.resourceType === 'IMAGE') result.push(resource);
+    }
+    return result;
+  }
+
+  private remoteEvidenceAudio(): RemoteSubmissionResource | null {
+    let evidence = this.evidence();
+    if (evidence === null) return null;
+    for (let resource of evidence.remoteResources) {
+      if (resource.resourceType === 'AUDIO') return resource;
+    }
+    return null;
+  }
+
+  private hasSubmittedEvidence(): boolean {
+    let evidence = this.evidence();
+    if (evidence === null) return false;
+    return evidence.localPhotoUris.length > 0 || evidence.localAudioUri.length > 0 ||
+      evidence.remoteResources.length > 0;
+  }
+
+  private submissionMethodText(): string {
+    let evidence = this.evidence();
+    if (evidence === null) return '';
+    let photos = evidence.localPhotoUris.length;
+    let hasAudio = evidence.localAudioUri.length > 0;
+    for (let resource of evidence.remoteResources) {
+      if (resource.resourceType === 'IMAGE') {
+        photos++;
+      } else if (resource.resourceType === 'AUDIO') {
+        hasAudio = true;
+      }
+    }
+    if (photos === 0 && !hasAudio) return '';
+    if (photos === 0) return '录音';
+    return hasAudio ? `${photos} 张照片 + 录音` : `${photos} 张照片`;
+  }
+
+  private submittedAtText(): string {
+    let evidence = this.evidence();
+    if (evidence !== null) return evidence.submittedAtText;
+    let latest = this.latestSubmission();
+    return latest === null ? '' : latest.submittedAtText;
+  }
+
+  private submittedLineText(): string {
+    let at = this.submittedAtText();
+    if (at.length === 0) return '';
+    let method = this.submissionMethodText();
+    return method.length === 0 ? `提交于 ${at}` : `提交于 ${at} · ${method}`;
+  }
+
+  private actualMinutes(): number {
+    let item = this.assignment();
+    if (item === null || item.elapsedSeconds <= 0) return 0;
+    return Math.max(1, Math.round(item.elapsedSeconds / 60));
+  }
+
+  private expectedActualText(): string {
+    let item = this.assignment();
+    if (item === null) return '';
+    let expected = `预计 ${item.expectedMinutes} 分钟`;
+    let actual = this.actualMinutes();
+    return actual > 0 ? `${expected} · 实际 ${actual} 分钟` : expected;
   }
 
   private isVoiceSubmission(): boolean {
@@ -142,6 +287,12 @@ export struct StudyWorkspacePage {
     let currentRevision = this.revision + this.actionRevision;
     if (currentRevision < 0) return [];
     return HomeworkSubmissionService.instance.listCached(this.assignmentId);
+  }
+
+  /** 提交记录按写入顺序追加，最后一条才是最新一次（订正重交后会多于一条）。 */
+  private latestSubmission(): Submission | null {
+    let items = this.submissions();
+    return items.length === 0 ? null : items[items.length - 1];
   }
 
   private primaryActionLabel(): string {
@@ -744,31 +895,159 @@ export struct StudyWorkspacePage {
       this.PhotoSubmissionPane();
       this.ExtraRecordingPane();
     }
+  }
 
-    if (this.submissions().length > 0) {
-      Column({ space: 8 }) {
-        Text(`已提交 · ${this.submissions()[0].fileLabel}`)
+  /**
+   * 已提交 / 已完成作业的只读回看。
+   *
+   * 以前这里只剩一行「作业已提交」，作业要求、用时、交了什么都看不到——作业一交出去
+   * 就变成一条没有内容的历史记录。现在把要求原文、完成情况、提交证据和家长反馈补齐，
+   * 并允许在换设备/清缓存后从云端取回提交内容。
+   */
+  @Builder
+  private SubmittedRecordPane() {
+    Column({ space: 12 }) {
+      if (this.assignment()!.instruction.length > 0) {
+        Column({ space: 5 }) {
+          Text('作业要求')
+            .width('100%')
+            .fontSize(AppTheme.LABEL_TITLE_SIZE)
+            .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TERTIARY_TEXT);
+          Text(this.assignment()!.instruction)
+            .width('100%')
+            .fontSize(AppTheme.READING_BODY_SIZE)
+            .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
+            .fontColor(AppTheme.TEXT);
+          if (this.assignment()!.textbookRef.length > 0) {
+            Text(`教材 · ${this.assignment()!.textbookRef}`)
+              .width('100%')
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+              .fontColor(AppTheme.TERTIARY_TEXT);
+          }
+        }
+        .width('100%')
+        .alignItems(HorizontalAlign.Start)
+        .padding(AppTheme.CARD_PADDING_COMPACT)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
+      }
+
+      this.SubmittedMetaPane();
+      this.SubmittedEvidencePane();
+
+      if (this.assignment()!.status === AssignmentStatus.COMPLETED &&
+        this.assignment()!.reviewNote.length > 0) {
+        Column({ space: 5 }) {
+          Text('家长反馈')
+            .width('100%')
+            .fontSize(AppTheme.LABEL_TITLE_SIZE)
+            .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.SUCCESS);
+          Text(this.assignment()!.reviewNote)
+            .width('100%')
+            .fontSize(AppTheme.READING_BODY_SIZE)
+            .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
+            .fontColor(AppTheme.TEXT);
+        }
+        .width('100%')
+        .alignItems(HorizontalAlign.Start)
+        .padding(AppTheme.CARD_PADDING_COMPACT)
+        .backgroundColor(AppTheme.SUCCESS_SOFT)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
+      }
+    }
+    .width('100%')
+    .alignItems(HorizontalAlign.Start);
+  }
+
+  @Builder
+  private SubmittedMetaPane() {
+    Column({ space: 3 }) {
+      Text(this.expectedActualText())
+        .width('100%')
+        .fontSize(AppTheme.META_SIZE)
+        .lineHeight(AppTheme.META_LINE_HEIGHT)
+        .fontColor(AppTheme.SUBTEXT);
+      if (this.submittedAtText().length > 0) {
+        Text(this.submittedLineText())
           .width('100%')
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT);
+      }
+    }
+    .width('100%')
+    .alignItems(HorizontalAlign.Start);
+  }
+
+  @Builder
+  private SubmittedEvidencePane() {
+    Column({ space: 8 }) {
+      Row({ space: 8 }) {
+        Text('我的提交')
+          .layoutWeight(1)
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.SUCCESS);
-        if (this.submissions()[0].photoUris.length > 0) {
-          this.PhotoStrip(this.submissions()[0].photoUris, false);
-        }
-        if (this.submissions()[0].audioUri !== undefined && this.submissions()[0].audioUri!.length > 0) {
-          SubmissionAudioEvidencePlayer({
-            localUri: this.submissions()[0].audioUri!,
-            fallbackDurationMs: this.submissions()[0].durationMs === undefined ?
-              0 : this.submissions()[0].durationMs!
-          });
+          .fontColor(AppTheme.TERTIARY_TEXT);
+        if (this.evidenceLoading) {
+          LoadingProgress()
+            .width(16)
+            .height(16)
+            .color(AppTheme.PRIMARY);
         }
       }
       .width('100%')
-      .padding(AppTheme.CARD_PADDING_COMPACT)
-      .backgroundColor(AppTheme.SUCCESS_SOFT)
-      .borderRadius(AppTheme.CONTROL_RADIUS);
+      .alignItems(VerticalAlign.Center);
+
+      if (this.remoteEvidenceAudio() !== null) {
+        SubmissionAudioEvidencePlayer({
+          resource: this.remoteEvidenceAudio(),
+          fallbackDurationMs: this.remoteEvidenceAudio()!.durationMs
+        });
+      } else if (this.localEvidenceAudioUri().length > 0) {
+        SubmissionAudioEvidencePlayer({
+          localUri: this.localEvidenceAudioUri(),
+          fallbackDurationMs: this.localEvidenceAudioDurationMs()
+        });
+      }
+
+      if (this.remoteEvidencePhotos().length > 0) {
+        CloudSubmissionPhotoStrip({ photos: this.remoteEvidencePhotos() });
+      } else if (this.localEvidencePhotoUris().length > 0) {
+        this.PhotoStrip(this.localEvidencePhotoUris(), false);
+      }
+
+      if (!this.hasSubmittedEvidence() && !this.evidenceLoading) {
+        Column({ space: 4 }) {
+          Text('本机没有保存这次提交的照片或录音。')
+            .width('100%')
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
+            .fontColor(AppTheme.SUBTEXT);
+          Text('从云端重新读取')
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY)
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('从云端重新读取提交内容')
+            .onClick(() => { void this.syncSubmittedEvidence(true); });
+        }
+        .width('100%')
+        .alignItems(HorizontalAlign.Start);
+      }
     }
+    .width('100%')
+    .alignItems(HorizontalAlign.Start)
+    .padding(AppTheme.CARD_PADDING_COMPACT)
+    .backgroundColor(AppTheme.SUCCESS_SOFT)
+    .borderRadius(AppTheme.CONTROL_RADIUS);
   }
 
   @Builder
@@ -905,8 +1184,15 @@ export struct StudyWorkspacePage {
               this.isVoiceSubmission()) {
               this.VoiceAssignmentContent(false, true);
               this.VoiceSubmissionPane();
-            } else {
+            } else if (this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) {
               this.SubmissionPane();
+            } else {
+              // 交出去之后仍然要能回看：语音作业保留绘本图片和朗读音频，
+              // 其他作业走只读的提交记录（要求 / 用时 / 证据 / 家长反馈）。
+              if (this.assignment()!.contentType === AssignmentContentType.AUDIO_IMAGE) {
+                this.VoiceAssignmentContent(true, false);
+              }
+              this.SubmittedRecordPane();
             }
           } else {
             if (this.assignment()!.reviewNote.length > 0) {

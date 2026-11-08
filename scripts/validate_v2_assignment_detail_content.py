@@ -21,6 +21,9 @@ page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDe
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
+home = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
+home_vm = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
+evidence_service = read("entry/src/main/ets/application/submission/ParentSubmissionEvidenceService.ets")
 
 require("StudyWorkspacePage" in detail and
         "assignmentId: this.assignmentId" in detail and
@@ -37,6 +40,21 @@ for token in ["老师要求", "教材 / 页码", "Button('问小伴'", "TutorPan
     require(token not in study, f"unified workspace must not show removed student UI: {token}")
 require("this.assignment()!.instruction.length > 0" in study,
         "teacher instruction must remain visible on the unified page")
+# 已提交/已完成的作业必须能回看，而不是只剩一行「已提交」。
+require("private SubmittedRecordPane()" in study and "this.SubmittedRecordPane();" in study,
+        "submitted and completed assignments must keep a readable record instead of a status-only page")
+require("作业要求" in study and "我的提交" in study and "提交于 " in study and "家长反馈" in study,
+        "submitted record must keep requirement, submission time, evidence and parent review note")
+require("items[items.length - 1]" in study,
+        "student submission evidence must show the newest attempt after a rework resubmission")
+require("CloudSubmissionPhotoStrip" in study and "SubmissionAudioEvidencePlayer" in study,
+        "submitted record must render both local and cloud submission evidence")
+require("cachedPreferLocal(assignmentId: string)" in evidence_service and
+        "HomeworkSubmissionService.instance.listCached(assignmentId)" in evidence_service,
+        "student evidence must prefer the local copy and fall back to the cloud record")
+require("todaySubmittedAssignments" in home_vm and "private SubmittedTodaySection()" in home and
+        "this.SubmittedTodaySection();" in home,
+        "student home must keep today's submitted homework reachable for read-only review")
 require("this.assignment()!.resourceLabels.length > 0" in study and "老师附件" in study,
         "teacher attachments may remain when actual resources exist")
 require("AssignmentCountdownCard" in study and

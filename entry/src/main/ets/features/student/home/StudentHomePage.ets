@@ -1,6 +1,7 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
@@ -141,6 +142,7 @@ export struct StudentHomePage {
   @State private actionAssignmentId: string = '';
   @State private actionMessage: string = '';
   @State private pendingTaskItems: Assignment[] = [];
+  @State private submittedTodayItems: Assignment[] = [];
   @State private subjectGroups: StudentHomeSubjectGroup[] = [];
   @State private taskRenderEpoch: number = 0;
   @State private attentionMessage: string = '';
@@ -166,6 +168,7 @@ export struct StudentHomePage {
     this.actionAssignmentId = '';
     this.actionMessage = '';
     this.pendingTaskItems = [];
+    this.submittedTodayItems = [];
     this.subjectGroups = [];
     this.attentionMessage = '';
     this.attentionCategory = AssignmentAttentionKind.NONE;
@@ -202,6 +205,7 @@ export struct StudentHomePage {
   private refreshTodaySnapshot(): void {
     if (this.studentId.length === 0) {
       this.pendingTaskItems = [];
+      this.submittedTodayItems = [];
       this.subjectGroups = [];
       this.attentionMessage = '';
       this.attentionCategory = AssignmentAttentionKind.NONE;
@@ -210,6 +214,7 @@ export struct StudentHomePage {
     let items = this.viewModel.todayPendingAssignments(this.studentId);
     let attention = this.viewModel.attention(this.studentId);
     this.pendingTaskItems = items;
+    this.submittedTodayItems = this.viewModel.todaySubmittedAssignments(this.studentId);
     this.subjectGroups = this.buildSubjectGroups(items);
     this.taskRenderEpoch++;
     this.attentionMessage = attention.text;
@@ -366,6 +371,39 @@ export struct StudentHomePage {
   }
 
   @Builder
+  private SubmittedTodaySection() {
+    if (this.submittedTodayItems.length > 0) {
+      Column({ space: 9 }) {
+        Row() {
+          Text('今天已提交')
+            .fontSize(AppTheme.SECTION_TITLE_SIZE)
+            .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.TEXT);
+          Blank();
+          Text(`${this.submittedTodayItems.length} 项`)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%');
+
+        Column({ space: 8 }) {
+          ForEach(this.submittedTodayItems, (item: Assignment) => {
+            AssignmentListItem({
+              assignment: item,
+              showChevron: true,
+              onOpen: () => this.onOpenStudy(item.id)
+            });
+          }, (item: Assignment) => this.assignmentRenderKey(item));
+        }
+        .width('100%');
+      }
+      .width('100%');
+    }
+  }
+
+  @Builder
   private PendingTasks() {
     Column({ space: AppTheme.SECTION_GAP_STANDARD }) {
       Row() {
@@ -409,6 +447,7 @@ export struct StudentHomePage {
       this.OfflineBanner();
       this.AttentionBanner();
       this.PendingTasks();
+      this.SubmittedTodaySection();
     }
     .width('100%')
     .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })

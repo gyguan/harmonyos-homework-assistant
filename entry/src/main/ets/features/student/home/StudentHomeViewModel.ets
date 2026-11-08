@@ -64,6 +64,22 @@ export class StudentHomeViewModel {
     return result;
   }
 
+  /**
+   * 今天已经交出去的作业（已提交 / 已完成）。
+   *
+   * 首页过去只列未完成任务，作业一提交就从首页消失，孩子再想回看自己交了什么
+   * 只能去「作业」页翻折叠起来的历史。这里补一条只读回看入口。
+   */
+  todaySubmittedAssignments(studentId: string = ''): Assignment[] {
+    let result: Assignment[] = [];
+    for (let item of this.assignments(studentId)) {
+      if (!StudentHomeViewModel.isToday(item)) continue;
+      if (StudentHomeViewModel.isUnfinished(item.status)) continue;
+      result.push(item);
+    }
+    return result;
+  }
+
   async refresh(): Promise<boolean> {
     return this.repository.refresh();
   }
